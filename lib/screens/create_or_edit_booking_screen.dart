@@ -10,6 +10,8 @@ class CreateOrEditBookingScreen extends StatefulWidget {
 class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
   @override
   Widget build(BuildContext context) {
+    // TODO hier weitermachen und erste Testbuchungen erstellen können, um diese in den
+    // unterschiedlichen Tab Views (Kalender, Täglich & Monatlich) anzeigen lassen zu können.
     return const Text('Test');
   }
 }

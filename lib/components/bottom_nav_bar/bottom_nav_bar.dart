@@ -36,12 +36,11 @@ class _BottomNavBarState extends State<BottomNavBar> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Haushaltsbuch'),
-      ),
-      body: IndexedStack(
-        index: _selectedIndex,
-        children: _screens,
+      body: SafeArea(
+        child: IndexedStack(
+          index: _selectedIndex,
+          children: _screens,
+        ),
       ),
       floatingActionButton: _selectedIndex == 0
           ? FloatingActionButton(
