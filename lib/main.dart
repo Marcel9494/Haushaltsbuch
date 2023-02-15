@@ -2,7 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
+import '/utils/consts/route_consts.dart';
+
 import '/components/bottom_nav_bar/bottom_nav_bar.dart';
+
+import '/screens/create_or_edit_booking_screen.dart';
 
 void main() {
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
@@ -27,18 +31,8 @@ class BudgetBookApp extends StatelessWidget {
         brightness: Brightness.dark,
       ),
       home: const BottomNavBar(),
-      onGenerateRoute: (RouteSettings settings) {
-        switch (settings.name) {
-          case '/addOrEditBooking':
-          // TODO hier weitermachen und Screen Arguments für Route anlegen
-          /*final args = settings.arguments as BottomNavBarScreenArguments;
-            return MaterialPageRoute<String>(
-              builder: (BuildContext context) => BottomNavBar(
-                selectedBottomNavBarIndex: args.selectedBottomNavBarIndex,
-              ),
-              settings: settings,
-            );*/
-        }
+      routes: {
+        createOrEditBookingRoute: (context) => const CreateOrEditBookingScreen(),
       },
     );
   }
