@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
-class AccountInputField extends StatelessWidget {
+class CategorieInputField extends StatelessWidget {
   final TextEditingController textController;
-  // TODO dynamische Konto Liste laden von Benutzer
-  List<String> accounts = ['KSK Konto', 'P2P Bondora', 'Comdirect Depot', 'Scalable Capital Depot'];
+  // TODO dynamische Kategorien Liste laden von Benutzer
+  List<String> categories = ['Lebensmittel', 'Haushaltswaren', 'Restaurant', 'Mode/Kleidung', 'Transport'];
 
-  AccountInputField({
+  CategorieInputField({
     Key? key,
     required this.textController,
   }) : super(key: key);
 
-  void _openBottomSheetWithAccountList(BuildContext context) {
+  void _openBottomSheetWithCategorieList(BuildContext context) {
     showCupertinoModalBottomSheet<void>(
       context: context,
       builder: (BuildContext context) {
@@ -23,7 +23,7 @@ class AccountInputField extends StatelessWidget {
               children: [
                 const Padding(
                   padding: EdgeInsets.only(top: 16.0, left: 20.0),
-                  child: Text('Konto auswählen:', style: TextStyle(fontSize: 18.0)),
+                  child: Text('Kategorie auswählen:', style: TextStyle(fontSize: 18.0)),
                 ),
                 Center(
                   child: GridView.count(
@@ -32,14 +32,14 @@ class AccountInputField extends StatelessWidget {
                     crossAxisCount: 3,
                     shrinkWrap: true,
                     children: <Widget>[
-                      for (int i = 0; i < accounts.length; i++)
+                      for (int i = 0; i < categories.length; i++)
                         OutlinedButton(
                           onPressed: () => {
-                            textController.text = accounts[i],
+                            textController.text = categories[i],
                             Navigator.pop(context),
                           },
                           child: Text(
-                            accounts[i],
+                            categories[i],
                             textAlign: TextAlign.center,
                             style: const TextStyle(
                               color: Colors.white70,
@@ -65,11 +65,11 @@ class AccountInputField extends StatelessWidget {
       textAlignVertical: TextAlignVertical.center,
       showCursor: false,
       readOnly: true,
-      onTap: () => _openBottomSheetWithAccountList(context),
+      onTap: () => _openBottomSheetWithCategorieList(context),
       decoration: const InputDecoration(
-        hintText: 'Konto',
+        hintText: 'Kategorie',
         prefixIcon: Icon(
-          Icons.account_balance_rounded,
+          Icons.donut_small_rounded,
           color: Colors.grey,
         ),
         focusedBorder: UnderlineInputBorder(

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:haushaltsbuch/components/input_fields/date_input_field.dart';
 
 import '/components/buttons/transaction_toggle_buttons.dart';
 import '/components/input_fields/title_input_field.dart';
 import '/components/input_fields/amount_input_field.dart';
+import '/components/input_fields/categorie_input_field.dart';
 import '/components/input_fields/account_input_field.dart';
 
 class CreateOrEditBookingScreen extends StatefulWidget {
@@ -13,9 +15,10 @@ class CreateOrEditBookingScreen extends StatefulWidget {
 }
 
 class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
-  //final TextEditingController _titleTextController = TextEditingController();
   final TextEditingController _amountTextController = TextEditingController();
+  final TextEditingController _bookingDateTextController = TextEditingController();
   final TextEditingController _accountTextController = TextEditingController();
+  final TextEditingController _categorieTextController = TextEditingController();
   String _title = '';
 
   void _setTitleState(String title) {
@@ -47,7 +50,9 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
                 title: _title,
                 titleCallback: _setTitleState,
               ),
+              DateInputField(textController: _bookingDateTextController),
               AmountInputField(textController: _amountTextController),
+              CategorieInputField(textController: _categorieTextController),
               AccountInputField(textController: _accountTextController),
             ],
           ),

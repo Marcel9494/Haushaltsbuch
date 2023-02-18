@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:intl/date_symbol_data_local.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 import '/utils/consts/route_consts.dart';
 
@@ -12,7 +12,7 @@ void main() {
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
     systemNavigationBarColor: Color(0xFF171717),
   ));
-  initializeDateFormatting().then((_) => runApp(const BudgetBookApp()));
+  runApp(const BudgetBookApp());
 }
 
 class BudgetBookApp extends StatelessWidget {
@@ -30,6 +30,13 @@ class BudgetBookApp extends StatelessWidget {
       theme: ThemeData(
         brightness: Brightness.dark,
       ),
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        Locale('de', 'DE'),
+      ],
       home: const BottomNavBar(),
       routes: {
         createOrEditBookingRoute: (context) => const CreateOrEditBookingScreen(),

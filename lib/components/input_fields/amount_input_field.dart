@@ -15,10 +15,14 @@ class AmountInputField extends StatelessWidget {
       builder: (BuildContext context) {
         return Material(
           child: SizedBox(
-            height: 380,
+            height: 400,
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('Betrag eingeben:'),
+                const Padding(
+                  padding: EdgeInsets.only(top: 16.0, left: 20.0),
+                  child: Text('Betrag eingeben:', style: TextStyle(fontSize: 18.0)),
+                ),
                 Center(
                   child: GridView.count(
                     primary: false,
@@ -27,22 +31,16 @@ class AmountInputField extends StatelessWidget {
                     shrinkWrap: true,
                     children: <Widget>[
                       OutlinedButton(
-                        onPressed: () {
-                          textController.text += '1';
-                        },
-                        child: const Text('1', style: TextStyle(color: Colors.cyanAccent)),
+                        onPressed: () => _setAmount('1'),
+                        child: const Text('1', style: TextStyle(color: Colors.cyanAccent, fontSize: 26.0)),
                       ),
                       OutlinedButton(
-                        onPressed: () {
-                          textController.text += '2';
-                        },
-                        child: const Text('2', style: TextStyle(color: Colors.cyanAccent)),
+                        onPressed: () => _setAmount('2'),
+                        child: const Text('2', style: TextStyle(color: Colors.cyanAccent, fontSize: 26.0)),
                       ),
                       OutlinedButton(
-                        onPressed: () {
-                          textController.text += '3';
-                        },
-                        child: const Text('3', style: TextStyle(color: Colors.cyanAccent)),
+                        onPressed: () => _setAmount('3'),
+                        child: const Text('3', style: TextStyle(color: Colors.cyanAccent, fontSize: 26.0)),
                       ),
                       OutlinedButton(
                         onPressed: () {
@@ -51,22 +49,16 @@ class AmountInputField extends StatelessWidget {
                         child: const Icon(Icons.clear_rounded, color: Colors.cyanAccent),
                       ),
                       OutlinedButton(
-                        onPressed: () {
-                          textController.text += '4';
-                        },
-                        child: const Text('4', style: TextStyle(color: Colors.cyanAccent)),
+                        onPressed: () => _setAmount('4'),
+                        child: const Text('4', style: TextStyle(color: Colors.cyanAccent, fontSize: 26.0)),
                       ),
                       OutlinedButton(
-                        onPressed: () {
-                          textController.text += '5';
-                        },
-                        child: const Text('5', style: TextStyle(color: Colors.cyanAccent)),
+                        onPressed: () => _setAmount('5'),
+                        child: const Text('5', style: TextStyle(color: Colors.cyanAccent, fontSize: 26.0)),
                       ),
                       OutlinedButton(
-                        onPressed: () {
-                          textController.text += '6';
-                        },
-                        child: const Text('6', style: TextStyle(color: Colors.cyanAccent)),
+                        onPressed: () => _setAmount('6'),
+                        child: const Text('6', style: TextStyle(color: Colors.cyanAccent, fontSize: 26.0)),
                       ),
                       OutlinedButton(
                         onPressed: () {
@@ -77,44 +69,34 @@ class AmountInputField extends StatelessWidget {
                         child: const Icon(Icons.backspace_rounded, color: Colors.cyanAccent),
                       ),
                       OutlinedButton(
-                        onPressed: () {
-                          textController.text += '7';
-                        },
-                        child: const Text('7', style: TextStyle(color: Colors.cyanAccent)),
+                        onPressed: () => _setAmount('7'),
+                        child: const Text('7', style: TextStyle(color: Colors.cyanAccent, fontSize: 26.0)),
                       ),
                       OutlinedButton(
-                        onPressed: () {
-                          textController.text += '8';
-                        },
-                        child: const Text('8', style: TextStyle(color: Colors.cyanAccent)),
+                        onPressed: () => _setAmount('8'),
+                        child: const Text('8', style: TextStyle(color: Colors.cyanAccent, fontSize: 26.0)),
                       ),
                       OutlinedButton(
-                        onPressed: () {
-                          textController.text += '9';
-                        },
-                        child: const Text('9', style: TextStyle(color: Colors.cyanAccent)),
+                        onPressed: () => _setAmount('9'),
+                        child: const Text('9', style: TextStyle(color: Colors.cyanAccent, fontSize: 26.0)),
                       ),
                       OutlinedButton(
                         onPressed: () {
                           Navigator.pop(context);
                         },
-                        child: const Icon(Icons.check_circle, color: Colors.cyanAccent),
+                        child: const Icon(Icons.check_circle, color: Colors.greenAccent),
+                      ),
+                      const Visibility(
+                        visible: false,
+                        child: Text(''),
                       ),
                       OutlinedButton(
-                        onPressed: () {},
-                        child: const Text(''),
+                        onPressed: () => _setAmount('0'),
+                        child: const Text('0', style: TextStyle(color: Colors.cyanAccent, fontSize: 26.0)),
                       ),
                       OutlinedButton(
-                        onPressed: () {
-                          textController.text += '0';
-                        },
-                        child: const Text('0', style: TextStyle(color: Colors.cyanAccent)),
-                      ),
-                      OutlinedButton(
-                        onPressed: () {
-                          textController.text += ',';
-                        },
-                        child: const Text(',', style: TextStyle(color: Colors.cyanAccent)),
+                        onPressed: () => _setAmount(','),
+                        child: const Text(',', style: TextStyle(color: Colors.cyanAccent, fontSize: 36.0)),
                       ),
                     ],
                   ),
@@ -127,13 +109,24 @@ class AmountInputField extends StatelessWidget {
     );
   }
 
+  void _setAmount(String amount) {
+    if (amount == ',' && textController.text.contains(',')) {
+      textController.text;
+    } else {
+      final regex = RegExp(r'^\d+(,\d{0,2})?$');
+      if (regex.hasMatch(textController.text + amount)) {
+        textController.text += amount;
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return TextFormField(
       maxLength: 9,
       controller: textController,
       textAlignVertical: TextAlignVertical.center,
-      showCursor: true,
+      showCursor: false,
       readOnly: true,
       onTap: () => _openBottomSheetForNumberInput(context),
       decoration: const InputDecoration(
