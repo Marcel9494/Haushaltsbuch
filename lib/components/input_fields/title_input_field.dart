@@ -1,22 +1,30 @@
 import 'package:flutter/material.dart';
 
 class TitleInputField extends StatelessWidget {
-  final TextEditingController textController;
+  final String title;
+  final Function titleCallback;
 
   const TitleInputField({
     Key? key,
-    required this.textController,
+    required this.title,
+    required this.titleCallback,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
-      controller: textController,
+      maxLength: 30,
+      onChanged: (title) => titleCallback(title),
+      textAlignVertical: TextAlignVertical.center,
       decoration: const InputDecoration(
         hintText: 'Titel',
+        counterText: '',
         prefixIcon: Icon(
           Icons.title_rounded,
           color: Colors.grey,
+        ),
+        focusedBorder: UnderlineInputBorder(
+          borderSide: BorderSide(color: Colors.cyanAccent, width: 1.5),
         ),
       ),
     );

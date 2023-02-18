@@ -13,9 +13,16 @@ class CreateOrEditBookingScreen extends StatefulWidget {
 }
 
 class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
-  final TextEditingController _titleTextController = TextEditingController();
+  //final TextEditingController _titleTextController = TextEditingController();
   final TextEditingController _amountTextController = TextEditingController();
   final TextEditingController _accountTextController = TextEditingController();
+  String _title = '';
+
+  void _setTitleState(String title) {
+    setState(() {
+      _title = title;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +43,10 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
           child: Column(
             children: [
               const TransactionToggleButtons(),
-              TitleInputField(textController: _titleTextController),
+              TitleInputField(
+                title: _title,
+                titleCallback: _setTitleState,
+              ),
               AmountInputField(textController: _amountTextController),
               AccountInputField(textController: _accountTextController),
             ],
