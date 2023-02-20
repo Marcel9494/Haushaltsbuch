@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
+import '/components/deco/bottom_sheet_line.dart';
+
 class AccountInputField extends StatelessWidget {
   final TextEditingController textController;
+  final String hintText;
   // TODO dynamische Konto Liste laden von Benutzer
   List<String> accounts = ['KSK Konto', 'P2P Bondora', 'Comdirect Depot', 'Scalable Capital Depot'];
 
   AccountInputField({
     Key? key,
     required this.textController,
+    this.hintText = 'Konto',
   }) : super(key: key);
 
   void _openBottomSheetWithAccountList(BuildContext context) {
@@ -18,9 +22,9 @@ class AccountInputField extends StatelessWidget {
         return Material(
           child: SizedBox(
             height: 400,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            child: ListView(
               children: [
+                const BottomSheetLine(),
                 const Padding(
                   padding: EdgeInsets.only(top: 16.0, left: 20.0),
                   child: Text('Konto auswählen:', style: TextStyle(fontSize: 18.0)),
@@ -43,7 +47,6 @@ class AccountInputField extends StatelessWidget {
                             textAlign: TextAlign.center,
                             style: const TextStyle(
                               color: Colors.white70,
-                              fontSize: 16.0,
                             ),
                           ),
                         ),
@@ -66,13 +69,13 @@ class AccountInputField extends StatelessWidget {
       showCursor: false,
       readOnly: true,
       onTap: () => _openBottomSheetWithAccountList(context),
-      decoration: const InputDecoration(
-        hintText: 'Konto',
-        prefixIcon: Icon(
+      decoration: InputDecoration(
+        hintText: hintText,
+        prefixIcon: const Icon(
           Icons.account_balance_rounded,
           color: Colors.grey,
         ),
-        focusedBorder: UnderlineInputBorder(
+        focusedBorder: const UnderlineInputBorder(
           borderSide: BorderSide(color: Colors.cyanAccent, width: 1.5),
         ),
       ),

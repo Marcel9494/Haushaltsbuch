@@ -1,9 +1,18 @@
 import 'package:flutter/material.dart';
 
-enum TransactionType { income, outcome, transfer }
+import '/screens/create_or_edit_booking_screen.dart';
+
+import '/models/enums/transaction_types.dart';
+
+typedef TransactionStringCallback = void Function(String currentTransaction);
 
 class TransactionToggleButtons extends StatefulWidget {
-  const TransactionToggleButtons({Key? key}) : super(key: key);
+  final TransactionStringCallback transactionStringCallback;
+
+  const TransactionToggleButtons({
+    Key? key,
+    required this.transactionStringCallback,
+  }) : super(key: key);
 
   @override
   State<TransactionToggleButtons> createState() => _TransactionToggleButtonsState();
@@ -16,6 +25,15 @@ class _TransactionToggleButtonsState extends State<TransactionToggleButtons> {
     setState(() {
       for (int i = 0; i < _selectedTransaction.length; i++) {
         _selectedTransaction[i] = i == selectedIndex;
+      }
+      if (_selectedTransaction[0]) {
+        CreateOrEditBookingScreen.of(context)!.currentTransaction = TransactionType.income.name;
+      } else if (_selectedTransaction[1]) {
+        CreateOrEditBookingScreen.of(context)!.currentTransaction = TransactionType.outcome.name;
+      } else if (_selectedTransaction[2]) {
+        CreateOrEditBookingScreen.of(context)!.currentTransaction = TransactionType.transfer.name;
+      } else {
+        CreateOrEditBookingScreen.of(context)!.currentTransaction = '';
       }
     });
   }
@@ -61,10 +79,10 @@ class _TransactionToggleButtonsState extends State<TransactionToggleButtons> {
         minWidth: 107.5,
       ),
       isSelected: _selectedTransaction,
-      children: const [
-        Text('Einnahme'),
-        Text('Ausgabe'),
-        Text('Übertrag'),
+      children: [
+        Text(TransactionType.income.name),
+        Text(TransactionType.outcome.name),
+        Text(TransactionType.transfer.name),
       ],
     );
   }

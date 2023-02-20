@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:haushaltsbuch/components/deco/bottom_sheet_line.dart';
+import 'package:intl/intl.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 class AmountInputField extends StatelessWidget {
@@ -15,10 +17,11 @@ class AmountInputField extends StatelessWidget {
       builder: (BuildContext context) {
         return Material(
           child: SizedBox(
-            height: 400,
+            height: 430,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                const BottomSheetLine(),
                 const Padding(
                   padding: EdgeInsets.only(top: 16.0, left: 20.0),
                   child: Text('Betrag eingeben:', style: TextStyle(fontSize: 18.0)),
@@ -106,7 +109,10 @@ class AmountInputField extends StatelessWidget {
           ),
         );
       },
-    );
+    ).whenComplete(() {
+      var amountFormatter = NumberFormat.simpleCurrency(locale: 'de-DE');
+      textController.text = amountFormatter.format(double.parse(textController.text.replaceAll(',', '.')));
+    });
   }
 
   void _setAmount(String amount) {
@@ -135,11 +141,6 @@ class AmountInputField extends StatelessWidget {
         prefixIcon: Icon(
           Icons.money_rounded,
           color: Colors.grey,
-        ),
-        suffixIcon: Icon(
-          Icons.euro_rounded,
-          color: Colors.grey,
-          size: 20.0,
         ),
         focusedBorder: UnderlineInputBorder(
           borderSide: BorderSide(color: Colors.cyanAccent, width: 1.5),

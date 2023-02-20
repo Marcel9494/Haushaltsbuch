@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
+import '/components/deco/bottom_sheet_line.dart';
+
 class CategorieInputField extends StatelessWidget {
   final TextEditingController textController;
   // TODO dynamische Kategorien Liste laden von Benutzer
-  List<String> categories = ['Lebensmittel', 'Haushaltswaren', 'Restaurant', 'Mode/Kleidung', 'Transport'];
+  List<String> categories = ['Lebensmittel', 'Haushaltswaren', 'Restaurant', 'Mode/Kleidung', 'Transport', 'Möbel', 'Reisen', 'Wohnen', 'Garten', 'Sonstiges'];
 
   CategorieInputField({
     Key? key,
@@ -18,9 +20,9 @@ class CategorieInputField extends StatelessWidget {
         return Material(
           child: SizedBox(
             height: 400,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            child: ListView(
               children: [
+                const BottomSheetLine(),
                 const Padding(
                   padding: EdgeInsets.only(top: 16.0, left: 20.0),
                   child: Text('Kategorie auswählen:', style: TextStyle(fontSize: 18.0)),
@@ -43,7 +45,6 @@ class CategorieInputField extends StatelessWidget {
                             textAlign: TextAlign.center,
                             style: const TextStyle(
                               color: Colors.white70,
-                              fontSize: 16.0,
                             ),
                           ),
                         ),
