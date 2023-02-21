@@ -12,11 +12,11 @@ class Booking extends HiveObject {
   @HiveField(1)
   late TransactionType transactionType;
   @HiveField(2)
-  late DateTime date;
+  late String date; // TODO type in DateTime ändern!?
   @HiveField(3)
-  late BookingRepeats bookingRepeats;
+  late String bookingRepeats; // TODO type in BookingRepeats ändern!?
   @HiveField(4)
-  late double amount;
+  late String amount;
   @HiveField(5)
   late String categorie;
   @HiveField(6)
@@ -25,8 +25,14 @@ class Booking extends HiveObject {
   late String toAccount;
 
   void createBooking(Booking newBooking) async {
-    var bookingBox = await Hive.openBox(BookingsBox);
+    var bookingBox = await Hive.openBox(bookingsBox);
     bookingBox.add(newBooking);
+  }
+
+  static Future<Booking> loadBooking() async {
+    var bookingBox = await Hive.openBox(bookingsBox);
+    Booking booking = bookingBox.getAt(0);
+    return booking;
   }
 }
 

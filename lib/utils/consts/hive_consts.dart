@@ -1,1 +1,1 @@
-const BookingsBox = 'bookings';
+const bookingsBox = 'bookings';

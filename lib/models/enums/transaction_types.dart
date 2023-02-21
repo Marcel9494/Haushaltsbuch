@@ -1,3 +1,6 @@
+import 'package:hive/hive.dart';
+
+@HiveType(typeId: 1)
 enum TransactionType { income, outcome, transfer }
 
 extension TransactionTypeExtension on TransactionType {
@@ -10,7 +13,37 @@ extension TransactionTypeExtension on TransactionType {
       case TransactionType.transfer:
         return 'Übertrag';
       default:
-        return '';
+        throw Exception('$name is not a valid Transaction.');
     }
+  }
+
+  TransactionType getTransactionType(String transaction) {
+    try {
+      if (transaction == TransactionType.income.name) {
+        return TransactionType.income;
+      } else if (transaction == TransactionType.outcome.name) {
+        return TransactionType.outcome;
+      } else if (transaction == TransactionType.transfer.name) {
+        return TransactionType.transfer;
+      }
+    } catch (e) {
+      throw Exception('$transaction is not a valid Transaction.');
+    }
+    return TransactionType.income;
+  }
+}
+
+class TransactionTypeAdapter extends TypeAdapter<TransactionType> {
+  @override
+  final typeId = 1;
+
+  @override
+  TransactionType read(BinaryReader reader) {
+    return TransactionType.income;
+  }
+
+  @override
+  void write(BinaryWriter writer, TransactionType obj) {
+    writer.write(obj.name);
   }
 }

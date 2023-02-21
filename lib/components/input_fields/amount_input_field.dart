@@ -5,10 +5,12 @@ import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 class AmountInputField extends StatelessWidget {
   final TextEditingController textController;
+  final String errorText;
 
   const AmountInputField({
     Key? key,
     required this.textController,
+    required this.errorText,
   }) : super(key: key);
 
   void _openBottomSheetForNumberInput(BuildContext context) {
@@ -110,8 +112,10 @@ class AmountInputField extends StatelessWidget {
         );
       },
     ).whenComplete(() {
-      var amountFormatter = NumberFormat.simpleCurrency(locale: 'de-DE');
-      textController.text = amountFormatter.format(double.parse(textController.text.replaceAll(',', '.')));
+      if (textController.text.isNotEmpty) {
+        var amountFormatter = NumberFormat.simpleCurrency(locale: 'de-DE');
+        textController.text = amountFormatter.format(double.parse(textController.text.replaceAll(',', '.')));
+      }
     });
   }
 
@@ -135,16 +139,17 @@ class AmountInputField extends StatelessWidget {
       showCursor: false,
       readOnly: true,
       onTap: () => _openBottomSheetForNumberInput(context),
-      decoration: const InputDecoration(
+      decoration: InputDecoration(
         hintText: 'Betrag',
         counterText: '',
-        prefixIcon: Icon(
+        prefixIcon: const Icon(
           Icons.money_rounded,
           color: Colors.grey,
         ),
-        focusedBorder: UnderlineInputBorder(
+        focusedBorder: const UnderlineInputBorder(
           borderSide: BorderSide(color: Colors.cyanAccent, width: 1.5),
         ),
+        errorText: errorText.isEmpty ? null : errorText,
       ),
     );
   }

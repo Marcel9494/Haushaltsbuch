@@ -5,12 +5,14 @@ import '/components/deco/bottom_sheet_line.dart';
 
 class CategorieInputField extends StatelessWidget {
   final TextEditingController textController;
+  final String errorText;
   // TODO dynamische Kategorien Liste laden von Benutzer
   List<String> categories = ['Lebensmittel', 'Haushaltswaren', 'Restaurant', 'Mode/Kleidung', 'Transport', 'Möbel', 'Reisen', 'Wohnen', 'Garten', 'Sonstiges'];
 
   CategorieInputField({
     Key? key,
     required this.textController,
+    required this.errorText,
   }) : super(key: key);
 
   void _openBottomSheetWithCategorieList(BuildContext context) {
@@ -67,15 +69,16 @@ class CategorieInputField extends StatelessWidget {
       showCursor: false,
       readOnly: true,
       onTap: () => _openBottomSheetWithCategorieList(context),
-      decoration: const InputDecoration(
+      decoration: InputDecoration(
         hintText: 'Kategorie',
-        prefixIcon: Icon(
+        prefixIcon: const Icon(
           Icons.donut_small_rounded,
           color: Colors.grey,
         ),
-        focusedBorder: UnderlineInputBorder(
+        focusedBorder: const UnderlineInputBorder(
           borderSide: BorderSide(color: Colors.cyanAccent, width: 1.5),
         ),
+        errorText: errorText.isEmpty ? null : errorText,
       ),
     );
   }

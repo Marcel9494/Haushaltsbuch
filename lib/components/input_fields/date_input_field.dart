@@ -4,10 +4,12 @@ import '/utils/date_formatters/date_formatter.dart';
 
 class DateInputField extends StatelessWidget {
   final TextEditingController textController;
+  late DateTime? parsedDate;
 
-  const DateInputField({
+  DateInputField({
     Key? key,
     required this.textController,
+    required this.parsedDate,
   }) : super(key: key);
 
   @override
@@ -36,7 +38,7 @@ class DateInputField extends StatelessWidget {
         ),
       ),
       onTap: () async {
-        DateTime? parsedDate = await showDatePicker(
+        parsedDate = await showDatePicker(
           context: context,
           locale: const Locale('de', 'DE'),
           initialDate: DateTime.now(),
@@ -58,7 +60,7 @@ class DateInputField extends StatelessWidget {
           },
         );
         if (parsedDate != null) {
-          textController.text = dateFormatterDDMMYYYYEE.format(parsedDate);
+          textController.text = dateFormatterDDMMYYYYEE.format(parsedDate!);
         }
       },
     );

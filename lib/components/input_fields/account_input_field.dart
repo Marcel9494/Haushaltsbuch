@@ -5,6 +5,7 @@ import '/components/deco/bottom_sheet_line.dart';
 
 class AccountInputField extends StatelessWidget {
   final TextEditingController textController;
+  final String errorText;
   final String hintText;
   // TODO dynamische Konto Liste laden von Benutzer
   List<String> accounts = ['KSK Konto', 'P2P Bondora', 'Comdirect Depot', 'Scalable Capital Depot'];
@@ -12,6 +13,7 @@ class AccountInputField extends StatelessWidget {
   AccountInputField({
     Key? key,
     required this.textController,
+    required this.errorText,
     this.hintText = 'Konto',
   }) : super(key: key);
 
@@ -78,6 +80,7 @@ class AccountInputField extends StatelessWidget {
         focusedBorder: const UnderlineInputBorder(
           borderSide: BorderSide(color: Colors.cyanAccent, width: 1.5),
         ),
+        errorText: errorText.isEmpty ? null : errorText,
       ),
     );
   }
