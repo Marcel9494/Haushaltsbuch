@@ -14,7 +14,7 @@ class SaveButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+      padding: const EdgeInsets.fromLTRB(16.0, 32.0, 16.0, 32.0),
       child: SizedBox(
         width: double.infinity,
         child: RoundedLoadingButton(
@@ -22,7 +22,7 @@ class SaveButton extends StatelessWidget {
           onPressed: () => saveFunction(),
           color: Colors.cyanAccent,
           successColor: Colors.green,
-          height: 40.0,
+          height: 38.0,
           child: const Text(
             'Speichern',
             style: TextStyle(
@@ -30,17 +30,7 @@ class SaveButton extends StatelessWidget {
               color: Colors.black87,
             ),
           ),
-        ), /*ElevatedButton(
-          onPressed: () => saveFunction(),
-          child: const Text('Speichern'),
-          style: ElevatedButton.styleFrom(
-            primary: Colors.cyanAccent.shade700,
-            onPrimary: Colors.black87,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16.0),
-            ),
-          ),
-        ),*/
+        ),
       ),
     );
   }

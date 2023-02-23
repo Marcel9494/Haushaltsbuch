@@ -18,6 +18,23 @@ extension BookingRepeatsExtension on BookingRepeats {
         return '';
     }
   }
+
+  BookingRepeats getBookingRepeats(String bookingRepeats) {
+    try {
+      if (bookingRepeats == BookingRepeats.noRepeat.name) {
+        return BookingRepeats.noRepeat;
+      } else if (bookingRepeats == BookingRepeats.everyDay.name) {
+        return BookingRepeats.everyDay;
+      } else if (bookingRepeats == BookingRepeats.everyWeek.name) {
+        return BookingRepeats.everyWeek;
+      } else if (bookingRepeats == BookingRepeats.everyMonth.name) {
+        return BookingRepeats.everyMonth;
+      }
+    } catch (e) {
+      throw Exception('$bookingRepeats is not a valid BookingRepeat.');
+    }
+    return BookingRepeats.noRepeat;
+  }
 }
 
 class BookingRepeatsAdapter extends TypeAdapter<BookingRepeats> {
@@ -26,7 +43,7 @@ class BookingRepeatsAdapter extends TypeAdapter<BookingRepeats> {
 
   @override
   BookingRepeats read(BinaryReader reader) {
-    return BookingRepeats.everyDay;
+    return BookingRepeats.noRepeat;
   }
 
   @override

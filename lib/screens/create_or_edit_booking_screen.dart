@@ -49,14 +49,6 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
     _bookingDateTextController.text = dateFormatterDDMMYYYYEE.format(DateTime.now());
   }
 
-  set currentTransaction(String transaction) => setState(() => _currentTransaction = transaction);
-
-  void _setTitleState(String title) {
-    setState(() {
-      _title = title;
-    });
-  }
-
   void _createBooking() {
     if (_validBookingAmount(_amountTextController.text) == false ||
         _validCategorie(_categorieTextController.text) == false ||
@@ -66,10 +58,11 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
     } else {
       Booking booking = Booking();
       TransactionType transactionType = TransactionType.income;
+      BookingRepeats bookingRepeats = BookingRepeats.noRepeat;
       booking.transactionType = transactionType.getTransactionType(_currentTransaction);
+      booking.bookingRepeats = bookingRepeats.getBookingRepeats(BookingRepeats.noRepeat.name); // TODO dynamisch machen, wenn Wiederholungen implementiert wurden
       booking.title = _title;
       booking.date = _parsedBookingDate.toString();
-      booking.bookingRepeats = BookingRepeats.noRepeat.name; // TODO dynamisch machen, wenn Wiederholungen implementiert wurden
       booking.amount = _amountTextController.text;
       booking.categorie = _categorieTextController.text;
       booking.fromAccount = _fromAccountTextController.text;
@@ -140,6 +133,14 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
     }
   }
 
+  set currentTransaction(String transaction) => setState(() => _currentTransaction = transaction);
+
+  void _setTitleState(String title) {
+    setState(() {
+      _title = title;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -150,13 +151,14 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
           backgroundColor: const Color(0x00ffffff),
         ),
         body: Padding(
-          padding: const EdgeInsets.all(12.0),
+          padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 24.0),
           child: Card(
             color: const Color(0x1fffffff),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(18.0),
             ),
             child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
                 TransactionToggleButtons(transactionStringCallback: (transaction) => setState(() => _currentTransaction = transaction)),
                 TitleInputField(

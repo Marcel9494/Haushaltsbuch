@@ -13,7 +13,7 @@ class TitleInputField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
-      maxLength: 30,
+      maxLength: 35,
       onChanged: (title) => titleCallback(title),
       textAlignVertical: TextAlignVertical.center,
       decoration: const InputDecoration(

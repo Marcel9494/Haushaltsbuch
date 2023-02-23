@@ -12,9 +12,9 @@ class Booking extends HiveObject {
   @HiveField(1)
   late TransactionType transactionType;
   @HiveField(2)
-  late String date; // TODO type in DateTime ändern!?
+  late String date;
   @HiveField(3)
-  late String bookingRepeats; // TODO type in BookingRepeats ändern!?
+  late BookingRepeats bookingRepeats;
   @HiveField(4)
   late String amount;
   @HiveField(5)
