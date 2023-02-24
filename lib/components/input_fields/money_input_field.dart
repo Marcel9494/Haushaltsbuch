@@ -1,16 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:haushaltsbuch/components/deco/bottom_sheet_line.dart';
-import 'package:intl/intl.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
-class AmountInputField extends StatelessWidget {
+import '/components/deco/bottom_sheet_line.dart';
+
+import '/utils/number_formatters/number_formatter.dart';
+
+class MoneyInputField extends StatelessWidget {
   final TextEditingController textController;
   final String errorText;
+  final String hintText;
+  final String bottomSheetTitle;
 
-  const AmountInputField({
+  const MoneyInputField({
     Key? key,
     required this.textController,
     required this.errorText,
+    required this.hintText,
+    required this.bottomSheetTitle,
   }) : super(key: key);
 
   void _openBottomSheetForNumberInput(BuildContext context) {
@@ -24,9 +30,9 @@ class AmountInputField extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const BottomSheetLine(),
-                const Padding(
-                  padding: EdgeInsets.only(top: 16.0, left: 20.0),
-                  child: Text('Betrag eingeben:', style: TextStyle(fontSize: 18.0)),
+                Padding(
+                  padding: const EdgeInsets.only(top: 16.0, left: 20.0),
+                  child: Text(bottomSheetTitle, style: const TextStyle(fontSize: 18.0)),
                 ),
                 Center(
                   child: GridView.count(
@@ -113,8 +119,7 @@ class AmountInputField extends StatelessWidget {
       },
     ).whenComplete(() {
       if (textController.text.isNotEmpty) {
-        var amountFormatter = NumberFormat.simpleCurrency(locale: 'de-DE');
-        textController.text = amountFormatter.format(double.parse(textController.text.replaceAll(',', '.')));
+        textController.text = formatToMoneyAmount(textController.text);
       }
     });
   }
@@ -140,7 +145,7 @@ class AmountInputField extends StatelessWidget {
       readOnly: true,
       onTap: () => _openBottomSheetForNumberInput(context),
       decoration: InputDecoration(
-        hintText: 'Betrag',
+        hintText: hintText,
         counterText: '',
         prefixIcon: const Icon(
           Icons.money_rounded,

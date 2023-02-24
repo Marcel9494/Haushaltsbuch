@@ -21,16 +21,16 @@ class _BookingsTabBarState extends State<BookingsTabBar> {
         appBar: TabBar(
           indicatorColor: Colors.cyanAccent,
           tabs: <Widget>[
-            Tab(text: 'Kalender'),
             Tab(text: 'Täglich'),
             Tab(text: 'Monatlich'),
+            Tab(text: 'Kalender'),
           ],
         ),
         body: TabBarView(
           children: <Widget>[
-            CalendarTabView(),
             DailyTabView(),
             MonthlyTabView(),
+            CalendarTabView(),
           ],
         ),
       ),

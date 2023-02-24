@@ -15,7 +15,7 @@ extension BookingRepeatsExtension on BookingRepeats {
       case BookingRepeats.everyMonth:
         return 'Jeden Monat';
       default:
-        return '';
+        throw Exception('$name is not a valid BookingRepeat.');
     }
   }
 

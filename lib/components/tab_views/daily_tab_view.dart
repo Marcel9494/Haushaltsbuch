@@ -12,11 +12,11 @@ class DailyTabView extends StatefulWidget {
 }
 
 class _DailyTabViewState extends State<DailyTabView> {
-  late Booking booking;
+  late List<Booking> bookingList = [];
 
-  Future<Booking> loadBookings() async {
-    booking = await Booking.loadBooking();
-    return booking;
+  Future<List<Booking>> loadBookingList() async {
+    bookingList = await Booking.loadBooking();
+    return bookingList;
   }
 
   @override
@@ -26,13 +26,34 @@ class _DailyTabViewState extends State<DailyTabView> {
         children: [
           const Text('Täglich'),
           FutureBuilder(
-            future: loadBookings(),
-            builder: (BuildContext context, AsyncSnapshot<Booking> snapshot) {
+            future: loadBookingList(),
+            builder: (BuildContext context, AsyncSnapshot<List<Booking>> snapshot) {
               switch (snapshot.connectionState) {
                 case ConnectionState.waiting:
-                  return const Text('Waiting');
+                  return const Text('Warten');
+                case ConnectionState.done:
+                  if (bookingList.isEmpty) {
+                    return const Text('Noch keine Buchungen vorhanden.');
+                  } else {
+                    return Expanded(
+                      child: RefreshIndicator(
+                        onRefresh: () async {
+                          bookingList = await loadBookingList();
+                          setState(() {});
+                          return;
+                        },
+                        color: Colors.cyanAccent,
+                        child: ListView.builder(
+                          itemCount: bookingList.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            return BookingCard(booking: bookingList[index]);
+                          },
+                        ),
+                      ),
+                    );
+                  }
                 default:
-                  return BookingCard(booking: booking);
+                  return const Text('Warten');
               }
             },
           ),

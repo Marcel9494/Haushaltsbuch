@@ -3,7 +3,6 @@ import 'package:hive/hive.dart';
 import '/utils/consts/hive_consts.dart';
 
 import '/models/enums/transaction_types.dart';
-import '/models/enums/booking_repeats.dart';
 
 @HiveType(typeId: 0)
 class Booking extends HiveObject {
@@ -14,7 +13,7 @@ class Booking extends HiveObject {
   @HiveField(2)
   late String date;
   @HiveField(3)
-  late BookingRepeats bookingRepeats;
+  late String bookingRepeats;
   @HiveField(4)
   late String amount;
   @HiveField(5)
@@ -29,10 +28,14 @@ class Booking extends HiveObject {
     bookingBox.add(newBooking);
   }
 
-  static Future<Booking> loadBooking() async {
+  static Future<List<Booking>> loadBooking() async {
     var bookingBox = await Hive.openBox(bookingsBox);
-    Booking booking = bookingBox.getAt(0);
-    return booking;
+    List<Booking> bookingList = [];
+    for (int i = 0; i < bookingBox.length; i++) {
+      Booking booking = await bookingBox.getAt(i);
+      bookingList.add(booking);
+    }
+    return bookingList;
   }
 }
 

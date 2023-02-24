@@ -7,9 +7,9 @@ import '/utils/consts/route_consts.dart';
 import '/utils/date_formatters/date_formatter.dart';
 
 import '/components/buttons/transaction_toggle_buttons.dart';
-import '/components/input_fields/title_input_field.dart';
+import '/components/input_fields/text_input_field.dart';
 import '/components/input_fields/date_input_field.dart';
-import '/components/input_fields/amount_input_field.dart';
+import '/components/input_fields/money_input_field.dart';
 import '/components/input_fields/categorie_input_field.dart';
 import '/components/input_fields/account_input_field.dart';
 import '/components/buttons/save_button.dart';
@@ -58,9 +58,8 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
     } else {
       Booking booking = Booking();
       TransactionType transactionType = TransactionType.income;
-      BookingRepeats bookingRepeats = BookingRepeats.noRepeat;
       booking.transactionType = transactionType.getTransactionType(_currentTransaction);
-      booking.bookingRepeats = bookingRepeats.getBookingRepeats(BookingRepeats.noRepeat.name); // TODO dynamisch machen, wenn Wiederholungen implementiert wurden
+      booking.bookingRepeats = BookingRepeats.noRepeat.name; // TODO dynamisch machen, wenn Wiederholungen implementiert wurden
       booking.title = _title;
       booking.date = _parsedBookingDate.toString();
       booking.amount = _amountTextController.text;
@@ -161,12 +160,9 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 TransactionToggleButtons(transactionStringCallback: (transaction) => setState(() => _currentTransaction = transaction)),
-                TitleInputField(
-                  title: _title,
-                  titleCallback: _setTitleState,
-                ),
+                TextInputField(input: _title, inputCallback: _setTitleState, hintText: 'Titel'),
                 DateInputField(textController: _bookingDateTextController, parsedDate: _parsedBookingDate),
-                AmountInputField(textController: _amountTextController, errorText: _amountErrorText),
+                MoneyInputField(textController: _amountTextController, errorText: _amountErrorText, hintText: 'Betrag', bottomSheetTitle: 'Betrag eingeben:'),
                 _currentTransaction == TransactionType.transfer.name
                     ? const SizedBox()
                     : CategorieInputField(textController: _categorieTextController, errorText: _categorieErrorText),
