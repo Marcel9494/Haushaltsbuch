@@ -28,7 +28,7 @@ class Booking extends HiveObject {
     bookingBox.add(newBooking);
   }
 
-  static Future<List<Booking>> loadBooking() async {
+  static Future<List<Booking>> loadBookings() async {
     var bookingBox = await Hive.openBox(bookingsBox);
     List<Booking> bookingList = [];
     for (int i = 0; i < bookingBox.length; i++) {

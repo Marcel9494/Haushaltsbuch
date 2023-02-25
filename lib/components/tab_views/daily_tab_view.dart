@@ -15,7 +15,7 @@ class _DailyTabViewState extends State<DailyTabView> {
   late List<Booking> bookingList = [];
 
   Future<List<Booking>> loadBookingList() async {
-    bookingList = await Booking.loadBooking();
+    bookingList = await Booking.loadBookings();
     return bookingList;
   }
 

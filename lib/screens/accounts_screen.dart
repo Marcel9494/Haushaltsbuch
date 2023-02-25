@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:haushaltsbuch/components/deco/overview_tile.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 import '/components/cards/account_card.dart';
 import '/components/deco/bottom_sheet_line.dart';
+import '/components/deco/loading_indicator.dart';
+import '/components/deco/overview_tile.dart';
 
 import '/utils/consts/route_consts.dart';
 
@@ -49,7 +50,7 @@ class _AccountsScreenState extends State<AccountsScreen> {
   }
 
   Future<List<Account>> loadAccountList() async {
-    accountList = await Account.loadAccount();
+    accountList = await Account.loadAccounts();
     return accountList;
   }
 
@@ -74,10 +75,10 @@ class _AccountsScreenState extends State<AccountsScreen> {
               builder: (BuildContext context, AsyncSnapshot<List<Account>> snapshot) {
                 switch (snapshot.connectionState) {
                   case ConnectionState.waiting:
-                    return const Text('Warten');
+                    return const LoadingIndicator();
                   case ConnectionState.done:
                     if (accountList.isEmpty) {
-                      return const Text('Noch keine Konten vorhanden.');
+                      return const Text('Noch keine Konten erstellt.');
                     } else {
                       return Expanded(
                         child: RefreshIndicator(
@@ -90,14 +91,31 @@ class _AccountsScreenState extends State<AccountsScreen> {
                           child: ListView.builder(
                             itemCount: accountList.length,
                             itemBuilder: (BuildContext context, int index) {
-                              return AccountCard(account: accountList[index]);
+                              if (index == 0 || accountList[index - 1].accountType != accountList[index].accountType) {
+                                return Column(
+                                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Text(accountList[index].accountType),
+                                    ),
+                                    AccountCard(account: accountList[index]),
+                                  ],
+                                );
+                              } else if (accountList[index - 1].accountType == accountList[index].accountType) {
+                                return AccountCard(account: accountList[index]);
+                              }
+                              return const SizedBox();
                             },
                           ),
                         ),
                       );
                     }
                   default:
-                    return const Text('Warten');
+                    if (snapshot.hasError) {
+                      return const Text('Konten Übersicht konnte nicht geladen werden.');
+                    }
+                    return const LoadingIndicator();
                 }
               },
             ),

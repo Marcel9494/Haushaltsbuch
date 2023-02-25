@@ -16,13 +16,14 @@ class Account extends HiveObject {
     accountBox.add(newAccount);
   }
 
-  static Future<List<Account>> loadAccount() async {
+  static Future<List<Account>> loadAccounts() async {
     var accountBox = await Hive.openBox(accountsBox);
     List<Account> accountList = [];
     for (int i = 0; i < accountBox.length; i++) {
       Account account = await accountBox.getAt(i);
       accountList.add(account);
     }
+    accountList.sort((first, second) => first.accountType.compareTo(second.accountType));
     return accountList;
   }
 }
