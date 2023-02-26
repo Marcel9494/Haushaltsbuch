@@ -11,11 +11,13 @@ import '/models/booking.dart';
 import '/models/account.dart';
 import 'models/enums/booking_repeats.dart';
 import 'models/enums/transaction_types.dart';
+import 'models/screen_arguments/account_details_screen_arguments.dart';
 
 import '/components/bottom_nav_bar/bottom_nav_bar.dart';
 
 import '/screens/create_or_edit_booking_screen.dart';
 import '/screens/create_or_edit_account_screen.dart';
+import '/screens/account_details_screen.dart';
 
 void main() async {
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
@@ -56,6 +58,18 @@ class BudgetBookApp extends StatelessWidget {
         bottomNavBarRoute: (context) => const BottomNavBar(),
         createOrEditBookingRoute: (context) => const CreateOrEditBookingScreen(),
         createOrEditAccountRoute: (context) => const CreateOrEditAccountScreen(),
+      },
+      onGenerateRoute: (RouteSettings settings) {
+        switch (settings.name) {
+          case accountDetailsRoute:
+            final args = settings.arguments as AccountDetailsScreenArguments;
+            return MaterialPageRoute<String>(
+              builder: (BuildContext context) => AccountDetailsScreen(
+                account: args.account,
+              ),
+              settings: settings,
+            );
+        }
       },
     );
   }

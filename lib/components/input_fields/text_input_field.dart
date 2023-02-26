@@ -4,6 +4,7 @@ class TextInputField extends StatelessWidget {
   final String input;
   final Function inputCallback;
   final String hintText;
+  final String errorText;
   final int maxLength;
 
   const TextInputField({
@@ -11,6 +12,7 @@ class TextInputField extends StatelessWidget {
     required this.input,
     required this.inputCallback,
     required this.hintText,
+    this.errorText = '',
     this.maxLength = 35,
   }) : super(key: key);
 
@@ -30,6 +32,7 @@ class TextInputField extends StatelessWidget {
         focusedBorder: const UnderlineInputBorder(
           borderSide: BorderSide(color: Colors.cyanAccent, width: 1.5),
         ),
+        errorText: errorText.isEmpty ? null : errorText,
       ),
     );
   }

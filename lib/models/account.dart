@@ -16,6 +16,17 @@ class Account extends HiveObject {
     accountBox.add(newAccount);
   }
 
+  void deleteAccount(Account deleteAccount) async {
+    var accountBox = await Hive.openBox(accountsBox);
+    for (int i = 0; i < accountBox.length; i++) {
+      Account account = await accountBox.getAt(i);
+      if (deleteAccount.name == account.name) {
+        accountBox.deleteAt(i);
+        break;
+      }
+    }
+  }
+
   static Future<List<Account>> loadAccounts() async {
     var accountBox = await Hive.openBox(accountsBox);
     List<Account> accountList = [];
@@ -25,6 +36,35 @@ class Account extends HiveObject {
     }
     accountList.sort((first, second) => first.accountType.compareTo(second.accountType));
     return accountList;
+  }
+
+  static Future<double> getAssetValue() async {
+    var accountBox = await Hive.openBox(accountsBox);
+    double assetValue = 0.0;
+    for (int i = 0; i < accountBox.length; i++) {
+      Account account = await accountBox.getAt(i);
+      if (account.accountType == 'Konto' ||
+          account.accountType == 'Kapitalanlage' ||
+          account.accountType == 'Bargeld' ||
+          account.accountType == 'Karte' ||
+          account.accountType == 'Versicherung' ||
+          account.accountType == 'Sonstiges') {
+        assetValue += double.parse(account.bankBalance.substring(0, account.bankBalance.length - 2).replaceAll('.', '').replaceAll(',', '.'));
+      }
+    }
+    return assetValue;
+  }
+
+  static Future<double> getLiabilityValue() async {
+    var accountBox = await Hive.openBox(accountsBox);
+    double liabilityValue = 0.0;
+    for (int i = 0; i < accountBox.length; i++) {
+      Account account = await accountBox.getAt(i);
+      if (account.accountType == 'Kredit') {
+        liabilityValue += double.parse(account.bankBalance.substring(0, account.bankBalance.length - 2).replaceAll('.', '').replaceAll(',', '.'));
+      }
+    }
+    return liabilityValue;
   }
 }
 

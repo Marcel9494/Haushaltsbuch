@@ -18,7 +18,9 @@ class AccountsScreen extends StatefulWidget {
 }
 
 class _AccountsScreenState extends State<AccountsScreen> {
-  late List<Account> accountList = [];
+  late List<Account> _accountList = [];
+  late double _assetValues = 0.0;
+  late double _liabilityValues = 0.0;
 
   void _openBottomSheetMenu(BuildContext context) {
     showCupertinoModalBottomSheet<void>(
@@ -50,8 +52,13 @@ class _AccountsScreenState extends State<AccountsScreen> {
   }
 
   Future<List<Account>> loadAccountList() async {
-    accountList = await Account.loadAccounts();
-    return accountList;
+    _accountList = await Account.loadAccounts();
+    return _accountList;
+  }
+
+  Future<void> getAssetAndLiabilityValues() async {
+    _assetValues = await Account.getAssetValue();
+    _liabilityValues = await Account.getLiabilityValue();
   }
 
   @override
@@ -69,7 +76,19 @@ class _AccountsScreenState extends State<AccountsScreen> {
       body: Center(
         child: Column(
           children: [
-            const OverviewTile(shouldText: 'Vermögen', should: 100000, haveText: 'Schulden', have: 50000, balanceText: 'Saldo'),
+            FutureBuilder(
+              future: getAssetAndLiabilityValues(),
+              builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
+                switch (snapshot.connectionState) {
+                  case ConnectionState.waiting:
+                    return const LoadingIndicator();
+                  case ConnectionState.done:
+                    return OverviewTile(shouldText: 'Vermögen', should: _assetValues, haveText: 'Schulden', have: _liabilityValues, balanceText: 'Saldo');
+                  default:
+                    return const SizedBox();
+                }
+              },
+            ),
             FutureBuilder(
               future: loadAccountList(),
               builder: (BuildContext context, AsyncSnapshot<List<Account>> snapshot) {
@@ -77,33 +96,33 @@ class _AccountsScreenState extends State<AccountsScreen> {
                   case ConnectionState.waiting:
                     return const LoadingIndicator();
                   case ConnectionState.done:
-                    if (accountList.isEmpty) {
+                    if (_accountList.isEmpty) {
                       return const Text('Noch keine Konten erstellt.');
                     } else {
                       return Expanded(
                         child: RefreshIndicator(
                           onRefresh: () async {
-                            accountList = await loadAccountList();
+                            _accountList = await loadAccountList();
                             setState(() {});
                             return;
                           },
                           color: Colors.cyanAccent,
                           child: ListView.builder(
-                            itemCount: accountList.length,
+                            itemCount: _accountList.length,
                             itemBuilder: (BuildContext context, int index) {
-                              if (index == 0 || accountList[index - 1].accountType != accountList[index].accountType) {
+                              if (index == 0 || _accountList[index - 1].accountType != _accountList[index].accountType) {
                                 return Column(
                                   crossAxisAlignment: CrossAxisAlignment.stretch,
                                   children: [
                                     Padding(
                                       padding: const EdgeInsets.all(8.0),
-                                      child: Text(accountList[index].accountType),
+                                      child: Text(_accountList[index].accountType, style: const TextStyle(fontSize: 16.0)),
                                     ),
-                                    AccountCard(account: accountList[index]),
+                                    AccountCard(account: _accountList[index]),
                                   ],
                                 );
-                              } else if (accountList[index - 1].accountType == accountList[index].accountType) {
-                                return AccountCard(account: accountList[index]);
+                              } else if (_accountList[index - 1].accountType == _accountList[index].accountType) {
+                                return AccountCard(account: _accountList[index]);
                               }
                               return const SizedBox();
                             },
