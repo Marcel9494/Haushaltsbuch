@@ -3,19 +3,26 @@ import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 import '/components/deco/bottom_sheet_line.dart';
 
-class AccountInputField extends StatelessWidget {
+import '/models/account.dart';
+
+class AccountInputField extends StatefulWidget {
   final TextEditingController textController;
   final String errorText;
   final String hintText;
-  // TODO dynamische Konto Liste laden von Benutzer
-  List<String> accounts = ['KSK Konto', 'P2P Bondora', 'Comdirect Depot', 'Scalable Capital Depot'];
 
-  AccountInputField({
+  const AccountInputField({
     Key? key,
     required this.textController,
     required this.errorText,
     this.hintText = 'Konto',
   }) : super(key: key);
+
+  @override
+  State<AccountInputField> createState() => _AccountInputFieldState();
+}
+
+class _AccountInputFieldState extends State<AccountInputField> {
+  List<String> accountNames = [];
 
   void _openBottomSheetWithAccountList(BuildContext context) {
     showCupertinoModalBottomSheet<void>(
@@ -31,29 +38,45 @@ class AccountInputField extends StatelessWidget {
                   padding: EdgeInsets.only(top: 16.0, left: 20.0),
                   child: Text('Konto auswählen:', style: TextStyle(fontSize: 18.0)),
                 ),
-                Center(
-                  child: GridView.count(
-                    primary: false,
-                    padding: const EdgeInsets.all(20),
-                    crossAxisCount: 3,
-                    shrinkWrap: true,
-                    children: <Widget>[
-                      for (int i = 0; i < accounts.length; i++)
-                        OutlinedButton(
-                          onPressed: () => {
-                            textController.text = accounts[i],
-                            Navigator.pop(context),
-                          },
-                          child: Text(
-                            accounts[i],
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(
-                              color: Colors.white70,
+                FutureBuilder(
+                  future: _loadAccountNameList(),
+                  builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
+                    switch (snapshot.connectionState) {
+                      case ConnectionState.waiting:
+                        return const SizedBox();
+                      case ConnectionState.done:
+                        if (accountNames.isEmpty) {
+                          return const Text('Erstelle zuerst ein Konto.');
+                        } else {
+                          return Center(
+                            child: GridView.count(
+                              primary: false,
+                              padding: const EdgeInsets.all(20),
+                              crossAxisCount: 3,
+                              shrinkWrap: true,
+                              children: <Widget>[
+                                for (int i = 0; i < accountNames.length; i++)
+                                  OutlinedButton(
+                                    onPressed: () => {
+                                      widget.textController.text = accountNames[i],
+                                      Navigator.pop(context),
+                                    },
+                                    child: Text(
+                                      accountNames[i],
+                                      textAlign: TextAlign.center,
+                                      style: const TextStyle(
+                                        color: Colors.white70,
+                                      ),
+                                    ),
+                                  ),
+                              ],
                             ),
-                          ),
-                        ),
-                    ],
-                  ),
+                          );
+                        }
+                      default:
+                        return const SizedBox();
+                    }
+                  },
                 ),
               ],
             ),
@@ -63,16 +86,21 @@ class AccountInputField extends StatelessWidget {
     );
   }
 
+  Future<List<String>> _loadAccountNameList() async {
+    accountNames = await Account.loadAccountNames();
+    return accountNames;
+  }
+
   @override
   Widget build(BuildContext context) {
     return TextFormField(
-      controller: textController,
+      controller: widget.textController,
       textAlignVertical: TextAlignVertical.center,
       showCursor: false,
       readOnly: true,
       onTap: () => _openBottomSheetWithAccountList(context),
       decoration: InputDecoration(
-        hintText: hintText,
+        hintText: widget.hintText,
         prefixIcon: const Icon(
           Icons.account_balance_rounded,
           color: Colors.grey,
@@ -80,7 +108,7 @@ class AccountInputField extends StatelessWidget {
         focusedBorder: const UnderlineInputBorder(
           borderSide: BorderSide(color: Colors.cyanAccent, width: 1.5),
         ),
-        errorText: errorText.isEmpty ? null : errorText,
+        errorText: widget.errorText.isEmpty ? null : widget.errorText,
       ),
     );
   }

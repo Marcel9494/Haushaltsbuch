@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:haushaltsbuch/components/dialogs/choice_dialog.dart';
-import 'package:haushaltsbuch/utils/consts/route_consts.dart';
+
+import '/components/dialogs/choice_dialog.dart';
+
+import '/utils/consts/route_consts.dart';
 
 import '/models/account.dart';
+import '/models/screen_arguments/bottom_nav_bar_screen_arguments.dart';
 
 class AccountDetailsScreen extends StatefulWidget {
   final Account account;
@@ -18,7 +21,7 @@ class AccountDetailsScreen extends StatefulWidget {
 
 class _AccountDetailsScreenState extends State<AccountDetailsScreen> {
   void _deleteAccount() {
-    showChoiceDialog(context, 'Konto löschen?', _yesPressed, _noPressed, 'Konto wurde gelöscht', '', Icons.info_outline);
+    showChoiceDialog(context, 'Konto löschen?', _yesPressed, _noPressed, 'Konto wurde gelöscht', 'Konto ${widget.account.name} wurde erfolgreich gelöscht.', Icons.info_outline);
   }
 
   void _yesPressed() {
@@ -27,9 +30,8 @@ class _AccountDetailsScreenState extends State<AccountDetailsScreen> {
     });
     Navigator.pop(context);
     Navigator.pop(context);
-    Navigator.popAndPushNamed(context, bottomNavBarRoute);
+    Navigator.popAndPushNamed(context, bottomNavBarRoute, arguments: BottomNavBarScreenArguments(2));
     FocusScope.of(context).unfocus();
-    //_showFlushbar('Konto wurde gelöscht.'),
   }
 
   void _noPressed() {

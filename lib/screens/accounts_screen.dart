@@ -42,6 +42,11 @@ class _AccountsScreenState extends State<AccountsScreen> {
                     leading: const Icon(Icons.add_circle_outline_rounded, color: Colors.cyanAccent),
                     title: const Text('Konto erstellen'),
                   ),
+                  ListTile(
+                    onTap: () => Navigator.popAndPushNamed(context, createOrEditCategorieRoute),
+                    leading: const Icon(Icons.edit_rounded, color: Colors.cyanAccent),
+                    title: const Text('Kategorien bearbeiten'),
+                  ),
                 ],
               ),
             ],
@@ -51,12 +56,12 @@ class _AccountsScreenState extends State<AccountsScreen> {
     );
   }
 
-  Future<List<Account>> loadAccountList() async {
+  Future<List<Account>> _loadAccountList() async {
     _accountList = await Account.loadAccounts();
     return _accountList;
   }
 
-  Future<void> getAssetAndLiabilityValues() async {
+  Future<void> _getAssetAndLiabilityValues() async {
     _assetValues = await Account.getAssetValue();
     _liabilityValues = await Account.getLiabilityValue();
   }
@@ -77,7 +82,7 @@ class _AccountsScreenState extends State<AccountsScreen> {
         child: Column(
           children: [
             FutureBuilder(
-              future: getAssetAndLiabilityValues(),
+              future: _getAssetAndLiabilityValues(),
               builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
                 switch (snapshot.connectionState) {
                   case ConnectionState.waiting:
@@ -90,7 +95,7 @@ class _AccountsScreenState extends State<AccountsScreen> {
               },
             ),
             FutureBuilder(
-              future: loadAccountList(),
+              future: _loadAccountList(),
               builder: (BuildContext context, AsyncSnapshot<List<Account>> snapshot) {
                 switch (snapshot.connectionState) {
                   case ConnectionState.waiting:
@@ -102,7 +107,7 @@ class _AccountsScreenState extends State<AccountsScreen> {
                       return Expanded(
                         child: RefreshIndicator(
                           onRefresh: () async {
-                            _accountList = await loadAccountList();
+                            _accountList = await _loadAccountList();
                             setState(() {});
                             return;
                           },

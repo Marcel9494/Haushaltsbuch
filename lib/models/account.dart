@@ -38,6 +38,16 @@ class Account extends HiveObject {
     return accountList;
   }
 
+  static Future<List<String>> loadAccountNames() async {
+    var accountBox = await Hive.openBox(accountsBox);
+    List<String> accountNameList = [];
+    for (int i = 0; i < accountBox.length; i++) {
+      String account = await accountBox.getAt(i).name;
+      accountNameList.add(account);
+    }
+    return accountNameList;
+  }
+
   static Future<double> getAssetValue() async {
     var accountBox = await Hive.openBox(accountsBox);
     double assetValue = 0.0;

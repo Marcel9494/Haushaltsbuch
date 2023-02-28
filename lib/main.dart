@@ -7,16 +7,19 @@ import 'package:hive_flutter/adapters.dart';
 
 import '/utils/consts/route_consts.dart';
 
-import '/models/booking.dart';
-import '/models/account.dart';
+import 'models/booking.dart';
+import 'models/account.dart';
+import 'models/categorie.dart';
 import 'models/enums/booking_repeats.dart';
 import 'models/enums/transaction_types.dart';
+import 'models/screen_arguments/bottom_nav_bar_screen_arguments.dart';
 import 'models/screen_arguments/account_details_screen_arguments.dart';
 
 import '/components/bottom_nav_bar/bottom_nav_bar.dart';
 
 import '/screens/create_or_edit_booking_screen.dart';
 import '/screens/create_or_edit_account_screen.dart';
+import '/screens/categories_screen.dart';
 import '/screens/account_details_screen.dart';
 
 void main() async {
@@ -26,6 +29,7 @@ void main() async {
   await Hive.initFlutter();
   Hive.registerAdapter(BookingAdapter());
   Hive.registerAdapter(AccountAdapter());
+  Hive.registerAdapter(CategorieAdapter());
   Hive.registerAdapter(TransactionTypeAdapter());
   Hive.registerAdapter(BookingRepeatsAdapter());
   runApp(const BudgetBookApp());
@@ -53,14 +57,22 @@ class BudgetBookApp extends StatelessWidget {
       supportedLocales: const [
         Locale('de', 'DE'),
       ],
-      home: const BottomNavBar(),
+      home: const BottomNavBar(screenIndex: 0),
       routes: {
-        bottomNavBarRoute: (context) => const BottomNavBar(),
         createOrEditBookingRoute: (context) => const CreateOrEditBookingScreen(),
         createOrEditAccountRoute: (context) => const CreateOrEditAccountScreen(),
+        createOrEditCategorieRoute: (context) => const CategoriesScreen(),
       },
       onGenerateRoute: (RouteSettings settings) {
         switch (settings.name) {
+          case bottomNavBarRoute:
+            final args = settings.arguments as BottomNavBarScreenArguments;
+            return MaterialPageRoute<String>(
+              builder: (BuildContext context) => BottomNavBar(
+                screenIndex: args.screenIndex,
+              ),
+              settings: settings,
+            );
           case accountDetailsRoute:
             final args = settings.arguments as AccountDetailsScreenArguments;
             return MaterialPageRoute<String>(

@@ -9,6 +9,7 @@ import '/components/input_fields/text_input_field.dart';
 import '/components/buttons/save_button.dart';
 
 import '/models/account.dart';
+import '/models/screen_arguments/bottom_nav_bar_screen_arguments.dart';
 
 import '/utils/consts/route_consts.dart';
 
@@ -43,7 +44,7 @@ class _CreateOrEditAccountScreenState extends State<CreateOrEditAccountScreen> {
           FocusScope.of(context).requestFocus(FocusNode());
           Navigator.pop(context);
           Navigator.pop(context);
-          Navigator.pushNamed(context, bottomNavBarRoute);
+          Navigator.pushNamed(context, bottomNavBarRoute, arguments: BottomNavBarScreenArguments(2));
         }
       });
     }

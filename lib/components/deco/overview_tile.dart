@@ -20,13 +20,43 @@ class OverviewTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
-      children: [
-        Text('$shouldText\n${formatToMoneyAmount(should.toString())}', textAlign: TextAlign.center),
-        Text('$haveText\n${formatToMoneyAmount(have.toString())}', textAlign: TextAlign.center),
-        Text('$balanceText\n${formatToMoneyAmount((should - have).toString())}', textAlign: TextAlign.center),
-      ],
+    return Padding(
+      padding: const EdgeInsets.only(top: 8.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          RichText(
+            textAlign: TextAlign.center,
+            text: TextSpan(children: <TextSpan>[
+              TextSpan(text: '$shouldText\n'),
+              TextSpan(
+                text: formatToMoneyAmount(should.toString()),
+                style: const TextStyle(height: 1.5, color: Colors.greenAccent, fontSize: 15.0),
+              ),
+            ]),
+          ),
+          RichText(
+            textAlign: TextAlign.center,
+            text: TextSpan(children: <TextSpan>[
+              TextSpan(text: '$haveText\n'),
+              TextSpan(
+                text: formatToMoneyAmount(have.toString()),
+                style: const TextStyle(height: 1.5, color: Colors.redAccent, fontSize: 15.0),
+              ),
+            ]),
+          ),
+          RichText(
+            textAlign: TextAlign.center,
+            text: TextSpan(children: <TextSpan>[
+              TextSpan(text: '$balanceText\n'),
+              TextSpan(
+                text: formatToMoneyAmount((should - have).toString()),
+                style: TextStyle(height: 1.5, color: (should - have) >= 0 ? Colors.greenAccent : Colors.redAccent, fontSize: 15.0),
+              ),
+            ]),
+          ),
+        ],
+      ),
     );
   }
 }

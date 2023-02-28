@@ -34,6 +34,7 @@ void showChoiceDialog(BuildContext context, String title, Function yesPressed, F
                   color: Colors.cyanAccent,
                 ),
                 duration: const Duration(seconds: 3),
+                flushbarPosition: FlushbarPosition.TOP,
                 leftBarIndicatorColor: Colors.cyanAccent,
               )..show(context),
             },

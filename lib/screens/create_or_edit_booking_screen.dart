@@ -17,6 +17,7 @@ import '/components/buttons/save_button.dart';
 import '/models/booking.dart';
 import '/models/enums/transaction_types.dart';
 import '/models/enums/booking_repeats.dart';
+import '/models/screen_arguments/bottom_nav_bar_screen_arguments.dart';
 
 class CreateOrEditBookingScreen extends StatefulWidget {
   const CreateOrEditBookingScreen({Key? key}) : super(key: key);
@@ -73,7 +74,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
           FocusScope.of(context).requestFocus(FocusNode());
           Navigator.pop(context);
           Navigator.pop(context);
-          Navigator.pushNamed(context, bottomNavBarRoute);
+          Navigator.pushNamed(context, bottomNavBarRoute, arguments: BottomNavBarScreenArguments(0));
         }
       });
     }

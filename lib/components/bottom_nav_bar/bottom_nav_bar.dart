@@ -7,7 +7,12 @@ import '/screens/statistics_screen.dart';
 import '/screens/accounts_screen.dart';
 
 class BottomNavBar extends StatefulWidget {
-  const BottomNavBar({Key? key}) : super(key: key);
+  final int screenIndex;
+
+  const BottomNavBar({
+    Key? key,
+    required this.screenIndex,
+  }) : super(key: key);
 
   @override
   State<BottomNavBar> createState() => _BottomNavBarState();
@@ -15,7 +20,7 @@ class BottomNavBar extends StatefulWidget {
 
 class _BottomNavBarState extends State<BottomNavBar> {
   static List<Widget> _screens = [];
-  late int _selectedIndex = 0;
+  late int _selectedIndex = widget.screenIndex;
 
   @override
   void initState() {
