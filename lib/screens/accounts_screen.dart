@@ -43,9 +43,9 @@ class _AccountsScreenState extends State<AccountsScreen> {
                     title: const Text('Konto erstellen'),
                   ),
                   ListTile(
-                    onTap: () => Navigator.popAndPushNamed(context, createOrEditCategorieRoute),
-                    leading: const Icon(Icons.edit_rounded, color: Colors.cyanAccent),
-                    title: const Text('Kategorien bearbeiten'),
+                    onTap: () => Navigator.popAndPushNamed(context, categoriesRoute),
+                    leading: const Icon(Icons.list_rounded, color: Colors.cyanAccent),
+                    title: const Text('Kategorien'),
                   ),
                 ],
               ),

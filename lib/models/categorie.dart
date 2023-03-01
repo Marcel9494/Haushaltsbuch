@@ -7,6 +7,22 @@ class Categorie extends HiveObject {
   @HiveField(0)
   late String name;
 
+  void createCategorie(Categorie newCategorie) async {
+    var categorieBox = await Hive.openBox(categoriesBox);
+    categorieBox.add(newCategorie);
+  }
+
+  void deleteCategorie(Categorie deleteCategorie) async {
+    var categorieBox = await Hive.openBox(categoriesBox);
+    for (int i = 0; i < categorieBox.length; i++) {
+      Categorie categorie = await categorieBox.getAt(i);
+      if (deleteCategorie.name == categorie.name) {
+        categorieBox.deleteAt(i);
+        break;
+      }
+    }
+  }
+
   static Future<List<Categorie>> loadCategories() async {
     var categorieBox = await Hive.openBox(categoriesBox);
     List<Categorie> categorieList = [];

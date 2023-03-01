@@ -6,6 +6,7 @@ class TextInputField extends StatelessWidget {
   final String hintText;
   final String errorText;
   final int maxLength;
+  final bool autofocus;
 
   const TextInputField({
     Key? key,
@@ -14,12 +15,14 @@ class TextInputField extends StatelessWidget {
     required this.hintText,
     this.errorText = '',
     this.maxLength = 35,
+    this.autofocus = false,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
       maxLength: maxLength,
+      autofocus: autofocus,
       onChanged: (input) => inputCallback(input),
       textAlignVertical: TextAlignVertical.center,
       decoration: InputDecoration(

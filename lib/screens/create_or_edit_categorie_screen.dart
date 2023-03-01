@@ -1,7 +1,13 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
-import 'package:haushaltsbuch/components/buttons/save_button.dart';
-import 'package:haushaltsbuch/components/input_fields/text_input_field.dart';
+import 'package:haushaltsbuch/utils/consts/route_consts.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
+
+import '/components/buttons/save_button.dart';
+import '/components/input_fields/text_input_field.dart';
+
+import '/models/categorie.dart';
 
 class CreateOrEditCategorieScreen extends StatefulWidget {
   const CreateOrEditCategorieScreen({Key? key}) : super(key: key);
@@ -16,13 +22,48 @@ class _CreateOrEditCategorieScreenState extends State<CreateOrEditCategorieScree
   String _categorieNameErrorText = '';
 
   void _createCategorie() {
-    // TODO hier weitermachen und Kategorien erstellen implementieren und anschließend zu Kategorie Seite wechseln und Kategorien in Liste anzeigen
+    if (_validCategorieName(_categorieName) == false) {
+      _setSaveButtonAnimation(false);
+    } else {
+      Categorie categorie = Categorie();
+      categorie.name = _categorieName;
+      categorie.createCategorie(categorie);
+      _setSaveButtonAnimation(true);
+      Timer(const Duration(milliseconds: 1200), () {
+        if (mounted) {
+          FocusScope.of(context).requestFocus(FocusNode());
+          Navigator.pop(context);
+          Navigator.pop(context);
+          Navigator.pushNamed(context, categoriesRoute);
+        }
+      });
+    }
+  }
+
+  bool _validCategorieName(String categorieNameInput) {
+    if (_categorieName.isEmpty) {
+      setState(() {
+        _categorieNameErrorText = 'Bitte geben Sie einen Kategorienamen ein.';
+      });
+      return false;
+    }
+    _categorieNameErrorText = '';
+    return true;
   }
 
   void _setCategorieNameState(String categorieName) {
     setState(() {
       _categorieName = categorieName;
     });
+  }
+
+  void _setSaveButtonAnimation(bool successful) {
+    successful ? _saveButtonController.success() : _saveButtonController.error();
+    if (successful == false) {
+      Timer(const Duration(seconds: 1), () {
+        _saveButtonController.reset();
+      });
+    }
   }
 
   @override
@@ -44,7 +85,7 @@ class _CreateOrEditCategorieScreenState extends State<CreateOrEditCategorieScree
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                TextInputField(input: _categorieName, inputCallback: _setCategorieNameState, errorText: _categorieNameErrorText, hintText: 'Kategoriename'),
+                TextInputField(input: _categorieName, inputCallback: _setCategorieNameState, errorText: _categorieNameErrorText, hintText: 'Kategoriename', autofocus: true),
                 SaveButton(saveFunction: _createCategorie, buttonController: _saveButtonController),
               ],
             ),

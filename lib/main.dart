@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:haushaltsbuch/screens/create_or_edit_categorie_screen.dart';
 
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/adapters.dart';
@@ -61,7 +62,8 @@ class BudgetBookApp extends StatelessWidget {
       routes: {
         createOrEditBookingRoute: (context) => const CreateOrEditBookingScreen(),
         createOrEditAccountRoute: (context) => const CreateOrEditAccountScreen(),
-        createOrEditCategorieRoute: (context) => const CategoriesScreen(),
+        createOrEditCategorieRoute: (context) => const CreateOrEditCategorieScreen(),
+        categoriesRoute: (context) => const CategoriesScreen(),
       },
       onGenerateRoute: (RouteSettings settings) {
         switch (settings.name) {
