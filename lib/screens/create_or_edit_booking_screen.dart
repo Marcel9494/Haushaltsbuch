@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:haushaltsbuch/models/account.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 
 import '/utils/consts/route_consts.dart';
@@ -20,7 +21,12 @@ import '/models/enums/booking_repeats.dart';
 import '/models/screen_arguments/bottom_nav_bar_screen_arguments.dart';
 
 class CreateOrEditBookingScreen extends StatefulWidget {
-  const CreateOrEditBookingScreen({Key? key}) : super(key: key);
+  final Booking booking;
+
+  const CreateOrEditBookingScreen({
+    Key? key,
+    required this.booking,
+  }) : super(key: key);
 
   @override
   State<CreateOrEditBookingScreen> createState() => _CreateOrEditBookingScreenState();
@@ -46,6 +52,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
   @override
   void initState() {
     super.initState();
+    _currentTransaction = TransactionType.outcome.name;
     _parsedBookingDate = DateTime.now();
     _bookingDateTextController.text = dateFormatterDDMMYYYYEE.format(DateTime.now());
   }
@@ -67,6 +74,11 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
       booking.categorie = _categorieTextController.text;
       booking.fromAccount = _fromAccountTextController.text;
       booking.toAccount = _toAccountTextController.text;
+      if (_currentTransaction == TransactionType.transfer.name) {
+        Account.transferMoney(_fromAccountTextController.text, _toAccountTextController.text, _amountTextController.text);
+      } else {
+        Account.calculateNewAccountBalance(_fromAccountTextController.text, _amountTextController.text, _currentTransaction);
+      }
       booking.createBooking(booking);
       _setSaveButtonAnimation(true);
       Timer(const Duration(milliseconds: 1200), () {

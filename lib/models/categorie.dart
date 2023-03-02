@@ -44,6 +44,16 @@ class Categorie extends HiveObject {
     categorieList.sort((first, second) => first.name.compareTo(second.name));
     return categorieList;
   }
+
+  static Future<List<String>> loadCategorieNames() async {
+    var categorieBox = await Hive.openBox(categoriesBox);
+    List<String> categorieNameList = [];
+    for (int i = 0; i < categorieBox.length; i++) {
+      String categorieName = await categorieBox.getAt(i).name;
+      categorieNameList.add(categorieName);
+    }
+    return categorieNameList;
+  }
 }
 
 class CategorieAdapter extends TypeAdapter<Categorie> {

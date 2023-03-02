@@ -1,3 +1,5 @@
+import 'package:haushaltsbuch/models/enums/transaction_types.dart';
+import 'package:haushaltsbuch/utils/number_formatters/number_formatter.dart';
 import 'package:hive/hive.dart';
 
 import '/utils/consts/hive_consts.dart';
@@ -27,6 +29,42 @@ class Account extends HiveObject {
     }
   }
 
+  static void calculateNewAccountBalance(String accountName, String amount, String transaction) async {
+    var accountBox = await Hive.openBox(accountsBox);
+    for (int i = 0; i < accountBox.length; i++) {
+      Account account = await accountBox.getAt(i);
+      if (accountName == account.name) {
+        double bankBalance = formatMoneyAmountToDouble(account.bankBalance);
+        if (transaction == TransactionType.outcome.name) {
+          bankBalance -= formatMoneyAmountToDouble(amount);
+        } else if (transaction == TransactionType.income.name) {
+          bankBalance += formatMoneyAmountToDouble(amount);
+        }
+        account.bankBalance = formatToMoneyAmount(bankBalance.toString());
+        accountBox.putAt(i, account);
+        break;
+      }
+    }
+  }
+
+  static void transferMoney(String fromAccountName, String toAccountName, String amount) async {
+    var accountBox = await Hive.openBox(accountsBox);
+    for (int i = 0; i < accountBox.length; i++) {
+      Account account = await accountBox.getAt(i);
+      if (fromAccountName == account.name) {
+        double bankBalance = formatMoneyAmountToDouble(account.bankBalance);
+        bankBalance -= formatMoneyAmountToDouble(amount);
+        account.bankBalance = formatToMoneyAmount(bankBalance.toString());
+        accountBox.putAt(i, account);
+      } else if (toAccountName == account.name) {
+        double bankBalance = formatMoneyAmountToDouble(account.bankBalance);
+        bankBalance += formatMoneyAmountToDouble(amount);
+        account.bankBalance = formatToMoneyAmount(bankBalance.toString());
+        accountBox.putAt(i, account);
+      }
+    }
+  }
+
   static Future<List<Account>> loadAccounts() async {
     var accountBox = await Hive.openBox(accountsBox);
     List<Account> accountList = [];
@@ -42,8 +80,8 @@ class Account extends HiveObject {
     var accountBox = await Hive.openBox(accountsBox);
     List<String> accountNameList = [];
     for (int i = 0; i < accountBox.length; i++) {
-      String account = await accountBox.getAt(i).name;
-      accountNameList.add(account);
+      String accountName = await accountBox.getAt(i).name;
+      accountNameList.add(accountName);
     }
     return accountNameList;
   }

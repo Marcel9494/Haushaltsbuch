@@ -14,6 +14,7 @@ import 'models/enums/booking_repeats.dart';
 import 'models/enums/transaction_types.dart';
 import 'models/screen_arguments/bottom_nav_bar_screen_arguments.dart';
 import 'models/screen_arguments/account_details_screen_arguments.dart';
+import 'models/screen_arguments/create_or_edit_booking_screen_arguments.dart';
 import 'models/screen_arguments/create_or_edit_categorie_screen_arguments.dart';
 
 import '/components/bottom_nav_bar/bottom_nav_bar.dart';
@@ -61,7 +62,6 @@ class BudgetBookApp extends StatelessWidget {
       ],
       home: const BottomNavBar(screenIndex: 0),
       routes: {
-        createOrEditBookingRoute: (context) => const CreateOrEditBookingScreen(),
         createOrEditAccountRoute: (context) => const CreateOrEditAccountScreen(),
         categoriesRoute: (context) => const CategoriesScreen(),
       },
@@ -80,6 +80,14 @@ class BudgetBookApp extends StatelessWidget {
             return MaterialPageRoute<String>(
               builder: (BuildContext context) => AccountDetailsScreen(
                 account: args.account,
+              ),
+              settings: settings,
+            );
+          case createOrEditBookingRoute:
+            final args = settings.arguments as CreateOrEditBookingScreenArguments;
+            return MaterialPageRoute<String>(
+              builder: (BuildContext context) => CreateOrEditBookingScreen(
+                booking: args.booking,
               ),
               settings: settings,
             );
