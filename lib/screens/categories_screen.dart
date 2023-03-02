@@ -1,5 +1,6 @@
 import 'package:another_flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
+import 'package:haushaltsbuch/models/screen_arguments/create_or_edit_categorie_screen_arguments.dart';
 
 import '/components/deco/loading_indicator.dart';
 
@@ -27,7 +28,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text('Kategorie löschen?'),
+          title: Text('Kategorie ${_categorieList[index].name} löschen?'),
           actions: <Widget>[
             TextButton(
               child: const Text(
@@ -87,7 +88,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
           IconButton(
             icon: const Icon(Icons.add),
             onPressed: () {
-              Navigator.pushNamed(context, createOrEditCategorieRoute);
+              Navigator.pushNamed(context, createOrEditCategorieRoute, arguments: CreateOrEditCategorieScreenArguments(''));
             },
           ),
         ],
@@ -117,9 +118,19 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                           itemBuilder: (BuildContext context, int index) {
                             return ListTile(
                               title: Text(_categorieList[index].name),
-                              trailing: IconButton(
-                                icon: const Icon(Icons.remove),
-                                onPressed: () => _deleteCategorie(index),
+                              trailing: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  IconButton(
+                                    icon: const Icon(Icons.edit),
+                                    onPressed: () =>
+                                        Navigator.pushNamed(context, createOrEditCategorieRoute, arguments: CreateOrEditCategorieScreenArguments(_categorieList[index].name)),
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(Icons.remove),
+                                    onPressed: () => _deleteCategorie(index),
+                                  ),
+                                ],
                               ),
                             );
                           },

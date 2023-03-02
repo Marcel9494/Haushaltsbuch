@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:haushaltsbuch/utils/consts/route_consts.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 
 import '/components/buttons/save_button.dart';
@@ -9,8 +8,15 @@ import '/components/input_fields/text_input_field.dart';
 
 import '/models/categorie.dart';
 
+import '/utils/consts/route_consts.dart';
+
 class CreateOrEditCategorieScreen extends StatefulWidget {
-  const CreateOrEditCategorieScreen({Key? key}) : super(key: key);
+  final String categorieName;
+
+  const CreateOrEditCategorieScreen({
+    Key? key,
+    required this.categorieName,
+  }) : super(key: key);
 
   @override
   State<CreateOrEditCategorieScreen> createState() => _CreateOrEditCategorieScreenState();
@@ -21,13 +27,23 @@ class _CreateOrEditCategorieScreenState extends State<CreateOrEditCategorieScree
   String _categorieName = '';
   String _categorieNameErrorText = '';
 
-  void _createCategorie() {
+  @override
+  void initState() {
+    super.initState();
+    _categorieName = widget.categorieName;
+  }
+
+  void _createOrUpdateCategorie() {
     if (_validCategorieName(_categorieName) == false) {
       _setSaveButtonAnimation(false);
     } else {
       Categorie categorie = Categorie();
       categorie.name = _categorieName;
-      categorie.createCategorie(categorie);
+      if (widget.categorieName == '') {
+        categorie.createCategorie(categorie);
+      } else {
+        categorie.updateCategorie(categorie, widget.categorieName);
+      }
       _setSaveButtonAnimation(true);
       Timer(const Duration(milliseconds: 1200), () {
         if (mounted) {
@@ -86,7 +102,7 @@ class _CreateOrEditCategorieScreenState extends State<CreateOrEditCategorieScree
               mainAxisSize: MainAxisSize.min,
               children: [
                 TextInputField(input: _categorieName, inputCallback: _setCategorieNameState, errorText: _categorieNameErrorText, hintText: 'Kategoriename', autofocus: true),
-                SaveButton(saveFunction: _createCategorie, buttonController: _saveButtonController),
+                SaveButton(saveFunction: _createOrUpdateCategorie, buttonController: _saveButtonController),
               ],
             ),
           ),

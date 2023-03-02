@@ -12,6 +12,17 @@ class Categorie extends HiveObject {
     categorieBox.add(newCategorie);
   }
 
+  void updateCategorie(Categorie updatedCategorie, String oldCategorieName) async {
+    var categorieBox = await Hive.openBox(categoriesBox);
+    for (int i = 0; i < categorieBox.length; i++) {
+      Categorie categorie = await categorieBox.getAt(i);
+      if (oldCategorieName == categorie.name) {
+        categorieBox.putAt(i, updatedCategorie);
+        break;
+      }
+    }
+  }
+
   void deleteCategorie(Categorie deleteCategorie) async {
     var categorieBox = await Hive.openBox(categoriesBox);
     for (int i = 0; i < categorieBox.length; i++) {

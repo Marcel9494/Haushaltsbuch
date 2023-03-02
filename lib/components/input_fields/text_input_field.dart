@@ -21,6 +21,7 @@ class TextInputField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      initialValue: input,
       maxLength: maxLength,
       autofocus: autofocus,
       onChanged: (input) => inputCallback(input),

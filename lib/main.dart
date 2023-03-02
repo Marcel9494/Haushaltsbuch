@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:haushaltsbuch/screens/create_or_edit_categorie_screen.dart';
 
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/adapters.dart';
@@ -15,11 +14,13 @@ import 'models/enums/booking_repeats.dart';
 import 'models/enums/transaction_types.dart';
 import 'models/screen_arguments/bottom_nav_bar_screen_arguments.dart';
 import 'models/screen_arguments/account_details_screen_arguments.dart';
+import 'models/screen_arguments/create_or_edit_categorie_screen_arguments.dart';
 
 import '/components/bottom_nav_bar/bottom_nav_bar.dart';
 
 import '/screens/create_or_edit_booking_screen.dart';
 import '/screens/create_or_edit_account_screen.dart';
+import '/screens/create_or_edit_categorie_screen.dart';
 import '/screens/categories_screen.dart';
 import '/screens/account_details_screen.dart';
 
@@ -62,7 +63,6 @@ class BudgetBookApp extends StatelessWidget {
       routes: {
         createOrEditBookingRoute: (context) => const CreateOrEditBookingScreen(),
         createOrEditAccountRoute: (context) => const CreateOrEditAccountScreen(),
-        createOrEditCategorieRoute: (context) => const CreateOrEditCategorieScreen(),
         categoriesRoute: (context) => const CategoriesScreen(),
       },
       onGenerateRoute: (RouteSettings settings) {
@@ -80,6 +80,14 @@ class BudgetBookApp extends StatelessWidget {
             return MaterialPageRoute<String>(
               builder: (BuildContext context) => AccountDetailsScreen(
                 account: args.account,
+              ),
+              settings: settings,
+            );
+          case createOrEditCategorieRoute:
+            final args = settings.arguments as CreateOrEditCategorieScreenArguments;
+            return MaterialPageRoute<String>(
+              builder: (BuildContext context) => CreateOrEditCategorieScreen(
+                categorieName: args.categorieName,
               ),
               settings: settings,
             );
