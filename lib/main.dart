@@ -87,7 +87,7 @@ class BudgetBookApp extends StatelessWidget {
             final args = settings.arguments as CreateOrEditBookingScreenArguments;
             return MaterialPageRoute<String>(
               builder: (BuildContext context) => CreateOrEditBookingScreen(
-                booking: args.booking,
+                bookingBoxIndex: args.bookingBoxIndex,
               ),
               settings: settings,
             );

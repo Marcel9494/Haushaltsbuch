@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 
-import '/utils/consts/route_consts.dart';
-
 import '/screens/bookings_screen.dart';
 import '/screens/statistics_screen.dart';
 import '/screens/accounts_screen.dart';
+
+import '/models/screen_arguments/create_or_edit_booking_screen_arguments.dart';
+
+import '/utils/consts/route_consts.dart';
 
 class BottomNavBar extends StatefulWidget {
   final int screenIndex;
@@ -49,7 +51,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
       ),
       floatingActionButton: _selectedIndex == 0
           ? FloatingActionButton(
-              onPressed: () => Navigator.pushNamed(context, createOrEditBookingRoute),
+              onPressed: () => Navigator.pushNamed(context, createOrEditBookingRoute, arguments: CreateOrEditBookingScreenArguments(-1)),
               child: Container(
                 width: 60,
                 height: 60,

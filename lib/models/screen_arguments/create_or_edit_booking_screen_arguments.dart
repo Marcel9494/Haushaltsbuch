@@ -1,9 +1,7 @@
-import '/models/booking.dart';
-
 class CreateOrEditBookingScreenArguments {
-  final Booking booking;
+  final int bookingBoxIndex;
 
   CreateOrEditBookingScreenArguments(
-    this.booking,
+    this.bookingBoxIndex,
   );
 }

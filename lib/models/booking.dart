@@ -2,14 +2,13 @@ import 'package:hive/hive.dart';
 
 import '/utils/consts/hive_consts.dart';
 
-import '/models/enums/transaction_types.dart';
-
 @HiveType(typeId: 0)
 class Booking extends HiveObject {
+  late int boxIndex;
   @HiveField(0)
   late String title;
   @HiveField(1)
-  late TransactionType transactionType;
+  late String transactionType;
   @HiveField(2)
   late String date;
   @HiveField(3)
@@ -28,11 +27,23 @@ class Booking extends HiveObject {
     bookingBox.add(newBooking);
   }
 
-  static Future<List<Booking>> loadBookings() async {
+  void updateBooking(Booking updatedBooking, int bookingBoxIndex) async {
+    var bookingBox = await Hive.openBox(bookingsBox);
+    bookingBox.putAt(bookingBoxIndex, updatedBooking);
+  }
+
+  static Future<Booking> loadBooking(int bookingBoxIndex) async {
+    var bookingBox = await Hive.openBox(bookingsBox);
+    Booking booking = await bookingBox.getAt(bookingBoxIndex);
+    return booking;
+  }
+
+  static Future<List<Booking>> loadBookingList() async {
     var bookingBox = await Hive.openBox(bookingsBox);
     List<Booking> bookingList = [];
     for (int i = 0; i < bookingBox.length; i++) {
       Booking booking = await bookingBox.getAt(i);
+      booking.boxIndex = i;
       bookingList.add(booking);
     }
     return bookingList;

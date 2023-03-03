@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:haushaltsbuch/models/account.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 
 import '/utils/consts/route_consts.dart';
@@ -14,18 +13,20 @@ import '/components/input_fields/money_input_field.dart';
 import '/components/input_fields/categorie_input_field.dart';
 import '/components/input_fields/account_input_field.dart';
 import '/components/buttons/save_button.dart';
+import '/components/deco/loading_indicator.dart';
 
 import '/models/booking.dart';
+import '/models/account.dart';
 import '/models/enums/transaction_types.dart';
 import '/models/enums/booking_repeats.dart';
 import '/models/screen_arguments/bottom_nav_bar_screen_arguments.dart';
 
 class CreateOrEditBookingScreen extends StatefulWidget {
-  final Booking booking;
+  final int bookingBoxIndex;
 
   const CreateOrEditBookingScreen({
     Key? key,
-    required this.booking,
+    required this.bookingBoxIndex,
   }) : super(key: key);
 
   @override
@@ -41,6 +42,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
   final TextEditingController _toAccountTextController = TextEditingController();
   final TextEditingController _categorieTextController = TextEditingController();
   final RoundedLoadingButtonController _saveButtonController = RoundedLoadingButtonController();
+  bool _isBookingEdited = false;
   String _currentTransaction = '';
   String _title = '';
   String _amountErrorText = '';
@@ -48,13 +50,31 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
   String _fromAccountErrorText = '';
   String _toAccountErrorText = '';
   DateTime? _parsedBookingDate;
+  late Booking loadedBooking;
 
   @override
   void initState() {
     super.initState();
-    _currentTransaction = TransactionType.outcome.name;
-    _parsedBookingDate = DateTime.now();
-    _bookingDateTextController.text = dateFormatterDDMMYYYYEE.format(DateTime.now());
+    if (widget.bookingBoxIndex != -1) {
+      _loadBooking();
+    } else {
+      _currentTransaction = TransactionType.outcome.name;
+      _parsedBookingDate = DateTime.now();
+      _bookingDateTextController.text = dateFormatterDDMMYYYYEE.format(DateTime.now());
+    }
+  }
+
+  Future<void> _loadBooking() async {
+    loadedBooking = await Booking.loadBooking(widget.bookingBoxIndex);
+    _currentTransaction = loadedBooking.transactionType;
+    _title = loadedBooking.title;
+    _parsedBookingDate = DateTime.parse(loadedBooking.date);
+    _bookingDateTextController.text = dateFormatterDDMMYYYYEE.format(DateTime.parse(loadedBooking.date));
+    _amountTextController.text = loadedBooking.amount;
+    _categorieTextController.text = loadedBooking.categorie;
+    _fromAccountTextController.text = loadedBooking.fromAccount;
+    _toAccountTextController.text = loadedBooking.toAccount;
+    _isBookingEdited = true;
   }
 
   void _createBooking() {
@@ -64,22 +84,25 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
         _validToAccount(_toAccountTextController.text) == false) {
       _setSaveButtonAnimation(false);
     } else {
-      Booking booking = Booking();
-      TransactionType transactionType = TransactionType.income;
-      booking.transactionType = transactionType.getTransactionType(_currentTransaction);
-      booking.bookingRepeats = BookingRepeats.noRepeat.name; // TODO dynamisch machen, wenn Wiederholungen implementiert wurden
-      booking.title = _title;
-      booking.date = _parsedBookingDate.toString();
-      booking.amount = _amountTextController.text;
-      booking.categorie = _categorieTextController.text;
-      booking.fromAccount = _fromAccountTextController.text;
-      booking.toAccount = _toAccountTextController.text;
+      Booking booking = Booking()
+        ..transactionType = _currentTransaction
+        ..bookingRepeats = BookingRepeats.noRepeat.name // TODO dynamisch machen, wenn Wiederholungen implementiert wurden
+        ..title = _title
+        ..date = _parsedBookingDate.toString()
+        ..amount = _amountTextController.text
+        ..categorie = _categorieTextController.text
+        ..fromAccount = _fromAccountTextController.text
+        ..toAccount = _toAccountTextController.text;
       if (_currentTransaction == TransactionType.transfer.name) {
         Account.transferMoney(_fromAccountTextController.text, _toAccountTextController.text, _amountTextController.text);
       } else {
         Account.calculateNewAccountBalance(_fromAccountTextController.text, _amountTextController.text, _currentTransaction);
       }
-      booking.createBooking(booking);
+      if (widget.bookingBoxIndex == -1) {
+        booking.createBooking(booking);
+      } else {
+        booking.updateBooking(booking, widget.bookingBoxIndex);
+      }
       _setSaveButtonAnimation(true);
       Timer(const Duration(milliseconds: 1200), () {
         if (mounted) {
@@ -146,6 +169,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
   }
 
   set currentTransaction(String transaction) => setState(() => _currentTransaction = transaction);
+  set currentBookingDate(DateTime bookingDate) => setState(() => _parsedBookingDate = bookingDate);
 
   void _setTitleState(String title) {
     setState(() {
@@ -169,24 +193,39 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(18.0),
             ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TransactionToggleButtons(transactionStringCallback: (transaction) => setState(() => _currentTransaction = transaction)),
-                TextInputField(input: _title, inputCallback: _setTitleState, hintText: 'Titel'),
-                DateInputField(textController: _bookingDateTextController, parsedDate: _parsedBookingDate),
-                MoneyInputField(textController: _amountTextController, errorText: _amountErrorText, hintText: 'Betrag', bottomSheetTitle: 'Betrag eingeben:'),
-                _currentTransaction == TransactionType.transfer.name
-                    ? const SizedBox()
-                    : CategorieInputField(textController: _categorieTextController, errorText: _categorieErrorText),
-                _currentTransaction == TransactionType.transfer.name
-                    ? AccountInputField(textController: _fromAccountTextController, errorText: _fromAccountErrorText, hintText: 'Von')
-                    : AccountInputField(textController: _fromAccountTextController, errorText: _fromAccountErrorText),
-                _currentTransaction == TransactionType.transfer.name
-                    ? AccountInputField(textController: _toAccountTextController, errorText: _toAccountErrorText, hintText: 'Nach')
-                    : const SizedBox(),
-                SaveButton(saveFunction: _createBooking, buttonController: _saveButtonController),
-              ],
+            child: FutureBuilder(
+              future: widget.bookingBoxIndex == -1
+                  ? null
+                  : _isBookingEdited
+                      ? null
+                      : _loadBooking(),
+              builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
+                switch (snapshot.connectionState) {
+                  case ConnectionState.waiting:
+                    return const LoadingIndicator();
+                  default:
+                    return Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        TransactionToggleButtons(
+                            currentTransaction: _currentTransaction, transactionStringCallback: (transaction) => setState(() => _currentTransaction = transaction)),
+                        TextInputField(input: _title, inputCallback: _setTitleState, hintText: 'Titel'),
+                        DateInputField(textController: _bookingDateTextController, bookingDateCallback: (bookingDate) => setState(() => _parsedBookingDate = bookingDate)),
+                        MoneyInputField(textController: _amountTextController, errorText: _amountErrorText, hintText: 'Betrag', bottomSheetTitle: 'Betrag eingeben:'),
+                        _currentTransaction == TransactionType.transfer.name
+                            ? const SizedBox()
+                            : CategorieInputField(textController: _categorieTextController, errorText: _categorieErrorText),
+                        _currentTransaction == TransactionType.transfer.name
+                            ? AccountInputField(textController: _fromAccountTextController, errorText: _fromAccountErrorText, hintText: 'Von')
+                            : AccountInputField(textController: _fromAccountTextController, errorText: _fromAccountErrorText),
+                        _currentTransaction == TransactionType.transfer.name
+                            ? AccountInputField(textController: _toAccountTextController, errorText: _toAccountErrorText, hintText: 'Nach')
+                            : const SizedBox(),
+                        SaveButton(saveFunction: _createBooking, buttonController: _saveButtonController),
+                      ],
+                    );
+                }
+              },
             ),
           ),
         ),

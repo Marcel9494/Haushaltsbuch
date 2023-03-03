@@ -2,14 +2,18 @@ import 'package:flutter/material.dart';
 
 import '/utils/date_formatters/date_formatter.dart';
 
+import '/screens/create_or_edit_booking_screen.dart';
+
+typedef BookingDateCallback = void Function(DateTime bookingDate);
+
 class DateInputField extends StatelessWidget {
   final TextEditingController textController;
-  late DateTime? parsedDate;
+  final BookingDateCallback bookingDateCallback;
 
-  DateInputField({
+  const DateInputField({
     Key? key,
     required this.textController,
-    required this.parsedDate,
+    required this.bookingDateCallback,
   }) : super(key: key);
 
   @override
@@ -38,7 +42,7 @@ class DateInputField extends StatelessWidget {
         ),
       ),
       onTap: () async {
-        parsedDate = await showDatePicker(
+        DateTime? parsedDate = await showDatePicker(
           context: context,
           locale: const Locale('de', 'DE'),
           initialDate: DateTime.now(),
@@ -60,7 +64,8 @@ class DateInputField extends StatelessWidget {
           },
         );
         if (parsedDate != null) {
-          textController.text = dateFormatterDDMMYYYYEE.format(parsedDate!);
+          CreateOrEditBookingScreen.of(context)!.currentBookingDate = parsedDate;
+          textController.text = dateFormatterDDMMYYYYEE.format(parsedDate);
         }
       },
     );

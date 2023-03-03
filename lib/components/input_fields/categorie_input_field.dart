@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:haushaltsbuch/models/categorie.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 import '/components/deco/bottom_sheet_line.dart';
 
+import '/models/categorie.dart';
+
 class CategorieInputField extends StatefulWidget {
   final TextEditingController textController;
   final String errorText;
-  // TODO dynamische Kategorien Liste laden von Benutzer
 
-  CategorieInputField({
+  const CategorieInputField({
     Key? key,
     required this.textController,
     required this.errorText,
@@ -21,7 +21,6 @@ class CategorieInputField extends StatefulWidget {
 
 class _CategorieInputFieldState extends State<CategorieInputField> {
   List<String> categorieNames = [];
-  //List<String> categories = ['Lebensmittel', 'Haushaltswaren', 'Restaurant', 'Mode/Kleidung', 'Transport', 'Möbel', 'Reisen', 'Wohnen', 'Garten', 'Sonstiges'];
 
   void _openBottomSheetWithCategorieList(BuildContext context) {
     showCupertinoModalBottomSheet<void>(

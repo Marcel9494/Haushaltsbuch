@@ -7,10 +7,12 @@ import '/models/enums/transaction_types.dart';
 typedef TransactionStringCallback = void Function(String currentTransaction);
 
 class TransactionToggleButtons extends StatefulWidget {
+  final String currentTransaction;
   final TransactionStringCallback transactionStringCallback;
 
   const TransactionToggleButtons({
     Key? key,
+    required this.currentTransaction,
     required this.transactionStringCallback,
   }) : super(key: key);
 
@@ -19,7 +21,23 @@ class TransactionToggleButtons extends StatefulWidget {
 }
 
 class _TransactionToggleButtonsState extends State<TransactionToggleButtons> {
-  final List<bool> _selectedTransaction = <bool>[false, true, false];
+  late List<bool> _selectedTransaction = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _getSelectedTransaction();
+  }
+
+  void _getSelectedTransaction() {
+    if (widget.currentTransaction == TransactionType.income.name) {
+      _selectedTransaction = <bool>[true, false, false];
+    } else if (widget.currentTransaction == TransactionType.outcome.name) {
+      _selectedTransaction = <bool>[false, true, false];
+    } else if (widget.currentTransaction == TransactionType.transfer.name) {
+      _selectedTransaction = <bool>[false, false, true];
+    }
+  }
 
   void _setSelectedTransaction(int selectedIndex) {
     setState(() {
