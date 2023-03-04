@@ -34,6 +34,17 @@ class Categorie extends HiveObject {
     }
   }
 
+  Future<bool> existsCategorieName(String categorieName) async {
+    var categorieBox = await Hive.openBox(categoriesBox);
+    for (int i = 0; i < categorieBox.length; i++) {
+      Categorie categorie = await categorieBox.getAt(i);
+      if (categorieName.trim().toLowerCase() == categorie.name.toLowerCase()) {
+        return Future.value(true);
+      }
+    }
+    return Future.value(false);
+  }
+
   static Future<List<Categorie>> loadCategories() async {
     var categorieBox = await Hive.openBox(categoriesBox);
     List<Categorie> categorieList = [];

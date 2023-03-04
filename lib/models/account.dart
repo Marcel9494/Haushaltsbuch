@@ -29,6 +29,17 @@ class Account extends HiveObject {
     }
   }
 
+  Future<bool> existsAccountName(String accountName) async {
+    var accountBox = await Hive.openBox(accountsBox);
+    for (int i = 0; i < accountBox.length; i++) {
+      Account account = await accountBox.getAt(i);
+      if (accountName.trim().toLowerCase() == account.name.toLowerCase()) {
+        return Future.value(true);
+      }
+    }
+    return Future.value(false);
+  }
+
   static void calculateNewAccountBalance(String accountName, String amount, String transaction) async {
     var accountBox = await Hive.openBox(accountsBox);
     for (int i = 0; i < accountBox.length; i++) {

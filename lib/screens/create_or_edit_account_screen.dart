@@ -24,20 +24,23 @@ class _CreateOrEditAccountScreenState extends State<CreateOrEditAccountScreen> {
   final TextEditingController _accountGroupTextController = TextEditingController();
   final TextEditingController _bankBalanceTextController = TextEditingController();
   final RoundedLoadingButtonController _saveButtonController = RoundedLoadingButtonController();
+  final Account _account = Account();
   String _accountName = '';
   String _accountNameErrorText = '';
   String _accountGroupErrorText = '';
   String _bankBalanceErrorText = '';
 
-  void _createAccount() {
-    if (_validAccountGroup(_accountGroupTextController.text) == false || _validAccountName(_accountName) == false || _validBankBalance(_bankBalanceTextController.text) == false) {
+  void _createAccount() async {
+    _account.name = _accountName;
+    bool validAccountName = await _validAccountName(_accountName);
+    bool validAccountGroup = _validAccountGroup(_accountGroupTextController.text);
+    bool validBankBalance = _validBankBalance(_bankBalanceTextController.text);
+    if (validAccountGroup == false || validAccountName == false || validBankBalance == false) {
       _setSaveButtonAnimation(false);
     } else {
-      Account account = Account();
-      account.name = _accountName;
-      account.accountType = _accountGroupTextController.text;
-      account.bankBalance = _bankBalanceTextController.text;
-      account.createAccount(account);
+      _account.accountType = _accountGroupTextController.text;
+      _account.bankBalance = _bankBalanceTextController.text;
+      _account.createAccount(_account);
       _setSaveButtonAnimation(true);
       Timer(const Duration(milliseconds: 1200), () {
         if (mounted) {
@@ -50,10 +53,17 @@ class _CreateOrEditAccountScreenState extends State<CreateOrEditAccountScreen> {
     }
   }
 
-  bool _validAccountName(String accountNameInput) {
+  Future<bool> _validAccountName(String accountNameInput) async {
     if (_accountName.isEmpty) {
       setState(() {
         _accountNameErrorText = 'Bitte geben Sie einen Kontonamen ein.';
+      });
+      return false;
+    }
+    bool accountNameExisting = await _account.existsAccountName(_accountName);
+    if (accountNameExisting) {
+      setState(() {
+        _accountNameErrorText = 'Konto ist bereits angelegt.';
       });
       return false;
     }

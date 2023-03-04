@@ -24,6 +24,7 @@ class CreateOrEditCategorieScreen extends StatefulWidget {
 
 class _CreateOrEditCategorieScreenState extends State<CreateOrEditCategorieScreen> {
   final RoundedLoadingButtonController _saveButtonController = RoundedLoadingButtonController();
+  final Categorie _categorie = Categorie();
   String _categorieName = '';
   String _categorieNameErrorText = '';
 
@@ -33,33 +34,40 @@ class _CreateOrEditCategorieScreenState extends State<CreateOrEditCategorieScree
     _categorieName = widget.categorieName;
   }
 
-  void _createOrUpdateCategorie() {
-    if (_validCategorieName(_categorieName) == false) {
+  void _createOrUpdateCategorie() async {
+    _categorie.name = _categorieName.trim();
+    bool validCategorieName = await _validCategorieName(_categorieName);
+    if (validCategorieName == false) {
       _setSaveButtonAnimation(false);
-    } else {
-      Categorie categorie = Categorie();
-      categorie.name = _categorieName;
-      if (widget.categorieName == '') {
-        categorie.createCategorie(categorie);
-      } else {
-        categorie.updateCategorie(categorie, widget.categorieName);
-      }
-      _setSaveButtonAnimation(true);
-      Timer(const Duration(milliseconds: 1200), () {
-        if (mounted) {
-          FocusScope.of(context).requestFocus(FocusNode());
-          Navigator.pop(context);
-          Navigator.pop(context);
-          Navigator.pushNamed(context, categoriesRoute);
-        }
-      });
+      return;
     }
+    if (widget.categorieName == '') {
+      _categorie.createCategorie(_categorie);
+    } else {
+      _categorie.updateCategorie(_categorie, widget.categorieName);
+    }
+    _setSaveButtonAnimation(true);
+    Timer(const Duration(milliseconds: 1200), () {
+      if (mounted) {
+        FocusScope.of(context).requestFocus(FocusNode());
+        Navigator.pop(context);
+        Navigator.pop(context);
+        Navigator.pushNamed(context, categoriesRoute);
+      }
+    });
   }
 
-  bool _validCategorieName(String categorieNameInput) {
+  Future<bool> _validCategorieName(String categorieNameInput) async {
     if (_categorieName.isEmpty) {
       setState(() {
         _categorieNameErrorText = 'Bitte geben Sie einen Kategorienamen ein.';
+      });
+      return false;
+    }
+    bool categorieNameExisting = await _categorie.existsCategorieName(_categorieName);
+    if (categorieNameExisting) {
+      setState(() {
+        _categorieNameErrorText = 'Kategoriename ist bereits vorhanden.';
       });
       return false;
     }
@@ -88,7 +96,7 @@ class _CreateOrEditCategorieScreenState extends State<CreateOrEditCategorieScree
       child: Scaffold(
         backgroundColor: const Color(0x00ffffff),
         appBar: AppBar(
-          title: const Text('Kategorie erstellen'),
+          title: widget.categorieName == '' ? const Text('Kategorie erstellen') : const Text('Kategorie bearbeiten'),
           backgroundColor: const Color(0x00ffffff),
         ),
         body: Padding(

@@ -32,6 +32,11 @@ class Booking extends HiveObject {
     bookingBox.putAt(bookingBoxIndex, updatedBooking);
   }
 
+  void deleteBooking(int bookingBoxIndex) async {
+    var bookingBox = await Hive.openBox(bookingsBox);
+    bookingBox.deleteAt(bookingBoxIndex);
+  }
+
   static Future<Booking> loadBooking(int bookingBoxIndex) async {
     var bookingBox = await Hive.openBox(bookingsBox);
     Booking booking = await bookingBox.getAt(bookingBoxIndex);

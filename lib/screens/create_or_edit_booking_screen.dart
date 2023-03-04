@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:another_flushbar/flushbar.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 
 import '/utils/consts/route_consts.dart';
@@ -50,30 +51,30 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
   String _fromAccountErrorText = '';
   String _toAccountErrorText = '';
   DateTime? _parsedBookingDate;
-  late Booking loadedBooking;
+  late Booking _loadedBooking;
 
   @override
   void initState() {
     super.initState();
-    if (widget.bookingBoxIndex != -1) {
-      _loadBooking();
-    } else {
+    if (widget.bookingBoxIndex == -1) {
       _currentTransaction = TransactionType.outcome.name;
       _parsedBookingDate = DateTime.now();
       _bookingDateTextController.text = dateFormatterDDMMYYYYEE.format(DateTime.now());
+    } else {
+      _loadBooking();
     }
   }
 
   Future<void> _loadBooking() async {
-    loadedBooking = await Booking.loadBooking(widget.bookingBoxIndex);
-    _currentTransaction = loadedBooking.transactionType;
-    _title = loadedBooking.title;
-    _parsedBookingDate = DateTime.parse(loadedBooking.date);
-    _bookingDateTextController.text = dateFormatterDDMMYYYYEE.format(DateTime.parse(loadedBooking.date));
-    _amountTextController.text = loadedBooking.amount;
-    _categorieTextController.text = loadedBooking.categorie;
-    _fromAccountTextController.text = loadedBooking.fromAccount;
-    _toAccountTextController.text = loadedBooking.toAccount;
+    _loadedBooking = await Booking.loadBooking(widget.bookingBoxIndex);
+    _currentTransaction = _loadedBooking.transactionType;
+    _title = _loadedBooking.title;
+    _parsedBookingDate = DateTime.parse(_loadedBooking.date);
+    _bookingDateTextController.text = dateFormatterDDMMYYYYEE.format(DateTime.parse(_loadedBooking.date));
+    _amountTextController.text = _loadedBooking.amount;
+    _categorieTextController.text = _loadedBooking.categorie;
+    _fromAccountTextController.text = _loadedBooking.fromAccount;
+    _toAccountTextController.text = _loadedBooking.toAccount;
     _isBookingEdited = true;
   }
 
@@ -177,13 +178,81 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
     });
   }
 
+  void _deleteBooking(int index) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Buchung löschen?'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text(
+                'Nein',
+                style: TextStyle(
+                  color: Colors.cyanAccent,
+                ),
+              ),
+              onPressed: () => _noPressed(),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                primary: Colors.cyanAccent,
+                onPrimary: Colors.black87,
+              ),
+              onPressed: () => {
+                _yesPressed(index),
+                Flushbar(
+                  title: 'Buchung wurde gelöscht',
+                  message: 'Buchung wurde erfolgreich gelöscht.',
+                  icon: const Icon(
+                    Icons.info_outline,
+                    size: 28.0,
+                    color: Colors.cyanAccent,
+                  ),
+                  duration: const Duration(seconds: 3),
+                  leftBarIndicatorColor: Colors.cyanAccent,
+                )..show(context),
+              },
+              child: const Text('Ja'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _yesPressed(int index) {
+    setState(() {
+      _loadedBooking.deleteBooking(widget.bookingBoxIndex);
+    });
+    Navigator.pop(context);
+    Navigator.pop(context);
+    Navigator.popAndPushNamed(context, bottomNavBarRoute, arguments: BottomNavBarScreenArguments(0));
+    FocusScope.of(context).unfocus();
+  }
+
+  void _noPressed() {
+    Navigator.pop(context);
+    FocusScope.of(context).unfocus();
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
         backgroundColor: const Color(0x00ffffff),
         appBar: AppBar(
-          title: const Text('Buchung erstellen'),
+          title: widget.bookingBoxIndex == -1 ? const Text('Buchung erstellen') : const Text('Buchung bearbeiten'),
+          actions: [
+            widget.bookingBoxIndex == -1
+                ? const SizedBox()
+                : IconButton(
+                    icon: const Icon(Icons.delete_forever_rounded),
+                    onPressed: () {
+                      _deleteBooking(widget.bookingBoxIndex);
+                    },
+                  ),
+          ],
           backgroundColor: const Color(0x00ffffff),
         ),
         body: Padding(
