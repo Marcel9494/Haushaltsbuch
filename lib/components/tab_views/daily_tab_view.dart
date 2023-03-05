@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:haushaltsbuch/models/enums/transaction_types.dart';
 
+import '/components/buttons/change_month_buttons.dart';
 import '/components/deco/overview_tile.dart';
 import '/components/cards/booking_card.dart';
 
 import '/utils/number_formatters/number_formatter.dart';
 
 import '/models/booking.dart';
+import '/models/enums/transaction_types.dart';
 
 class DailyTabView extends StatefulWidget {
   const DailyTabView({Key? key}) : super(key: key);
@@ -60,6 +61,7 @@ class _DailyTabViewState extends State<DailyTabView> {
               } else {
                 return Column(
                   children: [
+                    const ChangeMonthButtons(),
                     OverviewTile(shouldText: 'Einnahmen', should: _getRevenues(), haveText: 'Ausgaben', have: _getExpenditures(), balanceText: 'Saldo'),
                     Expanded(
                       child: RefreshIndicator(
