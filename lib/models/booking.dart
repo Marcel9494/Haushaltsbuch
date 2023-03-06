@@ -51,6 +51,7 @@ class Booking extends HiveObject {
       booking.boxIndex = i;
       bookingList.add(booking);
     }
+    bookingList.sort((first, second) => first.date.compareTo(second.date));
     return bookingList;
   }
 }
