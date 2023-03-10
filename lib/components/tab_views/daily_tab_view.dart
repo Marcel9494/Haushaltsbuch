@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '/components/buttons/change_month_buttons.dart';
-import '/components/deco/overview_tile.dart';
 import '/components/cards/booking_card.dart';
+import '/components/deco/overview_tile.dart';
+import '/components/deco/loading_indicator.dart';
 
 import '/utils/date_formatters/date_formatter.dart';
 import '/utils/number_formatters/number_formatter.dart';
@@ -26,6 +27,7 @@ class _DailyTabViewState extends State<DailyTabView> {
 
   Future<List<Booking>> loadBookingList() async {
     _bookingList = await Booking.loadBookingList();
+    _prepareMaps(_bookingList);
     _getTodayExpenditures(_bookingList);
     _getTodayRevenues(_bookingList);
     return _bookingList;
@@ -51,36 +53,38 @@ class _DailyTabViewState extends State<DailyTabView> {
     return _expenditures;
   }
 
-  void _getTodayExpenditures(List<Booking> bookingList) {
+  void _prepareMaps(List<Booking> bookingList) {
     _todayExpendituresMap.clear();
+    _todayRevenuesMap.clear();
     for (int i = 0; i < bookingList.length; i++) {
-      if (bookingList[i].transactionType == TransactionType.outcome.name) {
+      if (bookingList[i].transactionType == TransactionType.outcome.name || bookingList[i].transactionType == TransactionType.income.name) {
         DateTime bookingDate = DateTime(DateTime.parse(bookingList[i].date).year, DateTime.parse(bookingList[i].date).month, DateTime.parse(bookingList[i].date).day);
-        if (i == 0 || _todayExpendituresMap.containsKey(bookingDate) == false) {
-          _todayExpendituresMap[bookingDate] = formatMoneyAmountToDouble(bookingList[i].amount);
-        } else {
-          double? amount = _todayExpendituresMap[bookingDate];
-          amount = amount! + formatMoneyAmountToDouble(bookingList[i].amount);
-          _todayExpendituresMap[bookingDate] = amount;
+        if (_todayExpendituresMap.containsKey(bookingDate) == false && _todayRevenuesMap.containsKey(bookingDate) == false) {
+          _todayExpendituresMap[bookingDate] = 0.0;
+          _todayRevenuesMap[bookingDate] = 0.0;
         }
       }
     }
   }
 
-  void _getTodayRevenues(List<Booking> bookingList) {
-    _todayRevenuesMap.clear();
+  void _getTodayExpenditures(List<Booking> bookingList) {
     for (int i = 0; i < bookingList.length; i++) {
-      // TODO hier weitermachen und auf income ändern + mit _todayExpendituresMap[bookingDate] vergleichen, wenn keine Einnahmen vorhanden sind auf 0 setzen.
-      // TODO andersrum genauso falls keine Ausgaben vorhanden sind.
       if (bookingList[i].transactionType == TransactionType.outcome.name) {
         DateTime bookingDate = DateTime(DateTime.parse(bookingList[i].date).year, DateTime.parse(bookingList[i].date).month, DateTime.parse(bookingList[i].date).day);
-        if (i == 0 || _todayRevenuesMap.containsKey(bookingDate) == false) {
-          _todayRevenuesMap[bookingDate] = formatMoneyAmountToDouble(bookingList[i].amount);
-        } else {
-          double? amount = _todayRevenuesMap[bookingDate];
-          amount = amount! + formatMoneyAmountToDouble(bookingList[i].amount);
-          _todayRevenuesMap[bookingDate] = amount;
-        }
+        double? amount = _todayExpendituresMap[bookingDate];
+        amount = amount! + formatMoneyAmountToDouble(bookingList[i].amount);
+        _todayExpendituresMap[bookingDate] = amount;
+      }
+    }
+  }
+
+  void _getTodayRevenues(List<Booking> bookingList) {
+    for (int i = 0; i < bookingList.length; i++) {
+      if (bookingList[i].transactionType == TransactionType.income.name) {
+        DateTime bookingDate = DateTime(DateTime.parse(bookingList[i].date).year, DateTime.parse(bookingList[i].date).month, DateTime.parse(bookingList[i].date).day);
+        double? amount = _todayRevenuesMap[bookingDate];
+        amount = amount! + formatMoneyAmountToDouble(bookingList[i].amount);
+        _todayRevenuesMap[bookingDate] = amount;
       }
     }
   }
@@ -93,7 +97,7 @@ class _DailyTabViewState extends State<DailyTabView> {
         builder: (BuildContext context, AsyncSnapshot<List<Booking>> snapshot) {
           switch (snapshot.connectionState) {
             case ConnectionState.waiting:
-              return const Text('Warten');
+              return const LoadingIndicator();
             case ConnectionState.done:
               if (_bookingList.isEmpty) {
                 return const Text('Noch keine Buchungen vorhanden.');
@@ -130,18 +134,15 @@ class _DailyTabViewState extends State<DailyTabView> {
                                     children: [
                                       Padding(
                                         padding: const EdgeInsets.all(12.0),
-                                        child: Text(dateFormatterDDMMYYYYEE.format(DateTime.parse(_bookingList[index].date)) + ':', style: const TextStyle(fontSize: 16.0)),
+                                        child: Text(dateFormatterEEDDMMYYYY.format(DateTime.parse(_bookingList[index].date)) + ':', style: const TextStyle(fontSize: 16.0)),
                                       ),
+                                      Text(
+                                          formatToMoneyAmount(_todayRevenuesMap[DateTime(DateTime.parse(_bookingList[index].date).year,
+                                                  DateTime.parse(_bookingList[index].date).month, DateTime.parse(_bookingList[index].date).day)]
+                                              .toString()),
+                                          style: const TextStyle(color: Colors.greenAccent)),
                                       Padding(
-                                        padding: const EdgeInsets.only(right: 8.0),
-                                        child: Text(
-                                            formatToMoneyAmount(_todayRevenuesMap[DateTime(DateTime.parse(_bookingList[index].date).year,
-                                                    DateTime.parse(_bookingList[index].date).month, DateTime.parse(_bookingList[index].date).day)]
-                                                .toString()),
-                                            style: const TextStyle(color: Colors.greenAccent)),
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.only(right: 8.0),
+                                        padding: const EdgeInsets.only(right: 21.0),
                                         child: Text(
                                             formatToMoneyAmount(_todayExpendituresMap[DateTime(DateTime.parse(_bookingList[index].date).year,
                                                     DateTime.parse(_bookingList[index].date).month, DateTime.parse(_bookingList[index].date).day)]
