@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:month_picker_dialog/month_picker_dialog.dart';
 
-import '/components/buttons/change_month_buttons.dart';
 import '/components/cards/booking_card.dart';
 import '/components/deco/overview_tile.dart';
 import '/components/deco/loading_indicator.dart';
@@ -20,13 +20,14 @@ class DailyTabView extends StatefulWidget {
 
 class _DailyTabViewState extends State<DailyTabView> {
   late List<Booking> _bookingList = [];
+  late DateTime _selectedDate = DateTime.now();
   late double _revenues = 0.0;
   late double _expenditures = 0.0;
   late final Map<DateTime, double> _todayExpendituresMap = {};
   late final Map<DateTime, double> _todayRevenuesMap = {};
 
   Future<List<Booking>> loadBookingList() async {
-    _bookingList = await Booking.loadBookingList();
+    _bookingList = await Booking.loadBookingList(_selectedDate.month, _selectedDate.year);
     _prepareMaps(_bookingList);
     _getTodayExpenditures(_bookingList);
     _getTodayRevenues(_bookingList);
@@ -92,83 +93,110 @@ class _DailyTabViewState extends State<DailyTabView> {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: FutureBuilder(
-        future: loadBookingList(),
-        builder: (BuildContext context, AsyncSnapshot<List<Booking>> snapshot) {
-          switch (snapshot.connectionState) {
-            case ConnectionState.waiting:
-              return const LoadingIndicator();
-            case ConnectionState.done:
-              if (_bookingList.isEmpty) {
-                return const Text('Noch keine Buchungen vorhanden.');
-              } else {
-                return Column(
-                  children: [
-                    const ChangeMonthButtons(),
-                    OverviewTile(shouldText: 'Einnahmen', should: _getRevenues(), haveText: 'Ausgaben', have: _getExpenditures(), balanceText: 'Saldo'),
-                    Expanded(
-                      child: RefreshIndicator(
-                        onRefresh: () async {
-                          _bookingList = await loadBookingList();
-                          setState(() {});
-                          return;
-                        },
-                        color: Colors.cyanAccent,
-                        child: ListView.builder(
-                          itemCount: _bookingList.length,
-                          itemBuilder: (BuildContext context, int index) {
-                            DateTime previousBookingDate = DateTime(0, 0, 0);
-                            DateTime bookingDate = DateTime(0, 0, 0);
-                            if (index != 0) {
-                              previousBookingDate = DateTime(DateTime.parse(_bookingList[index - 1].date).year, DateTime.parse(_bookingList[index - 1].date).month,
-                                  DateTime.parse(_bookingList[index - 1].date).day);
-                              bookingDate = DateTime(
-                                  DateTime.parse(_bookingList[index].date).year, DateTime.parse(_bookingList[index].date).month, DateTime.parse(_bookingList[index].date).day);
-                            }
-                            if (index == 0 || previousBookingDate != bookingDate) {
-                              return Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Padding(
-                                        padding: const EdgeInsets.all(12.0),
-                                        child: Text(dateFormatterEEDDMMYYYY.format(DateTime.parse(_bookingList[index].date)) + ':', style: const TextStyle(fontSize: 16.0)),
-                                      ),
-                                      Text(
-                                          formatToMoneyAmount(_todayRevenuesMap[DateTime(DateTime.parse(_bookingList[index].date).year,
-                                                  DateTime.parse(_bookingList[index].date).month, DateTime.parse(_bookingList[index].date).day)]
-                                              .toString()),
-                                          style: const TextStyle(color: Colors.greenAccent)),
-                                      Padding(
-                                        padding: const EdgeInsets.only(right: 21.0),
-                                        child: Text(
-                                            formatToMoneyAmount(_todayExpendituresMap[DateTime(DateTime.parse(_bookingList[index].date).year,
-                                                    DateTime.parse(_bookingList[index].date).month, DateTime.parse(_bookingList[index].date).day)]
-                                                .toString()),
-                                            style: const TextStyle(color: Colors.redAccent)),
-                                      ),
-                                    ],
-                                  ),
-                                  BookingCard(booking: _bookingList[index]),
-                                ],
-                              );
-                            } else if (previousBookingDate == bookingDate) {
-                              return BookingCard(booking: _bookingList[index]);
-                            }
-                            return const SizedBox();
-                          },
-                        ),
-                      ),
-                    ),
-                  ],
-                );
-              }
-            default:
-              return const Text('Warten');
-          }
-        },
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 14.0),
+            child: GestureDetector(
+                onTap: () {
+                  showMonthPicker(
+                    context: context,
+                    initialDate: DateTime.now(),
+                  ).then((date) {
+                    if (date != null) {
+                      setState(() {
+                        _selectedDate = date;
+                      });
+                    }
+                  });
+                },
+                child: Text(dateFormatterMMMMYYYY.format(_selectedDate))),
+          ),
+          Expanded(
+            child: FutureBuilder(
+              future: loadBookingList(),
+              builder: (BuildContext context, AsyncSnapshot<List<Booking>> snapshot) {
+                switch (snapshot.connectionState) {
+                  case ConnectionState.waiting:
+                    return const LoadingIndicator();
+                  case ConnectionState.done:
+                    if (_bookingList.isEmpty) {
+                      return Column(
+                        children: const [
+                          OverviewTile(shouldText: 'Einnahmen', should: 0, haveText: 'Ausgaben', have: 0, balanceText: 'Saldo'),
+                          Text('Noch keine Buchungen vorhanden.'),
+                        ],
+                      );
+                    } else {
+                      return Column(
+                        children: [
+                          OverviewTile(shouldText: 'Einnahmen', should: _getRevenues(), haveText: 'Ausgaben', have: _getExpenditures(), balanceText: 'Saldo'),
+                          Expanded(
+                            child: RefreshIndicator(
+                              onRefresh: () async {
+                                _bookingList = await loadBookingList();
+                                setState(() {});
+                                return;
+                              },
+                              color: Colors.cyanAccent,
+                              child: ListView.builder(
+                                itemCount: _bookingList.length,
+                                itemBuilder: (BuildContext context, int index) {
+                                  DateTime previousBookingDate = DateTime(0, 0, 0);
+                                  DateTime bookingDate = DateTime(0, 0, 0);
+                                  if (index != 0) {
+                                    previousBookingDate = DateTime(DateTime.parse(_bookingList[index - 1].date).year, DateTime.parse(_bookingList[index - 1].date).month,
+                                        DateTime.parse(_bookingList[index - 1].date).day);
+                                    bookingDate = DateTime(DateTime.parse(_bookingList[index].date).year, DateTime.parse(_bookingList[index].date).month,
+                                        DateTime.parse(_bookingList[index].date).day);
+                                  }
+                                  if (index == 0 || previousBookingDate != bookingDate) {
+                                    return Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Padding(
+                                              padding: const EdgeInsets.all(12.0),
+                                              child: Text(dateFormatterEEDDMMYYYY.format(DateTime.parse(_bookingList[index].date)) + ':', style: const TextStyle(fontSize: 16.0)),
+                                            ),
+                                            Text(
+                                                formatToMoneyAmount(_todayRevenuesMap[DateTime(DateTime.parse(_bookingList[index].date).year,
+                                                        DateTime.parse(_bookingList[index].date).month, DateTime.parse(_bookingList[index].date).day)]
+                                                    .toString()),
+                                                style: const TextStyle(color: Colors.greenAccent)),
+                                            Padding(
+                                              padding: const EdgeInsets.only(right: 21.0),
+                                              child: Text(
+                                                  formatToMoneyAmount(_todayExpendituresMap[DateTime(DateTime.parse(_bookingList[index].date).year,
+                                                          DateTime.parse(_bookingList[index].date).month, DateTime.parse(_bookingList[index].date).day)]
+                                                      .toString()),
+                                                  style: const TextStyle(color: Colors.redAccent)),
+                                            ),
+                                          ],
+                                        ),
+                                        BookingCard(booking: _bookingList[index]),
+                                      ],
+                                    );
+                                  } else if (previousBookingDate == bookingDate) {
+                                    return BookingCard(booking: _bookingList[index]);
+                                  }
+                                  return const SizedBox();
+                                },
+                              ),
+                            ),
+                          ),
+                        ],
+                      );
+                    }
+                  default:
+                    return const Text('Warten');
+                }
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
