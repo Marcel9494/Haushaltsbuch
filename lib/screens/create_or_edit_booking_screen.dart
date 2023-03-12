@@ -78,7 +78,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
     _isBookingEdited = true;
   }
 
-  void _createBooking() {
+  void _createOrUpdateBooking() {
     if (_validBookingAmount(_amountTextController.text) == false ||
         _validCategorie(_categorieTextController.text) == false ||
         _validFromAccount(_fromAccountTextController.text) == false ||
@@ -196,8 +196,8 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
             ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                primary: Colors.cyanAccent,
-                onPrimary: Colors.black87,
+                foregroundColor: Colors.black87,
+                backgroundColor: Colors.cyanAccent,
               ),
               onPressed: () => {
                 _yesPressed(index),
@@ -290,7 +290,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
                         _currentTransaction == TransactionType.transfer.name
                             ? AccountInputField(textController: _toAccountTextController, errorText: _toAccountErrorText, hintText: 'Nach')
                             : const SizedBox(),
-                        SaveButton(saveFunction: _createBooking, buttonController: _saveButtonController),
+                        SaveButton(saveFunction: _createOrUpdateBooking, buttonController: _saveButtonController),
                       ],
                     );
                 }

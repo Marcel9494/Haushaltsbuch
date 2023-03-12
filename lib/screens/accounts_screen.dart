@@ -9,6 +9,7 @@ import '/components/deco/overview_tile.dart';
 import '/utils/consts/route_consts.dart';
 
 import '/models/account.dart';
+import '/models/screen_arguments/create_or_edit_account_screen_arguments.dart';
 
 class AccountsScreen extends StatefulWidget {
   const AccountsScreen({Key? key}) : super(key: key);
@@ -38,7 +39,7 @@ class _AccountsScreenState extends State<AccountsScreen> {
               Column(
                 children: [
                   ListTile(
-                    onTap: () => Navigator.popAndPushNamed(context, createOrEditAccountRoute),
+                    onTap: () => Navigator.popAndPushNamed(context, createOrEditAccountRoute, arguments: CreateOrEditAccountScreenArguments(-1)),
                     leading: const Icon(Icons.add_circle_outline_rounded, color: Colors.cyanAccent),
                     title: const Text('Konto erstellen'),
                   ),

@@ -6,6 +6,7 @@ import '/utils/consts/hive_consts.dart';
 
 @HiveType(typeId: 3)
 class Account extends HiveObject {
+  late int boxIndex;
   @HiveField(0)
   late String name;
   @HiveField(1)
@@ -16,6 +17,11 @@ class Account extends HiveObject {
   void createAccount(Account newAccount) async {
     var accountBox = await Hive.openBox(accountsBox);
     accountBox.add(newAccount);
+  }
+
+  void updateAccount(Account updatedAccount, int accountBoxIndex) async {
+    var accountBox = await Hive.openBox(accountsBox);
+    accountBox.putAt(accountBoxIndex, updatedAccount);
   }
 
   void deleteAccount(Account deleteAccount) async {
@@ -76,11 +82,18 @@ class Account extends HiveObject {
     }
   }
 
+  static Future<Account> loadAccount(int accountBoxIndex) async {
+    var accountBox = await Hive.openBox(accountsBox);
+    Account account = await accountBox.getAt(accountBoxIndex);
+    return account;
+  }
+
   static Future<List<Account>> loadAccounts() async {
     var accountBox = await Hive.openBox(accountsBox);
     List<Account> accountList = [];
     for (int i = 0; i < accountBox.length; i++) {
       Account account = await accountBox.getAt(i);
+      account.boxIndex = i;
       accountList.add(account);
     }
     accountList.sort((first, second) => first.accountType.compareTo(second.accountType));

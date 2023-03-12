@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
-import 'package:hive/hive.dart';
 import 'package:hive_flutter/adapters.dart';
 
 import '/utils/consts/route_consts.dart';
@@ -14,6 +13,7 @@ import 'models/enums/booking_repeats.dart';
 import 'models/enums/transaction_types.dart';
 import 'models/screen_arguments/bottom_nav_bar_screen_arguments.dart';
 import 'models/screen_arguments/account_details_screen_arguments.dart';
+import 'models/screen_arguments/create_or_edit_account_screen_arguments.dart';
 import 'models/screen_arguments/create_or_edit_booking_screen_arguments.dart';
 import 'models/screen_arguments/create_or_edit_categorie_screen_arguments.dart';
 
@@ -62,7 +62,6 @@ class BudgetBookApp extends StatelessWidget {
       ],
       home: const BottomNavBar(screenIndex: 0),
       routes: {
-        createOrEditAccountRoute: (context) => const CreateOrEditAccountScreen(),
         categoriesRoute: (context) => const CategoriesScreen(),
       },
       onGenerateRoute: (RouteSettings settings) {
@@ -91,6 +90,14 @@ class BudgetBookApp extends StatelessWidget {
               ),
               settings: settings,
             );
+          case createOrEditAccountRoute:
+            final args = settings.arguments as CreateOrEditAccountScreenArguments;
+            return MaterialPageRoute<String>(
+              builder: (BuildContext context) => CreateOrEditAccountScreen(
+                accountBoxIndex: args.accountBoxIndex,
+              ),
+              settings: settings,
+            );
           case createOrEditCategorieRoute:
             final args = settings.arguments as CreateOrEditCategorieScreenArguments;
             return MaterialPageRoute<String>(
@@ -100,6 +107,7 @@ class BudgetBookApp extends StatelessWidget {
               settings: settings,
             );
         }
+        return null;
       },
     );
   }

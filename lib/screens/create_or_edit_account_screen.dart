@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 
+import '../components/deco/loading_indicator.dart';
 import '/components/input_fields/account_type_input_field.dart';
 import '/components/input_fields/money_input_field.dart';
 import '/components/input_fields/text_input_field.dart';
@@ -14,7 +15,12 @@ import '/models/screen_arguments/bottom_nav_bar_screen_arguments.dart';
 import '/utils/consts/route_consts.dart';
 
 class CreateOrEditAccountScreen extends StatefulWidget {
-  const CreateOrEditAccountScreen({Key? key}) : super(key: key);
+  final int accountBoxIndex;
+
+  const CreateOrEditAccountScreen({
+    Key? key,
+    required this.accountBoxIndex,
+  }) : super(key: key);
 
   @override
   State<CreateOrEditAccountScreen> createState() => _CreateOrEditAccountScreenState();
@@ -24,13 +30,31 @@ class _CreateOrEditAccountScreenState extends State<CreateOrEditAccountScreen> {
   final TextEditingController _accountGroupTextController = TextEditingController();
   final TextEditingController _bankBalanceTextController = TextEditingController();
   final RoundedLoadingButtonController _saveButtonController = RoundedLoadingButtonController();
+  bool _isAccountEdited = false;
   final Account _account = Account();
   String _accountName = '';
   String _accountNameErrorText = '';
   String _accountGroupErrorText = '';
   String _bankBalanceErrorText = '';
+  late Account _loadedAccount;
 
-  void _createAccount() async {
+  @override
+  void initState() {
+    super.initState();
+    if (widget.accountBoxIndex != -1) {
+      _loadAccount();
+    }
+  }
+
+  Future<void> _loadAccount() async {
+    _loadedAccount = await Account.loadAccount(widget.accountBoxIndex);
+    _accountName = _loadedAccount.name;
+    _accountGroupTextController.text = _loadedAccount.accountType;
+    _bankBalanceTextController.text = _loadedAccount.bankBalance;
+    _isAccountEdited = true;
+  }
+
+  void _createOrUpdateAccount() async {
     _account.name = _accountName;
     bool validAccountName = await _validAccountName(_accountName);
     bool validAccountGroup = _validAccountGroup(_accountGroupTextController.text);
@@ -40,7 +64,11 @@ class _CreateOrEditAccountScreenState extends State<CreateOrEditAccountScreen> {
     } else {
       _account.accountType = _accountGroupTextController.text;
       _account.bankBalance = _bankBalanceTextController.text;
-      _account.createAccount(_account);
+      if (widget.accountBoxIndex == -1) {
+        _account.createAccount(_account);
+      } else {
+        _account.updateAccount(_account, widget.accountBoxIndex);
+      }
       _setSaveButtonAnimation(true);
       Timer(const Duration(milliseconds: 1200), () {
         if (mounted) {
@@ -114,7 +142,7 @@ class _CreateOrEditAccountScreenState extends State<CreateOrEditAccountScreen> {
       child: Scaffold(
         backgroundColor: const Color(0x00ffffff),
         appBar: AppBar(
-          title: const Text('Konto erstellen'),
+          title: widget.accountBoxIndex == -1 ? const Text('Konto erstellen') : const Text('Konto bearbeiten'),
           backgroundColor: const Color(0x00ffffff),
         ),
         body: Padding(
@@ -124,14 +152,29 @@ class _CreateOrEditAccountScreenState extends State<CreateOrEditAccountScreen> {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(18.0),
             ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                AccountTypeInputField(textController: _accountGroupTextController, errorText: _accountGroupErrorText),
-                TextInputField(input: _accountName, inputCallback: _setAccountNameState, errorText: _accountNameErrorText, hintText: 'Name'),
-                MoneyInputField(textController: _bankBalanceTextController, errorText: _bankBalanceErrorText, hintText: 'Kontostand', bottomSheetTitle: 'Kontostand eingeben:'),
-                SaveButton(saveFunction: _createAccount, buttonController: _saveButtonController),
-              ],
+            child: FutureBuilder(
+              future: widget.accountBoxIndex == -1
+                  ? null
+                  : _isAccountEdited
+                      ? null
+                      : _loadAccount(),
+              builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
+                switch (snapshot.connectionState) {
+                  case ConnectionState.waiting:
+                    return const LoadingIndicator();
+                  default:
+                    return Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        AccountTypeInputField(textController: _accountGroupTextController, errorText: _accountGroupErrorText),
+                        TextInputField(input: _accountName, inputCallback: _setAccountNameState, errorText: _accountNameErrorText, hintText: 'Name'),
+                        MoneyInputField(
+                            textController: _bankBalanceTextController, errorText: _bankBalanceErrorText, hintText: 'Kontostand', bottomSheetTitle: 'Kontostand eingeben:'),
+                        SaveButton(saveFunction: _createOrUpdateAccount, buttonController: _saveButtonController),
+                      ],
+                    );
+                }
+              },
             ),
           ),
         ),

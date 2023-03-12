@@ -26,8 +26,8 @@ class _DailyTabViewState extends State<DailyTabView> {
   late final Map<DateTime, double> _todayExpendituresMap = {};
   late final Map<DateTime, double> _todayRevenuesMap = {};
 
-  Future<List<Booking>> loadBookingList() async {
-    _bookingList = await Booking.loadBookingList(_selectedDate.month, _selectedDate.year);
+  Future<List<Booking>> loadMonthlyBookingList() async {
+    _bookingList = await Booking.loadMonthlyBookingList(_selectedDate.month, _selectedDate.year);
     _prepareMaps(_bookingList);
     _getTodayExpenditures(_bookingList);
     _getTodayRevenues(_bookingList);
@@ -101,7 +101,14 @@ class _DailyTabViewState extends State<DailyTabView> {
                 onTap: () {
                   showMonthPicker(
                     context: context,
-                    initialDate: DateTime.now(),
+                    initialDate: _selectedDate,
+                    headerColor: Colors.grey.shade800,
+                    selectedMonthBackgroundColor: Colors.cyanAccent,
+                    unselectedMonthTextColor: Colors.white,
+                    confirmWidget: const Text('OK', style: TextStyle(color: Colors.cyanAccent)),
+                    cancelWidget: const Text('Abbrechen', style: TextStyle(color: Colors.cyanAccent)),
+                    locale: const Locale('DE-de'),
+                    roundedCornersRadius: 12.0,
                   ).then((date) {
                     if (date != null) {
                       setState(() {
@@ -114,7 +121,7 @@ class _DailyTabViewState extends State<DailyTabView> {
           ),
           Expanded(
             child: FutureBuilder(
-              future: loadBookingList(),
+              future: loadMonthlyBookingList(),
               builder: (BuildContext context, AsyncSnapshot<List<Booking>> snapshot) {
                 switch (snapshot.connectionState) {
                   case ConnectionState.waiting:
@@ -124,7 +131,11 @@ class _DailyTabViewState extends State<DailyTabView> {
                       return Column(
                         children: const [
                           OverviewTile(shouldText: 'Einnahmen', should: 0, haveText: 'Ausgaben', have: 0, balanceText: 'Saldo'),
-                          Text('Noch keine Buchungen vorhanden.'),
+                          Expanded(
+                            child: Center(
+                              child: Text('Noch keine Buchungen vorhanden.'),
+                            ),
+                          ),
                         ],
                       );
                     } else {
@@ -134,7 +145,7 @@ class _DailyTabViewState extends State<DailyTabView> {
                           Expanded(
                             child: RefreshIndicator(
                               onRefresh: () async {
-                                _bookingList = await loadBookingList();
+                                _bookingList = await loadMonthlyBookingList();
                                 setState(() {});
                                 return;
                               },
