@@ -19,6 +19,7 @@ import 'models/screen_arguments/create_or_edit_categorie_screen_arguments.dart';
 
 import '/components/bottom_nav_bar/bottom_nav_bar.dart';
 
+import '/screens/introduction_screens.dart';
 import '/screens/create_or_edit_booking_screen.dart';
 import '/screens/create_or_edit_account_screen.dart';
 import '/screens/create_or_edit_categorie_screen.dart';
@@ -52,6 +53,10 @@ class BudgetBookApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         brightness: Brightness.dark,
+        scaffoldBackgroundColor: const Color(0xff112025),
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Color(0xff112025),
+        ),
       ),
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,
@@ -60,7 +65,7 @@ class BudgetBookApp extends StatelessWidget {
       supportedLocales: const [
         Locale('de', 'DE'),
       ],
-      home: const BottomNavBar(screenIndex: 0),
+      home: const IntroductionScreens(),
       routes: {
         categoriesRoute: (context) => const CategoriesScreen(),
       },

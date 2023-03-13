@@ -1,8 +1,10 @@
-import 'package:haushaltsbuch/models/enums/transaction_types.dart';
-import 'package:haushaltsbuch/utils/number_formatters/number_formatter.dart';
 import 'package:hive/hive.dart';
 
+import '/models/enums/transaction_types.dart';
+
 import '/utils/consts/hive_consts.dart';
+import '/utils/number_formatters/number_formatter.dart';
+import 'booking.dart';
 
 @HiveType(typeId: 3)
 class Account extends HiveObject {
@@ -79,6 +81,18 @@ class Account extends HiveObject {
         account.bankBalance = formatToMoneyAmount(bankBalance.toString());
         accountBox.putAt(i, account);
       }
+    }
+  }
+
+  static void undoneAccountBooking(Booking loadedBooking) async {
+    var accountBox = await Hive.openBox(accountsBox);
+    var bookingBox = await Hive.openBox(bookingsBox);
+    // TODO hier weitermachen ud Buchung auf Konto rückgängig machen
+    double currentBankBalance = formatMoneyAmountToDouble(account.bankBalance);
+    if (loadedBooking.transactionType == TransactionType.outcome.name) {
+      booking.amount += formatMoneyAmountToDouble(amount);
+    } else if (transactionType == TransactionType.income.name) {
+      booking.amount -= amount;
     }
   }
 

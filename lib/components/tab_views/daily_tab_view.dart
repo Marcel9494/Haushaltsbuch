@@ -11,6 +11,8 @@ import '/utils/number_formatters/number_formatter.dart';
 import '/models/booking.dart';
 import '/models/enums/transaction_types.dart';
 
+import '../deco/date_text.dart';
+
 class DailyTabView extends StatefulWidget {
   const DailyTabView({Key? key}) : super(key: key);
 
@@ -94,6 +96,7 @@ class _DailyTabViewState extends State<DailyTabView> {
   Widget build(BuildContext context) {
     return Center(
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 14.0),
@@ -168,10 +171,7 @@ class _DailyTabViewState extends State<DailyTabView> {
                                         Row(
                                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                           children: [
-                                            Padding(
-                                              padding: const EdgeInsets.all(12.0),
-                                              child: Text(dateFormatterEEDDMMYYYY.format(DateTime.parse(_bookingList[index].date)) + ':', style: const TextStyle(fontSize: 16.0)),
-                                            ),
+                                            DateText(dateString: _bookingList[index].date),
                                             Text(
                                                 formatToMoneyAmount(_todayRevenuesMap[DateTime(DateTime.parse(_bookingList[index].date).year,
                                                         DateTime.parse(_bookingList[index].date).month, DateTime.parse(_bookingList[index].date).day)]
@@ -183,7 +183,7 @@ class _DailyTabViewState extends State<DailyTabView> {
                                                   formatToMoneyAmount(_todayExpendituresMap[DateTime(DateTime.parse(_bookingList[index].date).year,
                                                           DateTime.parse(_bookingList[index].date).month, DateTime.parse(_bookingList[index].date).day)]
                                                       .toString()),
-                                                  style: const TextStyle(color: Colors.redAccent)),
+                                                  style: const TextStyle(color: Color(0xfff4634f))),
                                             ),
                                           ],
                                         ),

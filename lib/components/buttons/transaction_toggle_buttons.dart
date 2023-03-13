@@ -93,8 +93,8 @@ class _TransactionToggleButtonsState extends State<TransactionToggleButtons> {
       selectedColor: Colors.white,
       color: Colors.white60,
       constraints: const BoxConstraints(
-        minHeight: 40.0,
-        minWidth: 107.5,
+        minHeight: 45.0,
+        minWidth: 108.0,
       ),
       isSelected: _selectedTransaction,
       children: [

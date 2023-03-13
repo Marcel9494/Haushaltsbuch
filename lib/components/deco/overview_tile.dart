@@ -41,7 +41,7 @@ class OverviewTile extends StatelessWidget {
               TextSpan(text: '$haveText\n'),
               TextSpan(
                 text: formatToMoneyAmount(have.toString()),
-                style: const TextStyle(height: 1.5, color: Colors.redAccent, fontSize: 15.0),
+                style: const TextStyle(height: 1.5, color: Color(0xfff4634f), fontSize: 15.0),
               ),
             ]),
           ),

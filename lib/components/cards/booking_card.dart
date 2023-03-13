@@ -18,7 +18,7 @@ class BookingCard extends StatelessWidget {
     if (booking.transactionType == TransactionType.income.name) {
       return Colors.greenAccent;
     } else if (booking.transactionType == TransactionType.outcome.name) {
-      return Colors.redAccent;
+      return const Color(0xfff4634f);
     } else if (booking.transactionType == TransactionType.transfer.name) {
       return Colors.cyanAccent;
     }
@@ -30,7 +30,7 @@ class BookingCard extends StatelessWidget {
     return GestureDetector(
       onTap: () => Navigator.pushNamed(context, createOrEditBookingRoute, arguments: CreateOrEditBookingScreenArguments(booking.boxIndex)),
       child: Card(
-        color: const Color(0x0fffffff),
+        color: const Color(0xff1c2b30),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(14.0),
         ),

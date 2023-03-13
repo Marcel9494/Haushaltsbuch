@@ -1,5 +1,7 @@
+import 'package:haushaltsbuch/models/enums/transaction_types.dart';
 import 'package:hive/hive.dart';
 
+import '../utils/number_formatters/number_formatter.dart';
 import '/utils/consts/hive_consts.dart';
 
 @HiveType(typeId: 0)
@@ -53,7 +55,7 @@ class Booking extends HiveObject {
         bookingList.add(booking);
       }
     }
-    bookingList.sort((first, second) => first.date.compareTo(second.date));
+    bookingList.sort((first, second) => second.date.compareTo(first.date));
     return bookingList;
   }
 }

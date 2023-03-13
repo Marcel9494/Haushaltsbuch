@@ -94,15 +94,23 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
         ..categorie = _categorieTextController.text
         ..fromAccount = _fromAccountTextController.text
         ..toAccount = _toAccountTextController.text;
+      // TODO hier weitermachen und wenn Buchung bearbeitet wird muss alte Buchung rückgängig gemacht werden, damit alle Daten richtig sind.
+      /*if (_currentTransaction == TransactionType.transfer.name) {
+        Account.transferMoney(_fromAccountTextController.text, _toAccountTextController.text, _amountTextController.text);
+      } else {
+        Account.calculateNewAccountBalance(_fromAccountTextController.text, _amountTextController.text, _currentTransaction);
+      }*/
+      if (widget.bookingBoxIndex == -1) {
+        booking.createBooking(booking);
+      } else {
+        // TODO hier Logik bei Bearbeitung von Buchung implementieren.
+        Account.undoneAccountBooking(_loadedBooking);
+        booking.updateBooking(booking, widget.bookingBoxIndex);
+      }
       if (_currentTransaction == TransactionType.transfer.name) {
         Account.transferMoney(_fromAccountTextController.text, _toAccountTextController.text, _amountTextController.text);
       } else {
         Account.calculateNewAccountBalance(_fromAccountTextController.text, _amountTextController.text, _currentTransaction);
-      }
-      if (widget.bookingBoxIndex == -1) {
-        booking.createBooking(booking);
-      } else {
-        booking.updateBooking(booking, widget.bookingBoxIndex);
       }
       _setSaveButtonAnimation(true);
       Timer(const Duration(milliseconds: 1200), () {
@@ -240,7 +248,6 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        backgroundColor: const Color(0x00ffffff),
         appBar: AppBar(
           title: widget.bookingBoxIndex == -1 ? const Text('Buchung erstellen') : const Text('Buchung bearbeiten'),
           actions: [
@@ -253,12 +260,11 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
                     },
                   ),
           ],
-          backgroundColor: const Color(0x00ffffff),
         ),
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 24.0),
           child: Card(
-            color: const Color(0x1fffffff),
+            color: const Color(0xff1c2b30),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(18.0),
             ),
