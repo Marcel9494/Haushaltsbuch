@@ -95,22 +95,16 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
         ..fromAccount = _fromAccountTextController.text
         ..toAccount = _toAccountTextController.text;
       // TODO hier weitermachen und wenn Buchung bearbeitet wird muss alte Buchung rückgängig gemacht werden, damit alle Daten richtig sind.
-      /*if (_currentTransaction == TransactionType.transfer.name) {
-        Account.transferMoney(_fromAccountTextController.text, _toAccountTextController.text, _amountTextController.text);
-      } else {
-        Account.calculateNewAccountBalance(_fromAccountTextController.text, _amountTextController.text, _currentTransaction);
-      }*/
-      if (widget.bookingBoxIndex == -1) {
-        booking.createBooking(booking);
-      } else {
-        // TODO hier Logik bei Bearbeitung von Buchung implementieren.
-        Account.undoneAccountBooking(_loadedBooking);
-        booking.updateBooking(booking, widget.bookingBoxIndex);
-      }
       if (_currentTransaction == TransactionType.transfer.name) {
         Account.transferMoney(_fromAccountTextController.text, _toAccountTextController.text, _amountTextController.text);
       } else {
         Account.calculateNewAccountBalance(_fromAccountTextController.text, _amountTextController.text, _currentTransaction);
+      }
+      if (widget.bookingBoxIndex == -1) {
+        booking.createBooking(booking);
+      } else {
+        Account.undoneAccountBooking(_loadedBooking);
+        booking.updateBooking(booking, widget.bookingBoxIndex);
       }
       _setSaveButtonAnimation(true);
       Timer(const Duration(milliseconds: 1200), () {

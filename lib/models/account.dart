@@ -86,13 +86,32 @@ class Account extends HiveObject {
 
   static void undoneAccountBooking(Booking loadedBooking) async {
     var accountBox = await Hive.openBox(accountsBox);
-    var bookingBox = await Hive.openBox(bookingsBox);
-    // TODO hier weitermachen ud Buchung auf Konto rückgängig machen
-    double currentBankBalance = formatMoneyAmountToDouble(account.bankBalance);
-    if (loadedBooking.transactionType == TransactionType.outcome.name) {
-      booking.amount += formatMoneyAmountToDouble(amount);
-    } else if (transactionType == TransactionType.income.name) {
-      booking.amount -= amount;
+    for (int i = 0; i < accountBox.length; i++) {
+      Account fromAccount = await accountBox.getAt(i);
+      if (loadedBooking.fromAccount == fromAccount.name) {
+        double amount = formatMoneyAmountToDouble(loadedBooking.amount);
+        double bankBalance = formatMoneyAmountToDouble(fromAccount.bankBalance);
+        if (loadedBooking.transactionType == TransactionType.outcome.name) {
+          bankBalance += amount;
+        } else if (loadedBooking.transactionType == TransactionType.income.name) {
+          bankBalance -= amount;
+        } else if (loadedBooking.transactionType == TransactionType.transfer.name) {
+          for (int j = 0; j < accountBox.length; j++) {
+            Account toAccount = await accountBox.getAt(j);
+            if (loadedBooking.toAccount == toAccount.name) {
+              double bankBalanceToAccount = formatMoneyAmountToDouble(toAccount.bankBalance);
+              bankBalance += amount;
+              bankBalanceToAccount -= amount;
+              toAccount.bankBalance = formatToMoneyAmount(bankBalanceToAccount.toString());
+              accountBox.putAt(toAccount.boxIndex, toAccount);
+              break;
+            }
+          }
+        }
+        fromAccount.bankBalance = formatToMoneyAmount(bankBalance.toString());
+        accountBox.putAt(fromAccount.boxIndex, fromAccount);
+        break;
+      }
     }
   }
 

@@ -60,12 +60,10 @@ class _DailyTabViewState extends State<DailyTabView> {
     _todayExpendituresMap.clear();
     _todayRevenuesMap.clear();
     for (int i = 0; i < bookingList.length; i++) {
-      if (bookingList[i].transactionType == TransactionType.outcome.name || bookingList[i].transactionType == TransactionType.income.name) {
-        DateTime bookingDate = DateTime(DateTime.parse(bookingList[i].date).year, DateTime.parse(bookingList[i].date).month, DateTime.parse(bookingList[i].date).day);
-        if (_todayExpendituresMap.containsKey(bookingDate) == false && _todayRevenuesMap.containsKey(bookingDate) == false) {
-          _todayExpendituresMap[bookingDate] = 0.0;
-          _todayRevenuesMap[bookingDate] = 0.0;
-        }
+      DateTime bookingDate = DateTime(DateTime.parse(bookingList[i].date).year, DateTime.parse(bookingList[i].date).month, DateTime.parse(bookingList[i].date).day);
+      if (_todayExpendituresMap.containsKey(bookingDate) == false && _todayRevenuesMap.containsKey(bookingDate) == false) {
+        _todayExpendituresMap[bookingDate] = 0.0;
+        _todayRevenuesMap[bookingDate] = 0.0;
       }
     }
   }
