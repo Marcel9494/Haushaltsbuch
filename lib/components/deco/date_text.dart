@@ -26,7 +26,7 @@ class DateText extends StatelessWidget {
                 ),
                 child: Text(
                   dateFormatterEEDD.format(DateTime.parse(dateString)),
-                  style: const TextStyle(fontSize: 16.0),
+                  style: const TextStyle(fontSize: 16.0, fontWeight: FontWeight.w500),
                 ),
               ),
             ),

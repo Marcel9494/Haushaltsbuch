@@ -47,7 +47,7 @@ class _CreateOrEditCategorieScreenState extends State<CreateOrEditCategorieScree
       _categorie.updateCategorie(_categorie, widget.categorieName);
     }
     _setSaveButtonAnimation(true);
-    Timer(const Duration(milliseconds: 1200), () {
+    Timer(const Duration(milliseconds: 1000), () {
       if (mounted) {
         FocusScope.of(context).requestFocus(FocusNode());
         Navigator.pop(context);
@@ -64,12 +64,14 @@ class _CreateOrEditCategorieScreenState extends State<CreateOrEditCategorieScree
       });
       return false;
     }
-    bool categorieNameExisting = await _categorie.existsCategorieName(_categorieName);
-    if (categorieNameExisting) {
-      setState(() {
-        _categorieNameErrorText = 'Kategoriename ist bereits vorhanden.';
-      });
-      return false;
+    if (widget.categorieName == '') {
+      bool categorieNameExisting = await _categorie.existsCategorieName(_categorieName);
+      if (categorieNameExisting) {
+        setState(() {
+          _categorieNameErrorText = 'Kategoriename ist bereits vorhanden.';
+        });
+        return false;
+      }
     }
     _categorieNameErrorText = '';
     return true;

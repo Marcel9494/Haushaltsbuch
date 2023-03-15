@@ -131,7 +131,7 @@ class _DailyTabViewState extends State<DailyTabView> {
                     if (_bookingList.isEmpty) {
                       return Column(
                         children: const [
-                          OverviewTile(shouldText: 'Einnahmen', should: 0, haveText: 'Ausgaben', have: 0, balanceText: 'Saldo'),
+                          OverviewTile(shouldText: 'Einnahmen', should: 0, haveText: 'Ausgaben', have: 0, balanceText: 'Saldo', showAverageValuesPerDay: true),
                           Expanded(
                             child: Center(
                               child: Text('Noch keine Buchungen vorhanden.'),
@@ -142,7 +142,8 @@ class _DailyTabViewState extends State<DailyTabView> {
                     } else {
                       return Column(
                         children: [
-                          OverviewTile(shouldText: 'Einnahmen', should: _getRevenues(), haveText: 'Ausgaben', have: _getExpenditures(), balanceText: 'Saldo'),
+                          OverviewTile(
+                              shouldText: 'Einnahmen', should: _getRevenues(), haveText: 'Ausgaben', have: _getExpenditures(), balanceText: 'Saldo', showAverageValuesPerDay: true),
                           Expanded(
                             child: RefreshIndicator(
                               onRefresh: () async {
@@ -166,24 +167,27 @@ class _DailyTabViewState extends State<DailyTabView> {
                                     return Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            DateText(dateString: _bookingList[index].date),
-                                            Text(
-                                                formatToMoneyAmount(_todayRevenuesMap[DateTime(DateTime.parse(_bookingList[index].date).year,
-                                                        DateTime.parse(_bookingList[index].date).month, DateTime.parse(_bookingList[index].date).day)]
-                                                    .toString()),
-                                                style: const TextStyle(color: Colors.greenAccent)),
-                                            Padding(
-                                              padding: const EdgeInsets.only(right: 21.0),
-                                              child: Text(
-                                                  formatToMoneyAmount(_todayExpendituresMap[DateTime(DateTime.parse(_bookingList[index].date).year,
+                                        Padding(
+                                          padding: EdgeInsets.only(top: index == 0 ? 0.0 : 10.0),
+                                          child: Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              DateText(dateString: _bookingList[index].date),
+                                              Text(
+                                                  formatToMoneyAmount(_todayRevenuesMap[DateTime(DateTime.parse(_bookingList[index].date).year,
                                                           DateTime.parse(_bookingList[index].date).month, DateTime.parse(_bookingList[index].date).day)]
                                                       .toString()),
-                                                  style: const TextStyle(color: Color(0xfff4634f))),
-                                            ),
-                                          ],
+                                                  style: const TextStyle(color: Colors.greenAccent)),
+                                              Padding(
+                                                padding: const EdgeInsets.only(right: 21.0),
+                                                child: Text(
+                                                    formatToMoneyAmount(_todayExpendituresMap[DateTime(DateTime.parse(_bookingList[index].date).year,
+                                                            DateTime.parse(_bookingList[index].date).month, DateTime.parse(_bookingList[index].date).day)]
+                                                        .toString()),
+                                                    style: const TextStyle(color: Color(0xfff4634f))),
+                                              ),
+                                            ],
+                                          ),
                                         ),
                                         BookingCard(booking: _bookingList[index]),
                                       ],

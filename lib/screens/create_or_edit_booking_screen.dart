@@ -94,7 +94,6 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
         ..categorie = _categorieTextController.text
         ..fromAccount = _fromAccountTextController.text
         ..toAccount = _toAccountTextController.text;
-      // TODO hier weitermachen und wenn Buchung bearbeitet wird muss alte Buchung rückgängig gemacht werden, damit alle Daten richtig sind.
       if (_currentTransaction == TransactionType.transfer.name) {
         Account.transferMoney(_fromAccountTextController.text, _toAccountTextController.text, _amountTextController.text);
       } else {
@@ -107,7 +106,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
         booking.updateBooking(booking, widget.bookingBoxIndex);
       }
       _setSaveButtonAnimation(true);
-      Timer(const Duration(milliseconds: 1200), () {
+      Timer(const Duration(milliseconds: 1000), () {
         if (mounted) {
           FocusScope.of(context).requestFocus(FocusNode());
           Navigator.pop(context);

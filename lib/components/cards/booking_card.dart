@@ -57,9 +57,9 @@ class BookingCard extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(booking.categorie),
+                          booking.transactionType == TransactionType.transfer.name ? const SizedBox() : Text(booking.categorie),
                           Padding(
-                            padding: const EdgeInsets.only(top: 8.0),
+                            padding: EdgeInsets.only(top: booking.transactionType == TransactionType.transfer.name ? 0.0 : 8.0),
                             child: Text(booking.fromAccount, style: const TextStyle(color: Colors.grey)),
                           ),
                           booking.transactionType == TransactionType.transfer.name

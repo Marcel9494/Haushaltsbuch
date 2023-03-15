@@ -70,7 +70,7 @@ class _CreateOrEditAccountScreenState extends State<CreateOrEditAccountScreen> {
         _account.updateAccount(_account, widget.accountBoxIndex);
       }
       _setSaveButtonAnimation(true);
-      Timer(const Duration(milliseconds: 1200), () {
+      Timer(const Duration(milliseconds: 1000), () {
         if (mounted) {
           FocusScope.of(context).requestFocus(FocusNode());
           Navigator.pop(context);
@@ -88,12 +88,14 @@ class _CreateOrEditAccountScreenState extends State<CreateOrEditAccountScreen> {
       });
       return false;
     }
-    bool accountNameExisting = await _account.existsAccountName(_accountName);
-    if (accountNameExisting) {
-      setState(() {
-        _accountNameErrorText = 'Konto ist bereits angelegt.';
-      });
-      return false;
+    if (widget.accountBoxIndex == -1) {
+      bool accountNameExisting = await _account.existsAccountName(_accountName);
+      if (accountNameExisting) {
+        setState(() {
+          _accountNameErrorText = 'Konto ist bereits angelegt.';
+        });
+        return false;
+      }
     }
     _accountNameErrorText = '';
     return true;
