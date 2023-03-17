@@ -1,10 +1,13 @@
 import 'package:hive/hive.dart';
 
 import '/utils/consts/hive_consts.dart';
+import 'enums/categorie_types.dart';
 
 @HiveType(typeId: 4)
 class Categorie extends HiveObject {
   @HiveField(0)
+  late String type;
+  @HiveField(1)
   late String name;
 
   void createCategorie(Categorie newCategorie) async {
@@ -64,6 +67,49 @@ class Categorie extends HiveObject {
       categorieNameList.add(categorieName);
     }
     return categorieNameList;
+  }
+
+  static void createStartExpenditureCategories() async {
+    var categorieBox = await Hive.openBox(categoriesBox);
+    if (categorieBox.isNotEmpty) {
+      return;
+    }
+    List<String> categorieNames = [
+      'Lebensmittel',
+      'Haushaltswaren',
+      'Transport',
+      'Wohnen + Nebenkosten',
+      'Restaurant / Lieferdienst',
+      'Unterhaltung',
+      'Kultur',
+      'Mode / Schönheitspflege',
+      'Gesundheit',
+      'Bildung',
+      'Geschenke',
+      'Technik',
+      'Finanzverluste',
+      'Sonstiges'
+    ];
+    for (int i = 0; i < categorieNames.length; i++) {
+      Categorie categorie = Categorie()
+        ..type = CategorieType.outcome.name
+        ..name = categorieNames[i];
+      categorieBox.add(categorie);
+    }
+  }
+
+  static void createStartRevenueCategories() async {
+    var categorieBox = await Hive.openBox(categoriesBox);
+    if (categorieBox.isNotEmpty) {
+      return;
+    }
+    List<String> categorieNames = ['Gehalt', 'Bonuszahlung', 'Bargeld Geschenk', 'Dividende', 'Zinsen', 'Mieteinkommen', 'Finanzgewinne', 'Sonstiges'];
+    for (int i = 0; i < categorieNames.length; i++) {
+      Categorie categorie = Categorie()
+        ..type = CategorieType.income.name
+        ..name = categorieNames[i];
+      categorieBox.add(categorie);
+    }
   }
 }
 

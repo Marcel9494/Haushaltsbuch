@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:haushaltsbuch/models/screen_arguments/bottom_nav_bar_screen_arguments.dart';
-import 'package:haushaltsbuch/utils/consts/route_consts.dart';
 
 import 'package:introduction_screen/introduction_screen.dart';
+
+import '/models/categorie.dart';
+import '/models/screen_arguments/bottom_nav_bar_screen_arguments.dart';
+
+import '/utils/consts/route_consts.dart';
 
 class IntroductionScreens extends StatefulWidget {
   const IntroductionScreens({Key? key}) : super(key: key);
@@ -12,6 +15,12 @@ class IntroductionScreens extends StatefulWidget {
 }
 
 class _IntroductionScreensState extends State<IntroductionScreens> {
+  void _createStartCategories() {
+    Categorie.createStartExpenditureCategories();
+    Categorie.createStartRevenueCategories();
+    Navigator.popAndPushNamed(context, bottomNavBarRoute, arguments: BottomNavBarScreenArguments(0));
+  }
+
   @override
   Widget build(BuildContext context) {
     return IntroductionScreen(
@@ -47,7 +56,7 @@ class _IntroductionScreensState extends State<IntroductionScreens> {
       next: const Text('Weiter'),
       done: const Text('Fertig'),
       onDone: () {
-        Navigator.popAndPushNamed(context, bottomNavBarRoute, arguments: BottomNavBarScreenArguments(0));
+        _createStartCategories();
       },
     );
   }

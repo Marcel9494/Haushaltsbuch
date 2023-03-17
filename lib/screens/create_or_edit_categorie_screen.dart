@@ -3,10 +3,12 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 
+import '/components/buttons/categorie_type_toggle_buttons.dart';
 import '/components/buttons/save_button.dart';
 import '/components/input_fields/text_input_field.dart';
 
 import '/models/categorie.dart';
+import '/models/enums/categorie_types.dart';
 
 import '/utils/consts/route_consts.dart';
 
@@ -20,6 +22,8 @@ class CreateOrEditCategorieScreen extends StatefulWidget {
 
   @override
   State<CreateOrEditCategorieScreen> createState() => _CreateOrEditCategorieScreenState();
+
+  static _CreateOrEditCategorieScreenState? of(BuildContext context) => context.findAncestorStateOfType<_CreateOrEditCategorieScreenState>();
 }
 
 class _CreateOrEditCategorieScreenState extends State<CreateOrEditCategorieScreen> {
@@ -27,11 +31,13 @@ class _CreateOrEditCategorieScreenState extends State<CreateOrEditCategorieScree
   final Categorie _categorie = Categorie();
   String _categorieName = '';
   String _categorieNameErrorText = '';
+  String _currentCategorieType = '';
 
   @override
   void initState() {
     super.initState();
     _categorieName = widget.categorieName;
+    _currentCategorieType = CategorieType.outcome.name;
   }
 
   void _createOrUpdateCategorie() async {
@@ -92,6 +98,8 @@ class _CreateOrEditCategorieScreenState extends State<CreateOrEditCategorieScree
     }
   }
 
+  set currentCategorieType(String categorieType) => setState(() => _currentCategorieType = categorieType);
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -111,6 +119,8 @@ class _CreateOrEditCategorieScreenState extends State<CreateOrEditCategorieScree
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
+                CategorieTypeToggleButtons(
+                    currentCategorieType: _currentCategorieType, categorieTypeStringCallback: (categorie) => setState(() => _currentCategorieType = categorie)),
                 TextInputField(input: _categorieName, inputCallback: _setCategorieNameState, errorText: _categorieNameErrorText, hintText: 'Kategoriename', autofocus: true),
                 SaveButton(saveFunction: _createOrUpdateCategorie, buttonController: _saveButtonController),
               ],
