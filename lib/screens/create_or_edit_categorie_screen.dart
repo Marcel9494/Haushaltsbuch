@@ -42,7 +42,8 @@ class _CreateOrEditCategorieScreenState extends State<CreateOrEditCategorieScree
 
   void _createOrUpdateCategorie() async {
     _categorie.name = _categorieName.trim();
-    bool validCategorieName = await _validCategorieName(_categorieName);
+    _categorie.type = _currentCategorieType;
+    bool validCategorieName = await _validCategorieName(_categorie);
     if (validCategorieName == false) {
       _setSaveButtonAnimation(false);
       return;
@@ -63,15 +64,15 @@ class _CreateOrEditCategorieScreenState extends State<CreateOrEditCategorieScree
     });
   }
 
-  Future<bool> _validCategorieName(String categorieNameInput) async {
-    if (_categorieName.isEmpty) {
+  Future<bool> _validCategorieName(Categorie categorie) async {
+    if (categorie.name.isEmpty) {
       setState(() {
         _categorieNameErrorText = 'Bitte geben Sie einen Kategorienamen ein.';
       });
       return false;
     }
     if (widget.categorieName == '') {
-      bool categorieNameExisting = await _categorie.existsCategorieName(_categorieName);
+      bool categorieNameExisting = await _categorie.existsCategorieName(categorie);
       if (categorieNameExisting) {
         setState(() {
           _categorieNameErrorText = 'Kategoriename ist bereits vorhanden.';

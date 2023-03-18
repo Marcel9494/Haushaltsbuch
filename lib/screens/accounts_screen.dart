@@ -46,7 +46,7 @@ class _AccountsScreenState extends State<AccountsScreen> {
                   ListTile(
                     onTap: () => Navigator.popAndPushNamed(context, categoriesRoute),
                     leading: const Icon(Icons.list_rounded, color: Colors.cyanAccent),
-                    title: const Text('Kategorien'),
+                    title: const Text('Kategorien verwalten'),
                   ),
                 ],
               ),

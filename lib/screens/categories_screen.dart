@@ -1,12 +1,10 @@
-import 'package:another_flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
-import 'package:haushaltsbuch/models/screen_arguments/create_or_edit_categorie_screen_arguments.dart';
 
-import '/components/deco/loading_indicator.dart';
+import '/components/tab_bar/categories_tab_bar.dart';
 
 import '/utils/consts/route_consts.dart';
 
-import '/models/categorie.dart';
+import '/models/screen_arguments/create_or_edit_categorie_screen_arguments.dart';
 
 class CategoriesScreen extends StatefulWidget {
   const CategoriesScreen({Key? key}) : super(key: key);
@@ -16,69 +14,6 @@ class CategoriesScreen extends StatefulWidget {
 }
 
 class _CategoriesScreenState extends State<CategoriesScreen> {
-  late List<Categorie> _categorieList = [];
-
-  Future<List<Categorie>> _loadCategorieList() async {
-    _categorieList = await Categorie.loadCategories();
-    return _categorieList;
-  }
-
-  void _deleteCategorie(int index) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text('Kategorie ${_categorieList[index].name} löschen?'),
-          actions: <Widget>[
-            TextButton(
-              child: const Text(
-                'Nein',
-                style: TextStyle(
-                  color: Colors.cyanAccent,
-                ),
-              ),
-              onPressed: () => _noPressed(),
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                primary: Colors.cyanAccent,
-                onPrimary: Colors.black87,
-              ),
-              onPressed: () => {
-                _yesPressed(index),
-                Flushbar(
-                  title: 'Kategorie wurde gelöscht',
-                  message: 'Kategorie ${_categorieList[index].name} wurde erfolgreich gelöscht.',
-                  icon: const Icon(
-                    Icons.info_outline,
-                    size: 28.0,
-                    color: Colors.cyanAccent,
-                  ),
-                  duration: const Duration(seconds: 3),
-                  leftBarIndicatorColor: Colors.cyanAccent,
-                )..show(context),
-              },
-              child: const Text('Ja'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void _yesPressed(int index) {
-    setState(() {
-      _categorieList[index].deleteCategorie(_categorieList[index]);
-    });
-    Navigator.pop(context);
-    FocusScope.of(context).unfocus();
-  }
-
-  void _noPressed() {
-    Navigator.pop(context);
-    FocusScope.of(context).unfocus();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -93,58 +28,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
           ),
         ],
       ),
-      body: Column(
-        children: [
-          FutureBuilder(
-            future: _loadCategorieList(),
-            builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
-              switch (snapshot.connectionState) {
-                case ConnectionState.waiting:
-                  return const LoadingIndicator();
-                case ConnectionState.done:
-                  if (_categorieList.isEmpty) {
-                    return const Center(child: Text('Noch keine Kategorien erstellt.'));
-                  } else {
-                    return Expanded(
-                      child: RefreshIndicator(
-                        onRefresh: () async {
-                          _categorieList = await _loadCategorieList();
-                          setState(() {});
-                          return;
-                        },
-                        color: Colors.cyanAccent,
-                        child: ListView.builder(
-                          itemCount: _categorieList.length,
-                          itemBuilder: (BuildContext context, int index) {
-                            return ListTile(
-                              title: Text(_categorieList[index].name),
-                              trailing: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  IconButton(
-                                    icon: const Icon(Icons.edit),
-                                    onPressed: () =>
-                                        Navigator.pushNamed(context, createOrEditCategorieRoute, arguments: CreateOrEditCategorieScreenArguments(_categorieList[index].name)),
-                                  ),
-                                  IconButton(
-                                    icon: const Icon(Icons.remove),
-                                    onPressed: () => _deleteCategorie(index),
-                                  ),
-                                ],
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                    );
-                  }
-                default:
-                  return const SizedBox();
-              }
-            },
-          ),
-        ],
-      ),
+      body: const CategoriesTabBar(),
     );
   }
 }

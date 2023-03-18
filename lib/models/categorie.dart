@@ -29,31 +29,33 @@ class Categorie extends HiveObject {
   void deleteCategorie(Categorie deleteCategorie) async {
     var categorieBox = await Hive.openBox(categoriesBox);
     for (int i = 0; i < categorieBox.length; i++) {
-      Categorie categorie = await categorieBox.getAt(i);
-      if (deleteCategorie.name == categorie.name) {
+      Categorie currentCategorie = await categorieBox.getAt(i);
+      if (deleteCategorie.name == currentCategorie.name && deleteCategorie.type == currentCategorie.type) {
         categorieBox.deleteAt(i);
         break;
       }
     }
   }
 
-  Future<bool> existsCategorieName(String categorieName) async {
+  Future<bool> existsCategorieName(Categorie categorie) async {
     var categorieBox = await Hive.openBox(categoriesBox);
     for (int i = 0; i < categorieBox.length; i++) {
-      Categorie categorie = await categorieBox.getAt(i);
-      if (categorieName.trim().toLowerCase() == categorie.name.toLowerCase()) {
+      Categorie currentCategorie = await categorieBox.getAt(i);
+      if (categorie.name.trim().toLowerCase() == currentCategorie.name.trim().toLowerCase() && categorie.type == currentCategorie.type) {
         return Future.value(true);
       }
     }
     return Future.value(false);
   }
 
-  static Future<List<Categorie>> loadCategories() async {
+  static Future<List<Categorie>> loadCategories(CategorieType categorieType) async {
     var categorieBox = await Hive.openBox(categoriesBox);
     List<Categorie> categorieList = [];
     for (int i = 0; i < categorieBox.length; i++) {
       Categorie categorie = await categorieBox.getAt(i);
-      categorieList.add(categorie);
+      if (categorie.type == categorieType.name) {
+        categorieList.add(categorie);
+      }
     }
     categorieList.sort((first, second) => first.name.compareTo(second.name));
     return categorieList;
@@ -71,8 +73,11 @@ class Categorie extends HiveObject {
 
   static void createStartExpenditureCategories() async {
     var categorieBox = await Hive.openBox(categoriesBox);
-    if (categorieBox.isNotEmpty) {
-      return;
+    for (int i = 0; i < categorieBox.length; i++) {
+      String categorieType = await categorieBox.getAt(i).type;
+      if (categorieType == CategorieType.outcome.name) {
+        return;
+      }
     }
     List<String> categorieNames = [
       'Lebensmittel',
@@ -100,8 +105,11 @@ class Categorie extends HiveObject {
 
   static void createStartRevenueCategories() async {
     var categorieBox = await Hive.openBox(categoriesBox);
-    if (categorieBox.isNotEmpty) {
-      return;
+    for (int i = 0; i < categorieBox.length; i++) {
+      String categorieType = await categorieBox.getAt(i).type;
+      if (categorieType == CategorieType.income.name) {
+        return;
+      }
     }
     List<String> categorieNames = ['Gehalt', 'Bonuszahlung', 'Bargeld Geschenk', 'Dividende', 'Zinsen', 'Mieteinkommen', 'Finanzgewinne', 'Sonstiges'];
     for (int i = 0; i < categorieNames.length; i++) {
