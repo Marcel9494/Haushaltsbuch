@@ -282,7 +282,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
                         MoneyInputField(textController: _amountTextController, errorText: _amountErrorText, hintText: 'Betrag', bottomSheetTitle: 'Betrag eingeben:'),
                         _currentTransaction == TransactionType.transfer.name
                             ? const SizedBox()
-                            : CategorieInputField(textController: _categorieTextController, errorText: _categorieErrorText),
+                            : CategorieInputField(textController: _categorieTextController, errorText: _categorieErrorText, transactionType: _currentTransaction),
                         _currentTransaction == TransactionType.transfer.name
                             ? AccountInputField(textController: _fromAccountTextController, errorText: _fromAccountErrorText, hintText: 'Von')
                             : AccountInputField(textController: _fromAccountTextController, errorText: _fromAccountErrorText),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:haushaltsbuch/models/enums/categorie_types.dart';
 
 import '/components/tab_bar/categories_tab_bar.dart';
 
@@ -23,7 +24,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
           IconButton(
             icon: const Icon(Icons.add),
             onPressed: () {
-              Navigator.pushNamed(context, createOrEditCategorieRoute, arguments: CreateOrEditCategorieScreenArguments(''));
+              Navigator.pushNamed(context, createOrEditCategorieRoute, arguments: CreateOrEditCategorieScreenArguments('', CategorieType.outcome.name));
             },
           ),
         ],

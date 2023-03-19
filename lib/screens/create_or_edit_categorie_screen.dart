@@ -14,10 +14,12 @@ import '/utils/consts/route_consts.dart';
 
 class CreateOrEditCategorieScreen extends StatefulWidget {
   final String categorieName;
+  final String categorieType;
 
   const CreateOrEditCategorieScreen({
     Key? key,
     required this.categorieName,
+    required this.categorieType,
   }) : super(key: key);
 
   @override
@@ -37,7 +39,7 @@ class _CreateOrEditCategorieScreenState extends State<CreateOrEditCategorieScree
   void initState() {
     super.initState();
     _categorieName = widget.categorieName;
-    _currentCategorieType = CategorieType.outcome.name;
+    _currentCategorieType = widget.categorieType;
   }
 
   void _createOrUpdateCategorie() async {

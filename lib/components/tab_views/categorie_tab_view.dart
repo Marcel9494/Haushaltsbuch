@@ -118,8 +118,8 @@ class _CategorieTabViewState extends State<CategorieTabView> {
                                 children: [
                                   IconButton(
                                     icon: const Icon(Icons.edit),
-                                    onPressed: () =>
-                                        Navigator.pushNamed(context, createOrEditCategorieRoute, arguments: CreateOrEditCategorieScreenArguments(_categorieList[index].name)),
+                                    onPressed: () => Navigator.pushNamed(context, createOrEditCategorieRoute,
+                                        arguments: CreateOrEditCategorieScreenArguments(_categorieList[index].name, _categorieList[index].type!)),
                                   ),
                                   IconButton(
                                     icon: const Icon(Icons.remove),

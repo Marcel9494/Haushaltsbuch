@@ -8,11 +8,13 @@ import '/models/categorie.dart';
 class CategorieInputField extends StatefulWidget {
   final TextEditingController textController;
   final String errorText;
+  final String transactionType;
 
   const CategorieInputField({
     Key? key,
     required this.textController,
     required this.errorText,
+    required this.transactionType,
   }) : super(key: key);
 
   @override
@@ -85,7 +87,7 @@ class _CategorieInputFieldState extends State<CategorieInputField> {
   }
 
   Future<List<String>> _loadCategorieNameList() async {
-    categorieNames = await Categorie.loadCategorieNames();
+    categorieNames = await Categorie.loadCategorieNames(widget.transactionType);
     return categorieNames;
   }
 

@@ -6,7 +6,7 @@ import 'enums/categorie_types.dart';
 @HiveType(typeId: 4)
 class Categorie extends HiveObject {
   @HiveField(0)
-  late String type;
+  String? type;
   @HiveField(1)
   late String name;
 
@@ -61,12 +61,14 @@ class Categorie extends HiveObject {
     return categorieList;
   }
 
-  static Future<List<String>> loadCategorieNames() async {
+  static Future<List<String>> loadCategorieNames(String transactionType) async {
     var categorieBox = await Hive.openBox(categoriesBox);
     List<String> categorieNameList = [];
     for (int i = 0; i < categorieBox.length; i++) {
-      String categorieName = await categorieBox.getAt(i).name;
-      categorieNameList.add(categorieName);
+      Categorie categorie = await categorieBox.getAt(i);
+      if (transactionType == categorie.type) {
+        categorieNameList.add(categorie.name);
+      }
     }
     return categorieNameList;
   }
@@ -74,8 +76,8 @@ class Categorie extends HiveObject {
   static void createStartExpenditureCategories() async {
     var categorieBox = await Hive.openBox(categoriesBox);
     for (int i = 0; i < categorieBox.length; i++) {
-      String categorieType = await categorieBox.getAt(i).type;
-      if (categorieType == CategorieType.outcome.name) {
+      Categorie categorie = await categorieBox.getAt(i);
+      if (categorie.type == CategorieType.outcome.name) {
         return;
       }
     }
@@ -99,15 +101,17 @@ class Categorie extends HiveObject {
       Categorie categorie = Categorie()
         ..type = CategorieType.outcome.name
         ..name = categorieNames[i];
-      categorieBox.add(categorie);
+      categorie.createCategorie(categorie);
     }
   }
 
   static void createStartRevenueCategories() async {
     var categorieBox = await Hive.openBox(categoriesBox);
     for (int i = 0; i < categorieBox.length; i++) {
-      String categorieType = await categorieBox.getAt(i).type;
-      if (categorieType == CategorieType.income.name) {
+      Categorie categorie = await categorieBox.getAt(i);
+      print(categorieBox.length);
+      print(categorie.name);
+      if (categorie.type == CategorieType.income.name) {
         return;
       }
     }
@@ -116,7 +120,7 @@ class Categorie extends HiveObject {
       Categorie categorie = Categorie()
         ..type = CategorieType.income.name
         ..name = categorieNames[i];
-      categorieBox.add(categorie);
+      categorie.createCategorie(categorie);
     }
   }
 }
