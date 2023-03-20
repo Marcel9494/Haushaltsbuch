@@ -90,7 +90,6 @@ class _DailyTabViewState extends State<DailyTabView> {
               ),
             ],
           ),
-          // TODO hier weitermachen und tägliche Statistiken implementieren
           _selectedBookingOption[0] ? DailyBookingTabView(selectedDate: _selectedDate) : const DailyStatisticsTabView(),
         ],
       ),
