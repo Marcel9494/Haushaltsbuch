@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 
+import '../cards/expenditure_card.dart';
 import '../deco/loading_indicator.dart';
 
 class DailyStatisticsTabView extends StatefulWidget {
@@ -16,8 +17,7 @@ class _DailyStatisticsTabViewState extends State<DailyStatisticsTabView> {
 
   Future<List<double>> _loadCategorieCostsList() async {
     for (int i = 0; i < 10; i++) {
-      _categorieCostsList[i] = i.toDouble();
-      print(_categorieCostsList[i]);
+      _categorieCostsList.add(i.toDouble());
     }
     return _categorieCostsList;
   }
@@ -26,35 +26,29 @@ class _DailyStatisticsTabViewState extends State<DailyStatisticsTabView> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Row(
-          children: <Widget>[
-            Expanded(
-              child: AspectRatio(
-                aspectRatio: 1,
-                child: PieChart(
-                  PieChartData(
-                    pieTouchData: PieTouchData(
-                      touchCallback: (FlTouchEvent event, pieTouchResponse) {
-                        setState(() {
-                          if (!event.isInterestedForInteractions || pieTouchResponse == null || pieTouchResponse.touchedSection == null) {
-                            _touchedIndex = -1;
-                            return;
-                          }
-                          _touchedIndex = pieTouchResponse.touchedSection!.touchedSectionIndex;
-                        });
-                      },
-                    ),
-                    borderData: FlBorderData(
-                      show: false,
-                    ),
-                    sectionsSpace: 0,
-                    centerSpaceRadius: 40,
-                    sections: showingSections(),
-                  ),
-                ),
+        AspectRatio(
+          aspectRatio: 1.6,
+          child: PieChart(
+            PieChartData(
+              pieTouchData: PieTouchData(
+                touchCallback: (FlTouchEvent event, pieTouchResponse) {
+                  setState(() {
+                    if (!event.isInterestedForInteractions || pieTouchResponse == null || pieTouchResponse.touchedSection == null) {
+                      _touchedIndex = -1;
+                      return;
+                    }
+                    _touchedIndex = pieTouchResponse.touchedSection!.touchedSectionIndex;
+                  });
+                },
               ),
+              borderData: FlBorderData(
+                show: false,
+              ),
+              sectionsSpace: 0,
+              centerSpaceRadius: 40,
+              sections: showingSections(),
             ),
-          ],
+          ),
         ),
         FutureBuilder(
           future: _loadCategorieCostsList(),
@@ -66,18 +60,19 @@ class _DailyStatisticsTabViewState extends State<DailyStatisticsTabView> {
                 if (_categorieCostsList.isEmpty) {
                   return const Text('Noch keine Kostenstellen vorhanden.');
                 } else {
-                  return Expanded(
-                    child: RefreshIndicator(
-                      onRefresh: () async {
-                        _categorieCostsList = await _loadCategorieCostsList();
-                        setState(() {});
-                        return;
-                      },
-                      color: Colors.cyanAccent,
+                  return RefreshIndicator(
+                    onRefresh: () async {
+                      _categorieCostsList = await _loadCategorieCostsList();
+                      setState(() {});
+                      return;
+                    },
+                    color: Colors.cyanAccent,
+                    child: SizedBox(
+                      height: 300.0,
                       child: ListView.builder(
                         itemCount: _categorieCostsList.length,
                         itemBuilder: (BuildContext context, int index) {
-                          return Text(_categorieCostsList[index].toString());
+                          return const ExpenditureCard();
                         },
                       ),
                     ),
