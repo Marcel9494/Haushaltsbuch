@@ -1,19 +1,51 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:haushaltsbuch/models/categorie_stats.dart';
+import 'package:haushaltsbuch/models/enums/transaction_types.dart';
 
+import '../../models/booking.dart';
+import '../../utils/number_formatters/number_formatter.dart';
 import '../cards/expenditure_card.dart';
 import '../deco/loading_indicator.dart';
 
 class DailyStatisticsTabView extends StatefulWidget {
-  const DailyStatisticsTabView({Key? key}) : super(key: key);
+  final DateTime selectedDate;
+
+  const DailyStatisticsTabView({
+    Key? key,
+    required this.selectedDate,
+  }) : super(key: key);
 
   @override
   State<DailyStatisticsTabView> createState() => _DailyStatisticsTabViewState();
 }
 
 class _DailyStatisticsTabViewState extends State<DailyStatisticsTabView> {
+  late List<Booking> _bookingList = [];
   int _touchedIndex = -1;
   List<double> _categorieCostsList = [];
+  double _monthlyExpenditures = 0.0;
+
+  Future<List<Booking>> loadMonthlyExpenditureStatistic() async {
+    double totalExpenditures = 0.0;
+    List<CategorieStats> categorieStats = [];
+    _bookingList = await Booking.loadMonthlyBookingList(widget.selectedDate.month, widget.selectedDate.year);
+    for (int i = 0; i < _bookingList.length; i++) {
+      if (_bookingList[i].transactionType == TransactionType.outcome.name) {
+        totalExpenditures += formatMoneyAmountToDouble(_bookingList[i].amount);
+        if (i == 0 || categorieStats[i].categorieName.contains(_bookingList[i].categorie) == false) {
+          CategorieStats newCategorieStats = CategorieStats()
+            ..categorieName = _bookingList[i].categorie
+            ..amount = _bookingList[i].amount
+            ..percentage = 0.0;
+          categorieStats.add(newCategorieStats);
+        } else {
+          // TODO hier weitermachen
+        }
+      }
+    }
+    return _bookingList;
+  }
 
   Future<List<double>> _loadCategorieCostsList() async {
     for (int i = 0; i < 10; i++) {

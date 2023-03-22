@@ -22,7 +22,6 @@ class DailyBookingTabView extends StatefulWidget {
 
 class _DailyBookingTabViewState extends State<DailyBookingTabView> {
   late List<Booking> _bookingList = [];
-
   late double _revenues = 0.0;
   late double _expenditures = 0.0;
   late final Map<DateTime, double> _todayExpendituresMap = {};
