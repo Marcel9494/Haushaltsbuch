@@ -21,37 +21,51 @@ class DailyStatisticsTabView extends StatefulWidget {
 }
 
 class _DailyStatisticsTabViewState extends State<DailyStatisticsTabView> {
-  late List<Booking> _bookingList = [];
   int _touchedIndex = -1;
-  List<double> _categorieCostsList = [];
+  List<CategorieStats> _categorieStats = [];
   double _monthlyExpenditures = 0.0;
 
-  Future<List<Booking>> loadMonthlyExpenditureStatistic() async {
+  Future<List<CategorieStats>> _loadMonthlyExpenditureStatistic() async {
     double totalExpenditures = 0.0;
-    List<CategorieStats> categorieStats = [];
-    _bookingList = await Booking.loadMonthlyBookingList(widget.selectedDate.month, widget.selectedDate.year);
+    _categorieStats = [];
+    bool categorieStatsAreUpdated = false;
+    List<Booking> _bookingList = await Booking.loadMonthlyBookingList(widget.selectedDate.month, widget.selectedDate.year);
     for (int i = 0; i < _bookingList.length; i++) {
       if (_bookingList[i].transactionType == TransactionType.outcome.name) {
+        categorieStatsAreUpdated = false;
         totalExpenditures += formatMoneyAmountToDouble(_bookingList[i].amount);
-        if (i == 0 || categorieStats[i].categorieName.contains(_bookingList[i].categorie) == false) {
+        if (i == 0) {
           CategorieStats newCategorieStats = CategorieStats()
             ..categorieName = _bookingList[i].categorie
             ..amount = _bookingList[i].amount
             ..percentage = 0.0;
-          categorieStats.add(newCategorieStats);
+          _categorieStats.add(newCategorieStats);
         } else {
-          // TODO hier weitermachen
+          for (int j = 0; j < _categorieStats.length; j++) {
+            if (_categorieStats[j].categorieName.contains(_bookingList[i].categorie)) {
+              double amount = formatMoneyAmountToDouble(_categorieStats[j].amount);
+              amount += formatMoneyAmountToDouble(_bookingList[i].amount);
+              _categorieStats[j].amount = formatToMoneyAmount(amount.toString());
+              categorieStatsAreUpdated = true;
+              break;
+            }
+          }
+          if (categorieStatsAreUpdated == false) {
+            CategorieStats newCategorieStats = CategorieStats()
+              ..categorieName = _bookingList[i].categorie
+              ..amount = _bookingList[i].amount
+              ..percentage = 0.0;
+            _categorieStats.add(newCategorieStats);
+          }
         }
       }
     }
-    return _bookingList;
+    _calculateMonthlyExpenditurePercentage(_categorieStats, totalExpenditures);
+    return _categorieStats;
   }
 
-  Future<List<double>> _loadCategorieCostsList() async {
-    for (int i = 0; i < 10; i++) {
-      _categorieCostsList.add(i.toDouble());
-    }
-    return _categorieCostsList;
+  void _calculateMonthlyExpenditurePercentage(List<CategorieStats> categorieStats, double totalExpenditures) {
+    // TODO hier weitermachen
   }
 
   @override
@@ -83,18 +97,18 @@ class _DailyStatisticsTabViewState extends State<DailyStatisticsTabView> {
           ),
         ),
         FutureBuilder(
-          future: _loadCategorieCostsList(),
-          builder: (BuildContext context, AsyncSnapshot<List<double>> snapshot) {
+          future: _loadMonthlyExpenditureStatistic(),
+          builder: (BuildContext context, AsyncSnapshot<List<CategorieStats>> snapshot) {
             switch (snapshot.connectionState) {
               case ConnectionState.waiting:
                 return const LoadingIndicator();
               case ConnectionState.done:
-                if (_categorieCostsList.isEmpty) {
+                if (_categorieStats.isEmpty) {
                   return const Text('Noch keine Kostenstellen vorhanden.');
                 } else {
                   return RefreshIndicator(
                     onRefresh: () async {
-                      _categorieCostsList = await _loadCategorieCostsList();
+                      _categorieStats = await _loadMonthlyExpenditureStatistic();
                       setState(() {});
                       return;
                     },
@@ -102,9 +116,9 @@ class _DailyStatisticsTabViewState extends State<DailyStatisticsTabView> {
                     child: SizedBox(
                       height: 300.0,
                       child: ListView.builder(
-                        itemCount: _categorieCostsList.length,
+                        itemCount: _categorieStats.length,
                         itemBuilder: (BuildContext context, int index) {
-                          return const ExpenditureCard();
+                          return ExpenditureCard(categorieStats: _categorieStats[index]);
                         },
                       ),
                     ),

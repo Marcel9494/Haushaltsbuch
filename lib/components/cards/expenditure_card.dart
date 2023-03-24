@@ -1,7 +1,14 @@
 import 'package:flutter/material.dart';
 
+import '/models/categorie_stats.dart';
+
 class ExpenditureCard extends StatelessWidget {
-  const ExpenditureCard({Key? key}) : super(key: key);
+  final CategorieStats categorieStats;
+
+  const ExpenditureCard({
+    Key? key,
+    required this.categorieStats,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -20,14 +27,14 @@ class ExpenditureCard extends StatelessWidget {
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: const [
+            children: [
               Padding(
-                padding: EdgeInsets.all(16.0),
-                child: Text('Test'),
+                padding: const EdgeInsets.all(16.0),
+                child: Text(categorieStats.categorieName),
               ),
               Padding(
-                padding: EdgeInsets.only(top: 16.0, bottom: 16.0, right: 16.0),
-                child: Text('Test'),
+                padding: const EdgeInsets.only(top: 16.0, bottom: 16.0, right: 16.0),
+                child: Text(categorieStats.amount),
               ),
             ],
           ),

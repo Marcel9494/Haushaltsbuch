@@ -90,7 +90,7 @@ class _DailyTabViewState extends State<DailyTabView> {
               ),
             ],
           ),
-          _selectedBookingOption[0] ? DailyBookingTabView(selectedDate: _selectedDate) : const DailyStatisticsTabView(),
+          _selectedBookingOption[0] ? DailyBookingTabView(selectedDate: _selectedDate) : DailyStatisticsTabView(selectedDate: _selectedDate),
         ],
       ),
     );
