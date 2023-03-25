@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:haushaltsbuch/models/categorie_stats.dart';
-import 'package:haushaltsbuch/models/enums/transaction_types.dart';
+import 'dart:math' as math;
 
-import '../../models/booking.dart';
-import '../../utils/number_formatters/number_formatter.dart';
+import '/models/categorie_stats.dart';
+import '/models/enums/transaction_types.dart';
+import '/models/booking.dart';
+
+import '/utils/number_formatters/number_formatter.dart';
+
 import '../cards/expenditure_card.dart';
+
 import '../deco/loading_indicator.dart';
 
 class DailyStatisticsTabView extends StatefulWidget {
@@ -38,7 +42,8 @@ class _DailyStatisticsTabViewState extends State<DailyStatisticsTabView> {
           CategorieStats newCategorieStats = CategorieStats()
             ..categorieName = _bookingList[i].categorie
             ..amount = _bookingList[i].amount
-            ..percentage = 0.0;
+            ..percentage = 0.0
+            ..statColor = Color((math.Random().nextDouble() * 0xFFFFFF).toInt()).withOpacity(0.6);
           _categorieStats.add(newCategorieStats);
         } else {
           for (int j = 0; j < _categorieStats.length; j++) {
@@ -54,59 +59,63 @@ class _DailyStatisticsTabViewState extends State<DailyStatisticsTabView> {
             CategorieStats newCategorieStats = CategorieStats()
               ..categorieName = _bookingList[i].categorie
               ..amount = _bookingList[i].amount
-              ..percentage = 0.0;
+              ..percentage = 0.0
+              ..statColor = Color((math.Random().nextDouble() * 0xFFFFFF).toInt()).withOpacity(0.6);
             _categorieStats.add(newCategorieStats);
           }
         }
       }
     }
-    _calculateMonthlyExpenditurePercentage(_categorieStats, totalExpenditures);
+    _calculateMonthlyExpenditurePercentage(totalExpenditures);
+    _categorieStats.sort((first, second) => second.amount.compareTo(first.amount));
     return _categorieStats;
   }
 
-  void _calculateMonthlyExpenditurePercentage(List<CategorieStats> categorieStats, double totalExpenditures) {
-    // TODO hier weitermachen
+  void _calculateMonthlyExpenditurePercentage(double totalExpenditures) {
+    for (int i = 0; i < _categorieStats.length; i++) {
+      _categorieStats[i].percentage = (formatMoneyAmountToDouble(_categorieStats[i].amount) * 100) / totalExpenditures;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        AspectRatio(
-          aspectRatio: 1.6,
-          child: PieChart(
-            PieChartData(
-              pieTouchData: PieTouchData(
-                touchCallback: (FlTouchEvent event, pieTouchResponse) {
-                  setState(() {
-                    if (!event.isInterestedForInteractions || pieTouchResponse == null || pieTouchResponse.touchedSection == null) {
-                      _touchedIndex = -1;
-                      return;
-                    }
-                    _touchedIndex = pieTouchResponse.touchedSection!.touchedSectionIndex;
-                  });
-                },
-              ),
-              borderData: FlBorderData(
-                show: false,
-              ),
-              sectionsSpace: 0,
-              centerSpaceRadius: 40,
-              sections: showingSections(),
-            ),
-          ),
-        ),
-        FutureBuilder(
-          future: _loadMonthlyExpenditureStatistic(),
-          builder: (BuildContext context, AsyncSnapshot<List<CategorieStats>> snapshot) {
-            switch (snapshot.connectionState) {
-              case ConnectionState.waiting:
-                return const LoadingIndicator();
-              case ConnectionState.done:
-                if (_categorieStats.isEmpty) {
-                  return const Text('Noch keine Kostenstellen vorhanden.');
-                } else {
-                  return RefreshIndicator(
+    return FutureBuilder(
+      future: _loadMonthlyExpenditureStatistic(),
+      builder: (BuildContext context, AsyncSnapshot<List<CategorieStats>> snapshot) {
+        switch (snapshot.connectionState) {
+          case ConnectionState.waiting:
+            return const LoadingIndicator();
+          case ConnectionState.done:
+            if (_categorieStats.isEmpty) {
+              return const Text('Noch keine Kostenstellen vorhanden.');
+            } else {
+              return Column(
+                children: [
+                  AspectRatio(
+                    aspectRatio: 1.6,
+                    child: PieChart(
+                      PieChartData(
+                        pieTouchData: PieTouchData(
+                          touchCallback: (FlTouchEvent event, pieTouchResponse) {
+                            setState(() {
+                              if (!event.isInterestedForInteractions || pieTouchResponse == null || pieTouchResponse.touchedSection == null) {
+                                _touchedIndex = -1;
+                                return;
+                              }
+                              _touchedIndex = pieTouchResponse.touchedSection!.touchedSectionIndex;
+                            });
+                          },
+                        ),
+                        borderData: FlBorderData(
+                          show: false,
+                        ),
+                        sectionsSpace: 0,
+                        centerSpaceRadius: 40,
+                        sections: showingSections(),
+                      ),
+                    ),
+                  ),
+                  RefreshIndicator(
                     onRefresh: () async {
                       _categorieStats = await _loadMonthlyExpenditureStatistic();
                       setState(() {});
@@ -114,7 +123,7 @@ class _DailyStatisticsTabViewState extends State<DailyStatisticsTabView> {
                     },
                     color: Colors.cyanAccent,
                     child: SizedBox(
-                      height: 300.0,
+                      height: 325.0,
                       child: ListView.builder(
                         itemCount: _categorieStats.length,
                         itemBuilder: (BuildContext context, int index) {
@@ -122,82 +131,38 @@ class _DailyStatisticsTabViewState extends State<DailyStatisticsTabView> {
                         },
                       ),
                     ),
-                  );
-                }
-              default:
-                if (snapshot.hasError) {
-                  return const Text('Konten Übersicht konnte nicht geladen werden.');
-                }
-                return const LoadingIndicator();
+                  ),
+                ],
+              );
             }
-          },
-        ),
-      ],
+          default:
+            if (snapshot.hasError) {
+              return const Text('Konten Übersicht konnte nicht geladen werden.');
+            }
+            return const LoadingIndicator();
+        }
+      },
     );
   }
 
   List<PieChartSectionData> showingSections() {
-    return List.generate(4, (i) {
+    return List.generate(_categorieStats.length, (i) {
       final isTouched = i == _touchedIndex;
       final fontSize = isTouched ? 25.0 : 16.0;
       final radius = isTouched ? 60.0 : 50.0;
-      const shadows = [Shadow(color: Colors.black, blurRadius: 2)];
-      switch (i) {
-        case 0:
-          return PieChartSectionData(
-            color: Colors.blue,
-            value: 40,
-            title: '40%',
-            radius: radius,
-            titleStyle: TextStyle(
-              fontSize: fontSize,
-              fontWeight: FontWeight.bold,
-              color: Colors.white70,
-              shadows: shadows,
-            ),
-          );
-        case 1:
-          return PieChartSectionData(
-            color: Colors.yellowAccent,
-            value: 30,
-            title: '30%',
-            radius: radius,
-            titleStyle: TextStyle(
-              fontSize: fontSize,
-              fontWeight: FontWeight.bold,
-              color: Colors.white70,
-              shadows: shadows,
-            ),
-          );
-        case 2:
-          return PieChartSectionData(
-            color: Colors.purple,
-            value: 15,
-            title: '15%',
-            radius: radius,
-            titleStyle: TextStyle(
-              fontSize: fontSize,
-              fontWeight: FontWeight.bold,
-              color: Colors.white70,
-              shadows: shadows,
-            ),
-          );
-        case 3:
-          return PieChartSectionData(
-            color: Colors.greenAccent,
-            value: 15,
-            title: '15%',
-            radius: radius,
-            titleStyle: TextStyle(
-              fontSize: fontSize,
-              fontWeight: FontWeight.bold,
-              color: Colors.white70,
-              shadows: shadows,
-            ),
-          );
-        default:
-          throw Error();
-      }
+      return PieChartSectionData(
+        color: _categorieStats[i].statColor,
+        value: _categorieStats[i].percentage,
+        title: _categorieStats[i].percentage.toStringAsFixed(1) + '%',
+        badgeWidget: Text(_categorieStats[i].categorieName),
+        badgePositionPercentageOffset: 1.3,
+        radius: radius,
+        titleStyle: TextStyle(
+          fontSize: fontSize,
+          fontWeight: FontWeight.bold,
+          color: Colors.white70,
+        ),
+      );
     });
   }
 }

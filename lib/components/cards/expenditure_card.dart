@@ -22,15 +22,27 @@ class ExpenditureCard extends StatelessWidget {
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14.0)),
         ),
         child: Container(
-          decoration: const BoxDecoration(
-            border: Border(left: BorderSide(color: Colors.cyanAccent, width: 5)),
+          decoration: BoxDecoration(
+            border: Border(left: BorderSide(color: categorieStats.statColor, width: 6)),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Text(categorieStats.categorieName),
+              RichText(
+                textAlign: TextAlign.center,
+                text: TextSpan(
+                  children: [
+                    WidgetSpan(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                        child: Text('${categorieStats.percentage.toStringAsFixed(1)} %'),
+                      ),
+                    ),
+                    TextSpan(
+                      text: categorieStats.categorieName,
+                    ),
+                  ],
+                ),
               ),
               Padding(
                 padding: const EdgeInsets.only(top: 16.0, bottom: 16.0, right: 16.0),
