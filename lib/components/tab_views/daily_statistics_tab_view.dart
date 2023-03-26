@@ -25,19 +25,18 @@ class DailyStatisticsTabView extends StatefulWidget {
 }
 
 class _DailyStatisticsTabViewState extends State<DailyStatisticsTabView> {
-  int _touchedIndex = -1;
   List<CategorieStats> _categorieStats = [];
-  double _monthlyExpenditures = 0.0;
+  double _totalExpenditures = 0.0;
 
   Future<List<CategorieStats>> _loadMonthlyExpenditureStatistic() async {
-    double totalExpenditures = 0.0;
     _categorieStats = [];
+    _totalExpenditures = 0.0;
     bool categorieStatsAreUpdated = false;
     List<Booking> _bookingList = await Booking.loadMonthlyBookingList(widget.selectedDate.month, widget.selectedDate.year);
     for (int i = 0; i < _bookingList.length; i++) {
       if (_bookingList[i].transactionType == TransactionType.outcome.name) {
         categorieStatsAreUpdated = false;
-        totalExpenditures += formatMoneyAmountToDouble(_bookingList[i].amount);
+        _totalExpenditures += formatMoneyAmountToDouble(_bookingList[i].amount);
         if (i == 0) {
           CategorieStats newCategorieStats = CategorieStats()
             ..categorieName = _bookingList[i].categorie
@@ -66,14 +65,14 @@ class _DailyStatisticsTabViewState extends State<DailyStatisticsTabView> {
         }
       }
     }
-    _calculateMonthlyExpenditurePercentage(totalExpenditures);
+    _calculateMonthlyExpenditurePercentage();
     _categorieStats.sort((first, second) => second.amount.compareTo(first.amount));
     return _categorieStats;
   }
 
-  void _calculateMonthlyExpenditurePercentage(double totalExpenditures) {
+  void _calculateMonthlyExpenditurePercentage() {
     for (int i = 0; i < _categorieStats.length; i++) {
-      _categorieStats[i].percentage = (formatMoneyAmountToDouble(_categorieStats[i].amount) * 100) / totalExpenditures;
+      _categorieStats[i].percentage = (formatMoneyAmountToDouble(_categorieStats[i].amount) * 100) / _totalExpenditures;
     }
   }
 
@@ -95,22 +94,11 @@ class _DailyStatisticsTabViewState extends State<DailyStatisticsTabView> {
                     aspectRatio: 1.6,
                     child: PieChart(
                       PieChartData(
-                        pieTouchData: PieTouchData(
-                          touchCallback: (FlTouchEvent event, pieTouchResponse) {
-                            setState(() {
-                              if (!event.isInterestedForInteractions || pieTouchResponse == null || pieTouchResponse.touchedSection == null) {
-                                _touchedIndex = -1;
-                                return;
-                              }
-                              _touchedIndex = pieTouchResponse.touchedSection!.touchedSectionIndex;
-                            });
-                          },
-                        ),
                         borderData: FlBorderData(
                           show: false,
                         ),
-                        sectionsSpace: 0,
-                        centerSpaceRadius: 40,
+                        sectionsSpace: 4.0,
+                        centerSpaceRadius: 40.0,
                         sections: showingSections(),
                       ),
                     ),
@@ -146,19 +134,17 @@ class _DailyStatisticsTabViewState extends State<DailyStatisticsTabView> {
   }
 
   List<PieChartSectionData> showingSections() {
+    // TODO hier weitermachen und klicken deaktivieren auf Diagramm und anschließend Buchungen wiederholt ausführen implementieren
     return List.generate(_categorieStats.length, (i) {
-      final isTouched = i == _touchedIndex;
-      final fontSize = isTouched ? 25.0 : 16.0;
-      final radius = isTouched ? 60.0 : 50.0;
       return PieChartSectionData(
         color: _categorieStats[i].statColor,
         value: _categorieStats[i].percentage,
         title: _categorieStats[i].percentage.toStringAsFixed(1) + '%',
         badgeWidget: Text(_categorieStats[i].categorieName),
         badgePositionPercentageOffset: 1.3,
-        radius: radius,
-        titleStyle: TextStyle(
-          fontSize: fontSize,
+        radius: 50.0,
+        titleStyle: const TextStyle(
+          fontSize: 16.0,
           fontWeight: FontWeight.bold,
           color: Colors.white70,
         ),

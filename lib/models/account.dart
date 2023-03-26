@@ -1,9 +1,11 @@
 import 'package:hive/hive.dart';
 
 import '/models/enums/transaction_types.dart';
+import '/models/enums/account_types.dart';
 
 import '/utils/consts/hive_consts.dart';
 import '/utils/number_formatters/number_formatter.dart';
+
 import 'booking.dart';
 
 @HiveType(typeId: 3)
@@ -148,12 +150,12 @@ class Account extends HiveObject {
     double assetValue = 0.0;
     for (int i = 0; i < accountBox.length; i++) {
       Account account = await accountBox.getAt(i);
-      if (account.accountType == 'Konto' ||
-          account.accountType == 'Kapitalanlage' ||
-          account.accountType == 'Bargeld' ||
-          account.accountType == 'Karte' ||
-          account.accountType == 'Versicherung' ||
-          account.accountType == 'Sonstiges') {
+      if (account.accountType == AccountType.account.name ||
+          account.accountType == AccountType.capitalInvestments.name ||
+          account.accountType == AccountType.cash.name ||
+          account.accountType == AccountType.credit.name ||
+          account.accountType == AccountType.insurance.name ||
+          account.accountType == AccountType.other.name) {
         assetValue += double.parse(account.bankBalance.substring(0, account.bankBalance.length - 2).replaceAll('.', '').replaceAll(',', '.'));
       }
     }

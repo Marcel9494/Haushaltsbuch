@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 
+import '/models/enums/repeat_types.dart';
+
 import '/utils/date_formatters/date_formatter.dart';
+
+import '../dialogs/list_dialog.dart';
 
 import '/screens/create_or_edit_booking_screen.dart';
 
@@ -9,8 +13,17 @@ typedef BookingDateCallback = void Function(DateTime bookingDate);
 class DateInputField extends StatelessWidget {
   final TextEditingController textController;
   final BookingDateCallback bookingDateCallback;
+  final List<String> repeatTypes = [
+    RepeatType.never.name,
+    RepeatType.everyWeek.name,
+    RepeatType.everyTwoWeeks.name,
+    RepeatType.everyMonth.name,
+    RepeatType.everyThreeMonths.name,
+    RepeatType.everySixMonths.name,
+    RepeatType.everyYear.name,
+  ];
 
-  const DateInputField({
+  DateInputField({
     Key? key,
     required this.textController,
     required this.bookingDateCallback,
@@ -33,7 +46,8 @@ class DateInputField extends StatelessWidget {
         suffixIcon: IconTheme(
           data: const IconThemeData(color: Colors.grey),
           child: IconButton(
-            onPressed: () => {},
+            // TODO hier weitermachen und Wiederholungen in GUI richtig anzeigen lassen
+            onPressed: () => showListDialog(context, 'Wiederholung:', repeatTypes, textController),
             icon: const Icon(Icons.repeat_rounded),
           ),
         ),
@@ -57,7 +71,7 @@ class DateInputField extends StatelessWidget {
                   surface: Colors.grey.shade800,
                 ),
                 textButtonTheme: TextButtonThemeData(
-                  style: TextButton.styleFrom(primary: Colors.cyanAccent),
+                  style: TextButton.styleFrom(foregroundColor: Colors.cyanAccent),
                 ),
               ),
             );

@@ -35,7 +35,7 @@ class ExpenditureCard extends StatelessWidget {
                     WidgetSpan(
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                        child: Text('${categorieStats.percentage.toStringAsFixed(1)} %'),
+                        child: Text('${categorieStats.percentage.toStringAsFixed(0)} %'),
                       ),
                     ),
                     TextSpan(

@@ -1,11 +1,20 @@
 import 'package:flutter/material.dart';
 
-import '/utils/helper_components/scrolling_behavior.dart';
+import '../dialogs/list_dialog.dart';
+import '/models/enums/account_types.dart';
 
 class AccountTypeInputField extends StatelessWidget {
   final TextEditingController textController;
   final String errorText;
-  List<String> accountTypes = ['Konto', 'Kapitalanlage', 'Bargeld', 'Karte', 'Versicherung', 'Kredit', 'Sonstiges'];
+  List<String> accountTypes = [
+    AccountType.account.name,
+    AccountType.capitalInvestments.name,
+    AccountType.cash.name,
+    AccountType.card.name,
+    AccountType.insurance.name,
+    AccountType.credit.name,
+    AccountType.other.name,
+  ];
 
   AccountTypeInputField({
     Key? key,
@@ -14,32 +23,7 @@ class AccountTypeInputField extends StatelessWidget {
   }) : super(key: key);
 
   void _openBottomSheetWithAccountTypeList(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Konto Typen:'),
-          content: SizedBox(
-            height: 400.0,
-            child: ScrollConfiguration(
-              behavior: ScrollingBehavior(),
-              child: ListView.builder(
-                itemCount: accountTypes.length,
-                itemBuilder: (BuildContext context, int index) {
-                  return ListTile(
-                    title: Text(accountTypes[index]),
-                    onTap: () => {
-                      textController.text = accountTypes[index],
-                      Navigator.pop(context),
-                    },
-                  );
-                },
-              ),
-            ),
-          ),
-        );
-      },
-    );
+    showListDialog(context, 'Konto Typen:', accountTypes, textController);
   }
 
   @override
