@@ -66,7 +66,7 @@ class _DailyStatisticsTabViewState extends State<DailyStatisticsTabView> {
       }
     }
     _calculateMonthlyExpenditurePercentage();
-    _categorieStats.sort((first, second) => second.amount.compareTo(first.amount));
+    _categorieStats.sort((first, second) => second.percentage.compareTo(first.percentage));
     return _categorieStats;
   }
 

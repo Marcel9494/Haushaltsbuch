@@ -18,8 +18,8 @@ import '/components/deco/loading_indicator.dart';
 
 import '/models/booking.dart';
 import '/models/account.dart';
+import '/models/enums/repeat_types.dart';
 import '/models/enums/transaction_types.dart';
-import '/models/enums/booking_repeats.dart';
 import '/models/screen_arguments/bottom_nav_bar_screen_arguments.dart';
 
 class CreateOrEditBookingScreen extends StatefulWidget {
@@ -50,6 +50,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
   String _categorieErrorText = '';
   String _fromAccountErrorText = '';
   String _toAccountErrorText = '';
+  String _bookingRepeat = '';
   DateTime? _parsedBookingDate;
   late Booking _loadedBooking;
 
@@ -59,6 +60,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
     if (widget.bookingBoxIndex == -1) {
       _currentTransaction = TransactionType.outcome.name;
       _parsedBookingDate = DateTime.now();
+      _bookingRepeat = RepeatType.noRepetition.name;
       _bookingDateTextController.text = dateFormatterDDMMYYYYEE.format(DateTime.now());
     } else {
       _loadBooking();
@@ -71,6 +73,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
     _title = _loadedBooking.title;
     _parsedBookingDate = DateTime.parse(_loadedBooking.date);
     _bookingDateTextController.text = dateFormatterDDMMYYYYEE.format(DateTime.parse(_loadedBooking.date));
+    _bookingRepeat = _loadedBooking.bookingRepeats;
     _amountTextController.text = _loadedBooking.amount;
     _categorieTextController.text = _loadedBooking.categorie;
     _fromAccountTextController.text = _loadedBooking.fromAccount;
@@ -87,7 +90,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
     } else {
       Booking booking = Booking()
         ..transactionType = _currentTransaction
-        ..bookingRepeats = BookingRepeats.noRepeat.name // TODO dynamisch machen, wenn Wiederholungen implementiert wurden
+        ..bookingRepeats = _bookingRepeat
         ..title = _title
         ..date = _parsedBookingDate.toString()
         ..amount = _amountTextController.text
@@ -278,7 +281,11 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
                         TransactionToggleButtons(
                             currentTransaction: _currentTransaction, transactionStringCallback: (transaction) => setState(() => _currentTransaction = transaction)),
                         TextInputField(input: _title, inputCallback: _setTitleState, hintText: 'Titel'),
-                        DateInputField(textController: _bookingDateTextController, bookingDateCallback: (bookingDate) => setState(() => _parsedBookingDate = bookingDate)),
+                        DateInputField(
+                            textController: _bookingDateTextController,
+                            bookingDateCallback: (bookingDate) => setState(() => _parsedBookingDate = bookingDate),
+                            repeat: _bookingRepeat,
+                            repeatCallback: (repeat) => setState(() => _bookingRepeat = repeat)),
                         MoneyInputField(textController: _amountTextController, errorText: _amountErrorText, hintText: 'Betrag', bottomSheetTitle: 'Betrag eingeben:'),
                         _currentTransaction == TransactionType.transfer.name
                             ? const SizedBox()

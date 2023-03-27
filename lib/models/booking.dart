@@ -3,6 +3,7 @@ import 'package:hive/hive.dart';
 
 import '../utils/number_formatters/number_formatter.dart';
 import '/utils/consts/hive_consts.dart';
+import 'enums/repeat_types.dart';
 
 @HiveType(typeId: 0)
 class Booking extends HiveObject {
@@ -26,7 +27,24 @@ class Booking extends HiveObject {
 
   void createBooking(Booking newBooking) async {
     var bookingBox = await Hive.openBox(bookingsBox);
-    bookingBox.add(newBooking);
+    if (newBooking.bookingRepeats == RepeatType.noRepetition.name) {
+      bookingBox.add(newBooking);
+      // TODO hier weitermachen und alle Wiederholungstypen abhandeln + überlegen wieviele Buchungen in der Zukunft im voraus erstellt werden sollen.
+    } else if (newBooking.bookingRepeats == RepeatType.everyMonth.name) {
+      for (int i = 0; i < 12; i++) {
+        Booking nextBooking = Booking()
+          ..transactionType = newBooking.transactionType
+          ..bookingRepeats = newBooking.bookingRepeats
+          ..title = newBooking.title
+          ..date = newBooking.date
+          ..amount = newBooking.amount
+          ..categorie = newBooking.categorie
+          ..fromAccount = newBooking.fromAccount
+          ..toAccount = newBooking.toAccount;
+        nextBooking.date = DateTime(DateTime.now().year, DateTime.now().month + i, DateTime.now().day).toString();
+        bookingBox.add(nextBooking);
+      }
+    }
   }
 
   void updateBooking(Booking updatedBooking, int bookingBoxIndex) async {

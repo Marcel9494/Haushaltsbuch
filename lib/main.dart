@@ -9,7 +9,6 @@ import '/utils/consts/route_consts.dart';
 import 'models/booking.dart';
 import 'models/account.dart';
 import 'models/categorie.dart';
-import 'models/enums/booking_repeats.dart';
 import 'models/enums/transaction_types.dart';
 import 'models/screen_arguments/bottom_nav_bar_screen_arguments.dart';
 import 'models/screen_arguments/account_details_screen_arguments.dart';
@@ -35,7 +34,6 @@ void main() async {
   Hive.registerAdapter(AccountAdapter());
   Hive.registerAdapter(CategorieAdapter());
   Hive.registerAdapter(TransactionTypeAdapter());
-  Hive.registerAdapter(BookingRepeatsAdapter());
   runApp(const BudgetBookApp());
 }
 
