@@ -1,7 +1,5 @@
-import 'package:haushaltsbuch/models/enums/transaction_types.dart';
 import 'package:hive/hive.dart';
 
-import '../utils/number_formatters/number_formatter.dart';
 import '/utils/consts/hive_consts.dart';
 import 'enums/repeat_types.dart';
 
@@ -29,9 +27,9 @@ class Booking extends HiveObject {
     var bookingBox = await Hive.openBox(bookingsBox);
     if (newBooking.bookingRepeats == RepeatType.noRepetition.name) {
       bookingBox.add(newBooking);
-      // TODO hier weitermachen und alle Wiederholungstypen abhandeln + überlegen wieviele Buchungen in der Zukunft im voraus erstellt werden sollen.
-    } else if (newBooking.bookingRepeats == RepeatType.everyMonth.name) {
-      for (int i = 0; i < 12; i++) {
+    } else if (newBooking.bookingRepeats == RepeatType.everyWeek.name) {
+      for (int i = 0; i < 3; i++) {
+        DateTime bookingDate = DateTime.parse(date);
         Booking nextBooking = Booking()
           ..transactionType = newBooking.transactionType
           ..bookingRepeats = newBooking.bookingRepeats
@@ -41,7 +39,113 @@ class Booking extends HiveObject {
           ..categorie = newBooking.categorie
           ..fromAccount = newBooking.fromAccount
           ..toAccount = newBooking.toAccount;
-        nextBooking.date = DateTime(DateTime.now().year, DateTime.now().month + i, DateTime.now().day).toString();
+        nextBooking.date = DateTime(bookingDate.year, bookingDate.month, bookingDate.day + (i * 7)).toString();
+        bookingBox.add(nextBooking);
+      }
+    } else if (newBooking.bookingRepeats == RepeatType.everyTwoWeeks.name) {
+      for (int i = 0; i < 3; i++) {
+        DateTime bookingDate = DateTime.parse(date);
+        Booking nextBooking = Booking()
+          ..transactionType = newBooking.transactionType
+          ..bookingRepeats = newBooking.bookingRepeats
+          ..title = newBooking.title
+          ..date = newBooking.date
+          ..amount = newBooking.amount
+          ..categorie = newBooking.categorie
+          ..fromAccount = newBooking.fromAccount
+          ..toAccount = newBooking.toAccount;
+        nextBooking.date = DateTime(bookingDate.year, bookingDate.month, bookingDate.day + (i * 14)).toString();
+        bookingBox.add(nextBooking);
+      }
+    } else if (newBooking.bookingRepeats == RepeatType.beginningOfMonth.name) {
+      for (int i = 0; i < 3; i++) {
+        DateTime bookingDate = DateTime.parse(date);
+        Booking nextBooking = Booking()
+          ..transactionType = newBooking.transactionType
+          ..bookingRepeats = newBooking.bookingRepeats
+          ..title = newBooking.title
+          ..date = newBooking.date
+          ..amount = newBooking.amount
+          ..categorie = newBooking.categorie
+          ..fromAccount = newBooking.fromAccount
+          ..toAccount = newBooking.toAccount;
+        nextBooking.date = DateTime(bookingDate.year, bookingDate.month + i + 1, 1).toString();
+        bookingBox.add(nextBooking);
+      }
+    } else if (newBooking.bookingRepeats == RepeatType.endOfMonth.name) {
+      for (int i = 0; i < 3; i++) {
+        DateTime bookingDate = DateTime.parse(date);
+        Booking nextBooking = Booking()
+          ..transactionType = newBooking.transactionType
+          ..bookingRepeats = newBooking.bookingRepeats
+          ..title = newBooking.title
+          ..date = newBooking.date
+          ..amount = newBooking.amount
+          ..categorie = newBooking.categorie
+          ..fromAccount = newBooking.fromAccount
+          ..toAccount = newBooking.toAccount;
+        int lastDayOfMonth = DateTime(bookingDate.year, bookingDate.month + i + 1, 0).day;
+        nextBooking.date = DateTime(bookingDate.year, bookingDate.month + i, lastDayOfMonth).toString();
+        bookingBox.add(nextBooking);
+      }
+    } else if (newBooking.bookingRepeats == RepeatType.everyMonth.name) {
+      for (int i = 0; i < 3; i++) {
+        DateTime bookingDate = DateTime.parse(date);
+        Booking nextBooking = Booking()
+          ..transactionType = newBooking.transactionType
+          ..bookingRepeats = newBooking.bookingRepeats
+          ..title = newBooking.title
+          ..date = newBooking.date
+          ..amount = newBooking.amount
+          ..categorie = newBooking.categorie
+          ..fromAccount = newBooking.fromAccount
+          ..toAccount = newBooking.toAccount;
+        nextBooking.date = DateTime(bookingDate.year, bookingDate.month + i, bookingDate.day).toString();
+        bookingBox.add(nextBooking);
+      }
+    } else if (newBooking.bookingRepeats == RepeatType.everyThreeMonths.name) {
+      for (int i = 0; i < 3; i++) {
+        DateTime bookingDate = DateTime.parse(date);
+        Booking nextBooking = Booking()
+          ..transactionType = newBooking.transactionType
+          ..bookingRepeats = newBooking.bookingRepeats
+          ..title = newBooking.title
+          ..date = newBooking.date
+          ..amount = newBooking.amount
+          ..categorie = newBooking.categorie
+          ..fromAccount = newBooking.fromAccount
+          ..toAccount = newBooking.toAccount;
+        nextBooking.date = DateTime(bookingDate.year, bookingDate.month + (i * 3), bookingDate.day).toString();
+        bookingBox.add(nextBooking);
+      }
+    } else if (newBooking.bookingRepeats == RepeatType.everySixMonths.name) {
+      for (int i = 0; i < 3; i++) {
+        DateTime bookingDate = DateTime.parse(date);
+        Booking nextBooking = Booking()
+          ..transactionType = newBooking.transactionType
+          ..bookingRepeats = newBooking.bookingRepeats
+          ..title = newBooking.title
+          ..date = newBooking.date
+          ..amount = newBooking.amount
+          ..categorie = newBooking.categorie
+          ..fromAccount = newBooking.fromAccount
+          ..toAccount = newBooking.toAccount;
+        nextBooking.date = DateTime(bookingDate.year, bookingDate.month + (i * 6), bookingDate.day).toString();
+        bookingBox.add(nextBooking);
+      }
+    } else if (newBooking.bookingRepeats == RepeatType.everyYear.name) {
+      for (int i = 0; i < 3; i++) {
+        DateTime bookingDate = DateTime.parse(date);
+        Booking nextBooking = Booking()
+          ..transactionType = newBooking.transactionType
+          ..bookingRepeats = newBooking.bookingRepeats
+          ..title = newBooking.title
+          ..date = newBooking.date
+          ..amount = newBooking.amount
+          ..categorie = newBooking.categorie
+          ..fromAccount = newBooking.fromAccount
+          ..toAccount = newBooking.toAccount;
+        nextBooking.date = DateTime(bookingDate.year + i, bookingDate.month, bookingDate.day).toString();
         bookingBox.add(nextBooking);
       }
     }

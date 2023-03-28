@@ -1,4 +1,4 @@
-enum RepeatType { noRepetition, everyWeek, everyTwoWeeks, everyMonth, beginningOfMonth, everyThreeMonths, everySixMonths, everyYear }
+enum RepeatType { noRepetition, everyWeek, everyTwoWeeks, everyMonth, beginningOfMonth, endOfMonth, everyThreeMonths, everySixMonths, everyYear }
 
 extension RepeatTypeExtension on RepeatType {
   String get name {
@@ -13,6 +13,8 @@ extension RepeatTypeExtension on RepeatType {
         return 'Jeden Monat';
       case RepeatType.beginningOfMonth:
         return 'Am Monatsanfang';
+      case RepeatType.endOfMonth:
+        return 'Am Monatsende';
       case RepeatType.everyThreeMonths:
         return 'Alle drei Monate';
       case RepeatType.everySixMonths:

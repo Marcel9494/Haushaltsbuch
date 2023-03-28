@@ -47,6 +47,12 @@ class _DateInputFieldState extends State<DateInputField> {
                     onTap: () => {
                       setState(() {
                         widget.repeatCallback(RepeatType.values[index].name);
+                        if (RepeatType.values[index].name == RepeatType.beginningOfMonth.name) {
+                          widget.textController.text = dateFormatterDDMMYYYYEE.format(DateTime(DateTime.now().year, DateTime.now().month + 1, 1));
+                        } else if (RepeatType.values[index].name == RepeatType.endOfMonth.name) {
+                          widget.textController.text =
+                              dateFormatterDDMMYYYYEE.format(DateTime(DateTime.now().year, DateTime.now().month, DateTime(DateTime.now().year, DateTime.now().month + 1, 0).day));
+                        }
                       }),
                       Navigator.pop(context),
                     },
