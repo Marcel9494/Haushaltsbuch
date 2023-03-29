@@ -42,7 +42,7 @@ class _DailyStatisticsTabViewState extends State<DailyStatisticsTabView> {
             ..categorieName = _bookingList[i].categorie
             ..amount = _bookingList[i].amount
             ..percentage = 0.0
-            ..statColor = Color((math.Random().nextDouble() * 0xFFFFFF).toInt()).withOpacity(0.6);
+            ..statColor = const Color.fromRGBO(0, 200, 200, 0.8);
           _categorieStats.add(newCategorieStats);
         } else {
           for (int j = 0; j < _categorieStats.length; j++) {
@@ -59,7 +59,7 @@ class _DailyStatisticsTabViewState extends State<DailyStatisticsTabView> {
               ..categorieName = _bookingList[i].categorie
               ..amount = _bookingList[i].amount
               ..percentage = 0.0
-              ..statColor = Color((math.Random().nextDouble() * 0xFFFFFF).toInt()).withOpacity(0.6);
+              ..statColor = Color.fromRGBO((i * 20) % 255, (i * 20) % 255, (i * 50) % 255, 0.8);
             _categorieStats.add(newCategorieStats);
           }
         }
@@ -134,7 +134,6 @@ class _DailyStatisticsTabViewState extends State<DailyStatisticsTabView> {
   }
 
   List<PieChartSectionData> showingSections() {
-    // TODO hier weitermachen und klicken deaktivieren auf Diagramm und anschließend Buchungen wiederholt ausführen implementieren
     return List.generate(_categorieStats.length, (i) {
       return PieChartSectionData(
         color: _categorieStats[i].statColor,

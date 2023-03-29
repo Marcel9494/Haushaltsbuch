@@ -23,6 +23,19 @@ class Booking extends HiveObject {
   @HiveField(7)
   late String toAccount;
 
+  Booking createBookingInstance(Booking newBooking) {
+    return Booking()
+      ..transactionType = newBooking.transactionType
+      ..bookingRepeats = newBooking.bookingRepeats
+      ..title = newBooking.title
+      ..date = newBooking.date
+      ..amount = newBooking.amount
+      ..categorie = newBooking.categorie
+      ..fromAccount = newBooking.fromAccount
+      ..toAccount = newBooking.toAccount;
+  }
+
+  // TODO Anzahl der Buchungen erhöhen, damit für die nächsten 10 Jahre Buchungen erstellt werden. 3 nur als Test.
   void createBooking(Booking newBooking) async {
     var bookingBox = await Hive.openBox(bookingsBox);
     if (newBooking.bookingRepeats == RepeatType.noRepetition.name) {
@@ -30,60 +43,28 @@ class Booking extends HiveObject {
     } else if (newBooking.bookingRepeats == RepeatType.everyWeek.name) {
       for (int i = 0; i < 3; i++) {
         DateTime bookingDate = DateTime.parse(date);
-        Booking nextBooking = Booking()
-          ..transactionType = newBooking.transactionType
-          ..bookingRepeats = newBooking.bookingRepeats
-          ..title = newBooking.title
-          ..date = newBooking.date
-          ..amount = newBooking.amount
-          ..categorie = newBooking.categorie
-          ..fromAccount = newBooking.fromAccount
-          ..toAccount = newBooking.toAccount;
+        Booking nextBooking = createBookingInstance(newBooking);
         nextBooking.date = DateTime(bookingDate.year, bookingDate.month, bookingDate.day + (i * 7)).toString();
         bookingBox.add(nextBooking);
       }
     } else if (newBooking.bookingRepeats == RepeatType.everyTwoWeeks.name) {
       for (int i = 0; i < 3; i++) {
         DateTime bookingDate = DateTime.parse(date);
-        Booking nextBooking = Booking()
-          ..transactionType = newBooking.transactionType
-          ..bookingRepeats = newBooking.bookingRepeats
-          ..title = newBooking.title
-          ..date = newBooking.date
-          ..amount = newBooking.amount
-          ..categorie = newBooking.categorie
-          ..fromAccount = newBooking.fromAccount
-          ..toAccount = newBooking.toAccount;
+        Booking nextBooking = createBookingInstance(newBooking);
         nextBooking.date = DateTime(bookingDate.year, bookingDate.month, bookingDate.day + (i * 14)).toString();
         bookingBox.add(nextBooking);
       }
     } else if (newBooking.bookingRepeats == RepeatType.beginningOfMonth.name) {
       for (int i = 0; i < 3; i++) {
         DateTime bookingDate = DateTime.parse(date);
-        Booking nextBooking = Booking()
-          ..transactionType = newBooking.transactionType
-          ..bookingRepeats = newBooking.bookingRepeats
-          ..title = newBooking.title
-          ..date = newBooking.date
-          ..amount = newBooking.amount
-          ..categorie = newBooking.categorie
-          ..fromAccount = newBooking.fromAccount
-          ..toAccount = newBooking.toAccount;
+        Booking nextBooking = createBookingInstance(newBooking);
         nextBooking.date = DateTime(bookingDate.year, bookingDate.month + i + 1, 1).toString();
         bookingBox.add(nextBooking);
       }
     } else if (newBooking.bookingRepeats == RepeatType.endOfMonth.name) {
       for (int i = 0; i < 3; i++) {
         DateTime bookingDate = DateTime.parse(date);
-        Booking nextBooking = Booking()
-          ..transactionType = newBooking.transactionType
-          ..bookingRepeats = newBooking.bookingRepeats
-          ..title = newBooking.title
-          ..date = newBooking.date
-          ..amount = newBooking.amount
-          ..categorie = newBooking.categorie
-          ..fromAccount = newBooking.fromAccount
-          ..toAccount = newBooking.toAccount;
+        Booking nextBooking = createBookingInstance(newBooking);
         int lastDayOfMonth = DateTime(bookingDate.year, bookingDate.month + i + 1, 0).day;
         nextBooking.date = DateTime(bookingDate.year, bookingDate.month + i, lastDayOfMonth).toString();
         bookingBox.add(nextBooking);
@@ -91,60 +72,28 @@ class Booking extends HiveObject {
     } else if (newBooking.bookingRepeats == RepeatType.everyMonth.name) {
       for (int i = 0; i < 3; i++) {
         DateTime bookingDate = DateTime.parse(date);
-        Booking nextBooking = Booking()
-          ..transactionType = newBooking.transactionType
-          ..bookingRepeats = newBooking.bookingRepeats
-          ..title = newBooking.title
-          ..date = newBooking.date
-          ..amount = newBooking.amount
-          ..categorie = newBooking.categorie
-          ..fromAccount = newBooking.fromAccount
-          ..toAccount = newBooking.toAccount;
+        Booking nextBooking = createBookingInstance(newBooking);
         nextBooking.date = DateTime(bookingDate.year, bookingDate.month + i, bookingDate.day).toString();
         bookingBox.add(nextBooking);
       }
     } else if (newBooking.bookingRepeats == RepeatType.everyThreeMonths.name) {
       for (int i = 0; i < 3; i++) {
         DateTime bookingDate = DateTime.parse(date);
-        Booking nextBooking = Booking()
-          ..transactionType = newBooking.transactionType
-          ..bookingRepeats = newBooking.bookingRepeats
-          ..title = newBooking.title
-          ..date = newBooking.date
-          ..amount = newBooking.amount
-          ..categorie = newBooking.categorie
-          ..fromAccount = newBooking.fromAccount
-          ..toAccount = newBooking.toAccount;
+        Booking nextBooking = createBookingInstance(newBooking);
         nextBooking.date = DateTime(bookingDate.year, bookingDate.month + (i * 3), bookingDate.day).toString();
         bookingBox.add(nextBooking);
       }
     } else if (newBooking.bookingRepeats == RepeatType.everySixMonths.name) {
       for (int i = 0; i < 3; i++) {
         DateTime bookingDate = DateTime.parse(date);
-        Booking nextBooking = Booking()
-          ..transactionType = newBooking.transactionType
-          ..bookingRepeats = newBooking.bookingRepeats
-          ..title = newBooking.title
-          ..date = newBooking.date
-          ..amount = newBooking.amount
-          ..categorie = newBooking.categorie
-          ..fromAccount = newBooking.fromAccount
-          ..toAccount = newBooking.toAccount;
+        Booking nextBooking = createBookingInstance(newBooking);
         nextBooking.date = DateTime(bookingDate.year, bookingDate.month + (i * 6), bookingDate.day).toString();
         bookingBox.add(nextBooking);
       }
     } else if (newBooking.bookingRepeats == RepeatType.everyYear.name) {
       for (int i = 0; i < 3; i++) {
         DateTime bookingDate = DateTime.parse(date);
-        Booking nextBooking = Booking()
-          ..transactionType = newBooking.transactionType
-          ..bookingRepeats = newBooking.bookingRepeats
-          ..title = newBooking.title
-          ..date = newBooking.date
-          ..amount = newBooking.amount
-          ..categorie = newBooking.categorie
-          ..fromAccount = newBooking.fromAccount
-          ..toAccount = newBooking.toAccount;
+        Booking nextBooking = createBookingInstance(newBooking);
         nextBooking.date = DateTime(bookingDate.year + i, bookingDate.month, bookingDate.day).toString();
         bookingBox.add(nextBooking);
       }
