@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:haushaltsbuch/models/enums/transaction_types.dart';
 
 import '/models/booking.dart';
+import '/models/enums/transaction_types.dart';
 import '/models/screen_arguments/create_or_edit_booking_screen_arguments.dart';
 
 import '/utils/consts/route_consts.dart';
@@ -20,6 +20,8 @@ class BookingCard extends StatelessWidget {
     } else if (booking.transactionType == TransactionType.outcome.name) {
       return const Color(0xfff4634f);
     } else if (booking.transactionType == TransactionType.transfer.name) {
+      return Colors.cyanAccent;
+    } else if (booking.transactionType == TransactionType.investment.name) {
       return Colors.cyanAccent;
     }
     return Colors.cyanAccent;
@@ -57,12 +59,15 @@ class BookingCard extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          booking.transactionType == TransactionType.transfer.name ? const SizedBox() : Text(booking.categorie),
+                          booking.transactionType == TransactionType.transfer.name || booking.transactionType == TransactionType.investment.name
+                              ? const SizedBox()
+                              : Text(booking.categorie),
                           Padding(
-                            padding: EdgeInsets.only(top: booking.transactionType == TransactionType.transfer.name ? 0.0 : 8.0),
+                            padding: EdgeInsets.only(
+                                top: booking.transactionType == TransactionType.transfer.name || booking.transactionType == TransactionType.investment.name ? 0.0 : 8.0),
                             child: Text(booking.fromAccount, style: const TextStyle(color: Colors.grey)),
                           ),
-                          booking.transactionType == TransactionType.transfer.name
+                          booking.transactionType == TransactionType.transfer.name || booking.transactionType == TransactionType.investment.name
                               ? Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [

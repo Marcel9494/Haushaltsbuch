@@ -97,7 +97,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
         ..categorie = _categorieTextController.text
         ..fromAccount = _fromAccountTextController.text
         ..toAccount = _toAccountTextController.text;
-      if (_currentTransaction == TransactionType.transfer.name) {
+      if (_currentTransaction == TransactionType.transfer.name || _currentTransaction == TransactionType.investment.name) {
         Account.transferMoney(_fromAccountTextController.text, _toAccountTextController.text, _amountTextController.text);
       } else {
         Account.calculateNewAccountBalance(_fromAccountTextController.text, _amountTextController.text, _currentTransaction);
@@ -132,7 +132,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
   }
 
   bool _validCategorie(String categorieInput) {
-    if (_currentTransaction != TransactionType.transfer.name && _categorieTextController.text.isEmpty) {
+    if ((_currentTransaction != TransactionType.transfer.name && _currentTransaction != TransactionType.investment.name) && _categorieTextController.text.isEmpty) {
       setState(() {
         _categorieErrorText = 'Bitte wählen Sie eine Kategorie aus.';
       });
@@ -154,7 +154,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
   }
 
   bool _validToAccount(String toAccountInput) {
-    if (_currentTransaction == TransactionType.transfer.name && _toAccountTextController.text.isEmpty) {
+    if ((_currentTransaction == TransactionType.transfer.name && _currentTransaction != TransactionType.investment.name) && _toAccountTextController.text.isEmpty) {
       setState(() {
         _toAccountErrorText = 'Bitte wählen Sie ein Konto aus.';
       });
@@ -287,13 +287,13 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
                             repeat: _bookingRepeat,
                             repeatCallback: (repeat) => setState(() => _bookingRepeat = repeat)),
                         MoneyInputField(textController: _amountTextController, errorText: _amountErrorText, hintText: 'Betrag', bottomSheetTitle: 'Betrag eingeben:'),
-                        _currentTransaction == TransactionType.transfer.name
+                        _currentTransaction == TransactionType.transfer.name || _currentTransaction == TransactionType.investment.name
                             ? const SizedBox()
                             : CategorieInputField(textController: _categorieTextController, errorText: _categorieErrorText, transactionType: _currentTransaction),
-                        _currentTransaction == TransactionType.transfer.name
+                        _currentTransaction == TransactionType.transfer.name || _currentTransaction == TransactionType.investment.name
                             ? AccountInputField(textController: _fromAccountTextController, errorText: _fromAccountErrorText, hintText: 'Von')
                             : AccountInputField(textController: _fromAccountTextController, errorText: _fromAccountErrorText),
-                        _currentTransaction == TransactionType.transfer.name
+                        _currentTransaction == TransactionType.transfer.name || _currentTransaction == TransactionType.investment.name
                             ? AccountInputField(textController: _toAccountTextController, errorText: _toAccountErrorText, hintText: 'Nach')
                             : const SizedBox(),
                         SaveButton(saveFunction: _createOrUpdateBooking, buttonController: _saveButtonController),

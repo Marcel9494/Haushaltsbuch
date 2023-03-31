@@ -1,7 +1,7 @@
 import 'package:hive/hive.dart';
 
 @HiveType(typeId: 1)
-enum TransactionType { income, outcome, transfer }
+enum TransactionType { income, outcome, transfer, investment }
 
 extension TransactionTypeExtension on TransactionType {
   String get name {
@@ -12,6 +12,8 @@ extension TransactionTypeExtension on TransactionType {
         return 'Ausgabe';
       case TransactionType.transfer:
         return 'Übertrag';
+      case TransactionType.investment:
+        return 'Investition';
       default:
         throw Exception('$name is not a valid Transaction.');
     }
@@ -25,6 +27,8 @@ extension TransactionTypeExtension on TransactionType {
         return TransactionType.outcome;
       } else if (transaction == TransactionType.transfer.name) {
         return TransactionType.transfer;
+      } else if (transaction == TransactionType.investment.name) {
+        return TransactionType.investment;
       }
     } catch (e) {
       throw Exception('$transaction is not a valid Transaction.');

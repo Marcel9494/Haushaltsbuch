@@ -173,6 +173,28 @@ class Account extends HiveObject {
     }
     return liabilityValue;
   }
+
+  static void createStartAccounts() async {
+    var accountBox = await Hive.openBox(accountsBox);
+    if (accountBox.isNotEmpty) {
+      return;
+    }
+    Account cashAccount = Account()
+      ..name = 'Geldbeutel'
+      ..bankBalance = '0 €'
+      ..accountType = AccountType.cash.name;
+    cashAccount.createAccount(cashAccount);
+    Account giroAccount = Account()
+      ..name = 'Girokonto'
+      ..bankBalance = '0 €'
+      ..accountType = AccountType.account.name;
+    giroAccount.createAccount(giroAccount);
+    Account capitalInvestmentAccount = Account()
+      ..name = 'Aktiendepot'
+      ..bankBalance = '0 €'
+      ..accountType = AccountType.capitalInvestments.name;
+    capitalInvestmentAccount.createAccount(capitalInvestmentAccount);
+  }
 }
 
 class AccountAdapter extends TypeAdapter<Account> {

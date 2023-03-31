@@ -31,11 +31,13 @@ class _TransactionToggleButtonsState extends State<TransactionToggleButtons> {
 
   void _getSelectedTransaction() {
     if (widget.currentTransaction == TransactionType.income.name) {
-      _selectedTransaction = <bool>[true, false, false];
+      _selectedTransaction = <bool>[true, false, false, false];
     } else if (widget.currentTransaction == TransactionType.outcome.name) {
-      _selectedTransaction = <bool>[false, true, false];
+      _selectedTransaction = <bool>[false, true, false, false];
     } else if (widget.currentTransaction == TransactionType.transfer.name) {
-      _selectedTransaction = <bool>[false, false, true];
+      _selectedTransaction = <bool>[false, false, true, false];
+    } else if (widget.currentTransaction == TransactionType.investment.name) {
+      _selectedTransaction = <bool>[false, false, false, true];
     }
   }
 
@@ -50,6 +52,8 @@ class _TransactionToggleButtonsState extends State<TransactionToggleButtons> {
         CreateOrEditBookingScreen.of(context)!.currentTransaction = TransactionType.outcome.name;
       } else if (_selectedTransaction[2]) {
         CreateOrEditBookingScreen.of(context)!.currentTransaction = TransactionType.transfer.name;
+      } else if (_selectedTransaction[3]) {
+        CreateOrEditBookingScreen.of(context)!.currentTransaction = TransactionType.investment.name;
       } else {
         CreateOrEditBookingScreen.of(context)!.currentTransaction = '';
       }
@@ -63,6 +67,8 @@ class _TransactionToggleButtonsState extends State<TransactionToggleButtons> {
       return Colors.redAccent;
     } else if (_selectedTransaction[2]) {
       return Colors.cyanAccent;
+    } else if (_selectedTransaction[3]) {
+      return Colors.cyanAccent;
     }
     return Colors.white54;
   }
@@ -73,6 +79,8 @@ class _TransactionToggleButtonsState extends State<TransactionToggleButtons> {
     } else if (_selectedTransaction[1]) {
       return Colors.redAccent.withOpacity(0.2);
     } else if (_selectedTransaction[2]) {
+      return Colors.cyanAccent.withOpacity(0.2);
+    } else if (_selectedTransaction[3]) {
       return Colors.cyanAccent.withOpacity(0.2);
     }
     return Colors.transparent;
@@ -94,13 +102,14 @@ class _TransactionToggleButtonsState extends State<TransactionToggleButtons> {
       color: Colors.white60,
       constraints: const BoxConstraints(
         minHeight: 45.0,
-        minWidth: 108.0,
+        minWidth: 80.0,
       ),
       isSelected: _selectedTransaction,
       children: [
-        Text(TransactionType.income.name),
-        Text(TransactionType.outcome.name),
-        Text(TransactionType.transfer.name),
+        Text(TransactionType.income.name, style: const TextStyle(fontSize: 12.0)),
+        Text(TransactionType.outcome.name, style: const TextStyle(fontSize: 12.0)),
+        Text(TransactionType.transfer.name, style: const TextStyle(fontSize: 12.0)),
+        Text(TransactionType.investment.name, style: const TextStyle(fontSize: 12.0)),
       ],
     );
   }

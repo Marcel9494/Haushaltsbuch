@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'dart:math' as math;
 
 import '/models/categorie_stats.dart';
 import '/models/enums/transaction_types.dart';
@@ -86,7 +85,11 @@ class _DailyStatisticsTabViewState extends State<DailyStatisticsTabView> {
             return const LoadingIndicator();
           case ConnectionState.done:
             if (_categorieStats.isEmpty) {
-              return const Text('Noch keine Kostenstellen vorhanden.');
+              return const Expanded(
+                child: Center(
+                  child: Text('Noch keine Kostenstellen vorhanden.'),
+                ),
+              );
             } else {
               return Column(
                 children: [

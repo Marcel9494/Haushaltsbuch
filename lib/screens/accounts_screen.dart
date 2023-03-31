@@ -103,7 +103,11 @@ class _AccountsScreenState extends State<AccountsScreen> {
                     return const LoadingIndicator();
                   case ConnectionState.done:
                     if (_accountList.isEmpty) {
-                      return const Text('Noch keine Konten erstellt.');
+                      return const Expanded(
+                        child: Center(
+                          child: Text('Noch keine Konten erstellt.'),
+                        ),
+                      );
                     } else {
                       return Expanded(
                         child: RefreshIndicator(

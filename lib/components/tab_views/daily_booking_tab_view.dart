@@ -24,6 +24,7 @@ class _DailyBookingTabViewState extends State<DailyBookingTabView> {
   late List<Booking> _bookingList = [];
   late double _revenues = 0.0;
   late double _expenditures = 0.0;
+  late double _investments = 0.0;
   late final Map<DateTime, double> _todayExpendituresMap = {};
   late final Map<DateTime, double> _todayRevenuesMap = {};
 
@@ -53,6 +54,16 @@ class _DailyBookingTabViewState extends State<DailyBookingTabView> {
       }
     }
     return _expenditures;
+  }
+
+  double _getInvestments() {
+    _investments = 0.0;
+    for (int i = 0; i < _bookingList.length; i++) {
+      if (_bookingList[i].transactionType == TransactionType.investment.name) {
+        _investments += formatMoneyAmountToDouble(_bookingList[i].amount);
+      }
+    }
+    return _investments;
   }
 
   void _prepareMaps(List<Booking> bookingList) {
@@ -102,7 +113,16 @@ class _DailyBookingTabViewState extends State<DailyBookingTabView> {
               if (_bookingList.isEmpty) {
                 return Column(
                   children: const [
-                    OverviewTile(shouldText: 'Einnahmen', should: 0, haveText: 'Ausgaben', have: 0, balanceText: 'Saldo', showAverageValuesPerDay: true),
+                    OverviewTile(
+                      shouldText: 'Einnahmen',
+                      should: 0,
+                      haveText: 'Ausgaben',
+                      have: 0,
+                      balanceText: 'Saldo',
+                      showAverageValuesPerDay: true,
+                      investmentText: 'Investitionen',
+                      showInvestments: true,
+                    ),
                     Expanded(
                       child: Center(
                         child: Text('Noch keine Buchungen vorhanden.'),
@@ -114,7 +134,16 @@ class _DailyBookingTabViewState extends State<DailyBookingTabView> {
                 return Column(
                   children: [
                     OverviewTile(
-                        shouldText: 'Einnahmen', should: _getRevenues(), haveText: 'Ausgaben', have: _getExpenditures(), balanceText: 'Saldo', showAverageValuesPerDay: true),
+                      shouldText: 'Einnahmen',
+                      should: _getRevenues(),
+                      haveText: 'Ausgaben',
+                      have: _getExpenditures(),
+                      balanceText: 'Saldo',
+                      showAverageValuesPerDay: true,
+                      investmentText: 'Investitionen',
+                      investmentAmount: _getInvestments(),
+                      showInvestments: true,
+                    ),
                     Expanded(
                       child: RefreshIndicator(
                         onRefresh: () async {
