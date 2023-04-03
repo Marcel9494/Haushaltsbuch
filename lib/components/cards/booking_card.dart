@@ -51,7 +51,7 @@ class BookingCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Expanded(
-                    flex: 1,
+                    flex: 2,
                     child: Container(
                       decoration: BoxDecoration(
                         border: Border(right: BorderSide(color: Colors.grey.shade700, width: 0.5)),
@@ -81,7 +81,7 @@ class BookingCard extends StatelessWidget {
                     ),
                   ),
                   Expanded(
-                    flex: 1,
+                    flex: 3,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
@@ -93,7 +93,7 @@ class BookingCard extends StatelessWidget {
                     ),
                   ),
                   Expanded(
-                    flex: 1,
+                    flex: 2,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [

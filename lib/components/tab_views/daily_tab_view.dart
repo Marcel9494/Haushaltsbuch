@@ -14,8 +14,8 @@ class DailyTabView extends StatefulWidget {
 }
 
 class _DailyTabViewState extends State<DailyTabView> {
-  late DateTime _selectedDate = DateTime.now();
-  late List<bool> _selectedTabOption = [true, false, false];
+  DateTime _selectedDate = DateTime.now();
+  List<bool> _selectedTabOption = [true, false, false];
 
   void _setSelectedTab(int selectedIndex) {
     setState(() {

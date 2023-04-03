@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../models/monthly_stats.dart';
+import '../../utils/number_formatters/number_formatter.dart';
 
 class MonthlyOverviewCard extends StatelessWidget {
   final MonthlyStats monthlyStats;
@@ -32,10 +33,39 @@ class MonthlyOverviewCard extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(monthlyStats.month),
-                  Text(monthlyStats.revenues),
-                  Text(monthlyStats.expenditures),
-                  Text(monthlyStats.investments),
+                  Expanded(
+                    flex: 1,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        border: Border(right: BorderSide(color: Colors.grey.shade700, width: 0.5)),
+                      ),
+                      child: Text(monthlyStats.month),
+                    ),
+                  ),
+                  Expanded(
+                    flex: 1,
+                    child: Text(
+                      formatToMoneyAmount(monthlyStats.revenues),
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(color: Colors.greenAccent),
+                    ),
+                  ),
+                  Expanded(
+                    flex: 1,
+                    child: Text(
+                      formatToMoneyAmount(monthlyStats.expenditures),
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(color: Colors.redAccent),
+                    ),
+                  ),
+                  Expanded(
+                    flex: 1,
+                    child: Text(
+                      formatToMoneyAmount(monthlyStats.investments),
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(color: Colors.cyanAccent),
+                    ),
+                  ),
                 ],
               ),
             ),
