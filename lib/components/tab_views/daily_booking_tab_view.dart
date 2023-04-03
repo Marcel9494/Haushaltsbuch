@@ -22,48 +22,15 @@ class DailyBookingTabView extends StatefulWidget {
 
 class _DailyBookingTabViewState extends State<DailyBookingTabView> {
   late List<Booking> _bookingList = [];
-  late double _revenues = 0.0;
-  late double _expenditures = 0.0;
-  late double _investments = 0.0;
   late final Map<DateTime, double> _todayExpendituresMap = {};
   late final Map<DateTime, double> _todayRevenuesMap = {};
 
-  Future<List<Booking>> loadMonthlyBookingList() async {
+  Future<List<Booking>> _loadMonthlyBookingList() async {
     _bookingList = await Booking.loadMonthlyBookingList(widget.selectedDate.month, widget.selectedDate.year);
     _prepareMaps(_bookingList);
     _getTodayExpenditures(_bookingList);
     _getTodayRevenues(_bookingList);
     return _bookingList;
-  }
-
-  double _getRevenues() {
-    _revenues = 0.0;
-    for (int i = 0; i < _bookingList.length; i++) {
-      if (_bookingList[i].transactionType == TransactionType.income.name) {
-        _revenues += formatMoneyAmountToDouble(_bookingList[i].amount);
-      }
-    }
-    return _revenues;
-  }
-
-  double _getExpenditures() {
-    _expenditures = 0.0;
-    for (int i = 0; i < _bookingList.length; i++) {
-      if (_bookingList[i].transactionType == TransactionType.outcome.name) {
-        _expenditures += formatMoneyAmountToDouble(_bookingList[i].amount);
-      }
-    }
-    return _expenditures;
-  }
-
-  double _getInvestments() {
-    _investments = 0.0;
-    for (int i = 0; i < _bookingList.length; i++) {
-      if (_bookingList[i].transactionType == TransactionType.investment.name) {
-        _investments += formatMoneyAmountToDouble(_bookingList[i].amount);
-      }
-    }
-    return _investments;
   }
 
   void _prepareMaps(List<Booking> bookingList) {
@@ -104,7 +71,7 @@ class _DailyBookingTabViewState extends State<DailyBookingTabView> {
   Widget build(BuildContext context) {
     return Expanded(
       child: FutureBuilder(
-        future: loadMonthlyBookingList(),
+        future: _loadMonthlyBookingList(),
         builder: (BuildContext context, AsyncSnapshot<List<Booking>> snapshot) {
           switch (snapshot.connectionState) {
             case ConnectionState.waiting:
@@ -135,19 +102,19 @@ class _DailyBookingTabViewState extends State<DailyBookingTabView> {
                   children: [
                     OverviewTile(
                       shouldText: 'Einnahmen',
-                      should: _getRevenues(),
+                      should: Booking.getRevenues(_bookingList),
                       haveText: 'Ausgaben',
-                      have: _getExpenditures(),
+                      have: Booking.getExpenditures(_bookingList),
                       balanceText: 'Saldo',
                       showAverageValuesPerDay: true,
                       investmentText: 'Investitionen',
-                      investmentAmount: _getInvestments(),
+                      investmentAmount: Booking.getInvestments(_bookingList),
                       showInvestments: true,
                     ),
                     Expanded(
                       child: RefreshIndicator(
                         onRefresh: () async {
-                          _bookingList = await loadMonthlyBookingList();
+                          _bookingList = await _loadMonthlyBookingList();
                           setState(() {});
                           return;
                         },

@@ -1,7 +1,10 @@
 import 'package:hive/hive.dart';
 
+import '/utils/number_formatters/number_formatter.dart';
 import '/utils/consts/hive_consts.dart';
+
 import 'enums/repeat_types.dart';
+import 'enums/transaction_types.dart';
 
 @HiveType(typeId: 0)
 class Booking extends HiveObject {
@@ -128,6 +131,36 @@ class Booking extends HiveObject {
     }
     bookingList.sort((first, second) => second.date.compareTo(first.date));
     return bookingList;
+  }
+
+  static double getRevenues(List<Booking> bookingList) {
+    double revenues = 0.0;
+    for (int i = 0; i < bookingList.length; i++) {
+      if (bookingList[i].transactionType == TransactionType.income.name) {
+        revenues += formatMoneyAmountToDouble(bookingList[i].amount);
+      }
+    }
+    return revenues;
+  }
+
+  static double getExpenditures(List<Booking> bookingList) {
+    double _expenditures = 0.0;
+    for (int i = 0; i < bookingList.length; i++) {
+      if (bookingList[i].transactionType == TransactionType.outcome.name) {
+        _expenditures += formatMoneyAmountToDouble(bookingList[i].amount);
+      }
+    }
+    return _expenditures;
+  }
+
+  static double getInvestments(List<Booking> bookingList) {
+    double investments = 0.0;
+    for (int i = 0; i < bookingList.length; i++) {
+      if (bookingList[i].transactionType == TransactionType.investment.name) {
+        investments += formatMoneyAmountToDouble(bookingList[i].amount);
+      }
+    }
+    return investments;
   }
 }
 
