@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:month_picker_dialog/month_picker_dialog.dart';
 
 import '/components/deco/loading_indicator.dart';
 import '/components/cards/monthly_overview_card.dart';
 
 import '/utils/date_formatters/date_formatter.dart';
-import '/utils/number_formatters/number_formatter.dart';
 
 import '/models/booking.dart';
 import '/models/monthly_stats.dart';
@@ -32,9 +30,9 @@ class _MonthlyTabViewState extends State<MonthlyTabView> {
       List<Booking> _bookingList = await Booking.loadMonthlyBookingList(i + 1, _selectedDate.year);
       MonthlyStats monthlyStats = MonthlyStats();
       monthlyStats.month = dateFormatterMMMM.format(DateTime(_selectedDate.year, i + 1, 1)).toString();
-      monthlyStats.revenues = Booking.getRevenues(_bookingList).toString();
-      monthlyStats.expenditures = Booking.getExpenditures(_bookingList).toString();
-      monthlyStats.investments = Booking.getInvestments(_bookingList).toString();
+      monthlyStats.revenues = Booking.getRevenues(_bookingList);
+      monthlyStats.expenditures = Booking.getExpenditures(_bookingList);
+      monthlyStats.investments = Booking.getInvestments(_bookingList);
       _monthList.add(monthlyStats);
     }
     return _monthList;
@@ -43,7 +41,7 @@ class _MonthlyTabViewState extends State<MonthlyTabView> {
   double _getYearlyRevenues() {
     _yearlyRevenues = 0.0;
     for (int i = 0; i < _monthList.length; i++) {
-      _yearlyRevenues += formatMoneyAmountToDouble(_monthList[i].revenues);
+      _yearlyRevenues += _monthList[i].revenues;
     }
     return _yearlyRevenues;
   }
@@ -51,7 +49,7 @@ class _MonthlyTabViewState extends State<MonthlyTabView> {
   double _getYearlyExpenditures() {
     _yearlyExpenditures = 0.0;
     for (int i = 0; i < _monthList.length; i++) {
-      _yearlyExpenditures += formatMoneyAmountToDouble(_monthList[i].expenditures);
+      _yearlyExpenditures += _monthList[i].expenditures;
     }
     return _yearlyExpenditures;
   }
@@ -59,7 +57,7 @@ class _MonthlyTabViewState extends State<MonthlyTabView> {
   double _getYearlyInvestments() {
     _yearlyInvestments = 0.0;
     for (int i = 0; i < _monthList.length; i++) {
-      _yearlyInvestments += formatMoneyAmountToDouble(_monthList[i].investments);
+      _yearlyInvestments += _monthList[i].investments;
     }
     return _yearlyInvestments;
   }
@@ -93,24 +91,30 @@ class _MonthlyTabViewState extends State<MonthlyTabView> {
               width: 120.0,
               child: GestureDetector(
                 onTap: () {
-                  showMonthPicker(
+                  showDialog(
                     context: context,
-                    initialDate: _selectedDate,
-                    headerColor: Colors.grey.shade800,
-                    selectedMonthBackgroundColor: Colors.cyanAccent,
-                    unselectedMonthTextColor: Colors.white,
-                    confirmWidget: const Text('OK', style: TextStyle(color: Colors.cyanAccent)),
-                    cancelWidget: const Text('Abbrechen', style: TextStyle(color: Colors.cyanAccent)),
-                    locale: const Locale('DE-de'),
-                    roundedCornersRadius: 12.0,
-                    dismissible: true,
-                  ).then((date) {
-                    if (date != null) {
-                      setState(() {
-                        // TODO_selectedDate = date;
-                      });
-                    }
-                  });
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: const Text('Jahr auswählen:'),
+                        content: SizedBox(
+                          width: 300,
+                          height: 300,
+                          child: YearPicker(
+                            firstDate: DateTime(1950, 1),
+                            lastDate: DateTime(DateTime.now().year + 100, 1),
+                            initialDate: DateTime.now(),
+                            selectedDate: _selectedDate,
+                            onChanged: (DateTime date) {
+                              setState(() {
+                                _selectedDate = date;
+                              });
+                              Navigator.pop(context);
+                            },
+                          ),
+                        ),
+                      );
+                    },
+                  );
                 },
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 12.0),

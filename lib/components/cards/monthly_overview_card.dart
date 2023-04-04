@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../models/monthly_stats.dart';
+
 import '../../utils/number_formatters/number_formatter.dart';
 
 class MonthlyOverviewCard extends StatelessWidget {
@@ -43,27 +44,53 @@ class MonthlyOverviewCard extends StatelessWidget {
                     ),
                   ),
                   Expanded(
-                    flex: 1,
-                    child: Text(
-                      formatToMoneyAmount(monthlyStats.revenues),
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(color: Colors.greenAccent),
-                    ),
-                  ),
-                  Expanded(
-                    flex: 1,
-                    child: Text(
-                      formatToMoneyAmount(monthlyStats.expenditures),
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(color: Colors.redAccent),
-                    ),
-                  ),
-                  Expanded(
-                    flex: 1,
-                    child: Text(
-                      formatToMoneyAmount(monthlyStats.investments),
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(color: Colors.cyanAccent),
+                    flex: 3,
+                    child: Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 8.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              Text(
+                                formatToMoneyAmount(monthlyStats.revenues.toString()),
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(color: Colors.greenAccent),
+                              ),
+                              Text(
+                                formatToMoneyAmount(monthlyStats.expenditures.toString()),
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(color: Colors.redAccent),
+                              ),
+                              Text(
+                                formatToMoneyAmount((monthlyStats.revenues - monthlyStats.expenditures).toString()),
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(color: Colors.cyanAccent),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            Text(
+                              formatToMoneyAmount((monthlyStats.revenues - monthlyStats.expenditures).toString()),
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(color: Colors.greenAccent),
+                            ),
+                            Text(
+                              formatToMoneyAmount(monthlyStats.investments.toString()),
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(color: Colors.redAccent),
+                            ),
+                            Text(
+                              formatToMoneyAmount((monthlyStats.revenues - monthlyStats.expenditures - monthlyStats.investments).toStringAsFixed(2)),
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(color: Colors.cyanAccent),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
                   ),
                 ],
