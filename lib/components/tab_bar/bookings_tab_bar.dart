@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../tab_views/daily_tab_view.dart';
 import '../tab_views/monthly_tab_view.dart';
+import '../tab_views/yearly_tab_view.dart';
 
 class BookingsTabBar extends StatefulWidget {
   const BookingsTabBar({Key? key}) : super(key: key);
@@ -20,14 +20,14 @@ class _BookingsTabBarState extends State<BookingsTabBar> {
         appBar: TabBar(
           indicatorColor: Colors.cyanAccent,
           tabs: <Widget>[
-            Tab(text: 'Täglich'),
             Tab(text: 'Monatlich'),
+            Tab(text: 'Jährlich'),
           ],
         ),
         body: TabBarView(
           children: <Widget>[
-            DailyTabView(),
             MonthlyTabView(),
+            YearlyTabView(),
           ],
         ),
       ),

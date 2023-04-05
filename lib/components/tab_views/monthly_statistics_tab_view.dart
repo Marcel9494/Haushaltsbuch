@@ -5,25 +5,25 @@ import '/models/booking.dart';
 import '/models/categorie_stats.dart';
 import '/models/enums/transaction_types.dart';
 
+import '/utils/number_formatters/number_formatter.dart';
+
 import '../cards/expenditure_card.dart';
 
 import '../deco/loading_indicator.dart';
 
-import '/utils/number_formatters/number_formatter.dart';
-
-class DailyStatisticsTabView extends StatefulWidget {
+class MonthlyStatisticsTabView extends StatefulWidget {
   final DateTime selectedDate;
 
-  const DailyStatisticsTabView({
+  const MonthlyStatisticsTabView({
     Key? key,
     required this.selectedDate,
   }) : super(key: key);
 
   @override
-  State<DailyStatisticsTabView> createState() => _DailyStatisticsTabViewState();
+  State<MonthlyStatisticsTabView> createState() => _MonthlyStatisticsTabViewState();
 }
 
-class _DailyStatisticsTabViewState extends State<DailyStatisticsTabView> {
+class _MonthlyStatisticsTabViewState extends State<MonthlyStatisticsTabView> {
   List<CategorieStats> _categorieStats = [];
   double _totalExpenditures = 0.0;
   bool _showSavingsRate = true;
@@ -38,44 +38,16 @@ class _DailyStatisticsTabViewState extends State<DailyStatisticsTabView> {
         categorieStatsAreUpdated = false;
         _totalExpenditures += formatMoneyAmountToDouble(_bookingList[i].amount);
         if (_showSavingsRate && _bookingList[i].transactionType == TransactionType.investment.name) {
-          _createOrUpdateCategorieStats(i, _bookingList, 'Investition', categorieStatsAreUpdated, Colors.cyanAccent);
+          _categorieStats = CategorieStats.createOrUpdateCategorieStats(i, _bookingList, _categorieStats, 'Investition', categorieStatsAreUpdated, Colors.cyanAccent);
         } else {
-          _createOrUpdateCategorieStats(i, _bookingList, _bookingList[i].categorie, categorieStatsAreUpdated, Color.fromRGBO((i * 20) % 255, (i * 20) % 255, (i * 50) % 255, 0.8));
+          _categorieStats = CategorieStats.createOrUpdateCategorieStats(
+              i, _bookingList, _categorieStats, _bookingList[i].categorie, categorieStatsAreUpdated, Color.fromRGBO((i * 20) % 255, (i * 20) % 255, (i * 50) % 255, 0.8));
         }
       }
     }
     _calculateMonthlyExpenditurePercentage();
     _categorieStats.sort((first, second) => second.percentage.compareTo(first.percentage));
     return _categorieStats;
-  }
-
-  void _createOrUpdateCategorieStats(int i, List<Booking> bookingList, String categorieName, bool categorieStatsAreUpdated, Color color) {
-    if (i == 0) {
-      CategorieStats newCategorieStats = CategorieStats()
-        ..categorieName = categorieName
-        ..amount = bookingList[i].amount
-        ..percentage = 0.0
-        ..statColor = const Color.fromRGBO(0, 200, 200, 0.8);
-      _categorieStats.add(newCategorieStats);
-    } else {
-      for (int j = 0; j < _categorieStats.length; j++) {
-        if (_categorieStats[j].categorieName.contains(categorieName)) {
-          double amount = formatMoneyAmountToDouble(_categorieStats[j].amount);
-          amount += formatMoneyAmountToDouble(bookingList[i].amount);
-          _categorieStats[j].amount = formatToMoneyAmount(amount.toString());
-          categorieStatsAreUpdated = true;
-          break;
-        }
-      }
-      if (categorieStatsAreUpdated == false) {
-        CategorieStats newCategorieStats = CategorieStats()
-          ..categorieName = categorieName
-          ..amount = bookingList[i].amount
-          ..percentage = 0.0
-          ..statColor = color;
-        _categorieStats.add(newCategorieStats);
-      }
-    }
   }
 
   void _calculateMonthlyExpenditurePercentage() {

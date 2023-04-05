@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
-
-import '/components/deco/loading_indicator.dart';
-import '/components/cards/monthly_overview_card.dart';
+import 'package:month_picker_dialog/month_picker_dialog.dart';
 
 import '/utils/date_formatters/date_formatter.dart';
 
-import '/models/booking.dart';
-import '/models/monthly_stats.dart';
-
-import '../deco/overview_tile.dart';
+import 'monthly_booking_tab_view.dart';
+import 'monthly_budget_tab_view.dart';
+import 'monthly_statistics_tab_view.dart';
 
 class MonthlyTabView extends StatefulWidget {
   const MonthlyTabView({Key? key}) : super(key: key);
@@ -18,188 +15,130 @@ class MonthlyTabView extends StatefulWidget {
 }
 
 class _MonthlyTabViewState extends State<MonthlyTabView> {
-  double _yearlyRevenues = 0.0;
-  double _yearlyExpenditures = 0.0;
-  double _yearlyInvestments = 0.0;
   DateTime _selectedDate = DateTime.now();
-  List<MonthlyStats> _monthList = [];
+  List<bool> _selectedTabOption = [true, false, false];
 
-  Future<List<MonthlyStats>> _loadMonthlyStatsList() async {
-    _monthList.clear();
-    for (int i = 0; i < 12; i++) {
-      List<Booking> _bookingList = await Booking.loadMonthlyBookingList(i + 1, _selectedDate.year);
-      MonthlyStats monthlyStats = MonthlyStats();
-      monthlyStats.month = dateFormatterMMMM.format(DateTime(_selectedDate.year, i + 1, 1)).toString();
-      monthlyStats.revenues = Booking.getRevenues(_bookingList);
-      monthlyStats.expenditures = Booking.getExpenditures(_bookingList);
-      monthlyStats.investments = Booking.getInvestments(_bookingList);
-      _monthList.add(monthlyStats);
-    }
-    return _monthList;
-  }
-
-  double _getYearlyRevenues() {
-    _yearlyRevenues = 0.0;
-    for (int i = 0; i < _monthList.length; i++) {
-      _yearlyRevenues += _monthList[i].revenues;
-    }
-    return _yearlyRevenues;
-  }
-
-  double _getYearlyExpenditures() {
-    _yearlyExpenditures = 0.0;
-    for (int i = 0; i < _monthList.length; i++) {
-      _yearlyExpenditures += _monthList[i].expenditures;
-    }
-    return _yearlyExpenditures;
-  }
-
-  double _getYearlyInvestments() {
-    _yearlyInvestments = 0.0;
-    for (int i = 0; i < _monthList.length; i++) {
-      _yearlyInvestments += _monthList[i].investments;
-    }
-    return _yearlyInvestments;
-  }
-
-  void _nextYear() {
+  void _setSelectedTab(int selectedIndex) {
     setState(() {
-      _selectedDate = DateTime(_selectedDate.year + 1, _selectedDate.month, _selectedDate.day);
+      for (int i = 0; i < _selectedTabOption.length; i++) {
+        _selectedTabOption[i] = i == selectedIndex;
+      }
+      if (_selectedTabOption[0]) {
+        _selectedTabOption = [true, false, false];
+      } else if (_selectedTabOption[1]) {
+        _selectedTabOption = [false, true, false];
+      } else if (_selectedTabOption[2]) {
+        _selectedTabOption = [false, false, true];
+      } else {
+        _selectedTabOption = [true, false, false];
+      }
     });
   }
 
-  void _previousYear() {
+  void _nextMonth() {
     setState(() {
-      _selectedDate = DateTime(_selectedDate.year - 1, _selectedDate.month, _selectedDate.day);
+      _selectedDate = DateTime(_selectedDate.year, _selectedDate.month + 1, _selectedDate.day);
+    });
+  }
+
+  void _previousMonth() {
+    setState(() {
+      _selectedDate = DateTime(_selectedDate.year, _selectedDate.month - 1, _selectedDate.day);
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Row(
-          children: [
-            IconButton(
-              icon: const Icon(Icons.keyboard_arrow_left_rounded),
-              onPressed: () => _previousYear(),
-              padding: const EdgeInsets.only(left: 8.0, right: 2.0),
-              constraints: const BoxConstraints(),
-              splashColor: Colors.transparent,
-            ),
-            SizedBox(
-              width: 120.0,
-              child: GestureDetector(
-                onTap: () {
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return AlertDialog(
-                        title: const Text('Jahr auswählen:'),
-                        content: SizedBox(
-                          width: 300,
-                          height: 300,
-                          child: YearPicker(
-                            firstDate: DateTime(1950, 1),
-                            lastDate: DateTime(DateTime.now().year + 100, 1),
-                            initialDate: DateTime.now(),
-                            selectedDate: _selectedDate,
-                            onChanged: (DateTime date) {
+    return Center(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              SizedBox(
+                width: MediaQuery.of(context).size.width / 2,
+                child: Row(
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.keyboard_arrow_left_rounded),
+                      onPressed: () => _previousMonth(),
+                      padding: const EdgeInsets.only(left: 8.0, right: 2.0),
+                      constraints: const BoxConstraints(),
+                      splashColor: Colors.transparent,
+                    ),
+                    SizedBox(
+                      width: 120.0,
+                      child: GestureDetector(
+                        onTap: () {
+                          showMonthPicker(
+                            context: context,
+                            initialDate: _selectedDate,
+                            headerColor: Colors.grey.shade800,
+                            selectedMonthBackgroundColor: Colors.cyanAccent,
+                            unselectedMonthTextColor: Colors.white,
+                            confirmWidget: const Text('OK', style: TextStyle(color: Colors.cyanAccent)),
+                            cancelWidget: const Text('Abbrechen', style: TextStyle(color: Colors.cyanAccent)),
+                            locale: const Locale('DE-de'),
+                            roundedCornersRadius: 12.0,
+                            dismissible: true,
+                          ).then((date) {
+                            if (date != null) {
                               setState(() {
                                 _selectedDate = date;
                               });
-                              Navigator.pop(context);
-                            },
-                          ),
+                            }
+                          });
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 12.0),
+                          child: Text(dateFormatterMMMMYYYY.format(_selectedDate), textAlign: TextAlign.center),
                         ),
-                      );
-                    },
-                  );
-                },
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 12.0),
-                  child: Text(dateFormatterYYYY.format(_selectedDate), textAlign: TextAlign.center),
+                        behavior: HitTestBehavior.translucent,
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.keyboard_arrow_right_rounded),
+                      onPressed: () => _nextMonth(),
+                      padding: const EdgeInsets.only(left: 2.0),
+                      constraints: const BoxConstraints(),
+                      splashColor: Colors.transparent,
+                    ),
+                  ],
                 ),
-                behavior: HitTestBehavior.translucent,
               ),
-            ),
-            IconButton(
-              icon: const Icon(Icons.keyboard_arrow_right_rounded),
-              onPressed: () => _nextYear(),
-              padding: const EdgeInsets.only(left: 2.0),
-              constraints: const BoxConstraints(),
-              splashColor: Colors.transparent,
-            ),
-          ],
-        ),
-        Expanded(
-          child: FutureBuilder(
-            future: _loadMonthlyStatsList(),
-            builder: (BuildContext context, AsyncSnapshot<List<MonthlyStats>> snapshot) {
-              switch (snapshot.connectionState) {
-                case ConnectionState.waiting:
-                  return const LoadingIndicator();
-                case ConnectionState.done:
-                  if (_monthList.isEmpty) {
-                    return Column(
-                      children: const [
-                        OverviewTile(
-                          shouldText: 'Einnahmen',
-                          should: 0,
-                          haveText: 'Ausgaben',
-                          have: 0,
-                          balanceText: 'Saldo',
-                          showAverageValuesPerDay: true,
-                          investmentText: 'Investitionen',
-                          showInvestments: true,
-                        ),
-                        Expanded(
-                          child: Center(
-                            child: Text('Noch keine Buchungen vorhanden.'),
-                          ),
-                        ),
-                      ],
-                    );
-                  } else {
-                    return Column(
-                      children: [
-                        OverviewTile(
-                          shouldText: 'Einnahmen',
-                          should: _getYearlyRevenues(),
-                          haveText: 'Ausgaben',
-                          have: _getYearlyExpenditures(),
-                          balanceText: 'Saldo',
-                          showAverageValuesPerDay: true,
-                          investmentText: 'Investitionen',
-                          investmentAmount: _getYearlyInvestments(),
-                          showInvestments: true,
-                        ),
-                        Expanded(
-                          child: RefreshIndicator(
-                            onRefresh: () async {
-                              _monthList = await _loadMonthlyStatsList();
-                              setState(() {});
-                              return;
-                            },
-                            color: Colors.cyanAccent,
-                            child: ListView.builder(
-                              itemCount: _monthList.length,
-                              itemBuilder: (BuildContext context, int index) {
-                                return MonthlyOverviewCard(monthlyStats: _monthList[index]);
-                              },
-                            ),
-                          ),
-                        ),
-                      ],
-                    );
-                  }
-                default:
-                  return const Text('Warten');
-              }
-            },
+              SizedBox(
+                width: MediaQuery.of(context).size.width / 2,
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 12.0, left: 12.0),
+                  child: ToggleButtons(
+                    onPressed: (selectedIndex) => _setSelectedTab(selectedIndex),
+                    borderRadius: BorderRadius.circular(6.0),
+                    selectedBorderColor: Colors.cyanAccent,
+                    fillColor: Colors.cyanAccent.shade700,
+                    selectedColor: Colors.white,
+                    color: Colors.white60,
+                    constraints: const BoxConstraints(
+                      minHeight: 30.0,
+                      minWidth: 50.0,
+                    ),
+                    isSelected: _selectedTabOption,
+                    children: const [
+                      Icon(Icons.menu_book_rounded, size: 20.0),
+                      Icon(Icons.pie_chart_rounded, size: 20.0),
+                      Icon(Icons.bar_chart_rounded, size: 20.0),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
-        ),
-      ],
+          _selectedTabOption[0]
+              ? MonthlyBookingTabView(selectedDate: _selectedDate)
+              : _selectedTabOption[1]
+                  ? MonthlyStatisticsTabView(selectedDate: _selectedDate)
+                  : const MonthlyBudgetTabView(),
+        ],
+      ),
     );
   }
 }

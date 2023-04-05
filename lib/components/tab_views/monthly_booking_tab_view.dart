@@ -8,19 +8,19 @@ import '../deco/date_text.dart';
 import '../deco/loading_indicator.dart';
 import '../deco/overview_tile.dart';
 
-class DailyBookingTabView extends StatefulWidget {
+class MonthlyBookingTabView extends StatefulWidget {
   final DateTime selectedDate;
 
-  const DailyBookingTabView({
+  const MonthlyBookingTabView({
     Key? key,
     required this.selectedDate,
   }) : super(key: key);
 
   @override
-  State<DailyBookingTabView> createState() => _DailyBookingTabViewState();
+  State<MonthlyBookingTabView> createState() => _MonthlyBookingTabViewState();
 }
 
-class _DailyBookingTabViewState extends State<DailyBookingTabView> {
+class _MonthlyBookingTabViewState extends State<MonthlyBookingTabView> {
   late List<Booking> _bookingList = [];
   late final Map<DateTime, double> _todayExpendituresMap = {};
   late final Map<DateTime, double> _todayRevenuesMap = {};
