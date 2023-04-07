@@ -40,4 +40,11 @@ class CategorieStats {
     }
     return categorieStats;
   }
+
+  static List<CategorieStats> calculateCategoriePercentage(List<CategorieStats> categorieStats, double totalExpenditures) {
+    for (int i = 0; i < categorieStats.length; i++) {
+      categorieStats[i].percentage = (formatMoneyAmountToDouble(categorieStats[i].amount) * 100) / totalExpenditures;
+    }
+    return categorieStats;
+  }
 }

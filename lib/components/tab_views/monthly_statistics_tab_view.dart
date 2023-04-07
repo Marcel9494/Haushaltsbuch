@@ -45,15 +45,9 @@ class _MonthlyStatisticsTabViewState extends State<MonthlyStatisticsTabView> {
         }
       }
     }
-    _calculateMonthlyExpenditurePercentage();
+    _categorieStats = CategorieStats.calculateCategoriePercentage(_categorieStats, _totalExpenditures);
     _categorieStats.sort((first, second) => second.percentage.compareTo(first.percentage));
     return _categorieStats;
-  }
-
-  void _calculateMonthlyExpenditurePercentage() {
-    for (int i = 0; i < _categorieStats.length; i++) {
-      _categorieStats[i].percentage = (formatMoneyAmountToDouble(_categorieStats[i].amount) * 100) / _totalExpenditures;
-    }
   }
 
   @override
@@ -68,7 +62,7 @@ class _MonthlyStatisticsTabViewState extends State<MonthlyStatisticsTabView> {
             if (_categorieStats.isEmpty) {
               return const Expanded(
                 child: Center(
-                  child: Text('Noch keine Kostenstellen vorhanden.'),
+                  child: Text('Noch keine Ausgaben vorhanden.'),
                 ),
               );
             } else {
@@ -123,7 +117,7 @@ class _MonthlyStatisticsTabViewState extends State<MonthlyStatisticsTabView> {
             }
           default:
             if (snapshot.hasError) {
-              return const Text('Konten Übersicht konnte nicht geladen werden.');
+              return const Text('Monatliche Statistiken konnten nicht geladen werden.');
             }
             return const LoadingIndicator();
         }
