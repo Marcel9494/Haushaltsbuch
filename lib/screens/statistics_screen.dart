@@ -1,6 +1,9 @@
+import 'dart:math';
+
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
+import '/models/booking.dart';
 import '/models/account.dart';
 import '/models/wealth_development_stats.dart';
 
@@ -19,25 +22,47 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
   bool showAvg = false;
   double _assets = 0.0;
   double _liabilities = 0.0;
+  double _maxWealthValue = 0.0;
   List<WealthDevelopmentStats> _wealthDevelopmentStats = [];
 
   Future<List<WealthDevelopmentStats>> _loadChartBarData() async {
     _wealthDevelopmentStats = [];
     _assets = await Account.getAssetValue();
     _liabilities = await Account.getLiabilityValue();
+    List<double> wealthValues = [];
+    List<double> monthRevenues = [];
+    List<double> monthExpenditures = [];
+    List<double> monthInvestments = [];
     for (int i = 0; i < 12; i++) {
-      // TODO hier weitermachen und Vermögensentwicklung mit weiteren richtigen Daten berechnen
+      List<Booking> _bookingList = await Booking.loadMonthlyBookingList(i + 1, 2023);
+      monthRevenues.add(Booking.getRevenues(_bookingList));
+      monthExpenditures.add(Booking.getExpenditures(_bookingList));
+      monthInvestments.add(Booking.getInvestments(_bookingList));
       WealthDevelopmentStats wealthDevelopmentStat = WealthDevelopmentStats();
-      wealthDevelopmentStat.month = (i + 1).toString();
-      wealthDevelopmentStat.wealth = _assets - _liabilities;
+      wealthDevelopmentStat.month = i.toString();
+      wealthDevelopmentStat.wealth = 0.0;
       _wealthDevelopmentStats.add(wealthDevelopmentStat);
     }
+    print(monthExpenditures);
+    for (int i = DateTime.now().month; i > 0; i--) {
+      WealthDevelopmentStats wealthDevelopmentStat = WealthDevelopmentStats();
+      wealthDevelopmentStat.wealth = _assets - _liabilities;
+      wealthDevelopmentStat.month = i.toString();
+      for (int j = DateTime.now().month; j >= i; j--) {
+        wealthDevelopmentStat.wealth = wealthDevelopmentStat.wealth + monthExpenditures[j];
+      }
+      wealthValues.add(wealthDevelopmentStat.wealth);
+      _wealthDevelopmentStats[_wealthDevelopmentStats.indexWhere((element) => element.month == wealthDevelopmentStat.month)] = wealthDevelopmentStat;
+    }
+    // TODO hier weitermachen und zukünftige Vermögensentwicklung berechnen
+    _maxWealthValue = wealthValues.reduce(max);
     return _wealthDevelopmentStats;
   }
 
   LineChartBarData getLineChartData() {
     List<FlSpot> spotList = [];
     for (int i = 0; i < _wealthDevelopmentStats.length; i++) {
+      print(_wealthDevelopmentStats[i].wealth);
       spotList.add(FlSpot(i.toDouble(), _wealthDevelopmentStats[i].wealth));
     }
     LineChartBarData lineChartBarData = LineChartBarData(
@@ -86,10 +111,10 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                     aspectRatio: 1.7,
                     child: Padding(
                       padding: const EdgeInsets.only(
-                        right: 18,
-                        left: 12,
-                        top: 24,
-                        bottom: 12,
+                        right: 18.0,
+                        left: 12.0,
+                        top: 24.0,
+                        bottom: 12.0,
                       ),
                       child: LineChart(
                         showAvg ? avgData() : mainData(_wealthDevelopmentStats),
@@ -170,7 +195,6 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
       default:
         return Container();
     }
-
     return Text(text, style: style, textAlign: TextAlign.left);
   }
 
@@ -223,10 +247,10 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
         show: true,
         border: Border.all(color: const Color(0xff37434d)),
       ),
-      minX: 0,
-      maxX: 11,
-      minY: 0,
-      maxY: 3000,
+      minX: 0.0,
+      maxX: 11.0,
+      minY: 0.0,
+      maxY: _maxWealthValue,
       lineBarsData: [
         getLineChartData(),
       ],
