@@ -280,12 +280,12 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
                       children: [
                         TransactionToggleButtons(
                             currentTransaction: _currentTransaction, transactionStringCallback: (transaction) => setState(() => _currentTransaction = transaction)),
-                        TextInputField(input: _title, inputCallback: _setTitleState, hintText: 'Titel'),
                         DateInputField(
                             textController: _bookingDateTextController,
                             bookingDateCallback: (bookingDate) => setState(() => _parsedBookingDate = bookingDate),
                             repeat: _bookingRepeat,
                             repeatCallback: (repeat) => setState(() => _bookingRepeat = repeat)),
+                        TextInputField(input: _title, inputCallback: _setTitleState, hintText: 'Titel'),
                         MoneyInputField(textController: _amountTextController, errorText: _amountErrorText, hintText: 'Betrag', bottomSheetTitle: 'Betrag eingeben:'),
                         _currentTransaction == TransactionType.transfer.name || _currentTransaction == TransactionType.investment.name
                             ? const SizedBox()

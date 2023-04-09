@@ -77,7 +77,7 @@ class _MonthlyTabViewState extends State<MonthlyTabView> {
                             selectedMonthBackgroundColor: Colors.cyanAccent,
                             unselectedMonthTextColor: Colors.white,
                             confirmWidget: const Text('OK', style: TextStyle(color: Colors.cyanAccent)),
-                            cancelWidget: const Text('Abbrechen', style: TextStyle(color: Colors.cyanAccent)),
+                            cancelWidget: const Text('Abbrechen', style: TextStyle(color: Colors.grey)),
                             locale: const Locale('DE-de'),
                             roundedCornersRadius: 12.0,
                             dismissible: true,

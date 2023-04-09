@@ -23,6 +23,8 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
   double _assets = 0.0;
   double _liabilities = 0.0;
   double _maxWealthValue = 0.0;
+  double _currentYearPeriod = 1;
+  List<bool> _selectedStatisticTabOption = [true, false, false, false, false];
   List<WealthDevelopmentStats> _wealthDevelopmentStats = [];
 
   Future<List<WealthDevelopmentStats>> _loadChartBarData() async {
@@ -34,7 +36,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
     List<double> monthExpenditures = [];
     List<double> monthInvestments = [];
     for (int i = 0; i < 12; i++) {
-      List<Booking> _bookingList = await Booking.loadMonthlyBookingList(i + 1, 2023);
+      List<Booking> _bookingList = await Booking.loadMonthlyBookingList(i + 1, DateTime.now().year);
       monthRevenues.add(Booking.getRevenues(_bookingList));
       monthExpenditures.add(Booking.getExpenditures(_bookingList));
       monthInvestments.add(Booking.getInvestments(_bookingList));
@@ -43,18 +45,25 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
       wealthDevelopmentStat.wealth = 0.0;
       _wealthDevelopmentStats.add(wealthDevelopmentStat);
     }
-    print(monthExpenditures);
     for (int i = DateTime.now().month; i > 0; i--) {
       WealthDevelopmentStats wealthDevelopmentStat = WealthDevelopmentStats();
       wealthDevelopmentStat.wealth = _assets - _liabilities;
       wealthDevelopmentStat.month = i.toString();
       for (int j = DateTime.now().month; j >= i; j--) {
-        wealthDevelopmentStat.wealth = wealthDevelopmentStat.wealth + monthExpenditures[j];
+        wealthDevelopmentStat.wealth += monthExpenditures[j];
       }
       wealthValues.add(wealthDevelopmentStat.wealth);
       _wealthDevelopmentStats[_wealthDevelopmentStats.indexWhere((element) => element.month == wealthDevelopmentStat.month)] = wealthDevelopmentStat;
     }
-    // TODO hier weitermachen und zukünftige Vermögensentwicklung berechnen
+    double averageWealthGrowth = WealthDevelopmentStats.calculateAverageWealthGrowth(monthRevenues, monthExpenditures);
+    for (int i = DateTime.now().month; i < 12; i++) {
+      WealthDevelopmentStats wealthDevelopmentStat = WealthDevelopmentStats();
+      wealthDevelopmentStat.wealth = _assets - _liabilities;
+      wealthDevelopmentStat.month = i.toString();
+      wealthDevelopmentStat.wealth += averageWealthGrowth * i;
+      wealthValues.add(wealthDevelopmentStat.wealth);
+      _wealthDevelopmentStats[_wealthDevelopmentStats.indexWhere((element) => element.month == wealthDevelopmentStat.month)] = wealthDevelopmentStat;
+    }
     _maxWealthValue = wealthValues.reduce(max);
     return _wealthDevelopmentStats;
   }
@@ -62,16 +71,14 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
   LineChartBarData getLineChartData() {
     List<FlSpot> spotList = [];
     for (int i = 0; i < _wealthDevelopmentStats.length; i++) {
-      print(_wealthDevelopmentStats[i].wealth);
-      spotList.add(FlSpot(i.toDouble(), _wealthDevelopmentStats[i].wealth));
+      spotList.add(FlSpot(i.toDouble(), double.parse((_wealthDevelopmentStats[i].wealth / 1000).toStringAsFixed(2))));
     }
     LineChartBarData lineChartBarData = LineChartBarData(
       spots: _getSpotList(spotList),
-      isCurved: true,
       gradient: LinearGradient(
         colors: gradientColors,
       ),
-      barWidth: 3,
+      barWidth: 2.0,
       isStrokeCapRound: true,
       dotData: FlDotData(
         show: true,
@@ -93,67 +100,131 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
     return spotList;
   }
 
+  void _setSelectedStatisticTab(int selectedIndex) {
+    setState(() {
+      for (int i = 0; i < _selectedStatisticTabOption.length; i++) {
+        _selectedStatisticTabOption[i] = i == selectedIndex;
+      }
+      if (_selectedStatisticTabOption[0]) {
+        _selectedStatisticTabOption = [true, false, false, false, false];
+      } else if (_selectedStatisticTabOption[1]) {
+        _selectedStatisticTabOption = [false, true, false, false, false];
+      } else if (_selectedStatisticTabOption[2]) {
+        _selectedStatisticTabOption = [false, false, true, false, false];
+      } else if (_selectedStatisticTabOption[3]) {
+        _selectedStatisticTabOption = [false, false, false, true, false];
+      } else if (_selectedStatisticTabOption[4]) {
+        _selectedStatisticTabOption = [false, false, false, false, true];
+      } else {
+        _selectedStatisticTabOption = [true, false, false, false, false];
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: _loadChartBarData(),
-      builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
-        switch (snapshot.connectionState) {
-          case ConnectionState.waiting:
-            return const SizedBox();
-          case ConnectionState.done:
-            if (_wealthDevelopmentStats.isEmpty) {
-              return const Text('Noch keine Daten vorhanden.');
-            } else {
-              return Stack(
-                children: <Widget>[
-                  AspectRatio(
-                    aspectRatio: 1.7,
-                    child: Padding(
-                      padding: const EdgeInsets.only(
-                        right: 18.0,
-                        left: 12.0,
-                        top: 24.0,
-                        bottom: 12.0,
-                      ),
-                      child: LineChart(
-                        showAvg ? avgData() : mainData(_wealthDevelopmentStats),
-                      ),
-                    ),
-                  ),
-                  SizedBox(
-                    width: 60,
-                    height: 34,
-                    child: TextButton(
-                      onPressed: () {
-                        setState(() {
-                          showAvg = !showAvg;
-                        });
-                      },
-                      child: Text(
-                        'avg',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: showAvg ? Colors.white.withOpacity(0.5) : Colors.white,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12.0),
+          child: ToggleButtons(
+            onPressed: (selectedIndex) => _setSelectedStatisticTab(selectedIndex),
+            borderRadius: BorderRadius.circular(6.0),
+            selectedBorderColor: Colors.cyanAccent,
+            fillColor: Colors.cyanAccent.shade700,
+            selectedColor: Colors.white,
+            color: Colors.white60,
+            constraints: const BoxConstraints(
+              minHeight: 30.0,
+              minWidth: 50.0,
+            ),
+            isSelected: _selectedStatisticTabOption,
+            children: const [
+              Text('1 J.'),
+              Text('5 J.'),
+              Text('10 J.'),
+              Text('20 J.'),
+              Text('40 J.'),
+            ],
+          ),
+        ),
+        FutureBuilder(
+          future: _loadChartBarData(),
+          builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
+            switch (snapshot.connectionState) {
+              case ConnectionState.waiting:
+                return const SizedBox();
+              case ConnectionState.done:
+                if (_wealthDevelopmentStats.isEmpty) {
+                  return const Text('Noch keine Daten vorhanden.');
+                } else {
+                  return Stack(
+                    children: <Widget>[
+                      AspectRatio(
+                        aspectRatio: 1.7,
+                        child: Padding(
+                          padding: const EdgeInsets.only(
+                            right: 18.0,
+                            left: 12.0,
+                            top: 24.0,
+                            bottom: 12.0,
+                          ),
+                          child: LineChart(
+                            showAvg ? avgData() : mainData(_wealthDevelopmentStats),
+                          ),
                         ),
                       ),
-                    ),
-                  ),
-                ],
-              );
+                      SizedBox(
+                        width: 60,
+                        height: 34,
+                        child: TextButton(
+                          onPressed: () {
+                            setState(() {
+                              showAvg = !showAvg;
+                            });
+                          },
+                          child: Text(
+                            'avg',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: showAvg ? Colors.white.withOpacity(0.5) : Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                }
+              default:
+                return const SizedBox();
             }
-          default:
-            return const SizedBox();
-        }
-      },
+          },
+        ),
+        SliderTheme(
+          data: const SliderThemeData(
+            trackHeight: 0.5,
+          ),
+          child: Slider(
+            value: _currentYearPeriod,
+            min: 1,
+            max: 50,
+            divisions: 50,
+            activeColor: Colors.cyanAccent,
+            label: _currentYearPeriod.round().toString(),
+            onChanged: (double value) {
+              setState(() {
+                _currentYearPeriod = value;
+              });
+            },
+          ),
+        ),
+      ],
     );
   }
 
   Widget bottomTitleWidgets(double value, TitleMeta meta) {
-    const style = TextStyle(
-      fontWeight: FontWeight.bold,
-      fontSize: 16,
-    );
+    const style = TextStyle(fontSize: 12);
     Widget text;
     switch (value.toInt()) {
       case 2:
@@ -177,20 +248,17 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
   }
 
   Widget leftTitleWidgets(double value, TitleMeta meta) {
-    const style = TextStyle(
-      fontWeight: FontWeight.bold,
-      fontSize: 15,
-    );
-    String text;
+    const style = TextStyle(fontSize: 10);
+    String text = '';
     switch (value.toInt()) {
       case 1:
-        text = '10K';
+        text = '0 €';
         break;
       case 3:
-        text = '30k';
+        text = (_maxWealthValue / 2).toStringAsFixed(0) + ' €';
         break;
       case 5:
-        text = '50k';
+        text = _maxWealthValue.toStringAsFixed(0) + ' €';
         break;
       default:
         return Container();
@@ -250,7 +318,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
       minX: 0.0,
       maxX: 11.0,
       minY: 0.0,
-      maxY: _maxWealthValue,
+      maxY: _maxWealthValue / 1000,
       lineBarsData: [
         getLineChartData(),
       ],

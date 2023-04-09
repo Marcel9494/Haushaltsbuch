@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../../models/monthly_stats.dart';
+import '/models/monthly_stats.dart';
 
-import '../../utils/number_formatters/number_formatter.dart';
+import '/utils/number_formatters/number_formatter.dart';
 
 class MonthlyOverviewCard extends StatelessWidget {
   final MonthlyStats monthlyStats;
@@ -26,8 +26,9 @@ class MonthlyOverviewCard extends StatelessWidget {
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14.0)),
           ),
           child: Container(
-            decoration: const BoxDecoration(
-              border: Border(left: BorderSide(color: Colors.cyanAccent, width: 5.0)),
+            decoration: BoxDecoration(
+              border: Border(
+                  left: BorderSide(color: monthlyStats.revenues - monthlyStats.expenditures - monthlyStats.investments >= 0 ? Colors.greenAccent : Colors.redAccent, width: 5.0)),
             ),
             child: Padding(
               padding: const EdgeInsets.all(14.0),
@@ -44,6 +45,62 @@ class MonthlyOverviewCard extends StatelessWidget {
                     ),
                   ),
                   Expanded(
+                    flex: 3,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Text(
+                              formatToMoneyAmount(monthlyStats.revenues.toString()),
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(color: Colors.greenAccent),
+                            ),
+                            Text(
+                              '-${formatToMoneyAmount(monthlyStats.expenditures.toString())}',
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(color: Colors.redAccent),
+                            ),
+                            const SizedBox(height: 5.0),
+                            Text(
+                              formatToMoneyAmount((monthlyStats.revenues - monthlyStats.expenditures).toString()),
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: monthlyStats.revenues - monthlyStats.expenditures >= 0 ? Colors.greenAccent : Colors.redAccent,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Text(
+                              formatToMoneyAmount((monthlyStats.revenues - monthlyStats.expenditures).toString()),
+                              textAlign: TextAlign.center,
+                              style: TextStyle(color: monthlyStats.revenues - monthlyStats.expenditures >= 0 ? Colors.greenAccent : Colors.redAccent),
+                            ),
+                            Text(
+                              '-${formatToMoneyAmount(monthlyStats.investments.toString())}',
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(color: Colors.cyanAccent),
+                            ),
+                            const SizedBox(height: 5.0),
+                            Text(
+                              formatToMoneyAmount((monthlyStats.revenues - monthlyStats.expenditures - monthlyStats.investments).toStringAsFixed(2)),
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: monthlyStats.revenues - monthlyStats.expenditures - monthlyStats.investments >= 0 ? Colors.greenAccent : Colors.redAccent,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  /*Expanded(
                     flex: 3,
                     child: Column(
                       children: [
@@ -92,7 +149,7 @@ class MonthlyOverviewCard extends StatelessWidget {
                         ),
                       ],
                     ),
-                  ),
+                  ),*/
                 ],
               ),
             ),

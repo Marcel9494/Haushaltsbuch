@@ -14,7 +14,7 @@ class TextInputField extends StatelessWidget {
     required this.inputCallback,
     required this.hintText,
     this.errorText = '',
-    this.maxLength = 35,
+    this.maxLength = 40,
     this.autofocus = false,
   }) : super(key: key);
 
