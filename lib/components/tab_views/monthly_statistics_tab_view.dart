@@ -82,8 +82,15 @@ class _MonthlyStatisticsTabViewState extends State<MonthlyStatisticsTabView> {
                     ),
                   ),
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
+                      OutlinedButton(
+                        onPressed: () {}, // TODO hier weitermachen und Ausgaben, Einnahmen & Investitionen umschalten können
+                        child: const Text(
+                          'Ausgaben',
+                          style: TextStyle(color: Colors.cyanAccent),
+                        ),
+                      ),
                       const Text('Sparquote anzeigen:'),
                       Switch(
                         value: _showSavingsRate,

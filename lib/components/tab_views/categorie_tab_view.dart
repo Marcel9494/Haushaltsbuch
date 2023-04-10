@@ -47,8 +47,8 @@ class _CategorieTabViewState extends State<CategorieTabView> {
             ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                primary: Colors.cyanAccent,
-                onPrimary: Colors.black87,
+                foregroundColor: Colors.black87,
+                backgroundColor: Colors.cyanAccent,
               ),
               onPressed: () => {
                 _yesPressed(index),
@@ -98,7 +98,7 @@ class _CategorieTabViewState extends State<CategorieTabView> {
                   return const LoadingIndicator();
                 case ConnectionState.done:
                   if (_categorieList.isEmpty) {
-                    return const Center(child: Text('Noch keine Kategorien erstellt.'));
+                    return const Expanded(child: Center(child: Text('Noch keine Kategorien erstellt.')));
                   } else {
                     return Expanded(
                       child: RefreshIndicator(

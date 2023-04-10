@@ -1,7 +1,7 @@
 import 'package:hive/hive.dart';
 
 @HiveType(typeId: 5)
-enum CategorieType { income, outcome }
+enum CategorieType { income, outcome, investment }
 
 extension CategorieTypeExtension on CategorieType {
   String get name {
@@ -10,6 +10,21 @@ extension CategorieTypeExtension on CategorieType {
         return 'Einnahme';
       case CategorieType.outcome:
         return 'Ausgabe';
+      case CategorieType.investment:
+        return 'Investition';
+      default:
+        throw Exception('$name is not a valid Categorie.');
+    }
+  }
+
+  String get pluralName {
+    switch (this) {
+      case CategorieType.income:
+        return 'Einnahmen';
+      case CategorieType.outcome:
+        return 'Ausgaben';
+      case CategorieType.investment:
+        return 'Investitionen';
       default:
         throw Exception('$name is not a valid Categorie.');
     }
@@ -21,6 +36,8 @@ extension CategorieTypeExtension on CategorieType {
         return CategorieType.income;
       } else if (categorie == CategorieType.outcome.name) {
         return CategorieType.outcome;
+      } else if (categorie == CategorieType.investment.name) {
+        return CategorieType.investment;
       }
     } catch (e) {
       throw Exception('$categorie is not a valid Categorie.');

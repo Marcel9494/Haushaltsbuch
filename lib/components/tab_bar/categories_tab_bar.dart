@@ -14,21 +14,23 @@ class CategoriesTabBar extends StatefulWidget {
 class _CategoriesTabBarState extends State<CategoriesTabBar> {
   @override
   Widget build(BuildContext context) {
-    return const DefaultTabController(
+    return DefaultTabController(
       initialIndex: 0,
-      length: 2,
+      length: 3,
       child: Scaffold(
         appBar: TabBar(
           indicatorColor: Colors.cyanAccent,
           tabs: <Widget>[
-            Tab(text: 'Ausgaben'),
-            Tab(text: 'Einnahmen'),
+            Tab(text: CategorieType.outcome.pluralName),
+            Tab(text: CategorieType.income.pluralName),
+            Tab(text: CategorieType.investment.pluralName),
           ],
         ),
-        body: TabBarView(
+        body: const TabBarView(
           children: <Widget>[
             CategorieTabView(categorieType: CategorieType.outcome),
             CategorieTabView(categorieType: CategorieType.income),
+            CategorieTabView(categorieType: CategorieType.investment),
           ],
         ),
       ),

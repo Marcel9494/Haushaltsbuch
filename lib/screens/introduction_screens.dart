@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import 'package:introduction_screen/introduction_screen.dart';
 
+import '/components/bottom_nav_bar/bottom_nav_bar.dart';
+
 import '/models/account.dart';
 import '/models/categorie.dart';
 import '/models/screen_arguments/bottom_nav_bar_screen_arguments.dart';
@@ -16,9 +18,23 @@ class IntroductionScreens extends StatefulWidget {
 }
 
 class _IntroductionScreensState extends State<IntroductionScreens> {
+  @override
+  void initState() {
+    _forwardToApp();
+    super.initState();
+  }
+
+  void _forwardToApp() async {
+    // TODO funktioniert noch nicht
+    /*if (await Categorie.checkIfCategoriesExists()) {
+      Navigator.popAndPushNamed(context, bottomNavBarRoute, arguments: BottomNavBarScreenArguments(0));
+    }*/
+  }
+
   void _createStartCategoriesAndAccounts() {
     Categorie.createStartExpenditureCategories();
     Categorie.createStartRevenueCategories();
+    Categorie.createStartInvestmentCategories();
     Account.createStartAccounts();
     Navigator.popAndPushNamed(context, bottomNavBarRoute, arguments: BottomNavBarScreenArguments(0));
   }
@@ -28,8 +44,8 @@ class _IntroductionScreensState extends State<IntroductionScreens> {
     return IntroductionScreen(
       pages: [
         PageViewModel(
-          title: 'Einnahmen & Ausgaben',
-          body: 'Alle Einnahmen & Ausgaben im Blick.',
+          title: 'Einnahmen, Ausgaben & Investitionen',
+          body: 'Alle Einnahmen, Ausgaben & Investitionen im Blick.',
           //image: _buildImage('img1.jpg'),
           //decoration: pageDecoration,
         ),

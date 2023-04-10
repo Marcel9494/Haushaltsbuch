@@ -8,7 +8,6 @@ import '/components/buttons/save_button.dart';
 import '/components/input_fields/text_input_field.dart';
 
 import '/models/categorie.dart';
-import '/models/enums/categorie_types.dart';
 
 import '/utils/consts/route_consts.dart';
 

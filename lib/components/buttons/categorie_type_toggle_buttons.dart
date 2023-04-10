@@ -30,9 +30,11 @@ class _CategorieTypeToggleButtonsState extends State<CategorieTypeToggleButtons>
 
   void _getSelectedCategorieType() {
     if (widget.currentCategorieType == CategorieType.income.name) {
-      _selectedCategorieType = <bool>[true, false];
+      _selectedCategorieType = <bool>[true, false, false];
     } else if (widget.currentCategorieType == CategorieType.outcome.name) {
-      _selectedCategorieType = <bool>[false, true];
+      _selectedCategorieType = <bool>[false, true, false];
+    } else if (widget.currentCategorieType == CategorieType.investment.name) {
+      _selectedCategorieType = <bool>[false, false, true];
     }
   }
 
@@ -45,6 +47,8 @@ class _CategorieTypeToggleButtonsState extends State<CategorieTypeToggleButtons>
         CreateOrEditCategorieScreen.of(context)!.currentCategorieType = CategorieType.income.name;
       } else if (_selectedCategorieType[1]) {
         CreateOrEditCategorieScreen.of(context)!.currentCategorieType = CategorieType.outcome.name;
+      } else if (_selectedCategorieType[2]) {
+        CreateOrEditCategorieScreen.of(context)!.currentCategorieType = CategorieType.investment.name;
       } else {
         CreateOrEditCategorieScreen.of(context)!.currentCategorieType = '';
       }
@@ -56,6 +60,8 @@ class _CategorieTypeToggleButtonsState extends State<CategorieTypeToggleButtons>
       return Colors.greenAccent;
     } else if (_selectedCategorieType[1]) {
       return Colors.redAccent;
+    } else if (_selectedCategorieType[2]) {
+      return Colors.cyanAccent;
     }
     return Colors.white54;
   }
@@ -65,6 +71,8 @@ class _CategorieTypeToggleButtonsState extends State<CategorieTypeToggleButtons>
       return Colors.greenAccent.withOpacity(0.2);
     } else if (_selectedCategorieType[1]) {
       return Colors.redAccent.withOpacity(0.2);
+    } else if (_selectedCategorieType[2]) {
+      return Colors.cyanAccent.withOpacity(0.2);
     }
     return Colors.transparent;
   }
@@ -85,12 +93,13 @@ class _CategorieTypeToggleButtonsState extends State<CategorieTypeToggleButtons>
       color: Colors.white60,
       constraints: const BoxConstraints(
         minHeight: 45.0,
-        minWidth: 162.0,
+        minWidth: 108.0,
       ),
       isSelected: _selectedCategorieType,
       children: [
         Text(CategorieType.income.name),
         Text(CategorieType.outcome.name),
+        Text(CategorieType.investment.name),
       ],
     );
   }

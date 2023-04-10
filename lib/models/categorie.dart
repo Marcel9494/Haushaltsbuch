@@ -73,6 +73,14 @@ class Categorie extends HiveObject {
     return categorieNameList;
   }
 
+  static Future<bool> checkIfCategoriesExists() async {
+    var categorieBox = await Hive.openBox(categoriesBox);
+    if (categorieBox.isEmpty) {
+      return false;
+    }
+    return true;
+  }
+
   static void createStartExpenditureCategories() async {
     var categorieBox = await Hive.openBox(categoriesBox);
     for (int i = 0; i < categorieBox.length; i++) {
@@ -119,6 +127,23 @@ class Categorie extends HiveObject {
     for (int i = 0; i < categorieNames.length; i++) {
       Categorie categorie = Categorie()
         ..type = CategorieType.income.name
+        ..name = categorieNames[i];
+      categorie.createCategorie(categorie);
+    }
+  }
+
+  static void createStartInvestmentCategories() async {
+    var categorieBox = await Hive.openBox(categoriesBox);
+    for (int i = 0; i < categorieBox.length; i++) {
+      Categorie categorie = await categorieBox.getAt(i);
+      if (categorie.type == CategorieType.investment.name) {
+        return;
+      }
+    }
+    List<String> categorieNames = ['ETF', 'Aktie', 'Fond', 'Krypto', 'Rohstoff', 'P2P', 'Sonstiges'];
+    for (int i = 0; i < categorieNames.length; i++) {
+      Categorie categorie = Categorie()
+        ..type = CategorieType.investment.name
         ..name = categorieNames[i];
       categorie.createCategorie(categorie);
     }
