@@ -47,4 +47,14 @@ class CategorieStats {
     }
     return categorieStats;
   }
+
+  static List<CategorieStats> showSeparateInvestments(int i, List<Booking> bookingList, List<CategorieStats> categorieStats, String categorieName, Color color) {
+    CategorieStats newCategorieStats = CategorieStats()
+      ..categorieName = categorieName
+      ..amount = bookingList[i].amount
+      ..percentage = 0.0
+      ..statColor = color;
+    categorieStats.add(newCategorieStats);
+    return categorieStats;
+  }
 }

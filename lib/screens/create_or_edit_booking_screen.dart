@@ -287,7 +287,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
                             repeatCallback: (repeat) => setState(() => _bookingRepeat = repeat)),
                         TextInputField(input: _title, inputCallback: _setTitleState, hintText: 'Titel'),
                         MoneyInputField(textController: _amountTextController, errorText: _amountErrorText, hintText: 'Betrag', bottomSheetTitle: 'Betrag eingeben:'),
-                        _currentTransaction == TransactionType.transfer.name || _currentTransaction == TransactionType.investment.name
+                        _currentTransaction == TransactionType.transfer.name
                             ? const SizedBox()
                             : CategorieInputField(textController: _categorieTextController, errorText: _categorieErrorText, transactionType: _currentTransaction),
                         _currentTransaction == TransactionType.transfer.name || _currentTransaction == TransactionType.investment.name

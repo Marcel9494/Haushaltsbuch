@@ -24,7 +24,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
   double _liabilities = 0.0;
   double _maxWealthValue = 0.0;
   double _currentYearPeriod = 1;
-  List<bool> _selectedStatisticTabOption = [true, false, false, false, false];
+  List<bool> _selectedStatisticTabOption = [true, false, false, false];
   List<WealthDevelopmentStats> _wealthDevelopmentStats = [];
 
   Future<List<WealthDevelopmentStats>> _loadChartBarData() async {
@@ -56,6 +56,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
       _wealthDevelopmentStats[_wealthDevelopmentStats.indexWhere((element) => element.month == wealthDevelopmentStat.month)] = wealthDevelopmentStat;
     }
     double averageWealthGrowth = WealthDevelopmentStats.calculateAverageWealthGrowth(monthRevenues, monthExpenditures);
+    // TODO hier weitermachen und dynamich machen 12 * 5 oder 12 * 10, etc.
     for (int i = DateTime.now().month; i < 12; i++) {
       WealthDevelopmentStats wealthDevelopmentStat = WealthDevelopmentStats();
       wealthDevelopmentStat.wealth = _assets - _liabilities;
@@ -106,17 +107,15 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
         _selectedStatisticTabOption[i] = i == selectedIndex;
       }
       if (_selectedStatisticTabOption[0]) {
-        _selectedStatisticTabOption = [true, false, false, false, false];
+        _selectedStatisticTabOption = [true, false, false, false];
       } else if (_selectedStatisticTabOption[1]) {
-        _selectedStatisticTabOption = [false, true, false, false, false];
+        _selectedStatisticTabOption = [false, true, false, false];
       } else if (_selectedStatisticTabOption[2]) {
-        _selectedStatisticTabOption = [false, false, true, false, false];
+        _selectedStatisticTabOption = [false, false, true, false];
       } else if (_selectedStatisticTabOption[3]) {
-        _selectedStatisticTabOption = [false, false, false, true, false];
-      } else if (_selectedStatisticTabOption[4]) {
-        _selectedStatisticTabOption = [false, false, false, false, true];
+        _selectedStatisticTabOption = [false, false, false, true];
       } else {
-        _selectedStatisticTabOption = [true, false, false, false, false];
+        _selectedStatisticTabOption = [true, false, false, false];
       }
     });
   }
@@ -144,7 +143,6 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
               Text('1 J.'),
               Text('5 J.'),
               Text('10 J.'),
-              Text('20 J.'),
               Text('40 J.'),
             ],
           ),
@@ -201,43 +199,24 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
             }
           },
         ),
-        SliderTheme(
-          data: const SliderThemeData(
-            trackHeight: 0.5,
-          ),
-          child: Slider(
-            value: _currentYearPeriod,
-            min: 1,
-            max: 50,
-            divisions: 50,
-            activeColor: Colors.cyanAccent,
-            label: _currentYearPeriod.round().toString(),
-            onChanged: (double value) {
-              setState(() {
-                _currentYearPeriod = value;
-              });
-            },
-          ),
-        ),
       ],
     );
   }
 
   Widget bottomTitleWidgets(double value, TitleMeta meta) {
-    const style = TextStyle(fontSize: 12);
     Widget text;
     switch (value.toInt()) {
       case 2:
-        text = const Text('März', style: style);
+        text = Text('März\n${_wealthDevelopmentStats[value.toInt()].wealth.toStringAsFixed(2)}€', textAlign: TextAlign.center, style: const TextStyle(fontSize: 10));
         break;
       case 5:
-        text = const Text('Juni', style: style);
+        text = Text('Juni\n${_wealthDevelopmentStats[value.toInt()].wealth.toStringAsFixed(2)}€', textAlign: TextAlign.center, style: const TextStyle(fontSize: 10));
         break;
       case 8:
-        text = const Text('September', style: style);
+        text = Text('September\n${_wealthDevelopmentStats[value.toInt()].wealth.toStringAsFixed(2)}€', textAlign: TextAlign.center, style: const TextStyle(fontSize: 10));
         break;
       default:
-        text = const Text('', style: style);
+        text = const Text('', style: TextStyle(fontSize: 10));
         break;
     }
 
@@ -297,7 +276,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
         bottomTitles: AxisTitles(
           sideTitles: SideTitles(
             showTitles: true,
-            reservedSize: 30,
+            reservedSize: 35,
             interval: 1,
             getTitlesWidget: bottomTitleWidgets,
           ),
@@ -316,7 +295,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
         border: Border.all(color: const Color(0xff37434d)),
       ),
       minX: 0.0,
-      maxX: 11.0,
+      maxX: 11.0, // TODO dynamich machen * 5,
       minY: 0.0,
       maxY: _maxWealthValue / 1000,
       lineBarsData: [

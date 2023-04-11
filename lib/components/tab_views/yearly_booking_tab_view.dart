@@ -105,7 +105,6 @@ class _YearlyBookingTabViewState extends State<YearlyBookingTabView> {
                       haveText: 'Ausgaben',
                       have: _getYearlyExpenditures(),
                       balanceText: 'Saldo',
-                      showAverageValuesPerDay: true,
                       investmentText: 'Investitionen',
                       investmentAmount: _getYearlyInvestments(),
                       showInvestments: true,

@@ -3,6 +3,7 @@ import 'package:fl_chart/fl_chart.dart';
 
 import '/models/booking.dart';
 import '/models/categorie_stats.dart';
+import '/models/enums/categorie_types.dart';
 import '/models/enums/transaction_types.dart';
 
 import '/utils/number_formatters/number_formatter.dart';
@@ -25,8 +26,12 @@ class MonthlyStatisticsTabView extends StatefulWidget {
 
 class _MonthlyStatisticsTabViewState extends State<MonthlyStatisticsTabView> {
   List<CategorieStats> _categorieStats = [];
+  String _currentCategorieType = CategorieType.outcome.pluralName;
   double _totalExpenditures = 0.0;
+  double _totalRevenues = 0.0;
+  double _totalInvestments = 0.0;
   bool _showSavingsRate = true;
+  bool _showSeparateInvestments = true;
 
   Future<List<CategorieStats>> _loadMonthlyExpenditureStatistic() async {
     _categorieStats = [];
@@ -38,7 +43,8 @@ class _MonthlyStatisticsTabViewState extends State<MonthlyStatisticsTabView> {
         categorieStatsAreUpdated = false;
         _totalExpenditures += formatMoneyAmountToDouble(_bookingList[i].amount);
         if (_showSavingsRate && _bookingList[i].transactionType == TransactionType.investment.name) {
-          _categorieStats = CategorieStats.createOrUpdateCategorieStats(i, _bookingList, _categorieStats, 'Investition', categorieStatsAreUpdated, Colors.cyanAccent);
+          _categorieStats =
+              CategorieStats.createOrUpdateCategorieStats(i, _bookingList, _categorieStats, CategorieType.investment.pluralName, categorieStatsAreUpdated, Colors.cyanAccent);
         } else {
           _categorieStats = CategorieStats.createOrUpdateCategorieStats(
               i, _bookingList, _categorieStats, _bookingList[i].categorie, categorieStatsAreUpdated, Color.fromRGBO((i * 20) % 255, (i * 20) % 255, (i * 50) % 255, 0.8));
@@ -50,19 +56,75 @@ class _MonthlyStatisticsTabViewState extends State<MonthlyStatisticsTabView> {
     return _categorieStats;
   }
 
+  Future<List<CategorieStats>> _loadMonthlyRevenueStatistic() async {
+    _categorieStats = [];
+    _totalRevenues = 0.0;
+    bool categorieStatsAreUpdated = false;
+    List<Booking> _bookingList = await Booking.loadMonthlyBookingList(widget.selectedDate.month, widget.selectedDate.year);
+    for (int i = 0; i < _bookingList.length; i++) {
+      if (_bookingList[i].transactionType == TransactionType.income.name) {
+        categorieStatsAreUpdated = false;
+        _totalRevenues += formatMoneyAmountToDouble(_bookingList[i].amount);
+        _categorieStats = CategorieStats.createOrUpdateCategorieStats(
+            i, _bookingList, _categorieStats, _bookingList[i].categorie, categorieStatsAreUpdated, Color.fromRGBO((i * 20) % 255, (i * 20) % 255, (i * 50) % 255, 0.8));
+      }
+    }
+    _categorieStats = CategorieStats.calculateCategoriePercentage(_categorieStats, _totalRevenues);
+    _categorieStats.sort((first, second) => second.percentage.compareTo(first.percentage));
+    return _categorieStats;
+  }
+
+  Future<List<CategorieStats>> _loadMonthlyInvestmentStatistic() async {
+    _categorieStats = [];
+    _totalInvestments = 0.0;
+    bool categorieStatsAreUpdated = false;
+    List<Booking> _bookingList = await Booking.loadMonthlyBookingList(widget.selectedDate.month, widget.selectedDate.year);
+    for (int i = 0; i < _bookingList.length; i++) {
+      if (_bookingList[i].transactionType == TransactionType.investment.name) {
+        categorieStatsAreUpdated = false;
+        _totalInvestments += formatMoneyAmountToDouble(_bookingList[i].amount);
+        if (_showSeparateInvestments && _bookingList[i].transactionType == TransactionType.investment.name) {
+          _categorieStats = CategorieStats.showSeparateInvestments(
+              i, _bookingList, _categorieStats, _bookingList[i].categorie, Color.fromRGBO((i * 20) % 255, (i * 20) % 255, (i * 50) % 255, 0.8));
+        } else {
+          _categorieStats = CategorieStats.createOrUpdateCategorieStats(
+              i, _bookingList, _categorieStats, _bookingList[i].categorie, categorieStatsAreUpdated, Color.fromRGBO((i * 20) % 255, (i * 20) % 255, (i * 50) % 255, 0.8));
+        }
+      }
+    }
+    _categorieStats = CategorieStats.calculateCategoriePercentage(_categorieStats, _totalInvestments);
+    _categorieStats.sort((first, second) => second.percentage.compareTo(first.percentage));
+    return _categorieStats;
+  }
+
+  void _changeCategorieType() {
+    if (_currentCategorieType == CategorieType.outcome.pluralName) {
+      _currentCategorieType = CategorieType.income.pluralName;
+    } else if (_currentCategorieType == CategorieType.income.pluralName) {
+      _currentCategorieType = CategorieType.investment.pluralName;
+    } else if (_currentCategorieType == CategorieType.investment.pluralName) {
+      _currentCategorieType = CategorieType.outcome.pluralName;
+    }
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: _loadMonthlyExpenditureStatistic(),
+      future: _currentCategorieType == CategorieType.outcome.pluralName
+          ? _loadMonthlyExpenditureStatistic()
+          : _currentCategorieType == CategorieType.income.pluralName
+              ? _loadMonthlyRevenueStatistic()
+              : _loadMonthlyInvestmentStatistic(),
       builder: (BuildContext context, AsyncSnapshot<List<CategorieStats>> snapshot) {
         switch (snapshot.connectionState) {
           case ConnectionState.waiting:
             return const LoadingIndicator();
           case ConnectionState.done:
             if (_categorieStats.isEmpty) {
-              return const Expanded(
+              return Expanded(
                 child: Center(
-                  child: Text('Noch keine Ausgaben vorhanden.'),
+                  child: Text('Noch keine $_currentCategorieType vorhanden.'),
                 ),
               );
             } else {
@@ -82,23 +144,37 @@ class _MonthlyStatisticsTabViewState extends State<MonthlyStatisticsTabView> {
                     ),
                   ),
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    mainAxisAlignment: _currentCategorieType == CategorieType.income.pluralName ? MainAxisAlignment.start : MainAxisAlignment.spaceAround,
                     children: [
-                      OutlinedButton(
-                        onPressed: () {}, // TODO hier weitermachen und Ausgaben, Einnahmen & Investitionen umschalten können
-                        child: const Text(
-                          'Ausgaben',
-                          style: TextStyle(color: Colors.cyanAccent),
+                      Padding(
+                        padding: _currentCategorieType == CategorieType.income.pluralName ? const EdgeInsets.only(left: 12.0) : const EdgeInsets.all(0.0),
+                        child: OutlinedButton(
+                          onPressed: () => _changeCategorieType(),
+                          child: Text(
+                            _currentCategorieType,
+                            style: const TextStyle(color: Colors.cyanAccent),
+                          ),
                         ),
                       ),
-                      const Text('Sparquote anzeigen:'),
-                      Switch(
-                        value: _showSavingsRate,
-                        onChanged: (value) {
-                          setState(() {
-                            _showSavingsRate = value;
-                          });
-                        },
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          _currentCategorieType == CategorieType.outcome.pluralName
+                              ? const Text('Sparquote anzeigen:')
+                              : _currentCategorieType == CategorieType.investment.pluralName
+                                  ? const Text('Einzelne Positionen:')
+                                  : const SizedBox(),
+                          _currentCategorieType == CategorieType.outcome.pluralName || _currentCategorieType == CategorieType.investment.pluralName
+                              ? Switch(
+                                  value: _currentCategorieType == CategorieType.investment.pluralName ? _showSeparateInvestments : _showSavingsRate,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      _currentCategorieType == CategorieType.investment.pluralName ? _showSeparateInvestments = value : _showSavingsRate = value;
+                                    });
+                                  },
+                                )
+                              : const SizedBox(),
+                        ],
                       ),
                     ],
                   ),
