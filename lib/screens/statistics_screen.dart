@@ -2,7 +2,9 @@ import 'dart:math';
 
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
+import '../components/deco/bottom_sheet_line.dart';
 import '/models/booking.dart';
 import '/models/account.dart';
 import '/models/wealth_development_stats.dart';
@@ -101,7 +103,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
     return spotList;
   }
 
-  void _setSelectedStatisticTab(int selectedIndex) {
+  void _setSelectedAssetDevelopmentStatisticTab(int selectedIndex) {
     setState(() {
       for (int i = 0; i < _selectedStatisticTabOption.length; i++) {
         _selectedStatisticTabOption[i] = i == selectedIndex;
@@ -120,86 +122,142 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
     });
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12.0),
-          child: ToggleButtons(
-            onPressed: (selectedIndex) => _setSelectedStatisticTab(selectedIndex),
-            borderRadius: BorderRadius.circular(6.0),
-            selectedBorderColor: Colors.cyanAccent,
-            fillColor: Colors.cyanAccent.shade700,
-            selectedColor: Colors.white,
-            color: Colors.white60,
-            constraints: const BoxConstraints(
-              minHeight: 30.0,
-              minWidth: 50.0,
-            ),
-            isSelected: _selectedStatisticTabOption,
-            children: const [
-              Text('1 J.'),
-              Text('5 J.'),
-              Text('10 J.'),
-              Text('40 J.'),
+  void _setSelectedStatisticTab(int selectedStatisticIndex) {
+    // TODO hier weitermachen und auf einzelne Statistik Seiten verlinken siehe _setSelectedAssetDevelopmentStatisticTab
+    // und monthly_tab_view als Beispiel
+  }
+
+  void _openStatisticBottomSheetMenu(BuildContext context) {
+    showCupertinoModalBottomSheet<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return Material(
+          child: ListView(
+            shrinkWrap: true,
+            children: [
+              const BottomSheetLine(),
+              const Padding(
+                padding: EdgeInsets.only(top: 16.0, left: 20.0),
+                child: Text('Statistik auswählen:', style: TextStyle(fontSize: 18.0)),
+              ),
+              Column(
+                children: [
+                  ListTile(
+                    onTap: () => _setSelectedStatisticTab(0), //Navigator.popAndPushNamed(context, createOrEditAccountRoute, arguments: CreateOrEditAccountScreenArguments(-1)),
+                    leading: const Icon(Icons.show_chart_rounded, color: Colors.cyanAccent),
+                    title: const Text('Vermögensentwicklung'),
+                  ),
+                  ListTile(
+                    onTap: () => {}, //Navigator.popAndPushNamed(context, categoriesRoute),
+                    leading: const Icon(Icons.pie_chart_rounded, color: Colors.cyanAccent),
+                    title: const Text('Vermögensaufteilung'),
+                  ),
+                ],
+              ),
             ],
           ),
-        ),
-        FutureBuilder(
-          future: _loadChartBarData(),
-          builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
-            switch (snapshot.connectionState) {
-              case ConnectionState.waiting:
-                return const SizedBox();
-              case ConnectionState.done:
-                if (_wealthDevelopmentStats.isEmpty) {
-                  return const Text('Noch keine Daten vorhanden.');
-                } else {
-                  return Stack(
-                    children: <Widget>[
-                      AspectRatio(
-                        aspectRatio: 1.7,
-                        child: Padding(
-                          padding: const EdgeInsets.only(
-                            right: 18.0,
-                            left: 12.0,
-                            top: 24.0,
-                            bottom: 12.0,
-                          ),
-                          child: LineChart(
-                            showAvg ? avgData() : mainData(_wealthDevelopmentStats),
-                          ),
-                        ),
-                      ),
-                      SizedBox(
-                        width: 60,
-                        height: 34,
-                        child: TextButton(
-                          onPressed: () {
-                            setState(() {
-                              showAvg = !showAvg;
-                            });
-                          },
-                          child: Text(
-                            'avg',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: showAvg ? Colors.white.withOpacity(0.5) : Colors.white,
+        );
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Vermögensentwicklung'),
+      ),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                child: ToggleButtons(
+                  onPressed: (selectedIndex) => _setSelectedAssetDevelopmentStatisticTab(selectedIndex),
+                  borderRadius: BorderRadius.circular(6.0),
+                  selectedBorderColor: Colors.cyanAccent,
+                  fillColor: Colors.cyanAccent.shade700,
+                  selectedColor: Colors.white,
+                  color: Colors.white60,
+                  constraints: const BoxConstraints(
+                    minHeight: 30.0,
+                    minWidth: 50.0,
+                  ),
+                  isSelected: _selectedStatisticTabOption,
+                  children: const [
+                    Text('1 J.'),
+                    Text('5 J.'),
+                    Text('10 J.'),
+                    Text('40 J.'),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                child: IconButton(
+                  onPressed: () => _openStatisticBottomSheetMenu(context),
+                  icon: const Icon(Icons.show_chart_rounded),
+                ),
+              ),
+            ],
+          ),
+          FutureBuilder(
+            future: _loadChartBarData(),
+            builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
+              switch (snapshot.connectionState) {
+                case ConnectionState.waiting:
+                  return const SizedBox();
+                case ConnectionState.done:
+                  if (_wealthDevelopmentStats.isEmpty) {
+                    return const Text('Noch keine Daten vorhanden.');
+                  } else {
+                    return Stack(
+                      children: <Widget>[
+                        AspectRatio(
+                          aspectRatio: 1.7,
+                          child: Padding(
+                            padding: const EdgeInsets.only(
+                              right: 18.0,
+                              left: 12.0,
+                              top: 24.0,
+                              bottom: 12.0,
+                            ),
+                            child: LineChart(
+                              showAvg ? avgData() : mainData(_wealthDevelopmentStats),
                             ),
                           ),
                         ),
-                      ),
-                    ],
-                  );
-                }
-              default:
-                return const SizedBox();
-            }
-          },
-        ),
-      ],
+                        SizedBox(
+                          width: 60,
+                          height: 34,
+                          child: TextButton(
+                            onPressed: () {
+                              setState(() {
+                                showAvg = !showAvg;
+                              });
+                            },
+                            child: Text(
+                              'avg',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: showAvg ? Colors.white.withOpacity(0.5) : Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+                  }
+                default:
+                  return const SizedBox();
+              }
+            },
+          ),
+        ],
+      ),
     );
   }
 

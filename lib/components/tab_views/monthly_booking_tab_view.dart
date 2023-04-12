@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 
 import '/models/booking.dart';
 import '/models/enums/transaction_types.dart';
-import '/utils/number_formatters/number_formatter.dart';
+
 import '../cards/booking_card.dart';
+
+import '/utils/number_formatters/number_formatter.dart';
+
 import '../deco/date_text.dart';
 import '../deco/loading_indicator.dart';
 import '../deco/overview_tile.dart';
