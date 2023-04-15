@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
-import '/models/categorie_stats.dart';
+import '/models/percentage_stats.dart';
 
-class ExpenditureCard extends StatelessWidget {
-  final CategorieStats categorieStats;
+class PercentageCard extends StatelessWidget {
+  final PercentageStats percentageStats;
 
-  const ExpenditureCard({
+  const PercentageCard({
     Key? key,
-    required this.categorieStats,
+    required this.percentageStats,
   }) : super(key: key);
 
   @override
@@ -23,7 +23,7 @@ class ExpenditureCard extends StatelessWidget {
         ),
         child: Container(
           decoration: BoxDecoration(
-            border: Border(left: BorderSide(color: categorieStats.statColor, width: 6)),
+            border: Border(left: BorderSide(color: percentageStats.statColor, width: 6)),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -35,18 +35,18 @@ class ExpenditureCard extends StatelessWidget {
                     WidgetSpan(
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                        child: Text('${categorieStats.percentage.toStringAsFixed(0)} %'),
+                        child: Text('${percentageStats.percentage.toStringAsFixed(0)} %'),
                       ),
                     ),
                     TextSpan(
-                      text: categorieStats.categorieName,
+                      text: percentageStats.name,
                     ),
                   ],
                 ),
               ),
               Padding(
                 padding: const EdgeInsets.only(top: 16.0, bottom: 16.0, right: 16.0),
-                child: Text(categorieStats.amount),
+                child: Text(percentageStats.amount),
               ),
             ],
           ),
