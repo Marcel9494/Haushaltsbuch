@@ -10,7 +10,6 @@ class PercentageStats {
 
   static List<PercentageStats> createOrUpdatePercentageStats(
       int i, String amountString, List<PercentageStats> percentageStats, String categorieName, bool categorieStatsAreUpdated, Color color) {
-    print(amountString);
     if (i == 0) {
       PercentageStats newCategorieStats = PercentageStats()
         ..name = categorieName
@@ -54,6 +53,18 @@ class PercentageStats {
       ..percentage = 0.0
       ..statColor = color;
     percentageStats.add(newCategorieStats);
+    return percentageStats;
+  }
+
+  static List<PercentageStats> updatePercentageStats(int i, String amountString, List<PercentageStats> percentageStats, String categorieName, Color color) {
+    for (int j = 0; j < percentageStats.length; j++) {
+      if (percentageStats[j].name.contains(categorieName)) {
+        double amount = formatMoneyAmountToDouble(percentageStats[j].amount);
+        amount += formatMoneyAmountToDouble(amountString);
+        percentageStats[j].amount = formatToMoneyAmount(amount.toString());
+        break;
+      }
+    }
     return percentageStats;
   }
 }

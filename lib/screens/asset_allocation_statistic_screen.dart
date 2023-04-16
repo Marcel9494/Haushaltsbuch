@@ -1,9 +1,11 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:haushaltsbuch/models/enums/account_types.dart';
 
 import '../components/cards/percentage_card.dart';
 import '../components/deco/loading_indicator.dart';
 import '../models/account.dart';
+import '../models/enums/asset_allocation_statistic_types.dart';
 import '/models/percentage_stats.dart';
 
 class AssetAllocationStatisticScreen extends StatefulWidget {
@@ -15,6 +17,7 @@ class AssetAllocationStatisticScreen extends StatefulWidget {
 
 class _AssetAllocationStatisticScreenState extends State<AssetAllocationStatisticScreen> {
   List<PercentageStats> _percentageStats = [];
+  String _currentAssetAllocationStatisticType = AssetAllocationStatisticType.individualAccounts.name;
   double _totalAssets = 0.0;
 
   Future<List<PercentageStats>> _loadAssetAllocationStatistic() async {
@@ -24,12 +27,36 @@ class _AssetAllocationStatisticScreenState extends State<AssetAllocationStatisti
     List<Account> _accountList = await Account.loadAccounts();
     for (int i = 0; i < _accountList.length; i++) {
       categorieStatsAreUpdated = false;
-      _percentageStats =
-          PercentageStats.createOrUpdatePercentageStats(i, _accountList[i].bankBalance, _percentageStats, _accountList[i].accountType, categorieStatsAreUpdated, Colors.cyanAccent);
+      if (_currentAssetAllocationStatisticType == AssetAllocationStatisticType.individualAccounts.name) {
+        _percentageStats = PercentageStats.showSeparatePercentages(
+            i, _accountList[i].bankBalance, _percentageStats, _accountList[i].name, Color.fromRGBO((i * 20) % 255, (i * 20) % 255, (i * 50) % 255, 0.8));
+      } else if (_currentAssetAllocationStatisticType == AssetAllocationStatisticType.individualAccountTypes.name) {
+        _percentageStats = PercentageStats.createOrUpdatePercentageStats(i, _accountList[i].bankBalance, _percentageStats, _accountList[i].accountType, categorieStatsAreUpdated,
+            Color.fromRGBO((i * 20) % 255, (i * 20) % 255, (i * 50) % 255, 0.8));
+      } else if (_currentAssetAllocationStatisticType == AssetAllocationStatisticType.capitalOrRiskFreeInvestments.name) {
+        if (_accountList[i].accountType == AccountType.capitalInvestments.name) {
+          _percentageStats = PercentageStats.createOrUpdatePercentageStats(i, _accountList[i].bankBalance, _percentageStats, _accountList[i].accountType, categorieStatsAreUpdated,
+              Color.fromRGBO((i * 20) % 255, (i * 20) % 255, (i * 50) % 255, 0.8));
+        } else {
+          _percentageStats = PercentageStats.createOrUpdatePercentageStats(i, _accountList[i].bankBalance, _percentageStats, 'risikolose Anlagen', categorieStatsAreUpdated,
+              Color.fromRGBO((i * 20) % 255, (i * 20) % 255, (i * 50) % 255, 0.8));
+        }
+      }
     }
     _percentageStats = PercentageStats.calculatePercentage(_percentageStats, _totalAssets);
     _percentageStats.sort((first, second) => second.percentage.compareTo(first.percentage));
     return _percentageStats;
+  }
+
+  void _changeAssetAllocationStatisticType() {
+    if (_currentAssetAllocationStatisticType == AssetAllocationStatisticType.individualAccounts.name) {
+      _currentAssetAllocationStatisticType = AssetAllocationStatisticType.individualAccountTypes.name;
+    } else if (_currentAssetAllocationStatisticType == AssetAllocationStatisticType.individualAccountTypes.name) {
+      _currentAssetAllocationStatisticType = AssetAllocationStatisticType.capitalOrRiskFreeInvestments.name;
+    } else if (_currentAssetAllocationStatisticType == AssetAllocationStatisticType.capitalOrRiskFreeInvestments.name) {
+      _currentAssetAllocationStatisticType = AssetAllocationStatisticType.individualAccounts.name;
+    }
+    setState(() {});
   }
 
   @override
@@ -55,6 +82,21 @@ class _AssetAllocationStatisticScreenState extends State<AssetAllocationStatisti
                       sections: showingSections(),
                     ),
                   ),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(left: 12.0),
+                      child: OutlinedButton(
+                        onPressed: () => _changeAssetAllocationStatisticType(),
+                        child: Text(
+                          _currentAssetAllocationStatisticType,
+                          style: const TextStyle(color: Colors.cyanAccent),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
                 RefreshIndicator(
                   onRefresh: () async {
