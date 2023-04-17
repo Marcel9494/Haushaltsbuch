@@ -8,7 +8,7 @@ extension AssetAllocationStatisticTypeExtension on AssetAllocationStatisticType 
       case AssetAllocationStatisticType.individualAccountTypes:
         return 'Einzelne Kontotypen';
       case AssetAllocationStatisticType.capitalOrRiskFreeInvestments:
-        return 'Kapitalanlagen vs. risikolosen Anlagen';
+        return 'Kapitalanlagen vs. risikolose Anlagen';
       default:
         throw Exception('$name is not a valid Asset Allocation Statistic type.');
     }

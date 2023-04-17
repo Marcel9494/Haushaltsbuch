@@ -7,14 +7,14 @@ import '/models/account.dart';
 import '/models/booking.dart';
 import '/models/wealth_development_stats.dart';
 
-class AssetDevelopmentStatisticScreen extends StatefulWidget {
-  const AssetDevelopmentStatisticScreen({Key? key}) : super(key: key);
+class AssetDevelopmentStatisticTabView extends StatefulWidget {
+  const AssetDevelopmentStatisticTabView({Key? key}) : super(key: key);
 
   @override
-  State<AssetDevelopmentStatisticScreen> createState() => _AssetDevelopmentStatisticScreenState();
+  State<AssetDevelopmentStatisticTabView> createState() => _AssetDevelopmentStatisticTabViewState();
 }
 
-class _AssetDevelopmentStatisticScreenState extends State<AssetDevelopmentStatisticScreen> {
+class _AssetDevelopmentStatisticTabViewState extends State<AssetDevelopmentStatisticTabView> {
   List<Color> gradientColors = [Colors.cyanAccent, Colors.cyan];
   bool showAvg = false;
   double _assets = 0.0;

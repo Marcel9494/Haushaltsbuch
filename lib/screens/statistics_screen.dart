@@ -1,12 +1,11 @@
-import 'dart:math';
-
-import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 import '../components/deco/bottom_sheet_line.dart';
-import 'asset_development_statistic_screen.dart';
-import 'asset_allocation_statistic_screen.dart';
+import '../models/enums/statistic_types.dart';
+
+import '../components/tab_views/asset_development_statistic_tab_view.dart';
+import '../components/tab_views/asset_allocation_statistic_tab_view.dart';
 
 class StatisticsScreen extends StatefulWidget {
   const StatisticsScreen({Key? key}) : super(key: key);
@@ -17,72 +16,72 @@ class StatisticsScreen extends StatefulWidget {
 
 class _StatisticsScreenState extends State<StatisticsScreen> {
   List<bool> _selectedStatisticTabOption = [true, false];
+  StatisticType? _selectedStatistic;
 
-  void _setSelectedStatisticTab(int selectedStatisticIndex) {
+  void _setSelectedStatisticTab(StatisticType selectedStatisticType) {
     setState(() {
-      for (int i = 0; i < _selectedStatisticTabOption.length; i++) {
-        _selectedStatisticTabOption[i] = i == selectedStatisticIndex;
-      }
-      if (_selectedStatisticTabOption[0]) {
+      if (selectedStatisticType.name == StatisticType.assetDevelopment.name) {
         _selectedStatisticTabOption = [true, false];
-      } else if (_selectedStatisticTabOption[1]) {
+      } else if (selectedStatisticType.name == StatisticType.assetAllocation.name) {
         _selectedStatisticTabOption = [false, true];
       } else {
         _selectedStatisticTabOption = [true, false];
       }
     });
-    Navigator.pop(context);
-  }
-
-  void _openStatisticBottomSheetMenu(BuildContext context) {
-    showCupertinoModalBottomSheet<void>(
-      context: context,
-      builder: (BuildContext context) {
-        return Material(
-          child: ListView(
-            shrinkWrap: true,
-            children: [
-              const BottomSheetLine(),
-              const Padding(
-                padding: EdgeInsets.only(top: 16.0, left: 20.0),
-                child: Text('Statistik auswählen:', style: TextStyle(fontSize: 18.0)),
-              ),
-              Column(
-                children: [
-                  ListTile(
-                    onTap: () => _setSelectedStatisticTab(0),
-                    leading: const Icon(Icons.show_chart_rounded, color: Colors.cyanAccent),
-                    title: const Text('Vermögensentwicklung'),
-                  ),
-                  ListTile(
-                    onTap: () => _setSelectedStatisticTab(1),
-                    leading: const Icon(Icons.pie_chart_rounded, color: Colors.cyanAccent),
-                    title: const Text('Vermögensaufteilung'),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        );
-      },
-    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text(_selectedStatisticTabOption[0] ? 'Vermögensentwicklung' : 'Vermögensaufteilung'),
+          title: Text(_selectedStatisticTabOption[0] ? StatisticType.assetDevelopment.name : StatisticType.assetAllocation.name),
           actions: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12.0),
-              child: IconButton(
-                onPressed: () => _openStatisticBottomSheetMenu(context),
-                icon: Icon(_selectedStatisticTabOption[0] ? Icons.show_chart_rounded : Icons.pie_chart_rounded),
+            Center(
+              child: PopupMenuButton<StatisticType>(
+                initialValue: _selectedStatistic,
+                onSelected: (StatisticType item) {
+                  setState(() {
+                    _selectedStatistic = item;
+                    _setSelectedStatisticTab(item);
+                  });
+                },
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(12.0),
+                  ),
+                ),
+                itemBuilder: (BuildContext context) => <PopupMenuEntry<StatisticType>>[
+                  PopupMenuItem<StatisticType>(
+                    value: StatisticType.assetDevelopment,
+                    padding: EdgeInsets.zero,
+                    child: ListTile(
+                      leading: const Icon(Icons.show_chart_rounded),
+                      horizontalTitleGap: 0.0,
+                      visualDensity: const VisualDensity(horizontal: 0.0, vertical: -4.0),
+                      title: Text(
+                        StatisticType.assetDevelopment.name,
+                        style: const TextStyle(fontSize: 14.0),
+                      ),
+                    ),
+                  ),
+                  PopupMenuItem<StatisticType>(
+                    value: StatisticType.assetAllocation,
+                    padding: EdgeInsets.zero,
+                    child: ListTile(
+                      leading: const Icon(Icons.pie_chart_rounded),
+                      horizontalTitleGap: 0.0,
+                      visualDensity: const VisualDensity(horizontal: 0.0, vertical: -4.0),
+                      title: Text(
+                        StatisticType.assetAllocation.name,
+                        style: const TextStyle(fontSize: 14.0),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
         ),
-        body: _selectedStatisticTabOption[0] ? const AssetDevelopmentStatisticScreen() : const AssetAllocationStatisticScreen());
+        body: _selectedStatisticTabOption[0] ? const AssetDevelopmentStatisticTabView() : const AssetAllocationStatisticTabView());
   }
 }

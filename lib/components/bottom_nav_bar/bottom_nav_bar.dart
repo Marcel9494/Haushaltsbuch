@@ -78,7 +78,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
         backgroundColor: const Color(0x0fffffff),
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(icon: Icon(Icons.auto_stories_rounded), label: 'Buchungen'),
-          BottomNavigationBarItem(icon: Icon(Icons.insights_rounded), label: 'Statistiken'),
+          BottomNavigationBarItem(icon: Icon(Icons.bar_chart_rounded), label: 'Budgets'),
           BottomNavigationBarItem(icon: Icon(Icons.monetization_on_rounded), label: 'Konten'),
         ],
       ),

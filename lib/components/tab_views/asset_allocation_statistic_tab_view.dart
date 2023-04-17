@@ -1,21 +1,22 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:haushaltsbuch/models/enums/account_types.dart';
 
-import '../components/cards/percentage_card.dart';
-import '../components/deco/loading_indicator.dart';
-import '../models/account.dart';
-import '../models/enums/asset_allocation_statistic_types.dart';
+import '/components/cards/percentage_card.dart';
+import '/components/deco/loading_indicator.dart';
+
+import '/models/account.dart';
 import '/models/percentage_stats.dart';
+import '/models/enums/account_types.dart';
+import '/models/enums/asset_allocation_statistic_types.dart';
 
-class AssetAllocationStatisticScreen extends StatefulWidget {
-  const AssetAllocationStatisticScreen({Key? key}) : super(key: key);
+class AssetAllocationStatisticTabView extends StatefulWidget {
+  const AssetAllocationStatisticTabView({Key? key}) : super(key: key);
 
   @override
-  State<AssetAllocationStatisticScreen> createState() => _AssetAllocationStatisticScreenState();
+  State<AssetAllocationStatisticTabView> createState() => _AssetAllocationStatisticTabViewState();
 }
 
-class _AssetAllocationStatisticScreenState extends State<AssetAllocationStatisticScreen> {
+class _AssetAllocationStatisticTabViewState extends State<AssetAllocationStatisticTabView> {
   List<PercentageStats> _percentageStats = [];
   String _currentAssetAllocationStatisticType = AssetAllocationStatisticType.individualAccounts.name;
   double _totalAssets = 0.0;
@@ -106,7 +107,7 @@ class _AssetAllocationStatisticScreenState extends State<AssetAllocationStatisti
                   },
                   color: Colors.cyanAccent,
                   child: SizedBox(
-                    height: 275.0,
+                    height: 205.0,
                     child: ListView.builder(
                       itemCount: _percentageStats.length,
                       itemBuilder: (BuildContext context, int index) {

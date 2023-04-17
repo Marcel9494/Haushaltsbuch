@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:haushaltsbuch/components/tab_views/asset_allocation_statistic_tab_view.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
-import '/components/cards/account_card.dart';
+import '../components/tab_views/asset_development_statistic_tab_view.dart';
+
+import '/components/tab_views/account_overview_tab_view.dart';
 import '/components/deco/bottom_sheet_line.dart';
 import '/components/deco/loading_indicator.dart';
 import '/components/deco/overview_tile.dart';
@@ -19,9 +22,9 @@ class AccountsScreen extends StatefulWidget {
 }
 
 class _AccountsScreenState extends State<AccountsScreen> {
-  late List<Account> _accountList = [];
-  late double _assetValues = 0.0;
-  late double _liabilityValues = 0.0;
+  double _assetValues = 0.0;
+  double _liabilityValues = 0.0;
+  List<bool> _selectedTabOption = [true, false, false];
 
   void _openBottomSheetMenu(BuildContext context) {
     showCupertinoModalBottomSheet<void>(
@@ -57,14 +60,26 @@ class _AccountsScreenState extends State<AccountsScreen> {
     );
   }
 
-  Future<List<Account>> _loadAccountList() async {
-    _accountList = await Account.loadAccounts();
-    return _accountList;
-  }
-
   Future<void> _getAssetAndLiabilityValues() async {
     _assetValues = await Account.getAssetValue();
     _liabilityValues = await Account.getLiabilityValue();
+  }
+
+  void _setSelectedTab(int selectedIndex) {
+    setState(() {
+      for (int i = 0; i < _selectedTabOption.length; i++) {
+        _selectedTabOption[i] = i == selectedIndex;
+      }
+      if (_selectedTabOption[0]) {
+        _selectedTabOption = [true, false, false];
+      } else if (_selectedTabOption[1]) {
+        _selectedTabOption = [false, true, false];
+      } else if (_selectedTabOption[2]) {
+        _selectedTabOption = [false, false, true];
+      } else {
+        _selectedTabOption = [true, false, false];
+      }
+    });
   }
 
   @override
@@ -95,59 +110,37 @@ class _AccountsScreenState extends State<AccountsScreen> {
                 }
               },
             ),
-            FutureBuilder(
-              future: _loadAccountList(),
-              builder: (BuildContext context, AsyncSnapshot<List<Account>> snapshot) {
-                switch (snapshot.connectionState) {
-                  case ConnectionState.waiting:
-                    return const LoadingIndicator();
-                  case ConnectionState.done:
-                    if (_accountList.isEmpty) {
-                      return const Expanded(
-                        child: Center(
-                          child: Text('Noch keine Konten erstellt.'),
-                        ),
-                      );
-                    } else {
-                      return Expanded(
-                        child: RefreshIndicator(
-                          onRefresh: () async {
-                            _accountList = await _loadAccountList();
-                            setState(() {});
-                            return;
-                          },
-                          color: Colors.cyanAccent,
-                          child: ListView.builder(
-                            itemCount: _accountList.length,
-                            itemBuilder: (BuildContext context, int index) {
-                              if (index == 0 || _accountList[index - 1].accountType != _accountList[index].accountType) {
-                                return Column(
-                                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Text(_accountList[index].accountType, style: const TextStyle(fontSize: 16.0)),
-                                    ),
-                                    AccountCard(account: _accountList[index]),
-                                  ],
-                                );
-                              } else if (_accountList[index - 1].accountType == _accountList[index].accountType) {
-                                return AccountCard(account: _accountList[index]);
-                              }
-                              return const SizedBox();
-                            },
-                          ),
-                        ),
-                      );
-                    }
-                  default:
-                    if (snapshot.hasError) {
-                      return const Text('Konten Übersicht konnte nicht geladen werden.');
-                    }
-                    return const LoadingIndicator();
-                }
-              },
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(right: 16.0, left: 16.0),
+                  child: ToggleButtons(
+                    onPressed: (selectedIndex) => _setSelectedTab(selectedIndex),
+                    borderRadius: BorderRadius.circular(6.0),
+                    selectedBorderColor: Colors.cyanAccent,
+                    fillColor: Colors.cyanAccent.shade700,
+                    selectedColor: Colors.white,
+                    color: Colors.white60,
+                    constraints: const BoxConstraints(
+                      minHeight: 30.0,
+                      minWidth: 50.0,
+                    ),
+                    isSelected: _selectedTabOption,
+                    children: const [
+                      Icon(Icons.account_balance_wallet_rounded, size: 20.0),
+                      Icon(Icons.show_chart_rounded, size: 20.0),
+                      Icon(Icons.pie_chart_rounded, size: 20.0),
+                    ],
+                  ),
+                ),
+              ],
             ),
+            _selectedTabOption[0]
+                ? const AccountOverviewTabView()
+                : _selectedTabOption[1]
+                    ? const AssetDevelopmentStatisticTabView()
+                    : const AssetAllocationStatisticTabView(),
           ],
         ),
       ),
