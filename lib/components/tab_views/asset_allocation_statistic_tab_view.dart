@@ -62,69 +62,71 @@ class _AssetAllocationStatisticTabViewState extends State<AssetAllocationStatist
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: _loadAssetAllocationStatistic(),
-      builder: (BuildContext context, AsyncSnapshot<List<PercentageStats>> snapshot) {
-        switch (snapshot.connectionState) {
-          case ConnectionState.waiting:
-            return const LoadingIndicator();
-          case ConnectionState.done:
-            return Column(
-              children: [
-                AspectRatio(
-                  aspectRatio: 1.6,
-                  child: PieChart(
-                    PieChartData(
-                      borderData: FlBorderData(
-                        show: false,
+    return Expanded(
+      child: FutureBuilder(
+        future: _loadAssetAllocationStatistic(),
+        builder: (BuildContext context, AsyncSnapshot<List<PercentageStats>> snapshot) {
+          switch (snapshot.connectionState) {
+            case ConnectionState.waiting:
+              return const LoadingIndicator();
+            case ConnectionState.done:
+              return Column(
+                children: [
+                  AspectRatio(
+                    aspectRatio: 1.6,
+                    child: PieChart(
+                      PieChartData(
+                        borderData: FlBorderData(
+                          show: false,
+                        ),
+                        sectionsSpace: 4.0,
+                        centerSpaceRadius: 40.0,
+                        sections: showingSections(),
                       ),
-                      sectionsSpace: 4.0,
-                      centerSpaceRadius: 40.0,
-                      sections: showingSections(),
                     ),
                   ),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(left: 12.0),
-                      child: OutlinedButton(
-                        onPressed: () => _changeAssetAllocationStatisticType(),
-                        child: Text(
-                          _currentAssetAllocationStatisticType,
-                          style: const TextStyle(color: Colors.cyanAccent),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(left: 12.0),
+                        child: OutlinedButton(
+                          onPressed: () => _changeAssetAllocationStatisticType(),
+                          child: Text(
+                            _currentAssetAllocationStatisticType,
+                            style: const TextStyle(color: Colors.cyanAccent),
+                          ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-                RefreshIndicator(
-                  onRefresh: () async {
-                    _percentageStats = await _loadAssetAllocationStatistic();
-                    setState(() {});
-                    return;
-                  },
-                  color: Colors.cyanAccent,
-                  child: SizedBox(
-                    height: 205.0,
-                    child: ListView.builder(
-                      itemCount: _percentageStats.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        return PercentageCard(percentageStats: _percentageStats[index]);
-                      },
+                    ],
+                  ),
+                  RefreshIndicator(
+                    onRefresh: () async {
+                      _percentageStats = await _loadAssetAllocationStatistic();
+                      setState(() {});
+                      return;
+                    },
+                    color: Colors.cyanAccent,
+                    child: SizedBox(
+                      height: 220.0,
+                      child: ListView.builder(
+                        itemCount: _percentageStats.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          return PercentageCard(percentageStats: _percentageStats[index]);
+                        },
+                      ),
                     ),
                   ),
-                ),
-              ],
-            );
-          default:
-            if (snapshot.hasError) {
-              return const Text('Vermögensaufteilung konnte nicht geladen werden.');
-            }
-            return const LoadingIndicator();
-        }
-      },
+                ],
+              );
+            default:
+              if (snapshot.hasError) {
+                return const Text('Vermögensaufteilung konnte nicht geladen werden.');
+              }
+              return const LoadingIndicator();
+          }
+        },
+      ),
     );
   }
 

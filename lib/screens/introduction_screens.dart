@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 
 import 'package:introduction_screen/introduction_screen.dart';
 
-import '/components/bottom_nav_bar/bottom_nav_bar.dart';
-
 import '/models/account.dart';
 import '/models/categorie.dart';
 import '/models/screen_arguments/bottom_nav_bar_screen_arguments.dart';
@@ -46,26 +44,22 @@ class _IntroductionScreensState extends State<IntroductionScreens> {
         PageViewModel(
           title: 'Einnahmen, Ausgaben & Investitionen',
           body: 'Alle Einnahmen, Ausgaben & Investitionen im Blick.',
-          //image: _buildImage('img1.jpg'),
-          //decoration: pageDecoration,
+          image: Image.asset('assets/images/introduction_screen_image1.jpg'),
         ),
         PageViewModel(
           title: 'Budgets festlegen',
           body: 'TODO',
-          //image: _buildImage('img2.jpg'),
-          //decoration: pageDecoration,
+          image: Image.asset('assets/images/introduction_screen_image2.jpg'),
         ),
         PageViewModel(
           title: 'Konten und Vermögen verwalten',
           body: 'TODO',
           //image: _buildImage('img2.jpg'),
-          //decoration: pageDecoration,
         ),
         PageViewModel(
           title: 'Statistiken',
           body: 'TODO',
-          //image: _buildImage('img2.jpg'),
-          //decoration: pageDecoration,
+          image: Image.asset('assets/images/introduction_screen_image4.jpg'),
         ),
       ],
       showNextButton: true,

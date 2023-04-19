@@ -97,18 +97,21 @@ class _AccountsScreenState extends State<AccountsScreen> {
       body: Center(
         child: Column(
           children: [
-            FutureBuilder(
-              future: _getAssetAndLiabilityValues(),
-              builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
-                switch (snapshot.connectionState) {
-                  case ConnectionState.waiting:
-                    return const LoadingIndicator();
-                  case ConnectionState.done:
-                    return OverviewTile(shouldText: 'Vermögen', should: _assetValues, haveText: 'Schulden', have: _liabilityValues, balanceText: 'Saldo');
-                  default:
-                    return const SizedBox();
-                }
-              },
+            SizedBox(
+              height: 46.0,
+              child: FutureBuilder(
+                future: _getAssetAndLiabilityValues(),
+                builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
+                  switch (snapshot.connectionState) {
+                    case ConnectionState.waiting:
+                      return const LoadingIndicator();
+                    case ConnectionState.done:
+                      return OverviewTile(shouldText: 'Vermögen', should: _assetValues, haveText: 'Schulden', have: _liabilityValues, balanceText: 'Saldo');
+                    default:
+                      return const SizedBox();
+                  }
+                },
+              ),
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
