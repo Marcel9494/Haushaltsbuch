@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 
 import '/screens/bookings_screen.dart';
-import '/screens/statistics_screen.dart';
+import '/screens/budgets_screen.dart';
 import '/screens/accounts_screen.dart';
 
 import '/models/screen_arguments/create_or_edit_booking_screen_arguments.dart';
+import '/models/screen_arguments/create_or_edit_budget_screen_arguments.dart';
 
 import '/utils/consts/route_consts.dart';
 
@@ -29,7 +30,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
     super.initState();
     _screens = <Widget>[
       const BookingsScreen(),
-      const StatisticsScreen(),
+      const BudgetsScreen(),
       const AccountsScreen(),
     ];
   }
@@ -49,9 +50,11 @@ class _BottomNavBarState extends State<BottomNavBar> {
           children: _screens,
         ),
       ),
-      floatingActionButton: _selectedIndex == 0
+      floatingActionButton: _selectedIndex == 0 || _selectedIndex == 1
           ? FloatingActionButton(
-              onPressed: () => Navigator.pushNamed(context, createOrEditBookingRoute, arguments: CreateOrEditBookingScreenArguments(-1)),
+              onPressed: () => _selectedIndex == 0
+                  ? Navigator.pushNamed(context, createOrEditBookingRoute, arguments: CreateOrEditBookingScreenArguments(-1))
+                  : Navigator.pushNamed(context, createOrEditBudgetRoute, arguments: CreateOrEditBudgetScreenArguments(-1)),
               child: Container(
                 width: 60,
                 height: 60,

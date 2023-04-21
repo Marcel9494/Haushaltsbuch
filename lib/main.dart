@@ -9,11 +9,13 @@ import '/utils/consts/route_consts.dart';
 import 'models/booking.dart';
 import 'models/account.dart';
 import 'models/categorie.dart';
+import 'models/budget.dart';
 import 'models/enums/transaction_types.dart';
 import 'models/screen_arguments/bottom_nav_bar_screen_arguments.dart';
 import 'models/screen_arguments/account_details_screen_arguments.dart';
 import 'models/screen_arguments/create_or_edit_account_screen_arguments.dart';
 import 'models/screen_arguments/create_or_edit_booking_screen_arguments.dart';
+import 'models/screen_arguments/create_or_edit_budget_screen_arguments.dart';
 import 'models/screen_arguments/create_or_edit_categorie_screen_arguments.dart';
 
 import '/components/bottom_nav_bar/bottom_nav_bar.dart';
@@ -24,6 +26,7 @@ import '/screens/create_or_edit_account_screen.dart';
 import '/screens/create_or_edit_categorie_screen.dart';
 import '/screens/categories_screen.dart';
 import '/screens/account_details_screen.dart';
+import '/screens/create_or_edit_budget_screen.dart';
 
 void main() async {
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
@@ -33,6 +36,7 @@ void main() async {
   Hive.registerAdapter(BookingAdapter());
   Hive.registerAdapter(AccountAdapter());
   Hive.registerAdapter(CategorieAdapter());
+  Hive.registerAdapter(BudgetAdapter());
   Hive.registerAdapter(TransactionTypeAdapter());
   runApp(const BudgetBookApp());
 }
@@ -107,6 +111,14 @@ class BudgetBookApp extends StatelessWidget {
               builder: (BuildContext context) => CreateOrEditCategorieScreen(
                 categorieName: args.categorieName,
                 categorieType: args.categorieType,
+              ),
+              settings: settings,
+            );
+          case createOrEditBudgetRoute:
+            final args = settings.arguments as CreateOrEditBudgetScreenArguments;
+            return MaterialPageRoute<String>(
+              builder: (BuildContext context) => CreateOrEditBudgetScreen(
+                budgetBoxIndex: args.budgetBoxIndex,
               ),
               settings: settings,
             );
