@@ -34,7 +34,9 @@ class _CreateOrEditBudgetScreenState extends State<CreateOrEditBudgetScreen> {
   void _createOrUpdateBudget() {
     Budget budget = Budget()
       ..categorie = _categorieTextController.text
-      ..budget = formatMoneyAmountToDouble(_budgetTextController.text);
+      ..budget = formatMoneyAmountToDouble(_budgetTextController.text)
+      ..currentAmount = 0.0
+      ..percentage = 0.0;
     budget.createBudget(budget);
     _setSaveButtonAnimation(true);
     Timer(const Duration(milliseconds: 1000), () {

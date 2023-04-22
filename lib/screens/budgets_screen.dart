@@ -17,6 +17,7 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
 
   Future<List<Budget>> _loadBudgetList() async {
     _budgetList = await Budget.loadBudgets();
+    _budgetList[0].
     return _budgetList;
   }
 

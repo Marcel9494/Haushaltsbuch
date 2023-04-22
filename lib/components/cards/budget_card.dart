@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:percent_indicator/percent_indicator.dart';
 
 import '/models/budget.dart';
 
@@ -34,22 +35,31 @@ class BudgetCard extends StatelessWidget {
                 textAlign: TextAlign.center,
                 text: TextSpan(
                   children: [
-                    const WidgetSpan(
+                    WidgetSpan(
                       child: Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 10.0),
-                        child: Text('TODO'),
+                        padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                        child: Text(budget.categorie),
                       ),
                     ),
                     TextSpan(
-                      text: formatToMoneyAmount(budget.budget.toString()),
+                      text: '0,00 € / ${formatToMoneyAmount(budget.budget.toString())}',
                     ),
                   ],
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.only(top: 16.0, bottom: 16.0, right: 16.0),
-                child: Text(budget.categorie),
-              ),
+                padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 16.0),
+                child: CircularPercentIndicator(
+                  radius: 24.0,
+                  lineWidth: 4.5,
+                  percent: 0.8,
+                  center: const Text('100%', style: TextStyle(fontSize: 12.0)),
+                  progressColor: Colors.cyanAccent,
+                  backgroundWidth: 2.0,
+                  animation: true,
+                  animateFromLastPercent: true,
+                ),
+              )
             ],
           ),
         ),

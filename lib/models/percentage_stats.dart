@@ -39,9 +39,9 @@ class PercentageStats {
     return percentageStats;
   }
 
-  static List<PercentageStats> calculatePercentage(List<PercentageStats> percentageStats, double totalExpenditures) {
+  static List<PercentageStats> calculatePercentage(List<PercentageStats> percentageStats, double total) {
     for (int i = 0; i < percentageStats.length; i++) {
-      percentageStats[i].percentage = (formatMoneyAmountToDouble(percentageStats[i].amount) * 100) / totalExpenditures;
+      percentageStats[i].percentage = (formatMoneyAmountToDouble(percentageStats[i].amount) * 100) / total;
     }
     return percentageStats;
   }
