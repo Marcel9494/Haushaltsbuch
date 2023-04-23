@@ -31,11 +31,13 @@ class _CreateOrEditBudgetScreenState extends State<CreateOrEditBudgetScreen> {
   String _categorieErrorText = '';
   String _budgetErrorText = '';
 
+  // TODO hier weitermachen und verhindern das für eine Kategorie mehrmals ein Budget angelegt wird.
+  // Idee: Überhaupt nicht mehr anbieten, wenn bereits ein Budget erstellt wurde?
   void _createOrUpdateBudget() {
     Budget budget = Budget()
       ..categorie = _categorieTextController.text
       ..budget = formatMoneyAmountToDouble(_budgetTextController.text)
-      ..currentAmount = 0.0
+      ..currentExpenditure = 0.0
       ..percentage = 0.0;
     budget.createBudget(budget);
     _setSaveButtonAnimation(true);

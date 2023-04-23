@@ -144,13 +144,23 @@ class Booking extends HiveObject {
   }
 
   static double getExpenditures(List<Booking> bookingList) {
-    double _expenditures = 0.0;
+    double expenditures = 0.0;
     for (int i = 0; i < bookingList.length; i++) {
       if (bookingList[i].transactionType == TransactionType.outcome.name) {
-        _expenditures += formatMoneyAmountToDouble(bookingList[i].amount);
+        expenditures += formatMoneyAmountToDouble(bookingList[i].amount);
       }
     }
-    return _expenditures;
+    return expenditures;
+  }
+
+  static double getCategorieExpenditures(List<Booking> bookingList, String categorie) {
+    double categorieExpenditures = 0.0;
+    for (int i = 0; i < bookingList.length; i++) {
+      if (bookingList[i].transactionType == TransactionType.outcome.name && bookingList[i].categorie == categorie) {
+        categorieExpenditures += formatMoneyAmountToDouble(bookingList[i].amount);
+      }
+    }
+    return categorieExpenditures;
   }
 
   static double getInvestments(List<Booking> bookingList) {

@@ -1,3 +1,4 @@
+import 'package:haushaltsbuch/models/booking.dart';
 import 'package:hive/hive.dart';
 
 import '/utils/consts/hive_consts.dart';
@@ -25,20 +26,21 @@ class Budget extends HiveObject {
       budget.boxIndex = i;
       budgetList.add(budget);
     }
-    budgetList.sort((first, second) => first.categorie.compareTo(second.categorie));
+    budgetList.sort((first, second) => second.percentage.compareTo(first.percentage));
     return budgetList;
   }
 
-  Future<double> calculateCurrentExpenditure() async {
-    var budgetBox = await Hive.openBox(budgetsBox);
-    var bookingBox = await Hive.openBox(bookingsBox);
-    // TODO hier weitermachen
-    return 0.0;
+  static Future<List<Budget>> calculateCurrentExpenditure(List<Budget> budgetList) async {
+    List<Booking> bookingList = await Booking.loadMonthlyBookingList(4, 2023);
+    for (int i = 0; i < budgetList.length; i++) {
+      budgetList[i].currentExpenditure = Booking.getCategorieExpenditures(bookingList, budgetList[i].categorie);
+    }
+    return budgetList;
   }
 
-  static List<Budget> calculateBudgetPercentage(List<Budget> budgetList, double budgetAmount) {
+  static List<Budget> calculateBudgetPercentage(List<Budget> budgetList) {
     for (int i = 0; i < budgetList.length; i++) {
-      budgetList[i].percentage = (budgetList[i].currentExpenditure * 100) / budgetAmount;
+      budgetList[i].percentage = (budgetList[i].currentExpenditure * 100) / budgetList[i].budget;
     }
     return budgetList;
   }

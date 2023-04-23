@@ -26,7 +26,7 @@ class BudgetCard extends StatelessWidget {
         ),
         child: Container(
           decoration: const BoxDecoration(
-            border: Border(left: BorderSide(color: Colors.cyanAccent /* TODO dynamische Farbe implementieren */, width: 6)),
+            border: Border(left: BorderSide(color: Colors.cyanAccent /* TODO dynamische Farbe implementieren */, width: 6.0)),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -42,7 +42,7 @@ class BudgetCard extends StatelessWidget {
                       ),
                     ),
                     TextSpan(
-                      text: '0,00 € / ${formatToMoneyAmount(budget.budget.toString())}',
+                      text: '${formatToMoneyAmount(budget.currentExpenditure.toString())} / ${formatToMoneyAmount(budget.budget.toString())}',
                     ),
                   ],
                 ),
@@ -52,9 +52,13 @@ class BudgetCard extends StatelessWidget {
                 child: CircularPercentIndicator(
                   radius: 24.0,
                   lineWidth: 4.5,
-                  percent: 0.8,
-                  center: const Text('100%', style: TextStyle(fontSize: 12.0)),
-                  progressColor: Colors.cyanAccent,
+                  percent: budget.percentage / 100,
+                  center: Text('${budget.percentage.toStringAsFixed(1)}%', style: const TextStyle(fontSize: 12.0)),
+                  progressColor: budget.percentage < 80.0
+                      ? Colors.greenAccent
+                      : budget.percentage < 100.0
+                          ? Colors.yellowAccent
+                          : Colors.redAccent,
                   backgroundWidth: 2.0,
                   animation: true,
                   animateFromLastPercent: true,
