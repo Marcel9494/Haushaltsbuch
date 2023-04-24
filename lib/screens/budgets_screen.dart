@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../components/buttons/month_picker_buttons.dart';
 import '/components/cards/budget_card.dart';
 import '/components/deco/loading_indicator.dart';
 
@@ -14,10 +15,11 @@ class BudgetsScreen extends StatefulWidget {
 
 class _BudgetsScreenState extends State<BudgetsScreen> {
   List<Budget> _budgetList = [];
+  DateTime _selectedDate = DateTime.now();
 
   Future<List<Budget>> _loadBudgetList() async {
-    _budgetList = await Budget.loadBudgets();
-    _budgetList = await Budget.calculateCurrentExpenditure(_budgetList);
+    _budgetList = await Budget.loadMonthlyBudgetList(_selectedDate);
+    _budgetList = await Budget.calculateCurrentExpenditure(_budgetList, _selectedDate);
     _budgetList = Budget.calculateBudgetPercentage(_budgetList);
     return _budgetList;
   }
@@ -31,6 +33,12 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
       body: Center(
         child: Column(
           children: [
+            Row(children: [
+              SizedBox(
+                width: MediaQuery.of(context).size.width / 2,
+                child: MonthPickerButtons(selectedDate: _selectedDate, selectedDateCallback: (selectedDate) => setState(() => _selectedDate = selectedDate)),
+              ),
+            ]),
             FutureBuilder(
               future: _loadBudgetList(),
               builder: (BuildContext context, AsyncSnapshot<List<Budget>> snapshot) {

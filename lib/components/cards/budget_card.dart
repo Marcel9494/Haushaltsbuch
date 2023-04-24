@@ -25,8 +25,16 @@ class BudgetCard extends StatelessWidget {
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14.0)),
         ),
         child: Container(
-          decoration: const BoxDecoration(
-            border: Border(left: BorderSide(color: Colors.cyanAccent /* TODO dynamische Farbe implementieren */, width: 6.0)),
+          decoration: BoxDecoration(
+            border: Border(
+              left: BorderSide(
+                  color: budget.percentage < 80.0
+                      ? Colors.greenAccent
+                      : budget.percentage < 100.0
+                          ? Colors.yellowAccent
+                          : Colors.redAccent,
+                  width: 6.0),
+            ),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -50,10 +58,10 @@ class BudgetCard extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 16.0),
                 child: CircularPercentIndicator(
-                  radius: 24.0,
-                  lineWidth: 4.5,
-                  percent: budget.percentage / 100,
-                  center: Text('${budget.percentage.toStringAsFixed(1)}%', style: const TextStyle(fontSize: 12.0)),
+                  radius: 26.0,
+                  lineWidth: 4.0,
+                  percent: budget.percentage / 100 >= 1.0 ? 1.0 : budget.percentage / 100,
+                  center: Text('${budget.percentage.toStringAsFixed(0)} %', style: const TextStyle(fontSize: 12.0)),
                   progressColor: budget.percentage < 80.0
                       ? Colors.greenAccent
                       : budget.percentage < 100.0
