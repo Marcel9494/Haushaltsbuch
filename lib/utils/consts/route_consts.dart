@@ -6,3 +6,4 @@ const createOrEditCategorieRoute = '/createOrEditCategorie';
 const createOrEditBudgetRoute = '/createOrEditBudget';
 const categoriesRoute = '/categories';
 const accountDetailsRoute = '/accountDetails';
+const categorieAmountListRoute = '/categorieAmountList';

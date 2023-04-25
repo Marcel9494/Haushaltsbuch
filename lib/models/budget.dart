@@ -64,6 +64,15 @@ class Budget extends HiveObject {
     }
     return budgetList;
   }
+
+  static Future<double> calculateCompleteBudgetAmount(List<Budget> budgetList, DateTime selectedDate) async {
+    double completeBudgetAmount = 0.0;
+    List<Budget> budgetList = await Budget.loadMonthlyBudgetList(selectedDate);
+    for (int i = 0; i < budgetList.length; i++) {
+      completeBudgetAmount += budgetList[i].budget;
+    }
+    return completeBudgetAmount;
+  }
 }
 
 class BudgetAdapter extends TypeAdapter<Budget> {

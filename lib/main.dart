@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:haushaltsbuch/screens/categorie_amount_list_screen.dart';
 
 import 'package:hive_flutter/adapters.dart';
 
@@ -13,6 +14,7 @@ import 'models/budget.dart';
 import 'models/enums/transaction_types.dart';
 import 'models/screen_arguments/bottom_nav_bar_screen_arguments.dart';
 import 'models/screen_arguments/account_details_screen_arguments.dart';
+import 'models/screen_arguments/categorie_amount_list_screen_arguments.dart';
 import 'models/screen_arguments/create_or_edit_account_screen_arguments.dart';
 import 'models/screen_arguments/create_or_edit_booking_screen_arguments.dart';
 import 'models/screen_arguments/create_or_edit_budget_screen_arguments.dart';
@@ -119,6 +121,14 @@ class BudgetBookApp extends StatelessWidget {
             return MaterialPageRoute<String>(
               builder: (BuildContext context) => CreateOrEditBudgetScreen(
                 budgetBoxIndex: args.budgetBoxIndex,
+              ),
+              settings: settings,
+            );
+          case categorieAmountListRoute:
+            final args = settings.arguments as CategorieAmountListScreenArguments;
+            return MaterialPageRoute<String>(
+              builder: (BuildContext context) => CategorieAmountListScreen(
+                selectedDate: args.selectedDate,
               ),
               settings: settings,
             );
