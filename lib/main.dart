@@ -129,6 +129,7 @@ class BudgetBookApp extends StatelessWidget {
             return MaterialPageRoute<String>(
               builder: (BuildContext context) => CategorieAmountListScreen(
                 selectedDate: args.selectedDate,
+                categorie: args.categorie,
               ),
               settings: settings,
             );

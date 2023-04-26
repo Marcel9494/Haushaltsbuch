@@ -7,16 +7,18 @@ import '/utils/consts/route_consts.dart';
 
 class PercentageCard extends StatelessWidget {
   final PercentageStats percentageStats;
+  final DateTime? selectedDate;
 
   const PercentageCard({
     Key? key,
     required this.percentageStats,
+    this.selectedDate,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => Navigator.pushNamed(context, categorieAmountListRoute, arguments: CategorieAmountListScreenArguments(DateTime(2023, 1, 1))),
+      onTap: () => Navigator.pushNamed(context, categorieAmountListRoute, arguments: CategorieAmountListScreenArguments(selectedDate!, percentageStats.name)),
       child: Card(
         color: const Color(0xff1c2b30),
         shape: RoundedRectangleBorder(

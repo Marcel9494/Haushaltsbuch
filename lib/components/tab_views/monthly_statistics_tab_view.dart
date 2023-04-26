@@ -190,7 +190,7 @@ class _MonthlyStatisticsTabViewState extends State<MonthlyStatisticsTabView> {
                       child: ListView.builder(
                         itemCount: _percentageStats.length,
                         itemBuilder: (BuildContext context, int index) {
-                          return PercentageCard(percentageStats: _percentageStats[index]);
+                          return PercentageCard(percentageStats: _percentageStats[index], selectedDate: widget.selectedDate);
                         },
                       ),
                     ),

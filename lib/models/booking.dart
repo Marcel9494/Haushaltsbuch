@@ -119,14 +119,21 @@ class Booking extends HiveObject {
     return booking;
   }
 
-  static Future<List<Booking>> loadMonthlyBookingList(int selectedMonth, int selectedYear) async {
+  static Future<List<Booking>> loadMonthlyBookingList(int selectedMonth, int selectedYear, [String categorie = '']) async {
     var bookingBox = await Hive.openBox(bookingsBox);
     List<Booking> bookingList = [];
     for (int i = 0; i < bookingBox.length; i++) {
       Booking booking = await bookingBox.getAt(i);
       if (DateTime.parse(booking.date).month == selectedMonth && DateTime.parse(booking.date).year == selectedYear) {
-        booking.boxIndex = i;
-        bookingList.add(booking);
+        if (categorie == '') {
+          booking.boxIndex = i;
+          bookingList.add(booking);
+        } else {
+          if (categorie == booking.categorie) {
+            booking.boxIndex = i;
+            bookingList.add(booking);
+          }
+        }
       }
     }
     bookingList.sort((first, second) => second.date.compareTo(first.date));
