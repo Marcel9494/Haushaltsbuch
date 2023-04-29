@@ -83,12 +83,14 @@ class BudgetAdapter extends TypeAdapter<Budget> {
   Budget read(BinaryReader reader) {
     return Budget()
       ..categorie = reader.read()
-      ..budget = reader.read();
+      ..budget = reader.read()
+      ..budgetDate = reader.read();
   }
 
   @override
   void write(BinaryWriter writer, Budget obj) {
     writer.write(obj.categorie);
     writer.write(obj.budget);
+    writer.write(obj.budgetDate);
   }
 }

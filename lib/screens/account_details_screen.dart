@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../components/buttons/month_picker_buttons.dart';
 import '/components/dialogs/choice_dialog.dart';
+import '/components/tab_views/monthly_booking_tab_view.dart';
 
 import '/utils/consts/route_consts.dart';
 
@@ -21,6 +23,8 @@ class AccountDetailsScreen extends StatefulWidget {
 }
 
 class _AccountDetailsScreenState extends State<AccountDetailsScreen> {
+  DateTime _selectedDate = DateTime.now();
+
   void _deleteAccount() {
     showChoiceDialog(context, 'Konto löschen?', _yesPressed, _noPressed, 'Konto wurde gelöscht', 'Konto ${widget.account.name} wurde erfolgreich gelöscht.', Icons.info_outline);
   }
@@ -60,7 +64,16 @@ class _AccountDetailsScreenState extends State<AccountDetailsScreen> {
           ),
         ],
       ),
-      body: const Text('Account Details'),
+      body: Column(
+        children: [
+          MonthPickerButtons(selectedDate: _selectedDate, selectedDateCallback: (selectedDate) => setState(() => _selectedDate = selectedDate)),
+          MonthlyBookingTabView(
+            selectedDate: _selectedDate,
+            categorie: '',
+            account: widget.account.name,
+          ),
+        ],
+      ),
     );
   }
 }

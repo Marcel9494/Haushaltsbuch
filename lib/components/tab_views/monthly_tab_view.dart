@@ -77,7 +77,7 @@ class _MonthlyTabViewState extends State<MonthlyTabView> {
             ],
           ),
           _selectedTabOption[0]
-              ? MonthlyBookingTabView(selectedDate: _selectedDate, categorie: '')
+              ? MonthlyBookingTabView(selectedDate: _selectedDate, categorie: '', account: '')
               : _selectedTabOption[1]
                   ? MonthlyStatisticsTabView(selectedDate: _selectedDate)
                   : const MonthlyBudgetTabView(),

@@ -26,6 +26,7 @@ class _CategorieAmountListScreenState extends State<CategorieAmountListScreen> {
           MonthlyBookingTabView(
             selectedDate: widget.selectedDate,
             categorie: widget.categorie,
+            account: '',
           ),
         ],
       ),

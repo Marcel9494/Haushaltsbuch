@@ -23,7 +23,7 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
     _budgetList = await Budget.loadMonthlyBudgetList(_selectedDate);
     _budgetList = await Budget.calculateCurrentExpenditure(_budgetList, _selectedDate);
     _budgetList = Budget.calculateBudgetPercentage(_budgetList);
-    _completeBudgetAmount = await Budget.calculateCompleteBudgetAmount(_budgetList, _selectedDate);
+    // TODO _completeBudgetAmount = await Budget.calculateCompleteBudgetAmount(_budgetList, _selectedDate);
     return _budgetList;
   }
 

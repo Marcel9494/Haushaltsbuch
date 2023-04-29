@@ -15,6 +15,7 @@ class BudgetCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // TODO hier weitermachen und GestureDetector einführen siehe als Beispiel percentage_card.dart
     return Card(
       color: const Color(0xff1c2b30),
       shape: RoundedRectangleBorder(
