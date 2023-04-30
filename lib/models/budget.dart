@@ -1,19 +1,20 @@
-import 'package:haushaltsbuch/models/booking.dart';
 import 'package:hive/hive.dart';
+
+import '/models/booking.dart';
 
 import '/utils/consts/hive_consts.dart';
 
 @HiveType(typeId: 5)
 class Budget extends HiveObject {
   late int boxIndex;
+  late double currentExpenditure;
+  late double percentage;
   @HiveField(0)
   late String categorie;
   @HiveField(1)
   late double budget;
   @HiveField(2)
   late String budgetDate;
-  late double currentExpenditure;
-  late double percentage;
 
   Budget createBudgetInstance(Budget newBudget) {
     return Budget()

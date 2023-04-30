@@ -31,6 +31,7 @@ class _CreateOrEditBudgetScreenState extends State<CreateOrEditBudgetScreen> {
   String _categorieErrorText = '';
   String _budgetErrorText = '';
 
+  // TODO hier weitermachen und Fehler (leere Eingabefelder) abfangen
   // TODO hier weitermachen und verhindern das für eine Kategorie mehrmals ein Budget angelegt wird.
   // Idee: Überhaupt nicht mehr anbieten, wenn bereits ein Budget erstellt wurde?
   void _createOrUpdateBudget() {

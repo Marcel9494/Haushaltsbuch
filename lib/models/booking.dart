@@ -124,26 +124,11 @@ class Booking extends HiveObject {
     List<Booking> bookingList = [];
     for (int i = 0; i < bookingBox.length; i++) {
       Booking booking = await bookingBox.getAt(i);
-      if (DateTime.parse(booking.date).month == selectedMonth && DateTime.parse(booking.date).year == selectedYear) {
-        if (account == '') {
-          booking.boxIndex = i;
-          bookingList.add(booking);
-        } else if (account != '') {
-          if (account == booking.fromAccount) {
-            booking.boxIndex = i;
-            bookingList.add(booking);
-          }
-        } else {
-          if (categorie == '') {
-            booking.boxIndex = i;
-            bookingList.add(booking);
-          } else {
-            if (categorie == booking.categorie) {
-              booking.boxIndex = i;
-              bookingList.add(booking);
-            }
-          }
-        }
+      if ((DateTime.parse(booking.date).month == selectedMonth && DateTime.parse(booking.date).year == selectedYear && categorie == '' && account == '') ||
+          (DateTime.parse(booking.date).month == selectedMonth && DateTime.parse(booking.date).year == selectedYear && categorie != '' && booking.categorie == categorie) ||
+          (DateTime.parse(booking.date).month == selectedMonth && DateTime.parse(booking.date).year == selectedYear && account != '' && booking.fromAccount == account)) {
+        booking.boxIndex = i;
+        bookingList.add(booking);
       }
     }
     bookingList.sort((first, second) => second.date.compareTo(first.date));

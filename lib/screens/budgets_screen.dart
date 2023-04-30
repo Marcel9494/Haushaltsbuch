@@ -67,7 +67,7 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
                           child: ListView.builder(
                             itemCount: _budgetList.length,
                             itemBuilder: (BuildContext context, int index) {
-                              return BudgetCard(budget: _budgetList[index]);
+                              return BudgetCard(budget: _budgetList[index], selectedDate: _selectedDate);
                             },
                           ),
                         ),
