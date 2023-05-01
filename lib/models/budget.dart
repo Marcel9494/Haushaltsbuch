@@ -59,6 +59,15 @@ class Budget extends HiveObject {
     return budgetList;
   }
 
+  static Future<double> calculateCompleteBudgetExpenditures(List<Budget> budgetList, DateTime selectedDate) async {
+    double completeBudgetExpenditures = 0.0;
+    List<Budget> categorieBudgetList = await calculateCurrentExpenditure(budgetList, selectedDate);
+    for (int j = 0; j < categorieBudgetList.length; j++) {
+      completeBudgetExpenditures += categorieBudgetList[j].currentExpenditure;
+    }
+    return completeBudgetExpenditures;
+  }
+
   static List<Budget> calculateBudgetPercentage(List<Budget> budgetList) {
     for (int i = 0; i < budgetList.length; i++) {
       budgetList[i].percentage = (budgetList[i].currentExpenditure * 100) / budgetList[i].budget;

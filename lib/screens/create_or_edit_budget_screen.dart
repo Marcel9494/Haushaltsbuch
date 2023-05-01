@@ -31,10 +31,13 @@ class _CreateOrEditBudgetScreenState extends State<CreateOrEditBudgetScreen> {
   String _categorieErrorText = '';
   String _budgetErrorText = '';
 
-  // TODO hier weitermachen und Fehler (leere Eingabefelder) abfangen
   // TODO hier weitermachen und verhindern das für eine Kategorie mehrmals ein Budget angelegt wird.
-  // Idee: Überhaupt nicht mehr anbieten, wenn bereits ein Budget erstellt wurde?
+  // Idee: Überhaupt nicht mehr anbieten, wenn bereits ein Budget erstellt wurde oder bestehendes Budget updaten?
   void _createOrUpdateBudget() {
+    if (_validCategorie(_categorieTextController.text) == false || _validBudget(_budgetTextController.text) == false) {
+      _setSaveButtonAnimation(false);
+      return;
+    }
     Budget budget = Budget()
       ..categorie = _categorieTextController.text
       ..budget = formatMoneyAmountToDouble(_budgetTextController.text)
@@ -51,6 +54,28 @@ class _CreateOrEditBudgetScreenState extends State<CreateOrEditBudgetScreen> {
         Navigator.pushNamed(context, bottomNavBarRoute, arguments: BottomNavBarScreenArguments(1));
       }
     });
+  }
+
+  bool _validCategorie(String categorieInput) {
+    if (_categorieTextController.text.isEmpty) {
+      setState(() {
+        _categorieErrorText = 'Bitte wählen Sie eine Kategorie aus.';
+      });
+      return false;
+    }
+    _categorieErrorText = '';
+    return true;
+  }
+
+  bool _validBudget(String budgetInput) {
+    if (_budgetTextController.text.isEmpty) {
+      setState(() {
+        _budgetErrorText = 'Bitte geben Sie ein Budget ein.';
+      });
+      return false;
+    }
+    _budgetErrorText = '';
+    return true;
   }
 
   void _setSaveButtonAnimation(bool successful) {

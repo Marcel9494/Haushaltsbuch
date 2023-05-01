@@ -87,37 +87,37 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
         _validFromAccount(_fromAccountTextController.text) == false ||
         _validToAccount(_toAccountTextController.text) == false) {
       _setSaveButtonAnimation(false);
-    } else {
-      Booking booking = Booking()
-        ..transactionType = _currentTransaction
-        ..bookingRepeats = _bookingRepeat
-        ..title = _title
-        ..date = _parsedBookingDate.toString()
-        ..amount = _amountTextController.text
-        ..categorie = _categorieTextController.text
-        ..fromAccount = _fromAccountTextController.text
-        ..toAccount = _toAccountTextController.text;
-      if (_currentTransaction == TransactionType.transfer.name || _currentTransaction == TransactionType.investment.name) {
-        Account.transferMoney(_fromAccountTextController.text, _toAccountTextController.text, _amountTextController.text);
-      } else {
-        Account.calculateNewAccountBalance(_fromAccountTextController.text, _amountTextController.text, _currentTransaction);
-      }
-      if (widget.bookingBoxIndex == -1) {
-        booking.createBooking(booking);
-      } else {
-        Account.undoneAccountBooking(_loadedBooking);
-        booking.updateBooking(booking, widget.bookingBoxIndex);
-      }
-      _setSaveButtonAnimation(true);
-      Timer(const Duration(milliseconds: 1000), () {
-        if (mounted) {
-          FocusScope.of(context).requestFocus(FocusNode());
-          Navigator.pop(context);
-          Navigator.pop(context);
-          Navigator.pushNamed(context, bottomNavBarRoute, arguments: BottomNavBarScreenArguments(0));
-        }
-      });
+      return;
     }
+    Booking booking = Booking()
+      ..transactionType = _currentTransaction
+      ..bookingRepeats = _bookingRepeat
+      ..title = _title
+      ..date = _parsedBookingDate.toString()
+      ..amount = _amountTextController.text
+      ..categorie = _categorieTextController.text
+      ..fromAccount = _fromAccountTextController.text
+      ..toAccount = _toAccountTextController.text;
+    if (_currentTransaction == TransactionType.transfer.name || _currentTransaction == TransactionType.investment.name) {
+      Account.transferMoney(_fromAccountTextController.text, _toAccountTextController.text, _amountTextController.text);
+    } else {
+      Account.calculateNewAccountBalance(_fromAccountTextController.text, _amountTextController.text, _currentTransaction);
+    }
+    if (widget.bookingBoxIndex == -1) {
+      booking.createBooking(booking);
+    } else {
+      Account.undoneAccountBooking(_loadedBooking);
+      booking.updateBooking(booking, widget.bookingBoxIndex);
+    }
+    _setSaveButtonAnimation(true);
+    Timer(const Duration(milliseconds: 1000), () {
+      if (mounted) {
+        FocusScope.of(context).requestFocus(FocusNode());
+        Navigator.pop(context);
+        Navigator.pop(context);
+        Navigator.pushNamed(context, bottomNavBarRoute, arguments: BottomNavBarScreenArguments(0));
+      }
+    });
   }
 
   bool _validBookingAmount(String amountInput) {

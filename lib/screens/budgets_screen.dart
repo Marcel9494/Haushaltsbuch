@@ -16,14 +16,19 @@ class BudgetsScreen extends StatefulWidget {
 class _BudgetsScreenState extends State<BudgetsScreen> {
   List<Budget> _budgetList = [];
   DateTime _selectedDate = DateTime.now();
-  // TODO hier weitermachen und oben das Gesamtbudget und die bisherigen Gesamtausgaben anzeigen lassen als Card
+
   double _completeBudgetAmount = 0.0;
+  double _completeBudgetExpenditures = 0.0;
 
   Future<List<Budget>> _loadBudgetList() async {
     _budgetList = await Budget.loadMonthlyBudgetList(_selectedDate);
     _budgetList = await Budget.calculateCurrentExpenditure(_budgetList, _selectedDate);
     _budgetList = Budget.calculateBudgetPercentage(_budgetList);
-    // TODO _completeBudgetAmount = await Budget.calculateCompleteBudgetAmount(_budgetList, _selectedDate);
+    _completeBudgetAmount = await Budget.calculateCompleteBudgetAmount(_budgetList, _selectedDate);
+    _completeBudgetExpenditures = await Budget.calculateCompleteBudgetExpenditures(_budgetList, _selectedDate);
+    // TODO hier weitermachen und oben das Gesamtbudget und die bisherigen Gesamtausgaben anzeigen lassen als Card
+    print('Budget: ' + _completeBudgetAmount.toString());
+    print('Ausgaben: ' + _completeBudgetExpenditures.toString());
     return _budgetList;
   }
 
