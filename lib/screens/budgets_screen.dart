@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:percent_indicator/circular_percent_indicator.dart';
 
 import '../components/buttons/month_picker_buttons.dart';
 import '/components/cards/budget_card.dart';
@@ -16,9 +17,9 @@ class BudgetsScreen extends StatefulWidget {
 class _BudgetsScreenState extends State<BudgetsScreen> {
   List<Budget> _budgetList = [];
   DateTime _selectedDate = DateTime.now();
-
   double _completeBudgetAmount = 0.0;
   double _completeBudgetExpenditures = 0.0;
+  double _completeBudgetPercentage = 0.0;
 
   Future<List<Budget>> _loadBudgetList() async {
     _budgetList = await Budget.loadMonthlyBudgetList(_selectedDate);
@@ -26,9 +27,9 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
     _budgetList = Budget.calculateBudgetPercentage(_budgetList);
     _completeBudgetAmount = await Budget.calculateCompleteBudgetAmount(_budgetList, _selectedDate);
     _completeBudgetExpenditures = await Budget.calculateCompleteBudgetExpenditures(_budgetList, _selectedDate);
-    // TODO hier weitermachen und oben das Gesamtbudget und die bisherigen Gesamtausgaben anzeigen lassen als Card
-    print('Budget: ' + _completeBudgetAmount.toString());
-    print('Ausgaben: ' + _completeBudgetExpenditures.toString());
+    // TODO hier weitermachen und Gesamtbudget richtig berechnen und Code verbessern (Berechnung in Methode auslagern)
+    _completeBudgetPercentage = (_completeBudgetExpenditures * 100) / _completeBudgetAmount;
+    _budgetList.sort((first, second) => second.percentage.compareTo(first.percentage));
     return _budgetList;
   }
 
@@ -41,12 +42,28 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
       body: Center(
         child: Column(
           children: [
-            Row(children: [
-              SizedBox(
-                width: MediaQuery.of(context).size.width / 2,
-                child: MonthPickerButtons(selectedDate: _selectedDate, selectedDateCallback: (selectedDate) => setState(() => _selectedDate = selectedDate)),
-              ),
-            ]),
+            Row(
+              children: [
+                SizedBox(
+                  width: MediaQuery.of(context).size.width / 2,
+                  child: MonthPickerButtons(selectedDate: _selectedDate, selectedDateCallback: (selectedDate) => setState(() => _selectedDate = selectedDate)),
+                ),
+              ],
+            ),
+            CircularPercentIndicator(
+              radius: 36.0,
+              lineWidth: 4.0,
+              percent: _completeBudgetPercentage / 100 >= 1.0 ? 1.0 : _completeBudgetPercentage / 100,
+              center: Text('${_completeBudgetPercentage.toString()} %', style: const TextStyle(fontSize: 12.0)),
+              progressColor: _completeBudgetPercentage < 80.0
+                  ? Colors.greenAccent
+                  : _completeBudgetPercentage < 100.0
+                      ? Colors.yellowAccent
+                      : Colors.redAccent,
+              backgroundWidth: 2.0,
+              animation: true,
+              animateFromLastPercent: true,
+            ),
             FutureBuilder(
               future: _loadBudgetList(),
               builder: (BuildContext context, AsyncSnapshot<List<Budget>> snapshot) {

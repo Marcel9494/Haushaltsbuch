@@ -47,7 +47,6 @@ class Budget extends HiveObject {
         budgetList.add(budget);
       }
     }
-    budgetList.sort((first, second) => second.percentage.compareTo(first.percentage));
     return budgetList;
   }
 
