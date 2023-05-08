@@ -37,6 +37,40 @@ class Budget extends HiveObject {
     }
   }
 
+  static Future<List<Budget>> loadAllBudgetCategories() async {
+    var budgetBox = await Hive.openBox(budgetsBox);
+    List<Budget> budgetList = [];
+    bool categorieAlreadyInBudgetList = false;
+    for (int i = 0; i < budgetBox.length; i++) {
+      Budget budget = await budgetBox.getAt(i);
+      for (int j = 0; j < budgetList.length; j++) {
+        if (budgetList[j].categorie == budget.categorie) {
+          categorieAlreadyInBudgetList = true;
+          break;
+        }
+      }
+      if (categorieAlreadyInBudgetList) {
+        break;
+      }
+      budget.boxIndex = i;
+      budgetList.add(budget);
+    }
+    return budgetList;
+  }
+
+  static Future<List<Budget>> loadOneBudgetCategorie(String budgetCategorie) async {
+    var budgetBox = await Hive.openBox(budgetsBox);
+    List<Budget> budgetList = [];
+    for (int i = 0; i < budgetBox.length; i++) {
+      Budget budget = await budgetBox.getAt(i);
+      if (budget.categorie == budgetCategorie) {
+        budget.boxIndex = i;
+        budgetList.add(budget);
+      }
+    }
+    return budgetList;
+  }
+
   static Future<List<Budget>> loadMonthlyBudgetList(DateTime selectedDate) async {
     var budgetBox = await Hive.openBox(budgetsBox);
     List<Budget> budgetList = [];

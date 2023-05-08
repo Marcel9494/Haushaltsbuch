@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:haushaltsbuch/screens/categorie_amount_list_screen.dart';
-
+import 'package:haushaltsbuch/screens/edit_budget_screen.dart';
 import 'package:hive_flutter/adapters.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 import '/utils/consts/route_consts.dart';
 
@@ -12,6 +11,7 @@ import 'models/account.dart';
 import 'models/categorie.dart';
 import 'models/budget.dart';
 import 'models/enums/transaction_types.dart';
+import 'models/screen_arguments/edit_budget_screen_arguments.dart';
 import 'models/screen_arguments/bottom_nav_bar_screen_arguments.dart';
 import 'models/screen_arguments/account_details_screen_arguments.dart';
 import 'models/screen_arguments/categorie_amount_list_screen_arguments.dart';
@@ -22,6 +22,7 @@ import 'models/screen_arguments/create_or_edit_categorie_screen_arguments.dart';
 
 import '/components/bottom_nav_bar/bottom_nav_bar.dart';
 
+import '/screens/overview_budgets_screen.dart';
 import '/screens/introduction_screens.dart';
 import '/screens/create_or_edit_booking_screen.dart';
 import '/screens/create_or_edit_account_screen.dart';
@@ -29,6 +30,7 @@ import '/screens/create_or_edit_categorie_screen.dart';
 import '/screens/categories_screen.dart';
 import '/screens/account_details_screen.dart';
 import '/screens/create_or_edit_budget_screen.dart';
+import '/screens/categorie_amount_list_screen.dart';
 
 void main() async {
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
@@ -72,6 +74,7 @@ class BudgetBookApp extends StatelessWidget {
       home: const IntroductionScreens(),
       routes: {
         categoriesRoute: (context) => const CategoriesScreen(),
+        overviewBudgetsRoute: (context) => const OverviewBudgetsScreen(),
       },
       onGenerateRoute: (RouteSettings settings) {
         switch (settings.name) {
@@ -121,6 +124,14 @@ class BudgetBookApp extends StatelessWidget {
             return MaterialPageRoute<String>(
               builder: (BuildContext context) => CreateOrEditBudgetScreen(
                 budgetBoxIndex: args.budgetBoxIndex,
+              ),
+              settings: settings,
+            );
+          case editBudgetRoute:
+            final args = settings.arguments as EditBudgetScreenArguments;
+            return MaterialPageRoute<String>(
+              builder: (BuildContext context) => EditBudgetScreen(
+                budget: args.budget,
               ),
               settings: settings,
             );

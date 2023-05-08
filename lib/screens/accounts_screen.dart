@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:haushaltsbuch/components/tab_views/asset_allocation_statistic_tab_view.dart';
+
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
-import '../components/tab_views/asset_development_statistic_tab_view.dart';
-
+import '/components/tab_views/asset_development_statistic_tab_view.dart';
+import '/components/tab_views/asset_allocation_statistic_tab_view.dart';
 import '/components/tab_views/account_overview_tab_view.dart';
 import '/components/deco/bottom_sheet_line.dart';
 import '/components/deco/loading_indicator.dart';

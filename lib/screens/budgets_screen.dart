@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 
+import '../utils/consts/route_consts.dart';
 import '/components/cards/budget_card.dart';
 import '/components/deco/loading_indicator.dart';
 import '/components/buttons/month_picker_buttons.dart';
@@ -44,6 +45,12 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Budgets'),
+        actions: [
+          IconButton(
+            onPressed: () => Navigator.pushNamed(context, overviewBudgetsRoute),
+            icon: const Icon(Icons.edit_rounded),
+          ),
+        ],
       ),
       body: Center(
         child: Column(

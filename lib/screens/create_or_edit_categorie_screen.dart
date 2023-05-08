@@ -106,15 +106,13 @@ class _CreateOrEditCategorieScreenState extends State<CreateOrEditCategorieScree
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        backgroundColor: const Color(0x00ffffff),
         appBar: AppBar(
           title: widget.categorieName == '' ? const Text('Kategorie erstellen') : const Text('Kategorie bearbeiten'),
-          backgroundColor: const Color(0x00ffffff),
         ),
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 24.0),
           child: Card(
-            color: const Color(0x1fffffff),
+            color: const Color(0xff1c2b30),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(18.0),
             ),

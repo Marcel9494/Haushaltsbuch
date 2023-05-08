@@ -91,15 +91,13 @@ class _CreateOrEditBudgetScreenState extends State<CreateOrEditBudgetScreen> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        backgroundColor: const Color(0x00ffffff),
         appBar: AppBar(
           title: const Text('Budget erstellen'),
-          backgroundColor: const Color(0x00ffffff),
         ),
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 24.0),
           child: Card(
-            color: const Color(0x1fffffff),
+            color: const Color(0xff1c2b30),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(18.0),
             ),

@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 
-import '../components/deco/loading_indicator.dart';
+import '/components/deco/loading_indicator.dart';
 import '/components/input_fields/account_type_input_field.dart';
 import '/components/input_fields/money_input_field.dart';
 import '/components/input_fields/text_input_field.dart';
@@ -142,15 +142,13 @@ class _CreateOrEditAccountScreenState extends State<CreateOrEditAccountScreen> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        backgroundColor: const Color(0x00ffffff),
         appBar: AppBar(
           title: widget.accountBoxIndex == -1 ? const Text('Konto erstellen') : const Text('Konto bearbeiten'),
-          backgroundColor: const Color(0x00ffffff),
         ),
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 24.0),
           child: Card(
-            color: const Color(0x1fffffff),
+            color: const Color(0xff1c2b30),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(18.0),
             ),
