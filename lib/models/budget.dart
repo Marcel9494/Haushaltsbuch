@@ -37,11 +37,28 @@ class Budget extends HiveObject {
     }
   }
 
+  void deleteBudget(Budget deleteBudget) async {
+    var budgetBox = await Hive.openBox(budgetsBox);
+    for (int i = 0; i < budgetBox.length; i++) {
+      Budget budget = await budgetBox.getAt(i);
+      if (deleteBudget.categorie == budget.categorie) {
+        budgetBox.deleteAt(i);
+      }
+    }
+  }
+
+  static Future<Budget> loadBudget(int budgetBoxIndex) async {
+    var budgetBox = await Hive.openBox(budgetsBox);
+    Budget budget = await budgetBox.getAt(budgetBoxIndex);
+    return budget;
+  }
+
   static Future<List<Budget>> loadAllBudgetCategories() async {
     var budgetBox = await Hive.openBox(budgetsBox);
     List<Budget> budgetList = [];
     bool categorieAlreadyInBudgetList = false;
     for (int i = 0; i < budgetBox.length; i++) {
+      categorieAlreadyInBudgetList = false;
       Budget budget = await budgetBox.getAt(i);
       for (int j = 0; j < budgetList.length; j++) {
         if (budgetList[j].categorie == budget.categorie) {
@@ -50,7 +67,7 @@ class Budget extends HiveObject {
         }
       }
       if (categorieAlreadyInBudgetList) {
-        break;
+        continue;
       }
       budget.boxIndex = i;
       budgetList.add(budget);

@@ -20,7 +20,6 @@ class AccountCard extends StatelessWidget {
       child: GestureDetector(
         onTap: () => Navigator.pushNamed(context, accountDetailsRoute, arguments: AccountDetailsScreenArguments(account)),
         child: Card(
-          color: const Color(0xff1c2b30),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(14.0),
           ),

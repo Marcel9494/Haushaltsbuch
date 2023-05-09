@@ -15,9 +15,11 @@ import '/models/enums/transaction_types.dart';
 import '/models/screen_arguments/bottom_nav_bar_screen_arguments.dart';
 
 class CreateOrEditBudgetScreen extends StatefulWidget {
+  final int budgetBoxIndex;
+
   const CreateOrEditBudgetScreen({
     Key? key,
-    required int budgetBoxIndex,
+    required this.budgetBoxIndex,
   }) : super(key: key);
 
   @override
@@ -30,6 +32,21 @@ class _CreateOrEditBudgetScreenState extends State<CreateOrEditBudgetScreen> {
   final RoundedLoadingButtonController _saveButtonController = RoundedLoadingButtonController();
   String _categorieErrorText = '';
   String _budgetErrorText = '';
+  late Budget _loadedBudget;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.budgetBoxIndex != -1) {
+      _loadBudget();
+    }
+  }
+
+  Future<void> _loadBudget() async {
+    _loadedBudget = await Budget.loadBudget(widget.budgetBoxIndex);
+    _budgetTextController.text = formatToMoneyAmount(_loadedBudget.budget.toString());
+    // TODO _isBudgetEdited = true;
+  }
 
   // TODO hier weitermachen und verhindern das für eine Kategorie mehrmals ein Budget angelegt wird.
   // Idee: Überhaupt nicht mehr anbieten, wenn bereits ein Budget erstellt wurde oder bestehendes Budget updaten?
@@ -104,7 +121,9 @@ class _CreateOrEditBudgetScreenState extends State<CreateOrEditBudgetScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                CategorieInputField(textController: _categorieTextController, errorText: _categorieErrorText, transactionType: TransactionType.outcome.name),
+                widget.budgetBoxIndex == -1
+                    ? CategorieInputField(textController: _categorieTextController, errorText: _categorieErrorText, transactionType: TransactionType.outcome.name)
+                    : const SizedBox(),
                 MoneyInputField(textController: _budgetTextController, errorText: _budgetErrorText, hintText: 'Budget', bottomSheetTitle: 'Budget eingeben:'),
                 SaveButton(saveFunction: _createOrUpdateBudget, buttonController: _saveButtonController),
               ],

@@ -2,8 +2,12 @@ import 'package:flutter/material.dart';
 
 import '/models/budget.dart';
 
+import '/utils/consts/route_consts.dart';
+
+import '/components/dialogs/choice_dialog.dart';
 import '/components/deco/loading_indicator.dart';
 import '/components/cards/separate_budget_card.dart';
+import '/components/buttons/year_picker_buttons.dart';
 
 class EditBudgetScreen extends StatefulWidget {
   final Budget budget;
@@ -19,18 +23,48 @@ class EditBudgetScreen extends StatefulWidget {
 
 class _EditBudgetScreenState extends State<EditBudgetScreen> {
   List<Budget> _budgetList = [];
+  DateTime _selectedYear = DateTime.now();
 
   Future<List<Budget>> _loadOneBudgetCategorie() async {
     _budgetList = await Budget.loadOneBudgetCategorie(widget.budget.categorie);
     return _budgetList;
   }
 
+  void _deleteBudget() {
+    showChoiceDialog(
+        context, 'Budget löschen?', _yesPressed, _noPressed, 'Budget wurde gelöscht', 'Budget für ${widget.budget.categorie} wurde erfolgreich gelöscht.', Icons.info_outline);
+  }
+
+  void _yesPressed() {
+    setState(() {
+      widget.budget.deleteBudget(widget.budget);
+    });
+    Navigator.pop(context);
+    Navigator.pop(context);
+    Navigator.popAndPushNamed(context, overviewBudgetsRoute);
+    FocusScope.of(context).unfocus();
+  }
+
+  void _noPressed() {
+    Navigator.pop(context);
+    FocusScope.of(context).unfocus();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Budgets')),
+      appBar: AppBar(
+        title: const Text('Budgets'),
+        actions: <Widget>[
+          IconButton(
+            onPressed: () => _deleteBudget(),
+            icon: const Icon(Icons.delete_forever_rounded),
+          ),
+        ],
+      ),
       body: Column(
         children: [
+          YearPickerButtons(selectedYear: _selectedYear, selectedYearCallback: (selectedYear) => setState(() => _selectedYear = selectedYear)),
           FutureBuilder(
             future: _loadOneBudgetCategorie(),
             builder: (BuildContext context, AsyncSnapshot<List<Budget>> snapshot) {

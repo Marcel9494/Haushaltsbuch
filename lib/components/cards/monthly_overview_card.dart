@@ -17,7 +17,6 @@ class MonthlyOverviewCard extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.all(4.0),
       child: Card(
-        color: const Color(0xff1c2b30),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(14.0),
         ),

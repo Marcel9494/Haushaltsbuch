@@ -63,6 +63,7 @@ class BudgetBookApp extends StatelessWidget {
         appBarTheme: const AppBarTheme(
           backgroundColor: Color(0xff112025),
         ),
+        cardColor: const Color(0xff1c2b30),
       ),
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,

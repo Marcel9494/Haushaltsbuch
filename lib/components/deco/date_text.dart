@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../utils/date_formatters/date_formatter.dart';
+import '/utils/date_formatters/date_formatter.dart';
 
 class DateText extends StatelessWidget {
   final String dateString;

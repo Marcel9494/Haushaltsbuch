@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:haushaltsbuch/utils/number_formatters/number_formatter.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 
 import '../utils/consts/route_consts.dart';
@@ -80,34 +81,49 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
                       return Expanded(
                         child: Column(
                           children: [
-                            CircularPercentIndicator(
-                              radius: 54.0,
-                              lineWidth: 10.0,
-                              percent: _completeBudgetPercentage / 100 >= 1.0 ? 1.0 : _completeBudgetPercentage / 100,
-                              center: Text('${_completeBudgetPercentage.toStringAsFixed(1)} %', style: const TextStyle(fontSize: 16.0)),
-                              progressColor: _completeBudgetPercentage < 80.0
-                                  ? Colors.greenAccent
-                                  : _completeBudgetPercentage < 100.0
-                                      ? Colors.yellowAccent
-                                      : Colors.redAccent,
-                              backgroundWidth: 5.0,
-                              animation: true,
-                              animateFromLastPercent: true,
+                            SizedBox(
+                              height: 136,
+                              child: SingleChildScrollView(
+                                child: CircularPercentIndicator(
+                                  radius: 84.0,
+                                  lineWidth: 14.0,
+                                  percent: _completeBudgetPercentage / 100 >= 1.0 ? 1.0 : _completeBudgetPercentage / 100,
+                                  center: Text('${_completeBudgetPercentage.toStringAsFixed(1)} %', style: const TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold)),
+                                  header: Padding(
+                                    padding: const EdgeInsets.only(bottom: 12.0),
+                                    child: Text(
+                                        'Gesamtbudget: ${formatToMoneyAmount(_completeBudgetExpenditures.toString())} / ${formatToMoneyAmount(_completeBudgetAmount.toString())}',
+                                        style: const TextStyle(fontSize: 16.0)),
+                                  ),
+                                  progressColor: _completeBudgetPercentage < 80.0
+                                      ? Colors.greenAccent
+                                      : _completeBudgetPercentage < 100.0
+                                          ? Colors.yellowAccent
+                                          : Colors.redAccent,
+                                  arcType: ArcType.HALF,
+                                  circularStrokeCap: CircularStrokeCap.round,
+                                  arcBackgroundColor: Colors.grey,
+                                  animation: true,
+                                  animateFromLastPercent: true,
+                                ),
+                              ),
                             ),
-                            RefreshIndicator(
-                              onRefresh: () async {
-                                _budgetList = await _loadBudgetList();
-                                setState(() {});
-                                return;
-                              },
-                              color: Colors.cyanAccent,
-                              child: ListView.builder(
-                                scrollDirection: Axis.vertical,
-                                shrinkWrap: true,
-                                itemCount: _budgetList.length,
-                                itemBuilder: (BuildContext context, int index) {
-                                  return BudgetCard(budget: _budgetList[index], selectedDate: _selectedDate);
+                            Expanded(
+                              child: RefreshIndicator(
+                                onRefresh: () async {
+                                  _budgetList = await _loadBudgetList();
+                                  setState(() {});
+                                  return;
                                 },
+                                color: Colors.cyanAccent,
+                                child: ListView.builder(
+                                  scrollDirection: Axis.vertical,
+                                  shrinkWrap: true,
+                                  itemCount: _budgetList.length,
+                                  itemBuilder: (BuildContext context, int index) {
+                                    return BudgetCard(budget: _budgetList[index], selectedDate: _selectedDate);
+                                  },
+                                ),
                               ),
                             ),
                           ],

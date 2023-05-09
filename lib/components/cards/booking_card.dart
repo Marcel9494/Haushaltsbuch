@@ -32,7 +32,6 @@ class BookingCard extends StatelessWidget {
     return GestureDetector(
       onTap: () => Navigator.pushNamed(context, createOrEditBookingRoute, arguments: CreateOrEditBookingScreenArguments(booking.boxIndex)),
       child: Card(
-        color: const Color(0xff1c2b30),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(14.0),
         ),

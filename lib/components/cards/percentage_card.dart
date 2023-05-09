@@ -20,7 +20,6 @@ class PercentageCard extends StatelessWidget {
     return GestureDetector(
       onTap: () => Navigator.pushNamed(context, categorieAmountListRoute, arguments: CategorieAmountListScreenArguments(selectedDate!, percentageStats.name)),
       child: Card(
-        color: const Color(0xff1c2b30),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(14.0),
         ),

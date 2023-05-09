@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
+import '../buttons/year_picker_buttons.dart';
+
 import '/components/tab_views/yearly_booking_tab_view.dart';
 import '/components/tab_views/yearly_statistics_tab_view.dart';
-
-import '/utils/date_formatters/date_formatter.dart';
 
 class YearlyTabView extends StatefulWidget {
   const YearlyTabView({Key? key}) : super(key: key);
@@ -13,7 +13,7 @@ class YearlyTabView extends StatefulWidget {
 }
 
 class _YearlyTabViewState extends State<YearlyTabView> {
-  DateTime _selectedDate = DateTime.now();
+  DateTime _selectedYear = DateTime.now();
   List<bool> _selectedTabOption = [true, false];
 
   void _setSelectedTab(int selectedIndex) {
@@ -31,81 +31,13 @@ class _YearlyTabViewState extends State<YearlyTabView> {
     });
   }
 
-  void _nextYear() {
-    setState(() {
-      _selectedDate = DateTime(_selectedDate.year + 1, _selectedDate.month, _selectedDate.day);
-    });
-  }
-
-  void _previousYear() {
-    setState(() {
-      _selectedDate = DateTime(_selectedDate.year - 1, _selectedDate.month, _selectedDate.day);
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
         Row(
           children: [
-            SizedBox(
-              width: MediaQuery.of(context).size.width / 2,
-              child: Row(
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.keyboard_arrow_left_rounded),
-                    onPressed: () => _previousYear(),
-                    padding: const EdgeInsets.only(left: 8.0, right: 2.0),
-                    constraints: const BoxConstraints(),
-                    splashColor: Colors.transparent,
-                  ),
-                  SizedBox(
-                    width: 120.0,
-                    child: GestureDetector(
-                      onTap: () {
-                        showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return AlertDialog(
-                              title: const Text('Jahr auswählen:'),
-                              content: SizedBox(
-                                width: 300,
-                                height: 300,
-                                child: YearPicker(
-                                  firstDate: DateTime(1950, 1),
-                                  lastDate: DateTime(DateTime.now().year + 100, 1),
-                                  initialDate: DateTime.now(),
-                                  selectedDate: _selectedDate,
-                                  onChanged: (DateTime date) {
-                                    setState(() {
-                                      _selectedDate = date;
-                                    });
-                                    Navigator.pop(context);
-                                  },
-                                ),
-                              ),
-                            );
-                          },
-                        );
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 12.0),
-                        child: Text(dateFormatterYYYY.format(_selectedDate), textAlign: TextAlign.center),
-                      ),
-                      behavior: HitTestBehavior.translucent,
-                    ),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.keyboard_arrow_right_rounded),
-                    onPressed: () => _nextYear(),
-                    padding: const EdgeInsets.only(left: 2.0),
-                    constraints: const BoxConstraints(),
-                    splashColor: Colors.transparent,
-                  ),
-                ],
-              ),
-            ),
+            YearPickerButtons(selectedYear: _selectedYear, selectedYearCallback: (selectedYear) => setState(() => _selectedYear = selectedYear)),
             SizedBox(
               width: MediaQuery.of(context).size.width / 2,
               child: Row(
@@ -136,7 +68,7 @@ class _YearlyTabViewState extends State<YearlyTabView> {
             ),
           ],
         ),
-        _selectedTabOption[0] ? YearlyBookingTabView(selectedDate: _selectedDate) : YearlyStatisticsTabView(selectedDate: _selectedDate)
+        _selectedTabOption[0] ? YearlyBookingTabView(selectedDate: _selectedYear) : YearlyStatisticsTabView(selectedDate: _selectedYear)
       ],
     );
   }
