@@ -16,10 +16,12 @@ import '/models/screen_arguments/bottom_nav_bar_screen_arguments.dart';
 
 class CreateOrEditBudgetScreen extends StatefulWidget {
   final int budgetBoxIndex;
+  final String? budgetCategorie;
 
   const CreateOrEditBudgetScreen({
     Key? key,
     required this.budgetBoxIndex,
+    this.budgetCategorie,
   }) : super(key: key);
 
   @override
@@ -33,11 +35,14 @@ class _CreateOrEditBudgetScreenState extends State<CreateOrEditBudgetScreen> {
   String _categorieErrorText = '';
   String _budgetErrorText = '';
   late Budget _loadedBudget;
+  late Budget _standardBudget;
 
   @override
   void initState() {
     super.initState();
-    if (widget.budgetBoxIndex != -1) {
+    if (widget.budgetBoxIndex == -2) {
+      _loadStandardBudget();
+    } else if (widget.budgetBoxIndex != -1) {
       _loadBudget();
     }
   }
@@ -45,7 +50,11 @@ class _CreateOrEditBudgetScreenState extends State<CreateOrEditBudgetScreen> {
   Future<void> _loadBudget() async {
     _loadedBudget = await Budget.loadBudget(widget.budgetBoxIndex);
     _budgetTextController.text = formatToMoneyAmount(_loadedBudget.budget.toString());
-    // TODO _isBudgetEdited = true;
+  }
+
+  Future<void> _loadStandardBudget() async {
+    _standardBudget = await Budget.loadStandardBudget(widget.budgetCategorie!);
+    _budgetTextController.text = formatToMoneyAmount(_standardBudget.budget.toString());
   }
 
   // TODO hier weitermachen und verhindern das für eine Kategorie mehrmals ein Budget angelegt wird.
@@ -55,15 +64,33 @@ class _CreateOrEditBudgetScreenState extends State<CreateOrEditBudgetScreen> {
       _setSaveButtonAnimation(false);
       return;
     }
-    Budget budget = Budget()
-      ..categorie = _categorieTextController.text
-      ..budget = formatMoneyAmountToDouble(_budgetTextController.text)
-      ..currentExpenditure = 0.0
-      ..percentage = 0.0
-      ..budgetDate = DateTime.now().toString();
-    budget.createBudget(budget);
+    if (widget.budgetBoxIndex == -1) {
+      Budget newBudget = Budget()
+        ..categorie = _categorieTextController.text
+        ..budget = formatMoneyAmountToDouble(_budgetTextController.text)
+        ..currentExpenditure = 0.0
+        ..percentage = 0.0
+        ..budgetDate = DateTime.now().toString();
+      newBudget.createBudget(newBudget);
+    } else if (widget.budgetBoxIndex == -2) {
+      Budget updatedStandardBudget = Budget()
+        ..categorie = _standardBudget.categorie
+        ..budget = formatMoneyAmountToDouble(_budgetTextController.text)
+        ..currentExpenditure = _standardBudget.currentExpenditure
+        ..percentage = _standardBudget.percentage
+        ..budgetDate = _standardBudget.budgetDate.toString();
+      Budget.updateBudgetsFrom(updatedStandardBudget);
+    } else {
+      Budget updatedBudget = Budget()
+        ..categorie = _loadedBudget.categorie
+        ..budget = formatMoneyAmountToDouble(_budgetTextController.text)
+        ..currentExpenditure = _loadedBudget.currentExpenditure
+        ..percentage = _loadedBudget.percentage
+        ..budgetDate = _loadedBudget.budgetDate.toString();
+      updatedBudget.updateBudget(updatedBudget, widget.budgetBoxIndex);
+    }
     _setSaveButtonAnimation(true);
-    Timer(const Duration(milliseconds: 1000), () {
+    Timer(const Duration(milliseconds: 700), () {
       if (mounted) {
         FocusScope.of(context).requestFocus(FocusNode());
         Navigator.pop(context);
@@ -74,7 +101,7 @@ class _CreateOrEditBudgetScreenState extends State<CreateOrEditBudgetScreen> {
   }
 
   bool _validCategorie(String categorieInput) {
-    if (_categorieTextController.text.isEmpty) {
+    if (_categorieTextController.text.isEmpty && widget.budgetBoxIndex == -1) {
       setState(() {
         _categorieErrorText = 'Bitte wählen Sie eine Kategorie aus.';
       });

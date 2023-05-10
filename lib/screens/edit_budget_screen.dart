@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../components/cards/standard_budget_card.dart';
 import '/models/budget.dart';
 
 import '/utils/consts/route_consts.dart';
@@ -82,6 +83,7 @@ class _EditBudgetScreenState extends State<EditBudgetScreen> {
                     return Expanded(
                       child: Column(
                         children: [
+                          StandardBudgetCard(budgetList: _budgetList),
                           RefreshIndicator(
                             onRefresh: () async {
                               _budgetList = await _loadOneBudgetCategorie();

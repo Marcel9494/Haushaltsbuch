@@ -37,6 +37,20 @@ class Budget extends HiveObject {
     }
   }
 
+  void updateBudget(Budget updatedBudget, int budgetBoxIndex) async {
+    var budgetBox = await Hive.openBox(budgetsBox);
+    budgetBox.putAt(budgetBoxIndex, updatedBudget);
+  }
+
+  static void updateBudgetsFrom(Budget standardBudget) async {
+    List<Budget> budgetList = await loadOneBudgetCategorie(standardBudget.categorie);
+    for (int i = 0; i < budgetList.length; i++) {
+      if (DateTime.parse(budgetList[i].budgetDate).isAfter(DateTime.parse(standardBudget.budgetDate))) {
+        budgetList[i].budget = standardBudget.budget;
+      }
+    }
+  }
+
   void deleteBudget(Budget deleteBudget) async {
     var budgetBox = await Hive.openBox(budgetsBox);
     for (int i = 0; i < budgetBox.length; i++) {
@@ -51,6 +65,19 @@ class Budget extends HiveObject {
     var budgetBox = await Hive.openBox(budgetsBox);
     Budget budget = await budgetBox.getAt(budgetBoxIndex);
     return budget;
+  }
+
+  static Future<Budget> loadStandardBudget(String budgetCategorie) async {
+    var budgetBox = await Hive.openBox(budgetsBox);
+    Budget standardBudget = Budget();
+    for (int i = 0; i < budgetBox.length; i++) {
+      Budget budget = await budgetBox.getAt(i);
+      if (DateTime.parse(budget.budgetDate).month == DateTime.now().month && budgetCategorie == budget.categorie) {
+        standardBudget = budget;
+        break;
+      }
+    }
+    return standardBudget;
   }
 
   static Future<List<Budget>> loadAllBudgetCategories() async {

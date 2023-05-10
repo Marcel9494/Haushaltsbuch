@@ -49,7 +49,7 @@ class BudgetCard extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Expanded(
-                        flex: 2,
+                        flex: 3,
                         child: Container(
                           decoration: BoxDecoration(
                             border: Border(right: BorderSide(color: Colors.grey.shade700, width: 0.5)),
@@ -65,9 +65,12 @@ class BudgetCard extends StatelessWidget {
                           ),
                         ),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.only(left: 18.0),
-                        child: Text('${formatToMoneyAmount(budget.currentExpenditure.toString())} / ${formatToMoneyAmount(budget.budget.toString())}'),
+                      Expanded(
+                        flex: 4,
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 18.0),
+                          child: Text('${formatToMoneyAmount(budget.currentExpenditure.toString())} / ${formatToMoneyAmount(budget.budget.toString())}'),
+                        ),
                       ),
                     ],
                   ),

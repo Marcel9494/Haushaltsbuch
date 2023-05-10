@@ -110,7 +110,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
       booking.updateBooking(booking, widget.bookingBoxIndex);
     }
     _setSaveButtonAnimation(true);
-    Timer(const Duration(milliseconds: 1000), () {
+    Timer(const Duration(milliseconds: 700), () {
       if (mounted) {
         FocusScope.of(context).requestFocus(FocusNode());
         Navigator.pop(context);

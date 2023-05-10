@@ -1,7 +1,6 @@
 class CreateOrEditBudgetScreenArguments {
   final int budgetBoxIndex;
+  final String? budgetCategorie;
 
-  CreateOrEditBudgetScreenArguments(
-    this.budgetBoxIndex,
-  );
+  CreateOrEditBudgetScreenArguments(this.budgetBoxIndex, [this.budgetCategorie]);
 }
