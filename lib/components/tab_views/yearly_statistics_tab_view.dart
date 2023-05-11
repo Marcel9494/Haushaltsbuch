@@ -46,10 +46,9 @@ class _YearlyStatisticsTabViewState extends State<YearlyStatisticsTabView> {
         categorieStatsAreUpdated = false;
         _totalExpenditures += formatMoneyAmountToDouble(_bookingList[i].amount);
         if (_showSavingsRate && _bookingList[i].transactionType == TransactionType.investment.name) {
-          _percentageStats = PercentageStats.createOrUpdatePercentageStats(i, _bookingList[i].amount, _percentageStats, 'Investition', categorieStatsAreUpdated, Colors.cyanAccent);
+          _percentageStats = PercentageStats.createOrUpdatePercentageStats(i, _bookingList[i].amount, _percentageStats, 'Investition', categorieStatsAreUpdated);
         } else {
-          _percentageStats = PercentageStats.createOrUpdatePercentageStats(i, _bookingList[i].amount, _percentageStats, _bookingList[i].categorie, categorieStatsAreUpdated,
-              Color.fromRGBO((i * 20) % 255, (i * 20) % 255, (i * 50) % 255, 0.8));
+          _percentageStats = PercentageStats.createOrUpdatePercentageStats(i, _bookingList[i].amount, _percentageStats, _bookingList[i].categorie, categorieStatsAreUpdated);
         }
       }
     }
@@ -70,8 +69,7 @@ class _YearlyStatisticsTabViewState extends State<YearlyStatisticsTabView> {
       if (_bookingList[i].transactionType == TransactionType.income.name) {
         categorieStatsAreUpdated = false;
         _totalRevenues += formatMoneyAmountToDouble(_bookingList[i].amount);
-        _percentageStats = PercentageStats.createOrUpdatePercentageStats(
-            i, _bookingList[i].amount, _percentageStats, _bookingList[i].categorie, categorieStatsAreUpdated, Color.fromRGBO((i * 20) % 255, (i * 20) % 255, (i * 50) % 255, 0.8));
+        _percentageStats = PercentageStats.createOrUpdatePercentageStats(i, _bookingList[i].amount, _percentageStats, _bookingList[i].categorie, categorieStatsAreUpdated);
       }
     }
     _percentageStats = PercentageStats.calculatePercentage(_percentageStats, _totalRevenues);
@@ -92,11 +90,9 @@ class _YearlyStatisticsTabViewState extends State<YearlyStatisticsTabView> {
         categorieStatsAreUpdated = false;
         _totalInvestments += formatMoneyAmountToDouble(_bookingList[i].amount);
         if (_showSeparateInvestments && _bookingList[i].transactionType == TransactionType.investment.name) {
-          _percentageStats = PercentageStats.showSeparatePercentages(
-              i, _bookingList[i].amount, _percentageStats, _bookingList[i].categorie, Color.fromRGBO((i * 20) % 255, (i * 20) % 255, (i * 50) % 255, 0.8));
+          _percentageStats = PercentageStats.showSeparatePercentages(i, _bookingList[i].amount, _percentageStats, _bookingList[i].categorie);
         } else {
-          _percentageStats = PercentageStats.createOrUpdatePercentageStats(i, _bookingList[i].amount, _percentageStats, _bookingList[i].categorie, categorieStatsAreUpdated,
-              Color.fromRGBO((i * 20) % 255, (i * 20) % 255, (i * 50) % 255, 0.8));
+          _percentageStats = PercentageStats.createOrUpdatePercentageStats(i, _bookingList[i].amount, _percentageStats, _bookingList[i].categorie, categorieStatsAreUpdated);
         }
       }
     }

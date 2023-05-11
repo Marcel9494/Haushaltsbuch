@@ -29,18 +29,14 @@ class _AssetAllocationStatisticTabViewState extends State<AssetAllocationStatist
     for (int i = 0; i < _accountList.length; i++) {
       categorieStatsAreUpdated = false;
       if (_currentAssetAllocationStatisticType == AssetAllocationStatisticType.individualAccounts.name) {
-        _percentageStats = PercentageStats.showSeparatePercentages(
-            i, _accountList[i].bankBalance, _percentageStats, _accountList[i].name, Color.fromRGBO((i * 20) % 255, (i * 20) % 255, (i * 50) % 255, 0.8));
+        _percentageStats = PercentageStats.showSeparatePercentages(i, _accountList[i].bankBalance, _percentageStats, _accountList[i].name);
       } else if (_currentAssetAllocationStatisticType == AssetAllocationStatisticType.individualAccountTypes.name) {
-        _percentageStats = PercentageStats.createOrUpdatePercentageStats(i, _accountList[i].bankBalance, _percentageStats, _accountList[i].accountType, categorieStatsAreUpdated,
-            Color.fromRGBO((i * 20) % 255, (i * 20) % 255, (i * 50) % 255, 0.8));
+        _percentageStats = PercentageStats.createOrUpdatePercentageStats(i, _accountList[i].bankBalance, _percentageStats, _accountList[i].accountType, categorieStatsAreUpdated);
       } else if (_currentAssetAllocationStatisticType == AssetAllocationStatisticType.capitalOrRiskFreeInvestments.name) {
         if (_accountList[i].accountType == AccountType.capitalInvestments.name) {
-          _percentageStats = PercentageStats.createOrUpdatePercentageStats(i, _accountList[i].bankBalance, _percentageStats, _accountList[i].accountType, categorieStatsAreUpdated,
-              Color.fromRGBO((i * 20) % 255, (i * 20) % 255, (i * 50) % 255, 0.8));
+          _percentageStats = PercentageStats.createOrUpdatePercentageStats(i, _accountList[i].bankBalance, _percentageStats, _accountList[i].accountType, categorieStatsAreUpdated);
         } else {
-          _percentageStats = PercentageStats.createOrUpdatePercentageStats(i, _accountList[i].bankBalance, _percentageStats, 'risikolose Anlagen', categorieStatsAreUpdated,
-              Color.fromRGBO((i * 20) % 255, (i * 20) % 255, (i * 50) % 255, 0.8));
+          _percentageStats = PercentageStats.createOrUpdatePercentageStats(i, _accountList[i].bankBalance, _percentageStats, 'risikolose Anlagen', categorieStatsAreUpdated);
         }
       }
     }

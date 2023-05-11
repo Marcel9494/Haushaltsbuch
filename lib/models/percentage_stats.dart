@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import '../utils/color_palettes/charts_color_palette.dart';
 import '/utils/number_formatters/number_formatter.dart';
 
 class PercentageStats {
@@ -9,13 +10,13 @@ class PercentageStats {
   late Color statColor;
 
   static List<PercentageStats> createOrUpdatePercentageStats(
-      int i, String amountString, List<PercentageStats> percentageStats, String categorieName, bool categorieStatsAreUpdated, Color color) {
+      int i, String amountString, List<PercentageStats> percentageStats, String categorieName, bool categorieStatsAreUpdated) {
     if (i == 0) {
       PercentageStats newCategorieStats = PercentageStats()
         ..name = categorieName
         ..amount = amountString
         ..percentage = 0.0
-        ..statColor = const Color.fromRGBO(0, 200, 200, 0.8);
+        ..statColor = chartColorPalette[i];
       percentageStats.add(newCategorieStats);
     } else {
       for (int j = 0; j < percentageStats.length; j++) {
@@ -32,7 +33,7 @@ class PercentageStats {
           ..name = categorieName
           ..amount = amountString
           ..percentage = 0.0
-          ..statColor = color;
+          ..statColor = chartColorPalette[i % chartColorPalette.length];
         percentageStats.add(newCategorieStats);
       }
     }
@@ -46,12 +47,12 @@ class PercentageStats {
     return percentageStats;
   }
 
-  static List<PercentageStats> showSeparatePercentages(int i, String amountString, List<PercentageStats> percentageStats, String categorieName, Color color) {
+  static List<PercentageStats> showSeparatePercentages(int i, String amountString, List<PercentageStats> percentageStats, String categorieName) {
     PercentageStats newCategorieStats = PercentageStats()
       ..name = categorieName
       ..amount = amountString
       ..percentage = 0.0
-      ..statColor = color;
+      ..statColor = chartColorPalette[i % chartColorPalette.length];
     percentageStats.add(newCategorieStats);
     return percentageStats;
   }

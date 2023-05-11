@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 import '/models/booking.dart';
 import '/models/percentage_stats.dart';
 import '/models/enums/categorie_types.dart';
 import '/models/enums/transaction_types.dart';
+import '/models/enums/outcome_statistic_types.dart';
 
 import '/utils/number_formatters/number_formatter.dart';
 
 import '../cards/percentage_card.dart';
 
 import '../deco/loading_indicator.dart';
+import '../deco/bottom_sheet_line.dart';
 
 class MonthlyStatisticsTabView extends StatefulWidget {
   final DateTime selectedDate;
@@ -27,13 +30,32 @@ class MonthlyStatisticsTabView extends StatefulWidget {
 class _MonthlyStatisticsTabViewState extends State<MonthlyStatisticsTabView> {
   List<PercentageStats> _percentageStats = [];
   String _currentCategorieType = CategorieType.outcome.pluralName;
+  String _currentOutcomeStatisticType = OutcomeStatisticType.outcome.name;
   double _totalExpenditures = 0.0;
   double _totalRevenues = 0.0;
   double _totalInvestments = 0.0;
   bool _showSavingsRate = true;
   bool _showSeparateInvestments = true;
 
+  Future<List<PercentageStats>> _loadMonthlyStatistic() {
+    if (_currentCategorieType == CategorieType.outcome.pluralName) {
+      if (_currentOutcomeStatisticType == OutcomeStatisticType.outcome.name) {
+        return _loadMonthlyExpenditureStatistic();
+      } else if (_currentOutcomeStatisticType == OutcomeStatisticType.savingrate.name) {
+        return _loadMonthlyExpenditureAndSavingsrateStatistic();
+      } else if (_currentOutcomeStatisticType == OutcomeStatisticType.investmentrate.name) {
+        // TODO Funktion muss noch implementiert werden
+      }
+    } else if (_currentCategorieType == CategorieType.income.pluralName) {
+      return _loadMonthlyRevenueStatistic();
+    } else if (_currentCategorieType == CategorieType.investment.pluralName) {
+      return _loadMonthlyInvestmentStatistic();
+    }
+    return _loadMonthlyExpenditureStatistic();
+  }
+
   Future<List<PercentageStats>> _loadMonthlyExpenditureStatistic() async {
+    _currentOutcomeStatisticType = OutcomeStatisticType.outcome.name;
     _percentageStats = [];
     _totalExpenditures = 0.0;
     bool categorieStatsAreUpdated = false;
@@ -43,14 +65,38 @@ class _MonthlyStatisticsTabViewState extends State<MonthlyStatisticsTabView> {
         categorieStatsAreUpdated = false;
         _totalExpenditures += formatMoneyAmountToDouble(_bookingList[i].amount);
         if (_showSavingsRate && _bookingList[i].transactionType == TransactionType.investment.name) {
-          _percentageStats = PercentageStats.createOrUpdatePercentageStats(
-              i, _bookingList[i].amount, _percentageStats, CategorieType.investment.pluralName, categorieStatsAreUpdated, Colors.cyanAccent);
+          _percentageStats =
+              PercentageStats.createOrUpdatePercentageStats(i, _bookingList[i].amount, _percentageStats, CategorieType.investment.pluralName, categorieStatsAreUpdated);
         } else {
-          _percentageStats = PercentageStats.createOrUpdatePercentageStats(i, _bookingList[i].amount, _percentageStats, _bookingList[i].categorie, categorieStatsAreUpdated,
-              Color.fromRGBO((i * 20) % 255, (i * 20) % 255, (i * 50) % 255, 0.8));
+          _percentageStats = PercentageStats.createOrUpdatePercentageStats(i, _bookingList[i].amount, _percentageStats, _bookingList[i].categorie, categorieStatsAreUpdated);
         }
       }
     }
+    _percentageStats = PercentageStats.calculatePercentage(_percentageStats, _totalExpenditures);
+    _percentageStats.sort((first, second) => second.percentage.compareTo(first.percentage));
+    return _percentageStats;
+  }
+
+  // TODO hier weitermachen und Sparquote noch die richtigen Prozente berechnen
+  Future<List<PercentageStats>> _loadMonthlyExpenditureAndSavingsrateStatistic() async {
+    _currentOutcomeStatisticType = OutcomeStatisticType.savingrate.name;
+    _percentageStats = [];
+    _totalExpenditures = 0.0;
+    _totalRevenues = 0.0;
+    bool categorieStatsAreUpdated = false;
+    List<Booking> _bookingList = await Booking.loadMonthlyBookingList(widget.selectedDate.month, widget.selectedDate.year);
+    for (int i = 0; i < _bookingList.length; i++) {
+      if (_bookingList[i].transactionType == TransactionType.outcome.name) {
+        categorieStatsAreUpdated = false;
+        _totalExpenditures += formatMoneyAmountToDouble(_bookingList[i].amount);
+        _percentageStats = PercentageStats.createOrUpdatePercentageStats(i, _bookingList[i].amount, _percentageStats, _bookingList[i].categorie, categorieStatsAreUpdated);
+      } else if (_bookingList[i].transactionType == TransactionType.income.name) {
+        _totalRevenues += formatMoneyAmountToDouble(_bookingList[i].amount);
+      }
+    }
+    double _totalSavings = _totalRevenues - _totalExpenditures;
+    _percentageStats = PercentageStats.createOrUpdatePercentageStats(0, _totalSavings.toString(), _percentageStats, 'Sparquote', categorieStatsAreUpdated);
+    _percentageStats = PercentageStats.calculatePercentage(_percentageStats, _totalSavings);
     _percentageStats = PercentageStats.calculatePercentage(_percentageStats, _totalExpenditures);
     _percentageStats.sort((first, second) => second.percentage.compareTo(first.percentage));
     return _percentageStats;
@@ -65,8 +111,7 @@ class _MonthlyStatisticsTabViewState extends State<MonthlyStatisticsTabView> {
       if (_bookingList[i].transactionType == TransactionType.income.name) {
         categorieStatsAreUpdated = false;
         _totalRevenues += formatMoneyAmountToDouble(_bookingList[i].amount);
-        _percentageStats = PercentageStats.createOrUpdatePercentageStats(
-            i, _bookingList[i].amount, _percentageStats, _bookingList[i].categorie, categorieStatsAreUpdated, Color.fromRGBO((i * 20) % 255, (i * 20) % 255, (i * 50) % 255, 0.8));
+        _percentageStats = PercentageStats.createOrUpdatePercentageStats(i, _bookingList[i].amount, _percentageStats, _bookingList[i].categorie, categorieStatsAreUpdated);
       }
     }
     _percentageStats = PercentageStats.calculatePercentage(_percentageStats, _totalRevenues);
@@ -84,11 +129,9 @@ class _MonthlyStatisticsTabViewState extends State<MonthlyStatisticsTabView> {
         categorieStatsAreUpdated = false;
         _totalInvestments += formatMoneyAmountToDouble(_bookingList[i].amount);
         if (_showSeparateInvestments && _bookingList[i].transactionType == TransactionType.investment.name) {
-          _percentageStats = PercentageStats.showSeparatePercentages(
-              i, _bookingList[i].amount, _percentageStats, _bookingList[i].categorie, Color.fromRGBO((i * 20) % 255, (i * 20) % 255, (i * 50) % 255, 0.8));
+          _percentageStats = PercentageStats.showSeparatePercentages(i, _bookingList[i].amount, _percentageStats, _bookingList[i].categorie);
         } else {
-          _percentageStats = PercentageStats.createOrUpdatePercentageStats(i, _bookingList[i].amount, _percentageStats, _bookingList[i].categorie, categorieStatsAreUpdated,
-              Color.fromRGBO((i * 20) % 255, (i * 20) % 255, (i * 50) % 255, 0.8));
+          _percentageStats = PercentageStats.createOrUpdatePercentageStats(i, _bookingList[i].amount, _percentageStats, _bookingList[i].categorie, categorieStatsAreUpdated);
         }
       }
     }
@@ -108,14 +151,61 @@ class _MonthlyStatisticsTabViewState extends State<MonthlyStatisticsTabView> {
     setState(() {});
   }
 
+  void _openBottomSheetMenu(BuildContext context) {
+    showCupertinoModalBottomSheet<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return Material(
+          child: ListView(
+            shrinkWrap: true,
+            children: [
+              const BottomSheetLine(),
+              const Padding(
+                padding: EdgeInsets.only(top: 16.0, left: 20.0),
+                child: Text('Auswählen:', style: TextStyle(fontSize: 18.0)),
+              ),
+              Column(
+                children: [
+                  ListTile(
+                    onTap: () => {
+                      _loadMonthlyExpenditureStatistic(),
+                      Navigator.pop(context),
+                      setState(() {}),
+                    },
+                    leading: const Icon(Icons.local_grocery_store_rounded, color: Colors.cyanAccent),
+                    title: const Text('Nur Ausgaben'),
+                  ),
+                  ListTile(
+                    onTap: () => {
+                      _loadMonthlyExpenditureAndSavingsrateStatistic(),
+                      Navigator.pop(context),
+                      setState(() {}),
+                    },
+                    leading: const Icon(Icons.savings_rounded, color: Colors.cyanAccent),
+                    title: const Text('Ausgaben + Sparquote'),
+                  ),
+                  ListTile(
+                    onTap: () => {
+                      _loadMonthlyExpenditureStatistic(),
+                      Navigator.pop(context),
+                      setState(() {}),
+                    },
+                    leading: const Icon(Icons.volunteer_activism_rounded, color: Colors.cyanAccent),
+                    title: const Text('Ausgaben + Spar- & Investitionsquote'),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: _currentCategorieType == CategorieType.outcome.pluralName
-          ? _loadMonthlyExpenditureStatistic()
-          : _currentCategorieType == CategorieType.income.pluralName
-              ? _loadMonthlyRevenueStatistic()
-              : _loadMonthlyInvestmentStatistic(),
+      future: _loadMonthlyStatistic(),
       builder: (BuildContext context, AsyncSnapshot<List<PercentageStats>> snapshot) {
         switch (snapshot.connectionState) {
           case ConnectionState.waiting:
@@ -144,7 +234,7 @@ class _MonthlyStatisticsTabViewState extends State<MonthlyStatisticsTabView> {
                     ),
                   ),
                   Row(
-                    mainAxisAlignment: _currentCategorieType == CategorieType.income.pluralName ? MainAxisAlignment.start : MainAxisAlignment.spaceAround,
+                    mainAxisAlignment: _currentCategorieType == CategorieType.income.pluralName ? MainAxisAlignment.start : MainAxisAlignment.spaceBetween,
                     children: [
                       Padding(
                         padding: _currentCategorieType == CategorieType.income.pluralName ? const EdgeInsets.only(left: 12.0) : const EdgeInsets.all(0.0),
@@ -160,11 +250,17 @@ class _MonthlyStatisticsTabViewState extends State<MonthlyStatisticsTabView> {
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           _currentCategorieType == CategorieType.outcome.pluralName
-                              ? const Text('Sparquote anzeigen:')
+                              ? OutlinedButton(
+                                  onPressed: () => _openBottomSheetMenu(context),
+                                  child: Text(
+                                    _currentOutcomeStatisticType,
+                                    style: const TextStyle(color: Colors.cyanAccent),
+                                  ),
+                                )
                               : _currentCategorieType == CategorieType.investment.pluralName
                                   ? const Text('Einzelne Positionen:')
                                   : const SizedBox(),
-                          _currentCategorieType == CategorieType.outcome.pluralName || _currentCategorieType == CategorieType.investment.pluralName
+                          _currentCategorieType == CategorieType.investment.pluralName
                               ? Switch(
                                   value: _currentCategorieType == CategorieType.investment.pluralName ? _showSeparateInvestments : _showSavingsRate,
                                   onChanged: (value) {
@@ -180,7 +276,7 @@ class _MonthlyStatisticsTabViewState extends State<MonthlyStatisticsTabView> {
                   ),
                   RefreshIndicator(
                     onRefresh: () async {
-                      _percentageStats = await _loadMonthlyExpenditureStatistic();
+                      _percentageStats = await _loadMonthlyStatistic();
                       setState(() {});
                       return;
                     },
