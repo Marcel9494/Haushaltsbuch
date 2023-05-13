@@ -44,7 +44,7 @@ class _MonthlyStatisticsTabViewState extends State<MonthlyStatisticsTabView> {
       } else if (_currentOutcomeStatisticType == OutcomeStatisticType.savingrate.name) {
         return _loadMonthlyExpenditureAndSavingsrateStatistic();
       } else if (_currentOutcomeStatisticType == OutcomeStatisticType.investmentrate.name) {
-        // TODO Funktion muss noch implementiert werden
+        return _loadMonthlyExpenditureSavingsrateAndInvestmentrateStatistic();
       }
     } else if (_currentCategorieType == CategorieType.income.pluralName) {
       return _loadMonthlyRevenueStatistic();
@@ -61,15 +61,10 @@ class _MonthlyStatisticsTabViewState extends State<MonthlyStatisticsTabView> {
     bool categorieStatsAreUpdated = false;
     List<Booking> _bookingList = await Booking.loadMonthlyBookingList(widget.selectedDate.month, widget.selectedDate.year);
     for (int i = 0; i < _bookingList.length; i++) {
-      if (_bookingList[i].transactionType == TransactionType.outcome.name || (_showSavingsRate && _bookingList[i].transactionType == TransactionType.investment.name)) {
+      if (_bookingList[i].transactionType == TransactionType.outcome.name) {
         categorieStatsAreUpdated = false;
         _totalExpenditures += formatMoneyAmountToDouble(_bookingList[i].amount);
-        if (_showSavingsRate && _bookingList[i].transactionType == TransactionType.investment.name) {
-          _percentageStats =
-              PercentageStats.createOrUpdatePercentageStats(i, _bookingList[i].amount, _percentageStats, CategorieType.investment.pluralName, categorieStatsAreUpdated);
-        } else {
-          _percentageStats = PercentageStats.createOrUpdatePercentageStats(i, _bookingList[i].amount, _percentageStats, _bookingList[i].categorie, categorieStatsAreUpdated);
-        }
+        _percentageStats = PercentageStats.createOrUpdatePercentageStats(i, _bookingList[i].amount, _percentageStats, _bookingList[i].categorie, categorieStatsAreUpdated);
       }
     }
     _percentageStats = PercentageStats.calculatePercentage(_percentageStats, _totalExpenditures);
@@ -77,12 +72,12 @@ class _MonthlyStatisticsTabViewState extends State<MonthlyStatisticsTabView> {
     return _percentageStats;
   }
 
-  // TODO hier weitermachen und Sparquote noch die richtigen Prozente berechnen
   Future<List<PercentageStats>> _loadMonthlyExpenditureAndSavingsrateStatistic() async {
     _currentOutcomeStatisticType = OutcomeStatisticType.savingrate.name;
     _percentageStats = [];
     _totalExpenditures = 0.0;
     _totalRevenues = 0.0;
+    double totalSavings = 0.0;
     bool categorieStatsAreUpdated = false;
     List<Booking> _bookingList = await Booking.loadMonthlyBookingList(widget.selectedDate.month, widget.selectedDate.year);
     for (int i = 0; i < _bookingList.length; i++) {
@@ -94,10 +89,39 @@ class _MonthlyStatisticsTabViewState extends State<MonthlyStatisticsTabView> {
         _totalRevenues += formatMoneyAmountToDouble(_bookingList[i].amount);
       }
     }
-    double _totalSavings = _totalRevenues - _totalExpenditures;
-    _percentageStats = PercentageStats.createOrUpdatePercentageStats(0, _totalSavings.toString(), _percentageStats, 'Sparquote', categorieStatsAreUpdated);
-    _percentageStats = PercentageStats.calculatePercentage(_percentageStats, _totalSavings);
-    _percentageStats = PercentageStats.calculatePercentage(_percentageStats, _totalExpenditures);
+    totalSavings = _totalRevenues - _totalExpenditures;
+    _percentageStats = PercentageStats.createOrUpdatePercentageStats(
+        0, formatToMoneyAmount(totalSavings.toString()), _percentageStats, OutcomeStatisticType.savingrate.name, categorieStatsAreUpdated);
+    _percentageStats = PercentageStats.calculatePercentage(_percentageStats, totalSavings + _totalExpenditures);
+    _percentageStats.sort((first, second) => second.percentage.compareTo(first.percentage));
+    return _percentageStats;
+  }
+
+  Future<List<PercentageStats>> _loadMonthlyExpenditureSavingsrateAndInvestmentrateStatistic() async {
+    _currentOutcomeStatisticType = OutcomeStatisticType.investmentrate.name;
+    _percentageStats = [];
+    _totalExpenditures = 0.0;
+    _totalRevenues = 0.0;
+    double totalSavings = 0.0;
+    double totalInvestments = 0.0;
+    bool categorieStatsAreUpdated = false;
+    List<Booking> _bookingList = await Booking.loadMonthlyBookingList(widget.selectedDate.month, widget.selectedDate.year);
+    for (int i = 0; i < _bookingList.length; i++) {
+      if (_bookingList[i].transactionType == TransactionType.outcome.name) {
+        categorieStatsAreUpdated = false;
+        _totalExpenditures += formatMoneyAmountToDouble(_bookingList[i].amount);
+        _percentageStats = PercentageStats.createOrUpdatePercentageStats(i, _bookingList[i].amount, _percentageStats, _bookingList[i].categorie, categorieStatsAreUpdated);
+      } else if (_bookingList[i].transactionType == TransactionType.income.name) {
+        _totalRevenues += formatMoneyAmountToDouble(_bookingList[i].amount);
+      } else if (_bookingList[i].transactionType == TransactionType.investment.name) {
+        totalInvestments += formatMoneyAmountToDouble(_bookingList[i].amount);
+        _percentageStats =
+            PercentageStats.createOrUpdatePercentageStats(i, _bookingList[i].amount, _percentageStats, OutcomeStatisticType.investmentrate.name, categorieStatsAreUpdated);
+      }
+    }
+    totalSavings = _totalRevenues - _totalExpenditures - totalInvestments;
+    _percentageStats = PercentageStats.createOrUpdatePercentageStats(0, formatToMoneyAmount(totalSavings.toString()), _percentageStats, 'Sparquote', categorieStatsAreUpdated);
+    _percentageStats = PercentageStats.calculatePercentage(_percentageStats, totalSavings + _totalExpenditures + totalInvestments);
     _percentageStats.sort((first, second) => second.percentage.compareTo(first.percentage));
     return _percentageStats;
   }
@@ -161,7 +185,7 @@ class _MonthlyStatisticsTabViewState extends State<MonthlyStatisticsTabView> {
             children: [
               const BottomSheetLine(),
               const Padding(
-                padding: EdgeInsets.only(top: 16.0, left: 20.0),
+                padding: EdgeInsets.only(top: 12.0, left: 20.0, bottom: 8.0),
                 child: Text('Auswählen:', style: TextStyle(fontSize: 18.0)),
               ),
               Column(
@@ -174,6 +198,7 @@ class _MonthlyStatisticsTabViewState extends State<MonthlyStatisticsTabView> {
                     },
                     leading: const Icon(Icons.local_grocery_store_rounded, color: Colors.cyanAccent),
                     title: const Text('Nur Ausgaben'),
+                    subtitle: const Text('Es werden alle Ausgaben des aktuellen Monats angezeigt.'),
                   ),
                   ListTile(
                     onTap: () => {
@@ -183,15 +208,17 @@ class _MonthlyStatisticsTabViewState extends State<MonthlyStatisticsTabView> {
                     },
                     leading: const Icon(Icons.savings_rounded, color: Colors.cyanAccent),
                     title: const Text('Ausgaben + Sparquote'),
+                    subtitle: const Text('Zur Sparquote zählen alle Investitionen und übrige Geldmittel.'),
                   ),
                   ListTile(
                     onTap: () => {
-                      _loadMonthlyExpenditureStatistic(),
+                      _loadMonthlyExpenditureSavingsrateAndInvestmentrateStatistic(),
                       Navigator.pop(context),
                       setState(() {}),
                     },
                     leading: const Icon(Icons.volunteer_activism_rounded, color: Colors.cyanAccent),
                     title: const Text('Ausgaben + Spar- & Investitionsquote'),
+                    subtitle: const Text('Die Spar- und Investitionsquote werden als einzelne Positionen angezeigt.'),
                   ),
                 ],
               ),
@@ -237,7 +264,7 @@ class _MonthlyStatisticsTabViewState extends State<MonthlyStatisticsTabView> {
                     mainAxisAlignment: _currentCategorieType == CategorieType.income.pluralName ? MainAxisAlignment.start : MainAxisAlignment.spaceBetween,
                     children: [
                       Padding(
-                        padding: _currentCategorieType == CategorieType.income.pluralName ? const EdgeInsets.only(left: 12.0) : const EdgeInsets.all(0.0),
+                        padding: const EdgeInsets.only(left: 12.0),
                         child: OutlinedButton(
                           onPressed: () => _changeCategorieType(),
                           child: Text(
@@ -250,15 +277,18 @@ class _MonthlyStatisticsTabViewState extends State<MonthlyStatisticsTabView> {
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           _currentCategorieType == CategorieType.outcome.pluralName
-                              ? OutlinedButton(
-                                  onPressed: () => _openBottomSheetMenu(context),
-                                  child: Text(
-                                    _currentOutcomeStatisticType,
-                                    style: const TextStyle(color: Colors.cyanAccent),
+                              ? Padding(
+                                  padding: const EdgeInsets.only(right: 12.0),
+                                  child: OutlinedButton(
+                                    onPressed: () => _openBottomSheetMenu(context),
+                                    child: Text(
+                                      _currentOutcomeStatisticType,
+                                      style: const TextStyle(color: Colors.cyanAccent),
+                                    ),
                                   ),
                                 )
                               : _currentCategorieType == CategorieType.investment.pluralName
-                                  ? const Text('Einzelne Positionen:')
+                                  ? const Text('Einzelne Investments:')
                                   : const SizedBox(),
                           _currentCategorieType == CategorieType.investment.pluralName
                               ? Switch(
