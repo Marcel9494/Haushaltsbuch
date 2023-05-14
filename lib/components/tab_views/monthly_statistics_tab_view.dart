@@ -80,6 +80,9 @@ class _MonthlyStatisticsTabViewState extends State<MonthlyStatisticsTabView> {
     double totalSavings = 0.0;
     bool categorieStatsAreUpdated = false;
     List<Booking> _bookingList = await Booking.loadMonthlyBookingList(widget.selectedDate.month, widget.selectedDate.year);
+    if (_bookingList.isEmpty) {
+      return [];
+    }
     for (int i = 0; i < _bookingList.length; i++) {
       if (_bookingList[i].transactionType == TransactionType.outcome.name) {
         categorieStatsAreUpdated = false;
@@ -106,6 +109,9 @@ class _MonthlyStatisticsTabViewState extends State<MonthlyStatisticsTabView> {
     double totalInvestments = 0.0;
     bool categorieStatsAreUpdated = false;
     List<Booking> _bookingList = await Booking.loadMonthlyBookingList(widget.selectedDate.month, widget.selectedDate.year);
+    if (_bookingList.isEmpty) {
+      return [];
+    }
     for (int i = 0; i < _bookingList.length; i++) {
       if (_bookingList[i].transactionType == TransactionType.outcome.name) {
         categorieStatsAreUpdated = false;
@@ -240,8 +246,77 @@ class _MonthlyStatisticsTabViewState extends State<MonthlyStatisticsTabView> {
           case ConnectionState.done:
             if (_percentageStats.isEmpty) {
               return Expanded(
-                child: Center(
-                  child: Text('Noch keine $_currentCategorieType vorhanden.'),
+                child: Column(
+                  children: [
+                    AspectRatio(
+                      aspectRatio: 1.6,
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 16.0),
+                        child: PieChart(
+                          PieChartData(
+                            borderData: FlBorderData(
+                              show: false,
+                            ),
+                            sectionsSpace: 4.0,
+                            centerSpaceRadius: 40.0,
+                            sections: showingEmptyDiagram(),
+                          ),
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8.0),
+                      child: Row(
+                        mainAxisAlignment: _currentCategorieType == CategorieType.income.pluralName ? MainAxisAlignment.start : MainAxisAlignment.spaceBetween,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(left: 12.0),
+                            child: OutlinedButton(
+                              onPressed: () => _changeCategorieType(),
+                              child: Text(
+                                _currentCategorieType,
+                                style: const TextStyle(color: Colors.cyanAccent),
+                              ),
+                            ),
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              _currentCategorieType == CategorieType.outcome.pluralName
+                                  ? Padding(
+                                      padding: const EdgeInsets.only(right: 12.0),
+                                      child: OutlinedButton(
+                                        onPressed: () => _openBottomSheetMenu(context),
+                                        child: Text(
+                                          _currentOutcomeStatisticType,
+                                          style: const TextStyle(color: Colors.cyanAccent),
+                                        ),
+                                      ),
+                                    )
+                                  : _currentCategorieType == CategorieType.investment.pluralName
+                                      ? const Text('Einzelne Investments:')
+                                      : const SizedBox(),
+                              _currentCategorieType == CategorieType.investment.pluralName
+                                  ? Switch(
+                                      value: _currentCategorieType == CategorieType.investment.pluralName ? _showSeparateInvestments : _showSavingsRate,
+                                      onChanged: (value) {
+                                        setState(() {
+                                          _currentCategorieType == CategorieType.investment.pluralName ? _showSeparateInvestments = value : _showSavingsRate = value;
+                                        });
+                                      },
+                                    )
+                                  : const SizedBox(),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    Expanded(
+                      child: Center(
+                        child: Text('Noch keine $_currentCategorieType vorhanden.'),
+                      ),
+                    ),
+                  ],
                 ),
               );
             } else {
@@ -249,60 +324,66 @@ class _MonthlyStatisticsTabViewState extends State<MonthlyStatisticsTabView> {
                 children: [
                   AspectRatio(
                     aspectRatio: 1.6,
-                    child: PieChart(
-                      PieChartData(
-                        borderData: FlBorderData(
-                          show: false,
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 16.0),
+                      child: PieChart(
+                        PieChartData(
+                          borderData: FlBorderData(
+                            show: false,
+                          ),
+                          sectionsSpace: 4.0,
+                          centerSpaceRadius: 40.0,
+                          sections: showingSections(),
                         ),
-                        sectionsSpace: 4.0,
-                        centerSpaceRadius: 40.0,
-                        sections: showingSections(),
                       ),
                     ),
                   ),
-                  Row(
-                    mainAxisAlignment: _currentCategorieType == CategorieType.income.pluralName ? MainAxisAlignment.start : MainAxisAlignment.spaceBetween,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(left: 12.0),
-                        child: OutlinedButton(
-                          onPressed: () => _changeCategorieType(),
-                          child: Text(
-                            _currentCategorieType,
-                            style: const TextStyle(color: Colors.cyanAccent),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8.0),
+                    child: Row(
+                      mainAxisAlignment: _currentCategorieType == CategorieType.income.pluralName ? MainAxisAlignment.start : MainAxisAlignment.spaceBetween,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(left: 12.0),
+                          child: OutlinedButton(
+                            onPressed: () => _changeCategorieType(),
+                            child: Text(
+                              _currentCategorieType,
+                              style: const TextStyle(color: Colors.cyanAccent),
+                            ),
                           ),
                         ),
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          _currentCategorieType == CategorieType.outcome.pluralName
-                              ? Padding(
-                                  padding: const EdgeInsets.only(right: 12.0),
-                                  child: OutlinedButton(
-                                    onPressed: () => _openBottomSheetMenu(context),
-                                    child: Text(
-                                      _currentOutcomeStatisticType,
-                                      style: const TextStyle(color: Colors.cyanAccent),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            _currentCategorieType == CategorieType.outcome.pluralName
+                                ? Padding(
+                                    padding: const EdgeInsets.only(right: 12.0),
+                                    child: OutlinedButton(
+                                      onPressed: () => _openBottomSheetMenu(context),
+                                      child: Text(
+                                        _currentOutcomeStatisticType,
+                                        style: const TextStyle(color: Colors.cyanAccent),
+                                      ),
                                     ),
-                                  ),
-                                )
-                              : _currentCategorieType == CategorieType.investment.pluralName
-                                  ? const Text('Einzelne Investments:')
-                                  : const SizedBox(),
-                          _currentCategorieType == CategorieType.investment.pluralName
-                              ? Switch(
-                                  value: _currentCategorieType == CategorieType.investment.pluralName ? _showSeparateInvestments : _showSavingsRate,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      _currentCategorieType == CategorieType.investment.pluralName ? _showSeparateInvestments = value : _showSavingsRate = value;
-                                    });
-                                  },
-                                )
-                              : const SizedBox(),
-                        ],
-                      ),
-                    ],
+                                  )
+                                : _currentCategorieType == CategorieType.investment.pluralName
+                                    ? const Text('Einzelne Investments:')
+                                    : const SizedBox(),
+                            _currentCategorieType == CategorieType.investment.pluralName
+                                ? Switch(
+                                    value: _currentCategorieType == CategorieType.investment.pluralName ? _showSeparateInvestments : _showSavingsRate,
+                                    onChanged: (value) {
+                                      setState(() {
+                                        _currentCategorieType == CategorieType.investment.pluralName ? _showSeparateInvestments = value : _showSavingsRate = value;
+                                      });
+                                    },
+                                  )
+                                : const SizedBox(),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                   RefreshIndicator(
                     onRefresh: () async {
@@ -312,7 +393,7 @@ class _MonthlyStatisticsTabViewState extends State<MonthlyStatisticsTabView> {
                     },
                     color: Colors.cyanAccent,
                     child: SizedBox(
-                      height: 275.0,
+                      height: 259.0,
                       child: ListView.builder(
                         itemCount: _percentageStats.length,
                         itemBuilder: (BuildContext context, int index) {
@@ -348,6 +429,19 @@ class _MonthlyStatisticsTabViewState extends State<MonthlyStatisticsTabView> {
           fontWeight: FontWeight.bold,
           color: Colors.white70,
         ),
+      );
+    });
+  }
+
+  List<PieChartSectionData> showingEmptyDiagram() {
+    return List.generate(1, (i) {
+      return PieChartSectionData(
+        color: Colors.grey,
+        value: 100,
+        title: '',
+        badgeWidget: const Text(''),
+        badgePositionPercentageOffset: 1.3,
+        radius: 50.0,
       );
     });
   }
