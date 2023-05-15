@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../components/buttons/month_picker_buttons.dart';
+import '/components/buttons/month_picker_buttons.dart';
 import '/components/dialogs/choice_dialog.dart';
 import '/components/tab_views/monthly_booking_tab_view.dart';
 

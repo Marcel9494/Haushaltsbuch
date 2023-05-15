@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 import '/models/booking.dart';
 import '/models/percentage_stats.dart';
@@ -10,10 +9,12 @@ import '/models/enums/outcome_statistic_types.dart';
 
 import '/utils/number_formatters/number_formatter.dart';
 
+import '../buttons/expenditure_stats_button.dart';
+import '../buttons/transaction_stats_button.dart';
+
 import '../cards/percentage_card.dart';
 
 import '../deco/loading_indicator.dart';
-import '../deco/bottom_sheet_line.dart';
 
 class MonthlyStatisticsTabView extends StatefulWidget {
   final DateTime selectedDate;
@@ -55,7 +56,6 @@ class _MonthlyStatisticsTabViewState extends State<MonthlyStatisticsTabView> {
   }
 
   Future<List<PercentageStats>> _loadMonthlyExpenditureStatistic() async {
-    _currentOutcomeStatisticType = OutcomeStatisticType.outcome.name;
     _percentageStats = [];
     _totalExpenditures = 0.0;
     bool categorieStatsAreUpdated = false;
@@ -73,7 +73,6 @@ class _MonthlyStatisticsTabViewState extends State<MonthlyStatisticsTabView> {
   }
 
   Future<List<PercentageStats>> _loadMonthlyExpenditureAndSavingsrateStatistic() async {
-    _currentOutcomeStatisticType = OutcomeStatisticType.savingrate.name;
     _percentageStats = [];
     _totalExpenditures = 0.0;
     _totalRevenues = 0.0;
@@ -101,7 +100,6 @@ class _MonthlyStatisticsTabViewState extends State<MonthlyStatisticsTabView> {
   }
 
   Future<List<PercentageStats>> _loadMonthlyExpenditureSavingsrateAndInvestmentrateStatistic() async {
-    _currentOutcomeStatisticType = OutcomeStatisticType.investmentrate.name;
     _percentageStats = [];
     _totalExpenditures = 0.0;
     _totalRevenues = 0.0;
@@ -170,71 +168,6 @@ class _MonthlyStatisticsTabViewState extends State<MonthlyStatisticsTabView> {
     return _percentageStats;
   }
 
-  void _changeCategorieType() {
-    if (_currentCategorieType == CategorieType.outcome.pluralName) {
-      _currentCategorieType = CategorieType.income.pluralName;
-    } else if (_currentCategorieType == CategorieType.income.pluralName) {
-      _currentCategorieType = CategorieType.investment.pluralName;
-    } else if (_currentCategorieType == CategorieType.investment.pluralName) {
-      _currentCategorieType = CategorieType.outcome.pluralName;
-    }
-    setState(() {});
-  }
-
-  void _openBottomSheetMenu(BuildContext context) {
-    showCupertinoModalBottomSheet<void>(
-      context: context,
-      builder: (BuildContext context) {
-        return Material(
-          child: ListView(
-            shrinkWrap: true,
-            children: [
-              const BottomSheetLine(),
-              const Padding(
-                padding: EdgeInsets.only(top: 12.0, left: 20.0, bottom: 8.0),
-                child: Text('Auswählen:', style: TextStyle(fontSize: 18.0)),
-              ),
-              Column(
-                children: [
-                  ListTile(
-                    onTap: () => {
-                      _loadMonthlyExpenditureStatistic(),
-                      Navigator.pop(context),
-                      setState(() {}),
-                    },
-                    leading: const Icon(Icons.local_grocery_store_rounded, color: Colors.cyanAccent),
-                    title: const Text('Nur Ausgaben'),
-                    subtitle: const Text('Es werden alle Ausgaben des aktuellen Monats angezeigt.'),
-                  ),
-                  ListTile(
-                    onTap: () => {
-                      _loadMonthlyExpenditureAndSavingsrateStatistic(),
-                      Navigator.pop(context),
-                      setState(() {}),
-                    },
-                    leading: const Icon(Icons.savings_rounded, color: Colors.cyanAccent),
-                    title: const Text('Ausgaben + Sparquote'),
-                    subtitle: const Text('Zur Sparquote zählen alle Investitionen und übrige Geldmittel.'),
-                  ),
-                  ListTile(
-                    onTap: () => {
-                      _loadMonthlyExpenditureSavingsrateAndInvestmentrateStatistic(),
-                      Navigator.pop(context),
-                      setState(() {}),
-                    },
-                    leading: const Icon(Icons.volunteer_activism_rounded, color: Colors.cyanAccent),
-                    title: const Text('Ausgaben + Spar- & Investitionsquote'),
-                    subtitle: const Text('Die Spar- und Investitionsquote werden als einzelne Positionen angezeigt.'),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
@@ -264,52 +197,40 @@ class _MonthlyStatisticsTabViewState extends State<MonthlyStatisticsTabView> {
                         ),
                       ),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 8.0),
-                      child: Row(
-                        mainAxisAlignment: _currentCategorieType == CategorieType.income.pluralName ? MainAxisAlignment.start : MainAxisAlignment.spaceBetween,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(left: 12.0),
-                            child: OutlinedButton(
-                              onPressed: () => _changeCategorieType(),
-                              child: Text(
-                                _currentCategorieType,
-                                style: const TextStyle(color: Colors.cyanAccent),
-                              ),
-                            ),
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              _currentCategorieType == CategorieType.outcome.pluralName
-                                  ? Padding(
-                                      padding: const EdgeInsets.only(right: 12.0),
-                                      child: OutlinedButton(
-                                        onPressed: () => _openBottomSheetMenu(context),
-                                        child: Text(
-                                          _currentOutcomeStatisticType,
-                                          style: const TextStyle(color: Colors.cyanAccent),
-                                        ),
-                                      ),
-                                    )
-                                  : _currentCategorieType == CategorieType.investment.pluralName
-                                      ? const Text('Einzelne Investments:')
-                                      : const SizedBox(),
-                              _currentCategorieType == CategorieType.investment.pluralName
-                                  ? Switch(
-                                      value: _currentCategorieType == CategorieType.investment.pluralName ? _showSeparateInvestments : _showSavingsRate,
-                                      onChanged: (value) {
-                                        setState(() {
-                                          _currentCategorieType == CategorieType.investment.pluralName ? _showSeparateInvestments = value : _showSavingsRate = value;
-                                        });
-                                      },
-                                    )
-                                  : const SizedBox(),
-                            ],
-                          ),
-                        ],
-                      ),
+                    Row(
+                      mainAxisAlignment: _currentCategorieType == CategorieType.income.pluralName ? MainAxisAlignment.start : MainAxisAlignment.spaceBetween,
+                      children: [
+                        TransactionStatsButton(
+                          categorieType: _currentCategorieType,
+                          selectedCategorieTypeCallback: (String categorieType) => setState(() => _currentCategorieType = categorieType),
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            _currentCategorieType == CategorieType.outcome.pluralName
+                                ? ExpenditureStatsButton(
+                                    outcomeStatisticType: _currentOutcomeStatisticType,
+                                    selectedOutcomeStatisticTypeCallback: (String outcomeStatisticType) => setState(() => _currentOutcomeStatisticType = outcomeStatisticType),
+                                    expenditureFunction: _loadMonthlyExpenditureStatistic,
+                                    expenditureAndSavingrateFunction: _loadMonthlyExpenditureAndSavingsrateStatistic,
+                                    expenditureSavingrateAndInvestmentrateFunction: _loadMonthlyExpenditureSavingsrateAndInvestmentrateStatistic,
+                                  )
+                                : _currentCategorieType == CategorieType.investment.pluralName
+                                    ? const Text('Einzelne Investments:')
+                                    : const SizedBox(),
+                            _currentCategorieType == CategorieType.investment.pluralName
+                                ? Switch(
+                                    value: _currentCategorieType == CategorieType.investment.pluralName ? _showSeparateInvestments : _showSavingsRate,
+                                    onChanged: (value) {
+                                      setState(() {
+                                        _currentCategorieType == CategorieType.investment.pluralName ? _showSeparateInvestments = value : _showSavingsRate = value;
+                                      });
+                                    },
+                                  )
+                                : const SizedBox(),
+                          ],
+                        ),
+                      ],
                     ),
                     Expanded(
                       child: Center(
@@ -338,52 +259,40 @@ class _MonthlyStatisticsTabViewState extends State<MonthlyStatisticsTabView> {
                       ),
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8.0),
-                    child: Row(
-                      mainAxisAlignment: _currentCategorieType == CategorieType.income.pluralName ? MainAxisAlignment.start : MainAxisAlignment.spaceBetween,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(left: 12.0),
-                          child: OutlinedButton(
-                            onPressed: () => _changeCategorieType(),
-                            child: Text(
-                              _currentCategorieType,
-                              style: const TextStyle(color: Colors.cyanAccent),
-                            ),
-                          ),
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            _currentCategorieType == CategorieType.outcome.pluralName
-                                ? Padding(
-                                    padding: const EdgeInsets.only(right: 12.0),
-                                    child: OutlinedButton(
-                                      onPressed: () => _openBottomSheetMenu(context),
-                                      child: Text(
-                                        _currentOutcomeStatisticType,
-                                        style: const TextStyle(color: Colors.cyanAccent),
-                                      ),
-                                    ),
-                                  )
-                                : _currentCategorieType == CategorieType.investment.pluralName
-                                    ? const Text('Einzelne Investments:')
-                                    : const SizedBox(),
-                            _currentCategorieType == CategorieType.investment.pluralName
-                                ? Switch(
-                                    value: _currentCategorieType == CategorieType.investment.pluralName ? _showSeparateInvestments : _showSavingsRate,
-                                    onChanged: (value) {
-                                      setState(() {
-                                        _currentCategorieType == CategorieType.investment.pluralName ? _showSeparateInvestments = value : _showSavingsRate = value;
-                                      });
-                                    },
-                                  )
-                                : const SizedBox(),
-                          ],
-                        ),
-                      ],
-                    ),
+                  Row(
+                    mainAxisAlignment: _currentCategorieType == CategorieType.income.pluralName ? MainAxisAlignment.start : MainAxisAlignment.spaceBetween,
+                    children: [
+                      TransactionStatsButton(
+                        categorieType: _currentCategorieType,
+                        selectedCategorieTypeCallback: (String categorieType) => setState(() => _currentCategorieType = categorieType),
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          _currentCategorieType == CategorieType.outcome.pluralName
+                              ? ExpenditureStatsButton(
+                                  outcomeStatisticType: _currentOutcomeStatisticType,
+                                  selectedOutcomeStatisticTypeCallback: (String outcomeStatisticType) => setState(() => _currentOutcomeStatisticType = outcomeStatisticType),
+                                  expenditureFunction: _loadMonthlyExpenditureStatistic,
+                                  expenditureAndSavingrateFunction: _loadMonthlyExpenditureAndSavingsrateStatistic,
+                                  expenditureSavingrateAndInvestmentrateFunction: _loadMonthlyExpenditureSavingsrateAndInvestmentrateStatistic,
+                                )
+                              : _currentCategorieType == CategorieType.investment.pluralName
+                                  ? const Text('Einzelne Investments:')
+                                  : const SizedBox(),
+                          _currentCategorieType == CategorieType.investment.pluralName
+                              ? Switch(
+                                  value: _currentCategorieType == CategorieType.investment.pluralName ? _showSeparateInvestments : _showSavingsRate,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      _currentCategorieType == CategorieType.investment.pluralName ? _showSeparateInvestments = value : _showSavingsRate = value;
+                                    });
+                                  },
+                                )
+                              : const SizedBox(),
+                        ],
+                      ),
+                    ],
                   ),
                   RefreshIndicator(
                     onRefresh: () async {
