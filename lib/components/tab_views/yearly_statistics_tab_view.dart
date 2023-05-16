@@ -33,6 +33,8 @@ class _YearlyStatisticsTabViewState extends State<YearlyStatisticsTabView> {
   bool _showSavingsRate = true;
   bool _showSeparateInvestments = true;
 
+  // TODO hier weitermachen und gleich implementieren wie bei monthly_statistics_tab_view nur nicht auf
+  // Monatsbasis, sondern auf Jahresbasis + ebenfalls gemeinsame Widgets einbinden
   Future<List<PercentageStats>> _loadYearlyExpenditureStatistic() async {
     _percentageStats = [];
     _totalExpenditures = 0.0;

@@ -28,7 +28,7 @@ class TransactionStatsButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(top: 8.0, left: 12.0),
+      padding: const EdgeInsets.only(left: 12.0),
       child: OutlinedButton(
         onPressed: () => _changeCategorieType(),
         child: Text(

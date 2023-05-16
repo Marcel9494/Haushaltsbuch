@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
-import '../deco/bottom_sheet_line.dart';
+import '/models/enums/outcome_statistic_types.dart';
 
-import '../../models/enums/outcome_statistic_types.dart';
+import '../deco/bottom_sheet_line.dart';
 
 typedef SelectedOutcomeStatisticTypeCallback = void Function(String outcomeStatisticType);
 
@@ -80,7 +80,7 @@ class ExpenditureStatsButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(right: 12.0),
+      padding: const EdgeInsets.only(top: 8.0, right: 12.0),
       child: OutlinedButton(
         onPressed: () => _openBottomSheetMenu(context),
         child: Text(

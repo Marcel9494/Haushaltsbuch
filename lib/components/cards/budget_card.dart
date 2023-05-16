@@ -59,7 +59,7 @@ class BudgetCard extends StatelessWidget {
                             children: [
                               Padding(
                                 padding: const EdgeInsets.only(left: 18.0, top: 14.0, bottom: 14.0),
-                                child: Text(budget.categorie),
+                                child: Text(budget.categorie, overflow: TextOverflow.ellipsis, maxLines: 2),
                               ),
                             ],
                           ),
@@ -69,7 +69,10 @@ class BudgetCard extends StatelessWidget {
                         flex: 4,
                         child: Padding(
                           padding: const EdgeInsets.only(left: 18.0),
-                          child: Text('${formatToMoneyAmount(budget.currentExpenditure.toString())} / ${formatToMoneyAmount(budget.budget.toString())}'),
+                          child: Text(
+                            '${formatToMoneyAmount(budget.currentExpenditure.toString())} / ${formatToMoneyAmount(budget.budget.toString())}',
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
                       ),
                     ],

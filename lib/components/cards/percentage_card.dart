@@ -29,30 +29,30 @@ class PercentageCard extends StatelessWidget {
           ),
           child: Container(
             decoration: BoxDecoration(
-              border: Border(left: BorderSide(color: percentageStats.statColor, width: 6)),
+              border: Border(left: BorderSide(color: percentageStats.statColor, width: 6.0)),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                RichText(
-                  textAlign: TextAlign.center,
-                  text: TextSpan(
-                    children: [
-                      WidgetSpan(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                          child: Text('${percentageStats.percentage.toStringAsFixed(0)} %'),
-                        ),
-                      ),
-                      TextSpan(
-                        text: percentageStats.name,
-                      ),
-                    ],
+                Expanded(
+                  flex: 5,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                    child: Text(
+                      '${percentageStats.percentage.toStringAsFixed(1).replaceAll('.', ',')} %\t\t${percentageStats.name}',
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 16.0, bottom: 16.0, right: 16.0),
-                  child: Text(percentageStats.amount),
+                Expanded(
+                  flex: 2,
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 16.0, bottom: 16.0, right: 16.0),
+                    child: Text(
+                      percentageStats.amount,
+                      textAlign: TextAlign.right,
+                    ),
+                  ),
                 ),
               ],
             ),

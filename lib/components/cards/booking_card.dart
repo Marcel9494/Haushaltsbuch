@@ -60,18 +60,18 @@ class BookingCard extends StatelessWidget {
                         children: [
                           booking.transactionType == TransactionType.transfer.name || booking.transactionType == TransactionType.investment.name
                               ? const SizedBox()
-                              : Text(booking.categorie),
+                              : Text(booking.categorie, overflow: TextOverflow.ellipsis),
                           Padding(
                             padding: EdgeInsets.only(
                                 top: booking.transactionType == TransactionType.transfer.name || booking.transactionType == TransactionType.investment.name ? 0.0 : 8.0),
-                            child: Text(booking.fromAccount, style: const TextStyle(color: Colors.grey)),
+                            child: Text(booking.fromAccount, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.grey)),
                           ),
                           booking.transactionType == TransactionType.transfer.name || booking.transactionType == TransactionType.investment.name
                               ? Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     const Icon(Icons.keyboard_arrow_down_rounded, color: Colors.grey, size: 16.0),
-                                    Text(booking.toAccount, style: const TextStyle(color: Colors.grey)),
+                                    Text(booking.toAccount, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.grey)),
                                   ],
                                 )
                               : const SizedBox(),

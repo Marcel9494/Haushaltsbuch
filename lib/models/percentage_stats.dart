@@ -1,6 +1,6 @@
 import 'dart:ui';
 
-import '../utils/color_palettes/charts_color_palette.dart';
+import '/utils/color_palettes/charts_color_palette.dart';
 import '/utils/number_formatters/number_formatter.dart';
 
 class PercentageStats {
@@ -42,6 +42,11 @@ class PercentageStats {
 
   static List<PercentageStats> calculatePercentage(List<PercentageStats> percentageStats, double total) {
     for (int i = 0; i < percentageStats.length; i++) {
+      print(percentageStats[i].amount);
+      if (total <= 0.0) {
+        percentageStats[i].percentage = 0.0;
+        continue;
+      }
       percentageStats[i].percentage = (formatMoneyAmountToDouble(percentageStats[i].amount) * 100) / total;
     }
     return percentageStats;
