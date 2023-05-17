@@ -42,7 +42,6 @@ class PercentageStats {
 
   static List<PercentageStats> calculatePercentage(List<PercentageStats> percentageStats, double total) {
     for (int i = 0; i < percentageStats.length; i++) {
-      print(percentageStats[i].amount);
       if (total <= 0.0) {
         percentageStats[i].percentage = 0.0;
         continue;
