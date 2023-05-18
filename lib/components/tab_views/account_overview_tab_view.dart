@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:haushaltsbuch/utils/number_formatters/number_formatter.dart';
 
 import '../../models/account.dart';
 
@@ -15,9 +16,12 @@ class AccountOverviewTabView extends StatefulWidget {
 
 class _AccountOverviewTabViewState extends State<AccountOverviewTabView> {
   List<Account> _accountList = [];
+  Map<String, double> _accountTypeBalanceMap = {};
 
   Future<List<Account>> _loadAccountList() async {
     _accountList = await Account.loadAccounts();
+    _accountTypeBalanceMap = await Account.getAccountTypeBalance(_accountList);
+    print(_accountTypeBalanceMap);
     return _accountList;
   }
 
@@ -53,8 +57,17 @@ class _AccountOverviewTabViewState extends State<AccountOverviewTabView> {
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
                             Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(_accountList[index].accountType, style: const TextStyle(fontSize: 16.0)),
+                              padding: const EdgeInsets.fromLTRB(16.0, 8.0, 32.0, 8.0),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(_accountList[index].accountType, style: const TextStyle(fontSize: 16.0)),
+                                  Text(
+                                    formatToMoneyAmount(_accountTypeBalanceMap[_accountList[index].accountType].toString()),
+                                    style: TextStyle(fontWeight: FontWeight.bold),
+                                  ),
+                                ],
+                              ),
                             ),
                             AccountCard(account: _accountList[index]),
                           ],

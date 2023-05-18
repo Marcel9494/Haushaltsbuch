@@ -91,8 +91,7 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
                                   center: Text('${_completeBudgetPercentage.toStringAsFixed(1)} %', style: const TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold)),
                                   header: Padding(
                                     padding: const EdgeInsets.only(bottom: 12.0),
-                                    child: Text(
-                                        'Gesamtbudget: ${formatToMoneyAmount(_completeBudgetExpenditures.toString())} / ${formatToMoneyAmount(_completeBudgetAmount.toString())}',
+                                    child: Text('${formatToMoneyAmount(_completeBudgetExpenditures.toString())} / ${formatToMoneyAmount(_completeBudgetAmount.toString())}',
                                         style: const TextStyle(fontSize: 16.0)),
                                   ),
                                   progressColor: _completeBudgetPercentage < 80.0

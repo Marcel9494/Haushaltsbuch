@@ -90,17 +90,26 @@ class _MonthlyStatisticsTabViewState extends State<MonthlyStatisticsTabView> {
     return _percentageStats;
   }
 
+  double _checkPercentageValue(double value) {
+    if (value / 100 >= 1.0) {
+      return 1.0;
+    } else if (value / 100 <= 0.0) {
+      return 0.0;
+    }
+    return value / 100;
+  }
+
   List<PieChartSectionData> _showingSections() {
     return List.generate(_percentageStats.length, (i) {
       return PieChartSectionData(
         color: _percentageStats[i].statColor,
         value: _percentageStats[i].percentage,
         title: _percentageStats[i].percentage.toStringAsFixed(1).replaceAll('.', ',') + '%',
-        badgeWidget: Text(_percentageStats[i].name),
+        badgeWidget: Text(_percentageStats[i].name, style: const TextStyle(fontSize: 10.0)),
         badgePositionPercentageOffset: 1.3,
         radius: 46.0,
         titleStyle: const TextStyle(
-          fontSize: 16.0,
+          fontSize: 14.0,
           fontWeight: FontWeight.bold,
           color: Colors.white70,
         ),
@@ -119,15 +128,6 @@ class _MonthlyStatisticsTabViewState extends State<MonthlyStatisticsTabView> {
         radius: 46.0,
       );
     });
-  }
-
-  double _checkPercentageValue(double value) {
-    if (value / 100 >= 1.0) {
-      return 1.0;
-    } else if (value / 100 <= 0.0) {
-      return 0.0;
-    }
-    return value / 100;
   }
 
   @override

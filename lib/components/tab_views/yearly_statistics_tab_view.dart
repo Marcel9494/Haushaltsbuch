@@ -1,6 +1,8 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:percent_indicator/circular_percent_indicator.dart';
 
+import '../buttons/transaction_stats_button.dart';
 import '/models/booking.dart';
 import '/models/percentage_stats.dart';
 import '/models/enums/categorie_types.dart';
@@ -26,173 +28,270 @@ class YearlyStatisticsTabView extends StatefulWidget {
 
 class _YearlyStatisticsTabViewState extends State<YearlyStatisticsTabView> {
   List<PercentageStats> _percentageStats = [];
+  List<Booking> _bookingList = [];
   String _currentCategorieType = CategorieType.outcome.pluralName;
-  double _totalExpenditures = 0.0;
-  double _totalRevenues = 0.0;
+  double _totalSavings = 0.0;
+  double _savingPercentage = 0.0;
   double _totalInvestments = 0.0;
-  bool _showSavingsRate = true;
-  bool _showSeparateInvestments = true;
+  double _investmentPercentage = 0.0;
 
-  // TODO hier weitermachen und gleich implementieren wie bei monthly_statistics_tab_view nur nicht auf
-  // Monatsbasis, sondern auf Jahresbasis + ebenfalls gemeinsame Widgets einbinden
-  Future<List<PercentageStats>> _loadYearlyExpenditureStatistic() async {
-    _percentageStats = [];
-    _totalExpenditures = 0.0;
-    bool categorieStatsAreUpdated = false;
-    List<Booking> _bookingList = [];
+  Future<List<PercentageStats>> _loadStatistics() async {
+    _bookingList = [];
     for (int i = 0; i < 12; i++) {
-      _bookingList.addAll(await Booking.loadMonthlyBookingList(i + 1, widget.selectedDate.year));
+      _bookingList += await Booking.loadMonthlyBookingList(i + 1, widget.selectedDate.year);
     }
-    for (int i = 0; i < _bookingList.length; i++) {
-      if (_bookingList[i].transactionType == TransactionType.outcome.name || (_showSavingsRate && _bookingList[i].transactionType == TransactionType.investment.name)) {
-        categorieStatsAreUpdated = false;
-        _totalExpenditures += formatMoneyAmountToDouble(_bookingList[i].amount);
-        if (_showSavingsRate && _bookingList[i].transactionType == TransactionType.investment.name) {
-          _percentageStats = PercentageStats.createOrUpdatePercentageStats(i, _bookingList[i].amount, _percentageStats, 'Investition', categorieStatsAreUpdated);
-        } else {
-          _percentageStats = PercentageStats.createOrUpdatePercentageStats(i, _bookingList[i].amount, _percentageStats, _bookingList[i].categorie, categorieStatsAreUpdated);
-        }
-      }
-    }
-    _percentageStats = PercentageStats.calculatePercentage(_percentageStats, _totalExpenditures);
-    _percentageStats.sort((first, second) => second.percentage.compareTo(first.percentage));
-    return _percentageStats;
-  }
-
-  Future<List<PercentageStats>> _loadYearlyRevenueStatistic() async {
-    _percentageStats = [];
-    _totalRevenues = 0.0;
-    bool categorieStatsAreUpdated = false;
-    List<Booking> _bookingList = [];
-    for (int i = 0; i < 12; i++) {
-      _bookingList.addAll(await Booking.loadMonthlyBookingList(i + 1, widget.selectedDate.year));
-    }
-    for (int i = 0; i < _bookingList.length; i++) {
-      if (_bookingList[i].transactionType == TransactionType.income.name) {
-        categorieStatsAreUpdated = false;
-        _totalRevenues += formatMoneyAmountToDouble(_bookingList[i].amount);
-        _percentageStats = PercentageStats.createOrUpdatePercentageStats(i, _bookingList[i].amount, _percentageStats, _bookingList[i].categorie, categorieStatsAreUpdated);
-      }
-    }
-    _percentageStats = PercentageStats.calculatePercentage(_percentageStats, _totalRevenues);
-    _percentageStats.sort((first, second) => second.percentage.compareTo(first.percentage));
-    return _percentageStats;
-  }
-
-  Future<List<PercentageStats>> _loadYearlyInvestmentStatistic() async {
-    _percentageStats = [];
-    _totalInvestments = 0.0;
-    bool categorieStatsAreUpdated = false;
-    List<Booking> _bookingList = [];
-    for (int i = 0; i < 12; i++) {
-      _bookingList.addAll(await Booking.loadMonthlyBookingList(i + 1, widget.selectedDate.year));
-    }
-    for (int i = 0; i < _bookingList.length; i++) {
-      if (_bookingList[i].transactionType == TransactionType.investment.name) {
-        categorieStatsAreUpdated = false;
-        _totalInvestments += formatMoneyAmountToDouble(_bookingList[i].amount);
-        if (_showSeparateInvestments && _bookingList[i].transactionType == TransactionType.investment.name) {
-          _percentageStats = PercentageStats.showSeparatePercentages(i, _bookingList[i].amount, _percentageStats, _bookingList[i].categorie);
-        } else {
-          _percentageStats = PercentageStats.createOrUpdatePercentageStats(i, _bookingList[i].amount, _percentageStats, _bookingList[i].categorie, categorieStatsAreUpdated);
-        }
-      }
-    }
-    _percentageStats = PercentageStats.calculatePercentage(_percentageStats, _totalInvestments);
-    _percentageStats.sort((first, second) => second.percentage.compareTo(first.percentage));
-    return _percentageStats;
-  }
-
-  void _changeCategorieType() {
+    _totalSavings = await _getYearlySavings();
+    _totalInvestments = Booking.getInvestments(_bookingList);
+    _savingPercentage = await _getYearlySavingRate();
+    _investmentPercentage = await _getYearlyInvestmentRate();
     if (_currentCategorieType == CategorieType.outcome.pluralName) {
-      _currentCategorieType = CategorieType.income.pluralName;
+      return _loadYearlyStatistic(TransactionType.outcome);
     } else if (_currentCategorieType == CategorieType.income.pluralName) {
-      _currentCategorieType = CategorieType.investment.pluralName;
+      return _loadYearlyStatistic(TransactionType.income);
     } else if (_currentCategorieType == CategorieType.investment.pluralName) {
-      _currentCategorieType = CategorieType.outcome.pluralName;
+      return _loadYearlyStatistic(TransactionType.investment);
     }
-    setState(() {});
+    return _loadYearlyStatistic(TransactionType.outcome);
+  }
+
+  Future<List<PercentageStats>> _loadYearlyStatistic(TransactionType transactionType) async {
+    _percentageStats = [];
+    double total = 0.0;
+    for (int i = 0; i < _bookingList.length; i++) {
+      if (_bookingList[i].transactionType == transactionType.name) {
+        total += formatMoneyAmountToDouble(_bookingList[i].amount);
+        _percentageStats = PercentageStats.createOrUpdatePercentageStats(i, _bookingList[i].amount, _percentageStats, _bookingList[i].categorie, false);
+      }
+    }
+    _percentageStats = PercentageStats.calculatePercentage(_percentageStats, total);
+    _percentageStats.sort((first, second) => second.percentage.compareTo(first.percentage));
+    return _percentageStats;
+  }
+
+  Future<double> _getYearlySavings() async {
+    double totalRevenues = Booking.getRevenues(_bookingList);
+    double totalExpenditures = Booking.getExpenditures(_bookingList);
+    double totalInvestments = Booking.getInvestments(_bookingList);
+    return totalRevenues - totalExpenditures - totalInvestments;
+  }
+
+  Future<double> _getYearlySavingRate() async {
+    double totalRevenues = Booking.getRevenues(_bookingList);
+    if (totalRevenues <= 0.0) {
+      return 0.0;
+    }
+    return (_totalSavings * 100) / totalRevenues;
+  }
+
+  Future<double> _getYearlyInvestmentRate() async {
+    double totalInvestments = Booking.getInvestments(_bookingList);
+    double totalRevenues = Booking.getRevenues(_bookingList);
+    if (totalRevenues <= 0.0) {
+      return 0.0;
+    }
+    return (totalInvestments * 100) / totalRevenues;
+  }
+
+  double _checkPercentageValue(double value) {
+    if (value / 100 >= 1.0) {
+      return 1.0;
+    } else if (value / 100 <= 0.0) {
+      return 0.0;
+    }
+    return value / 100;
+  }
+
+  List<PieChartSectionData> _showingSections() {
+    return List.generate(_percentageStats.length, (i) {
+      return PieChartSectionData(
+        color: _percentageStats[i].statColor,
+        value: _percentageStats[i].percentage,
+        title: _percentageStats[i].percentage.toStringAsFixed(1).replaceAll('.', ',') + '%',
+        badgeWidget: Text(_percentageStats[i].name, style: const TextStyle(fontSize: 10.0)),
+        badgePositionPercentageOffset: 1.3,
+        radius: 46.0,
+        titleStyle: const TextStyle(
+          fontSize: 14.0,
+          fontWeight: FontWeight.bold,
+          color: Colors.white70,
+        ),
+      );
+    });
+  }
+
+  List<PieChartSectionData> _showingEmptyDiagram() {
+    return List.generate(1, (i) {
+      return PieChartSectionData(
+        color: Colors.grey,
+        value: 100,
+        title: '',
+        badgeWidget: const Text(''),
+        badgePositionPercentageOffset: 1.3,
+        radius: 46.0,
+      );
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: _currentCategorieType == CategorieType.outcome.pluralName
-          ? _loadYearlyExpenditureStatistic()
-          : _currentCategorieType == CategorieType.income.pluralName
-              ? _loadYearlyRevenueStatistic()
-              : _loadYearlyInvestmentStatistic(),
+      future: _loadStatistics(),
       builder: (BuildContext context, AsyncSnapshot<List<PercentageStats>> snapshot) {
         switch (snapshot.connectionState) {
           case ConnectionState.waiting:
             return const LoadingIndicator();
           case ConnectionState.done:
             if (_percentageStats.isEmpty) {
-              return const Expanded(
-                child: Center(
-                  child: Text('Noch keine Ausgaben vorhanden.'),
+              return Expanded(
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: _currentCategorieType == CategorieType.income.pluralName ? MainAxisAlignment.start : MainAxisAlignment.spaceBetween,
+                      children: [
+                        TransactionStatsButton(
+                          categorieType: _currentCategorieType,
+                          selectedCategorieTypeCallback: (String categorieType) => setState(() => _currentCategorieType = categorieType),
+                        ),
+                      ],
+                    ),
+                    AspectRatio(
+                      aspectRatio: 2.0,
+                      child: PieChart(
+                        PieChartData(
+                          borderData: FlBorderData(
+                            show: false,
+                          ),
+                          sectionsSpace: 4.0,
+                          centerSpaceRadius: 30.0,
+                          sections: _showingEmptyDiagram(),
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Center(
+                        child: Text('Noch keine $_currentCategorieType vorhanden.'),
+                      ),
+                    ),
+                  ],
                 ),
               );
             } else {
               return Column(
                 children: [
-                  AspectRatio(
-                    aspectRatio: 1.6,
-                    child: PieChart(
-                      PieChartData(
-                        borderData: FlBorderData(
-                          show: false,
-                        ),
-                        sectionsSpace: 4.0,
-                        centerSpaceRadius: 40.0,
-                        sections: showingSections(),
-                      ),
-                    ),
-                  ),
                   Row(
-                    mainAxisAlignment: _currentCategorieType == CategorieType.income.pluralName ? MainAxisAlignment.start : MainAxisAlignment.spaceAround,
+                    mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      Padding(
-                        padding: _currentCategorieType == CategorieType.income.pluralName ? const EdgeInsets.only(left: 12.0) : const EdgeInsets.all(0.0),
-                        child: OutlinedButton(
-                          onPressed: () => _changeCategorieType(),
-                          child: Text(
-                            _currentCategorieType,
-                            style: const TextStyle(color: Colors.cyanAccent),
-                          ),
-                        ),
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          _currentCategorieType == CategorieType.outcome.pluralName
-                              ? const Text('Sparquote anzeigen:')
-                              : _currentCategorieType == CategorieType.investment.pluralName
-                                  ? const Text('Einzelne Positionen:')
-                                  : const SizedBox(),
-                          _currentCategorieType == CategorieType.outcome.pluralName || _currentCategorieType == CategorieType.investment.pluralName
-                              ? Switch(
-                                  value: _currentCategorieType == CategorieType.investment.pluralName ? _showSeparateInvestments : _showSavingsRate,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      _currentCategorieType == CategorieType.investment.pluralName ? _showSeparateInvestments = value : _showSavingsRate = value;
-                                    });
-                                  },
-                                )
-                              : const SizedBox(),
-                        ],
+                      TransactionStatsButton(
+                        categorieType: _currentCategorieType,
+                        selectedCategorieTypeCallback: (String categorieType) => setState(() => _currentCategorieType = categorieType),
                       ),
                     ],
                   ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    child: AspectRatio(
+                      aspectRatio: 2.0,
+                      child: PieChart(
+                        PieChartData(
+                          borderData: FlBorderData(
+                            show: false,
+                          ),
+                          sectionsSpace: 4.0,
+                          centerSpaceRadius: 30.0,
+                          sections: _showingSections(),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        Expanded(
+                          flex: 2,
+                          child: Row(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                                child: CircularPercentIndicator(
+                                  radius: 20.0,
+                                  lineWidth: 2.0,
+                                  percent: _checkPercentageValue(_savingPercentage),
+                                  center: Text('${_savingPercentage.toStringAsFixed(0)}%', style: const TextStyle(fontSize: 12.0)),
+                                  progressColor: Colors.cyanAccent,
+                                  backgroundWidth: 1.0,
+                                  circularStrokeCap: CircularStrokeCap.round,
+                                  animation: true,
+                                  animateFromLastPercent: true,
+                                ),
+                              ),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(formatToMoneyAmount(_totalSavings.toString()), style: const TextStyle(fontSize: 12.0)),
+                                  const Text('Gespart', style: TextStyle(color: Colors.grey, fontSize: 12.0)),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                        Column(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                              child: Container(
+                                padding: const EdgeInsets.fromLTRB(8.0, 8.0, 6.0, 8.0),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(6.0),
+                                  border: Border.all(color: Colors.cyanAccent),
+                                ),
+                                child: Text(formatToMoneyAmount((_totalSavings + _totalInvestments).toString()), style: const TextStyle(fontSize: 12.0)),
+                              ),
+                            ),
+                          ],
+                        ),
+                        Expanded(
+                          flex: 2,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  Text(formatToMoneyAmount(_totalInvestments.toString()), style: const TextStyle(fontSize: 12.0)),
+                                  const Text('Investiert', style: TextStyle(color: Colors.grey, fontSize: 12.0)),
+                                ],
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                                child: CircularPercentIndicator(
+                                  radius: 20.0,
+                                  lineWidth: 2.0,
+                                  percent: _checkPercentageValue(_investmentPercentage),
+                                  center: Text('${_investmentPercentage.toStringAsFixed(0)}%', style: const TextStyle(fontSize: 12.0)),
+                                  progressColor: Colors.cyanAccent,
+                                  backgroundWidth: 1.0,
+                                  circularStrokeCap: CircularStrokeCap.round,
+                                  animation: true,
+                                  animateFromLastPercent: true,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                   RefreshIndicator(
                     onRefresh: () async {
-                      _percentageStats = await _loadYearlyExpenditureStatistic();
+                      _percentageStats = await _loadStatistics();
                       setState(() {});
                       return;
                     },
                     color: Colors.cyanAccent,
                     child: SizedBox(
-                      height: 275.0,
+                      height: 250.0,
                       child: ListView.builder(
                         itemCount: _percentageStats.length,
                         itemBuilder: (BuildContext context, int index) {
@@ -212,23 +311,5 @@ class _YearlyStatisticsTabViewState extends State<YearlyStatisticsTabView> {
         }
       },
     );
-  }
-
-  List<PieChartSectionData> showingSections() {
-    return List.generate(_percentageStats.length, (i) {
-      return PieChartSectionData(
-        color: _percentageStats[i].statColor,
-        value: _percentageStats[i].percentage,
-        title: _percentageStats[i].percentage.toStringAsFixed(1) + '%',
-        badgeWidget: Text(_percentageStats[i].name),
-        badgePositionPercentageOffset: 1.3,
-        radius: 50.0,
-        titleStyle: const TextStyle(
-          fontSize: 16.0,
-          fontWeight: FontWeight.bold,
-          color: Colors.white70,
-        ),
-      );
-    });
   }
 }

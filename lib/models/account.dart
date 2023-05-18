@@ -167,11 +167,25 @@ class Account extends HiveObject {
     double liabilityValue = 0.0;
     for (int i = 0; i < accountBox.length; i++) {
       Account account = await accountBox.getAt(i);
-      if (account.accountType == 'Kredit') {
+      if (account.accountType == AccountType.credit.name) {
         liabilityValue += double.parse(account.bankBalance.substring(0, account.bankBalance.length - 2).replaceAll('.', '').replaceAll(',', '.'));
       }
     }
     return liabilityValue;
+  }
+
+  static Future<Map<String, double>> getAccountTypeBalance(List<Account> accountList) async {
+    late final Map<String, double> accountTypeBalanceMap = {};
+    for (int i = 0; i < accountList.length; i++) {
+      if (accountTypeBalanceMap.containsKey(accountList[i].accountType) == false) {
+        accountTypeBalanceMap[accountList[i].accountType] = formatMoneyAmountToDouble(accountList[i].bankBalance);
+      } else {
+        double? amount = accountTypeBalanceMap[accountList[i].accountType];
+        amount = amount! + formatMoneyAmountToDouble(accountList[i].bankBalance);
+        accountTypeBalanceMap[accountList[i].accountType] = amount;
+      }
+    }
+    return accountTypeBalanceMap;
   }
 
   static void createStartAccounts() async {

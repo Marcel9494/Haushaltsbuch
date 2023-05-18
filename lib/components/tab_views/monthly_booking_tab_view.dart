@@ -15,12 +15,14 @@ class MonthlyBookingTabView extends StatefulWidget {
   final DateTime selectedDate;
   final String categorie;
   final String account;
+  final bool showOverviewTile;
 
   const MonthlyBookingTabView({
     Key? key,
     required this.selectedDate,
     required this.categorie,
     required this.account,
+    this.showOverviewTile = true,
   }) : super(key: key);
 
   @override
@@ -86,18 +88,20 @@ class _MonthlyBookingTabViewState extends State<MonthlyBookingTabView> {
             case ConnectionState.done:
               if (_bookingList.isEmpty) {
                 return Column(
-                  children: const [
-                    OverviewTile(
-                      shouldText: 'Einnahmen',
-                      should: 0,
-                      haveText: 'Ausgaben',
-                      have: 0,
-                      balanceText: 'Saldo',
-                      showAverageValuesPerDay: true,
-                      investmentText: 'Investitionen',
-                      showInvestments: true,
-                    ),
-                    Expanded(
+                  children: [
+                    widget.showOverviewTile
+                        ? const OverviewTile(
+                            shouldText: 'Einnahmen',
+                            should: 0,
+                            haveText: 'Ausgaben',
+                            have: 0,
+                            balanceText: 'Saldo',
+                            showAverageValuesPerDay: true,
+                            investmentText: 'Investitionen',
+                            showInvestments: true,
+                          )
+                        : const SizedBox(),
+                    const Expanded(
                       child: Center(
                         child: Text('Noch keine Buchungen vorhanden.'),
                       ),
@@ -107,17 +111,19 @@ class _MonthlyBookingTabViewState extends State<MonthlyBookingTabView> {
               } else {
                 return Column(
                   children: [
-                    OverviewTile(
-                      shouldText: 'Einnahmen',
-                      should: Booking.getRevenues(_bookingList),
-                      haveText: 'Ausgaben',
-                      have: Booking.getExpenditures(_bookingList),
-                      balanceText: 'Saldo',
-                      showAverageValuesPerDay: true,
-                      investmentText: 'Investitionen',
-                      investmentAmount: Booking.getInvestments(_bookingList),
-                      showInvestments: true,
-                    ),
+                    widget.showOverviewTile
+                        ? OverviewTile(
+                            shouldText: 'Einnahmen',
+                            should: Booking.getRevenues(_bookingList),
+                            haveText: 'Ausgaben',
+                            have: Booking.getExpenditures(_bookingList),
+                            balanceText: 'Saldo',
+                            showAverageValuesPerDay: true,
+                            investmentText: 'Investitionen',
+                            investmentAmount: Booking.getInvestments(_bookingList),
+                            showInvestments: true,
+                          )
+                        : const SizedBox(),
                     Expanded(
                       child: RefreshIndicator(
                         onRefresh: () async {

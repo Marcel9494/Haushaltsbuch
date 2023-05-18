@@ -27,6 +27,7 @@ class _CategorieAmountListScreenState extends State<CategorieAmountListScreen> {
             selectedDate: widget.selectedDate,
             categorie: widget.categorie,
             account: '',
+            showOverviewTile: false,
           ),
         ],
       ),

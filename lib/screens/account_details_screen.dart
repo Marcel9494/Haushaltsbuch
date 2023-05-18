@@ -71,6 +71,7 @@ class _AccountDetailsScreenState extends State<AccountDetailsScreen> {
             selectedDate: _selectedDate,
             categorie: '',
             account: widget.account.name,
+            showOverviewTile: false,
           ),
         ],
       ),

@@ -40,7 +40,10 @@ class MonthlyOverviewCard extends StatelessWidget {
                       decoration: BoxDecoration(
                         border: Border(right: BorderSide(color: Colors.grey.shade700, width: 0.5)),
                       ),
-                      child: Text(monthlyStats.month),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 18.0),
+                        child: Text(monthlyStats.month),
+                      ),
                     ),
                   ),
                   Expanded(
