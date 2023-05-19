@@ -21,21 +21,29 @@ class EditBudgetCard extends StatefulWidget {
 class _EditBudgetCardState extends State<EditBudgetCard> {
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(18.0),
-            child: Text(widget.budget.categorie),
-          ),
-          Text(formatToMoneyAmount(widget.budget.budget.toString())),
-          IconButton(
-              onPressed: () {
-                Navigator.pushNamed(context, editBudgetRoute, arguments: EditBudgetScreenArguments(widget.budget));
-              },
-              icon: const Icon(Icons.edit_rounded)),
-        ],
+    return GestureDetector(
+      onTap: () => Navigator.pushNamed(context, editBudgetRoute, arguments: EditBudgetScreenArguments(widget.budget)),
+      child: Card(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              flex: 3,
+              child: Padding(
+                padding: const EdgeInsets.all(18.0),
+                child: Text(widget.budget.categorie, overflow: TextOverflow.ellipsis),
+              ),
+            ),
+            Expanded(
+              flex: 1,
+              child: Text(formatToMoneyAmount(widget.budget.budget.toString()), overflow: TextOverflow.ellipsis),
+            ),
+            const Expanded(
+              flex: 1,
+              child: Icon(Icons.edit_rounded),
+            ),
+          ],
+        ),
       ),
     );
   }

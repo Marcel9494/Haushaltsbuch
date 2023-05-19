@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../utils/date_formatters/date_formatter.dart';
 import '/models/budget.dart';
 import '/models/screen_arguments/create_or_edit_budget_screen_arguments.dart';
 
@@ -41,12 +42,15 @@ class _StandardBudgetCardState extends State<StandardBudgetCard> {
     return GestureDetector(
       onTap: () => Navigator.pushNamed(context, createOrEditBudgetRoute, arguments: CreateOrEditBudgetScreenArguments(-2, widget.budgetList[0].categorie)),
       child: Card(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Text('Standardbudget'),
-            Text(formatToMoneyAmount(standardBudget.budget.toString())),
-          ],
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 8.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text('${widget.budgetList[0].categorie} Standardbudget'),
+              Text(formatToMoneyAmount(standardBudget.budget.toString())),
+            ],
+          ),
         ),
       ),
     );

@@ -64,6 +64,7 @@ class _EditBudgetScreenState extends State<EditBudgetScreen> {
         ],
       ),
       body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           YearPickerButtons(selectedYear: _selectedYear, selectedYearCallback: (selectedYear) => setState(() => _selectedYear = selectedYear)),
           FutureBuilder(
