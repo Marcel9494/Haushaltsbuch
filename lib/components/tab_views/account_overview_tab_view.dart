@@ -64,7 +64,7 @@ class _AccountOverviewTabViewState extends State<AccountOverviewTabView> {
                                   Text(_accountList[index].accountType, style: const TextStyle(fontSize: 16.0)),
                                   Text(
                                     formatToMoneyAmount(_accountTypeBalanceMap[_accountList[index].accountType].toString()),
-                                    style: TextStyle(fontWeight: FontWeight.bold),
+                                    style: const TextStyle(fontWeight: FontWeight.bold),
                                   ),
                                 ],
                               ),

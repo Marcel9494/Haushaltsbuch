@@ -35,7 +35,7 @@ class PercentageCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Expanded(
-                  flex: 5,
+                  flex: 7,
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 10.0),
                     child: Text(
@@ -45,12 +45,13 @@ class PercentageCard extends StatelessWidget {
                   ),
                 ),
                 Expanded(
-                  flex: 2,
+                  flex: 3,
                   child: Padding(
                     padding: const EdgeInsets.only(top: 16.0, bottom: 16.0, right: 16.0),
                     child: Text(
                       percentageStats.amount,
                       textAlign: TextAlign.right,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
                 ),

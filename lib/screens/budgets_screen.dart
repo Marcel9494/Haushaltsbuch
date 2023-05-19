@@ -57,10 +57,17 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
         child: Column(
           children: [
             Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 SizedBox(
                   width: MediaQuery.of(context).size.width / 2,
                   child: MonthPickerButtons(selectedDate: _selectedDate, selectedDateCallback: _reloadBudgetList),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(right: 12.0),
+                  child: DateTime.now().month == _selectedDate.month
+                      ? Text('Restliche Tage: ${DateTime(_selectedDate.year, _selectedDate.month + 1, 0).day - DateTime.now().day}')
+                      : const SizedBox(),
                 ),
               ],
             ),
@@ -97,7 +104,7 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
                                   progressColor: _completeBudgetPercentage < 80.0
                                       ? Colors.greenAccent
                                       : _completeBudgetPercentage < 100.0
-                                          ? Colors.yellowAccent
+                                          ? Colors.yellowAccent.shade700
                                           : Colors.redAccent,
                                   arcType: ArcType.HALF,
                                   circularStrokeCap: CircularStrokeCap.round,
