@@ -23,7 +23,7 @@ class _OverviewBudgetsScreenState extends State<OverviewBudgetsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Budgets bearbeiten')),
+      appBar: AppBar(title: const Text('Budgets verwalten')),
       body: Column(
         children: [
           FutureBuilder(

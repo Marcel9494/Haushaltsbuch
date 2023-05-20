@@ -21,7 +21,6 @@ class _AccountOverviewTabViewState extends State<AccountOverviewTabView> {
   Future<List<Account>> _loadAccountList() async {
     _accountList = await Account.loadAccounts();
     _accountTypeBalanceMap = await Account.getAccountTypeBalance(_accountList);
-    print(_accountTypeBalanceMap);
     return _accountList;
   }
 

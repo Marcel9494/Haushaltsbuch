@@ -31,10 +31,12 @@ class _AssetAllocationStatisticTabViewState extends State<AssetAllocationStatist
       if (_currentAssetAllocationStatisticType == AssetAllocationStatisticType.individualAccounts.name) {
         _percentageStats = PercentageStats.showSeparatePercentages(i, _accountList[i].bankBalance, _percentageStats, _accountList[i].name);
       } else if (_currentAssetAllocationStatisticType == AssetAllocationStatisticType.individualAccountTypes.name) {
-        _percentageStats = PercentageStats.createOrUpdatePercentageStats(i, _accountList[i].bankBalance, _percentageStats, _accountList[i].accountType, categorieStatsAreUpdated);
+        _percentageStats = PercentageStats.createOrUpdatePercentageStats(
+            i, _accountList[i].bankBalance, _percentageStats, AccountTypeExtension.getAccountTypePluralName(_accountList[i].accountType), categorieStatsAreUpdated);
       } else if (_currentAssetAllocationStatisticType == AssetAllocationStatisticType.capitalOrRiskFreeInvestments.name) {
         if (_accountList[i].accountType == AccountType.capitalInvestments.name) {
-          _percentageStats = PercentageStats.createOrUpdatePercentageStats(i, _accountList[i].bankBalance, _percentageStats, _accountList[i].accountType, categorieStatsAreUpdated);
+          _percentageStats =
+              PercentageStats.createOrUpdatePercentageStats(i, _accountList[i].bankBalance, _percentageStats, AccountType.capitalInvestments.pluralName, categorieStatsAreUpdated);
         } else {
           _percentageStats = PercentageStats.createOrUpdatePercentageStats(i, _accountList[i].bankBalance, _percentageStats, 'risikolose Anlagen', categorieStatsAreUpdated);
         }

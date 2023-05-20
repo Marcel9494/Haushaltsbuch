@@ -19,7 +19,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Kategorien'),
+        title: const Text('Kategorien verwalten'),
         actions: [
           IconButton(
             icon: const Icon(Icons.add),

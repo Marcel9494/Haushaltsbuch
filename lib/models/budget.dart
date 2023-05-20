@@ -102,12 +102,12 @@ class Budget extends HiveObject {
     return budgetList;
   }
 
-  static Future<List<Budget>> loadOneBudgetCategorie(String budgetCategorie) async {
+  static Future<List<Budget>> loadOneBudgetCategorie(String budgetCategorie, [int selectedYear = -1]) async {
     var budgetBox = await Hive.openBox(budgetsBox);
     List<Budget> budgetList = [];
     for (int i = 0; i < budgetBox.length; i++) {
       Budget budget = await budgetBox.getAt(i);
-      if (budget.categorie == budgetCategorie) {
+      if (DateTime.parse(budget.budgetDate).year == selectedYear && budget.categorie == budgetCategorie && selectedYear != -1) {
         budget.boxIndex = i;
         budgetList.add(budget);
       }

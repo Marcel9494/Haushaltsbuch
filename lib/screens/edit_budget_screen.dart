@@ -27,7 +27,7 @@ class _EditBudgetScreenState extends State<EditBudgetScreen> {
   DateTime _selectedYear = DateTime.now();
 
   Future<List<Budget>> _loadOneBudgetCategorie() async {
-    _budgetList = await Budget.loadOneBudgetCategorie(widget.budget.categorie);
+    _budgetList = await Budget.loadOneBudgetCategorie(widget.budget.categorie, _selectedYear.year);
     return _budgetList;
   }
 

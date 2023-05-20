@@ -93,7 +93,7 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
                               child: SingleChildScrollView(
                                 child: CircularPercentIndicator(
                                   radius: 84.0,
-                                  lineWidth: 14.0,
+                                  lineWidth: 10.0,
                                   percent: _completeBudgetPercentage / 100 >= 1.0 ? 1.0 : _completeBudgetPercentage / 100,
                                   center: Text('${_completeBudgetPercentage.toStringAsFixed(1)} %', style: const TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold)),
                                   header: Padding(
