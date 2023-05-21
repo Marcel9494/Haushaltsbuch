@@ -20,7 +20,7 @@ class _CategorieAmountListScreenState extends State<CategorieAmountListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Monatliche Buchungen')),
+      appBar: AppBar(title: Text(widget.categorie)),
       body: Column(
         children: [
           MonthlyBookingTabView(
@@ -28,6 +28,7 @@ class _CategorieAmountListScreenState extends State<CategorieAmountListScreen> {
             categorie: widget.categorie,
             account: '',
             showOverviewTile: false,
+            showBarChart: true,
           ),
         ],
       ),

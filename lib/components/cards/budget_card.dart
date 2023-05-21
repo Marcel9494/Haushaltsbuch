@@ -77,9 +77,11 @@ class BudgetCard extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(formatToMoneyAmount((budget.budget - budget.currentExpenditure).toString()), overflow: TextOverflow.ellipsis),
-                              const Padding(
-                                padding: EdgeInsets.only(top: 2.0),
-                                child: Text('noch verfügbar', style: TextStyle(color: Colors.grey)),
+                              Padding(
+                                padding: const EdgeInsets.only(top: 2.0),
+                                child: budget.budget - budget.currentExpenditure >= 0.0
+                                    ? const Text('noch verfügbar', style: TextStyle(color: Colors.grey))
+                                    : const Text('überschritten', style: TextStyle(color: Colors.grey)),
                               ),
                             ],
                           ),

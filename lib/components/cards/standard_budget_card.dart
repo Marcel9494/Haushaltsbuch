@@ -47,8 +47,20 @@ class _StandardBudgetCardState extends State<StandardBudgetCard> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('${widget.budgetList[0].categorie} Standardbudget'),
-              Text(formatToMoneyAmount(standardBudget.budget.toString())),
+              Expanded(
+                flex: 5,
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 12.0),
+                  child: Text('${widget.budgetList[0].categorie} Standardbudget', overflow: TextOverflow.ellipsis, maxLines: 2),
+                ),
+              ),
+              Expanded(
+                flex: 1,
+                child: Text(
+                  formatToMoneyAmount(standardBudget.budget.toString()),
+                  textAlign: TextAlign.right,
+                ),
+              ),
             ],
           ),
         ),

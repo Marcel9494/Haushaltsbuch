@@ -49,9 +49,6 @@ class _CategoriesTabBarState extends State<CategoriesTabBar> {
                 ],
               ),
             ),
-            //Tab(text: CategorieType.outcome.pluralName, icon: const Icon(Icons.arrow_downward_rounded, size: 12.0)),
-            //Tab(text: CategorieType.income.pluralName),
-            //Tab(text: CategorieType.investment.pluralName),
           ],
         ),
         body: const TabBarView(

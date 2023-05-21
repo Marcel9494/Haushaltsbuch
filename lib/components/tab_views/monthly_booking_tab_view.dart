@@ -7,6 +7,8 @@ import '../cards/booking_card.dart';
 
 import '/utils/number_formatters/number_formatter.dart';
 
+import '../charts/monthly_bar_chart.dart';
+
 import '../deco/date_text.dart';
 import '../deco/loading_indicator.dart';
 import '../deco/overview_tile.dart';
@@ -16,6 +18,7 @@ class MonthlyBookingTabView extends StatefulWidget {
   final String categorie;
   final String account;
   final bool showOverviewTile;
+  final bool showBarChart;
 
   const MonthlyBookingTabView({
     Key? key,
@@ -23,6 +26,7 @@ class MonthlyBookingTabView extends StatefulWidget {
     required this.categorie,
     required this.account,
     this.showOverviewTile = true,
+    this.showBarChart = false,
   }) : super(key: key);
 
   @override
@@ -124,6 +128,7 @@ class _MonthlyBookingTabViewState extends State<MonthlyBookingTabView> {
                             showInvestments: true,
                           )
                         : const SizedBox(),
+                    widget.showBarChart ? MonthlyBarChart(bookingList: _bookingList) : const SizedBox(),
                     Expanded(
                       child: RefreshIndicator(
                         onRefresh: () async {
