@@ -3,7 +3,6 @@ import 'dart:math';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
-import '../buttons/month_picker_buttons.dart';
 import '/models/booking.dart';
 
 import '/utils/date_formatters/date_formatter.dart';
@@ -11,12 +10,14 @@ import '/utils/number_formatters/number_formatter.dart';
 
 class MonthlyBarChart extends StatefulWidget {
   final List<Booking> bookingList;
+  final DateTime selectedDate;
   final Color leftBarColor = Colors.cyanAccent;
   final Color avgColor = Colors.cyan;
 
   const MonthlyBarChart({
     Key? key,
     required this.bookingList,
+    required this.selectedDate,
   }) : super(key: key);
 
   @override
@@ -29,7 +30,6 @@ class MonthlyBarChartState extends State<MonthlyBarChart> {
   List<BarChartGroupData> _monthlyExpendituresBarGroups = [];
   List<BarChartGroupData> _reversedMonthlyExpendituresBarGroups = [];
   List<BarChartGroupData> _showingMonthlyExpendituresBarGroups = [];
-  DateTime _selectedDate = DateTime.now();
   final double width = 8;
   int touchedGroupIndex = -1;
 
@@ -39,11 +39,12 @@ class MonthlyBarChartState extends State<MonthlyBarChart> {
     _loadMonthlyBarChartData();
   }
 
+  // TODO Callback für _monthlyExpenditures implementieren!?
   Future<List<double>> _loadMonthlyBarChartData() async {
     _monthlyExpenditures = [];
     _monthlyExpendituresBarGroups = [];
     for (int i = 0; i < 7; i++) {
-      _bookingList = await Booking.loadMonthlyBookingList(_selectedDate.month - i, _selectedDate.year, widget.bookingList[0].categorie);
+      _bookingList = await Booking.loadMonthlyBookingList(widget.selectedDate.month - i, widget.selectedDate.year, widget.bookingList[0].categorie);
       if (_bookingList.isEmpty) {
         _monthlyExpenditures.insert(i, 0.0);
         _monthlyExpendituresBarGroups.add(makeGroupData(i, _monthlyExpenditures[i]));
@@ -68,26 +69,8 @@ class MonthlyBarChartState extends State<MonthlyBarChart> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            Row(
-              children: <Widget>[
-                Expanded(
-                  flex: 2,
-                  child: MonthPickerButtons(
-                    selectedDate: _selectedDate,
-                    selectedDateCallback: (DateTime selectedDate) {
-                      _selectedDate = selectedDate;
-                      _loadMonthlyBarChartData();
-                    },
-                  ),
-                ),
-                Expanded(
-                  flex: 1,
-                  child: _monthlyExpenditures.isEmpty ? const Text('Gesamtsumme: 0,0 €') : Text('Gesamtsumme: ' + formatToMoneyAmount(_monthlyExpenditures[0].toString())),
-                ),
-              ],
-            ),
             const SizedBox(
-              height: 26.0,
+              height: 20.0,
             ),
             Expanded(
               child: BarChart(
@@ -218,13 +201,13 @@ class MonthlyBarChartState extends State<MonthlyBarChart> {
 
   Widget bottomMonthTitles(double value, TitleMeta meta) {
     final months = <String>[
-      dateFormatterMMM.format(_selectedDate),
-      dateFormatterMMM.format(DateTime(_selectedDate.year, _selectedDate.month - 1)),
-      dateFormatterMMM.format(DateTime(_selectedDate.year, _selectedDate.month - 2)),
-      dateFormatterMMM.format(DateTime(_selectedDate.year, _selectedDate.month - 3)),
-      dateFormatterMMM.format(DateTime(_selectedDate.year, _selectedDate.month - 4)),
-      dateFormatterMMM.format(DateTime(_selectedDate.year, _selectedDate.month - 5)),
-      dateFormatterMMM.format(DateTime(_selectedDate.year, _selectedDate.month - 6)),
+      dateFormatterMMM.format(widget.selectedDate),
+      dateFormatterMMM.format(DateTime(widget.selectedDate.year, widget.selectedDate.month - 1)),
+      dateFormatterMMM.format(DateTime(widget.selectedDate.year, widget.selectedDate.month - 2)),
+      dateFormatterMMM.format(DateTime(widget.selectedDate.year, widget.selectedDate.month - 3)),
+      dateFormatterMMM.format(DateTime(widget.selectedDate.year, widget.selectedDate.month - 4)),
+      dateFormatterMMM.format(DateTime(widget.selectedDate.year, widget.selectedDate.month - 5)),
+      dateFormatterMMM.format(DateTime(widget.selectedDate.year, widget.selectedDate.month - 6)),
     ];
 
     final Widget text = Text(

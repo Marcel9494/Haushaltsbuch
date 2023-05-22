@@ -207,7 +207,6 @@ class _MonthlyStatisticsTabViewState extends State<MonthlyStatisticsTabView> {
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
                         Expanded(
-                          flex: 2,
                           child: Row(
                             children: [
                               Padding(
@@ -234,33 +233,9 @@ class _MonthlyStatisticsTabViewState extends State<MonthlyStatisticsTabView> {
                             ],
                           ),
                         ),
-                        Column(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                              child: Container(
-                                padding: const EdgeInsets.fromLTRB(8.0, 8.0, 6.0, 8.0),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(6.0),
-                                  border: Border.all(color: Colors.cyanAccent),
-                                ),
-                                child: Text(formatToMoneyAmount((_totalSavings + _totalInvestments).toString()), style: const TextStyle(fontSize: 12.0)),
-                              ),
-                            ),
-                          ],
-                        ),
                         Expanded(
-                          flex: 2,
                           child: Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
                             children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  Text(formatToMoneyAmount(_totalInvestments.toString()), style: const TextStyle(fontSize: 12.0)),
-                                  const Text('Investiert', style: TextStyle(color: Colors.grey, fontSize: 12.0)),
-                                ],
-                              ),
                               Padding(
                                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
                                 child: CircularPercentIndicator(
@@ -274,6 +249,40 @@ class _MonthlyStatisticsTabViewState extends State<MonthlyStatisticsTabView> {
                                   animation: true,
                                   animateFromLastPercent: true,
                                 ),
+                              ),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(formatToMoneyAmount(_totalInvestments.toString()), style: const TextStyle(fontSize: 12.0)),
+                                  const Text('Investiert', style: TextStyle(color: Colors.grey, fontSize: 12.0)),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                        Expanded(
+                          child: Row(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                                child: CircularPercentIndicator(
+                                  radius: 20.0,
+                                  lineWidth: 2.0,
+                                  percent: _checkPercentageValue(_savingPercentage),
+                                  center: Text('${_savingPercentage.toStringAsFixed(0)}%', style: const TextStyle(fontSize: 12.0)),
+                                  progressColor: Colors.cyanAccent,
+                                  backgroundWidth: 1.0,
+                                  circularStrokeCap: CircularStrokeCap.round,
+                                  animation: true,
+                                  animateFromLastPercent: true,
+                                ),
+                              ),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(formatToMoneyAmount((_totalSavings + _totalInvestments).toString()), style: const TextStyle(fontSize: 12.0)),
+                                  const Text('Gesamt', style: TextStyle(color: Colors.grey, fontSize: 12.0)),
+                                ],
                               ),
                             ],
                           ),

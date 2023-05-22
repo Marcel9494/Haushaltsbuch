@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../buttons/month_picker_buttons.dart';
 import '/models/booking.dart';
 import '/models/enums/transaction_types.dart';
 
@@ -35,11 +36,12 @@ class MonthlyBookingTabView extends StatefulWidget {
 
 class _MonthlyBookingTabViewState extends State<MonthlyBookingTabView> {
   late List<Booking> _bookingList = [];
+  late DateTime _selectedDate = widget.selectedDate;
   late final Map<DateTime, double> _todayExpendituresMap = {};
   late final Map<DateTime, double> _todayRevenuesMap = {};
 
   Future<List<Booking>> _loadMonthlyBookingList() async {
-    _bookingList = await Booking.loadMonthlyBookingList(widget.selectedDate.month, widget.selectedDate.year, widget.categorie, widget.account);
+    _bookingList = await Booking.loadMonthlyBookingList(_selectedDate.month, _selectedDate.year, widget.categorie, widget.account);
     _prepareMaps(_bookingList);
     _getTodayExpenditures(_bookingList);
     _getTodayRevenues(_bookingList);
@@ -128,7 +130,33 @@ class _MonthlyBookingTabViewState extends State<MonthlyBookingTabView> {
                             showInvestments: true,
                           )
                         : const SizedBox(),
-                    widget.showBarChart ? MonthlyBarChart(bookingList: _bookingList) : const SizedBox(),
+                    widget.showBarChart
+                        ? Column(
+                            children: [
+                              Row(
+                                children: <Widget>[
+                                  Expanded(
+                                    flex: 2,
+                                    child: MonthPickerButtons(
+                                      selectedDate: _selectedDate,
+                                      selectedDateCallback: (DateTime selectedDate) {
+                                        setState(() {
+                                          _selectedDate = selectedDate;
+                                        });
+                                      },
+                                    ),
+                                  ),
+                                  const Expanded(
+                                    flex: 1,
+                                    child: Text('Gesamtsumme: 0,0 €'),
+                                    //child: _monthlyExpenditures.isEmpty ? const Text('Gesamtsumme: 0,0 €') : Text('Gesamtsumme: ' + formatToMoneyAmount(_monthlyExpenditures[0].toString())),
+                                  ),
+                                ],
+                              ),
+                              MonthlyBarChart(bookingList: _bookingList, selectedDate: _selectedDate),
+                            ],
+                          )
+                        : const SizedBox(),
                     Expanded(
                       child: RefreshIndicator(
                         onRefresh: () async {
