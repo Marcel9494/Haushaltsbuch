@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 
-import '../buttons/month_picker_buttons.dart';
+import '../deco/total_text.dart';
 import '/models/booking.dart';
 import '/models/enums/transaction_types.dart';
+
+import '../buttons/month_picker_buttons.dart';
 
 import '../cards/booking_card.dart';
 
@@ -107,6 +109,24 @@ class _MonthlyBookingTabViewState extends State<MonthlyBookingTabView> {
                             showInvestments: true,
                           )
                         : const SizedBox(),
+                    widget.showBarChart
+                        ? Row(
+                            children: <Widget>[
+                              Expanded(
+                                flex: 2,
+                                child: MonthPickerButtons(
+                                  selectedDate: _selectedDate,
+                                  selectedDateCallback: (DateTime selectedDate) {
+                                    setState(() {
+                                      _selectedDate = selectedDate;
+                                    });
+                                  },
+                                ),
+                              ),
+                              const TotalText(total: '0,0 €'),
+                            ],
+                          )
+                        : const SizedBox(),
                     const Expanded(
                       child: Center(
                         child: Text('Noch keine Buchungen vorhanden.'),
@@ -146,14 +166,10 @@ class _MonthlyBookingTabViewState extends State<MonthlyBookingTabView> {
                                       },
                                     ),
                                   ),
-                                  const Expanded(
-                                    flex: 1,
-                                    child: Text('Gesamtsumme: 0,0 €'),
-                                    //child: _monthlyExpenditures.isEmpty ? const Text('Gesamtsumme: 0,0 €') : Text('Gesamtsumme: ' + formatToMoneyAmount(_monthlyExpenditures[0].toString())),
-                                  ),
+                                  TotalText(total: formatToMoneyAmount(Booking.getExpenditures(_bookingList, _bookingList[0].categorie).toString())),
                                 ],
                               ),
-                              MonthlyBarChart(bookingList: _bookingList, selectedDate: _selectedDate),
+                              MonthlyBarChart(selectedDate: _selectedDate, categorie: _bookingList[0].categorie),
                             ],
                           )
                         : const SizedBox(),

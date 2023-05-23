@@ -9,15 +9,13 @@ import '/utils/date_formatters/date_formatter.dart';
 import '/utils/number_formatters/number_formatter.dart';
 
 class MonthlyBarChart extends StatefulWidget {
-  final List<Booking> bookingList;
   final DateTime selectedDate;
-  final Color leftBarColor = Colors.cyanAccent;
-  final Color avgColor = Colors.cyan;
+  final String categorie;
 
   const MonthlyBarChart({
     Key? key,
-    required this.bookingList,
     required this.selectedDate,
+    this.categorie = '',
   }) : super(key: key);
 
   @override
@@ -30,8 +28,7 @@ class MonthlyBarChartState extends State<MonthlyBarChart> {
   List<BarChartGroupData> _monthlyExpendituresBarGroups = [];
   List<BarChartGroupData> _reversedMonthlyExpendituresBarGroups = [];
   List<BarChartGroupData> _showingMonthlyExpendituresBarGroups = [];
-  final double width = 8;
-  int touchedGroupIndex = -1;
+  int _touchedGroupIndex = -1;
 
   @override
   void initState() {
@@ -39,19 +36,20 @@ class MonthlyBarChartState extends State<MonthlyBarChart> {
     _loadMonthlyBarChartData();
   }
 
-  // TODO Callback für _monthlyExpenditures implementieren!?
   Future<List<double>> _loadMonthlyBarChartData() async {
     _monthlyExpenditures = [];
     _monthlyExpendituresBarGroups = [];
+    _reversedMonthlyExpendituresBarGroups = [];
+    _showingMonthlyExpendituresBarGroups = [];
     for (int i = 0; i < 7; i++) {
-      _bookingList = await Booking.loadMonthlyBookingList(widget.selectedDate.month - i, widget.selectedDate.year, widget.bookingList[0].categorie);
+      _bookingList = await Booking.loadMonthlyBookingList(widget.selectedDate.month - i, widget.selectedDate.year, widget.categorie);
       if (_bookingList.isEmpty) {
         _monthlyExpenditures.insert(i, 0.0);
         _monthlyExpendituresBarGroups.add(makeGroupData(i, _monthlyExpenditures[i]));
-        continue;
+      } else {
+        _monthlyExpenditures.insert(i, Booking.getExpenditures(_bookingList, widget.categorie));
+        _monthlyExpendituresBarGroups.add(makeGroupData(i, _monthlyExpenditures[i]));
       }
-      _monthlyExpenditures.insert(i, Booking.getExpenditures(_bookingList, widget.bookingList[0].categorie));
-      _monthlyExpendituresBarGroups.add(makeGroupData(i, _monthlyExpenditures[i]));
     }
     _reversedMonthlyExpendituresBarGroups = _monthlyExpendituresBarGroups.reversed.toList();
     setState(() {
@@ -70,7 +68,7 @@ class MonthlyBarChartState extends State<MonthlyBarChart> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
             const SizedBox(
-              height: 20.0,
+              height: 14.0,
             ),
             Expanded(
               child: BarChart(
@@ -93,31 +91,30 @@ class MonthlyBarChartState extends State<MonthlyBarChart> {
                     touchCallback: (FlTouchEvent event, response) {
                       if (response == null || response.spot == null) {
                         setState(() {
-                          touchedGroupIndex = -1;
+                          _touchedGroupIndex = -1;
                           _showingMonthlyExpendituresBarGroups = List.of(_reversedMonthlyExpendituresBarGroups);
                         });
                         return;
                       }
 
-                      touchedGroupIndex = response.spot!.touchedBarGroupIndex;
+                      _touchedGroupIndex = response.spot!.touchedBarGroupIndex;
 
                       setState(() {
                         if (!event.isInterestedForInteractions) {
-                          touchedGroupIndex = -1;
+                          _touchedGroupIndex = -1;
                           _showingMonthlyExpendituresBarGroups = List.of(_reversedMonthlyExpendituresBarGroups);
                           return;
                         }
                         _showingMonthlyExpendituresBarGroups = List.of(_reversedMonthlyExpendituresBarGroups);
-                        if (touchedGroupIndex != -1) {
+                        if (_touchedGroupIndex != -1) {
                           var sum = 0.0;
-                          for (final rod in _showingMonthlyExpendituresBarGroups[touchedGroupIndex].barRods) {
+                          for (final rod in _showingMonthlyExpendituresBarGroups[_touchedGroupIndex].barRods) {
                             sum += rod.toY;
                           }
-                          final avg = sum / _showingMonthlyExpendituresBarGroups[touchedGroupIndex].barRods.length;
-
-                          _showingMonthlyExpendituresBarGroups[touchedGroupIndex] = _showingMonthlyExpendituresBarGroups[touchedGroupIndex].copyWith(
-                            barRods: _showingMonthlyExpendituresBarGroups[touchedGroupIndex].barRods.map((rod) {
-                              return rod.copyWith(toY: avg, color: widget.avgColor);
+                          final avg = sum / _showingMonthlyExpendituresBarGroups[_touchedGroupIndex].barRods.length;
+                          _showingMonthlyExpendituresBarGroups[_touchedGroupIndex] = _showingMonthlyExpendituresBarGroups[_touchedGroupIndex].copyWith(
+                            barRods: _showingMonthlyExpendituresBarGroups[_touchedGroupIndex].barRods.map((rod) {
+                              return rod.copyWith(toY: avg, color: Colors.cyan);
                             }).toList(),
                           );
                         }
@@ -168,6 +165,7 @@ class MonthlyBarChartState extends State<MonthlyBarChart> {
                     },
                   ),
                 ),
+                swapAnimationDuration: const Duration(milliseconds: 0),
               ),
             ),
           ],
@@ -185,7 +183,7 @@ class MonthlyBarChartState extends State<MonthlyBarChart> {
     String text = '';
     if (value == 0) {
       text = '0 €';
-    } else if (value == _monthlyExpenditures.reduce(max) / 2) {
+    } else if (value == (_monthlyExpenditures.reduce(max) / 2).round()) {
       text = formatToMoneyAmount((_monthlyExpenditures.reduce(max) / 2).toString());
     } else if (value == _monthlyExpenditures.reduce(max)) {
       text = formatToMoneyAmount(_monthlyExpenditures.reduce(max).toString());
@@ -233,8 +231,8 @@ class MonthlyBarChartState extends State<MonthlyBarChart> {
       barRods: [
         BarChartRodData(
           toY: y1,
-          color: widget.leftBarColor,
-          width: width,
+          color: Colors.cyanAccent,
+          width: 8.0,
         ),
       ],
     );
