@@ -135,6 +135,40 @@ class Account extends HiveObject {
     return accountList;
   }
 
+  static Future<List<Account>> loadAssetAccounts() async {
+    var accountBox = await Hive.openBox(accountsBox);
+    List<Account> accountList = [];
+    for (int i = 0; i < accountBox.length; i++) {
+      Account account = await accountBox.getAt(i);
+      if ((account.accountType == AccountType.account.name ||
+              account.accountType == AccountType.capitalInvestments.name ||
+              account.accountType == AccountType.cash.name ||
+              account.accountType == AccountType.credit.name ||
+              account.accountType == AccountType.insurance.name ||
+              account.accountType == AccountType.other.name) &&
+          formatMoneyAmountToDouble(account.bankBalance) >= 0.0) {
+        account.boxIndex = i;
+        accountList.add(account);
+      }
+    }
+    accountList.sort((first, second) => first.accountType.compareTo(second.accountType));
+    return accountList;
+  }
+
+  static Future<List<Account>> loadLiabilityAccounts() async {
+    var accountBox = await Hive.openBox(accountsBox);
+    List<Account> accountList = [];
+    for (int i = 0; i < accountBox.length; i++) {
+      Account account = await accountBox.getAt(i);
+      if (account.accountType == AccountType.credit.name || formatMoneyAmountToDouble(account.bankBalance) < 0.0) {
+        account.boxIndex = i;
+        accountList.add(account);
+      }
+    }
+    accountList.sort((first, second) => first.accountType.compareTo(second.accountType));
+    return accountList;
+  }
+
   static Future<List<String>> loadAccountNames() async {
     var accountBox = await Hive.openBox(accountsBox);
     List<String> accountNameList = [];
@@ -150,12 +184,13 @@ class Account extends HiveObject {
     double assetValue = 0.0;
     for (int i = 0; i < accountBox.length; i++) {
       Account account = await accountBox.getAt(i);
-      if (account.accountType == AccountType.account.name ||
-          account.accountType == AccountType.capitalInvestments.name ||
-          account.accountType == AccountType.cash.name ||
-          account.accountType == AccountType.credit.name ||
-          account.accountType == AccountType.insurance.name ||
-          account.accountType == AccountType.other.name) {
+      if ((account.accountType == AccountType.account.name ||
+              account.accountType == AccountType.capitalInvestments.name ||
+              account.accountType == AccountType.cash.name ||
+              account.accountType == AccountType.credit.name ||
+              account.accountType == AccountType.insurance.name ||
+              account.accountType == AccountType.other.name) &&
+          formatMoneyAmountToDouble(account.bankBalance) >= 0.0) {
         assetValue += double.parse(account.bankBalance.substring(0, account.bankBalance.length - 2).replaceAll('.', '').replaceAll(',', '.'));
       }
     }
@@ -167,11 +202,11 @@ class Account extends HiveObject {
     double liabilityValue = 0.0;
     for (int i = 0; i < accountBox.length; i++) {
       Account account = await accountBox.getAt(i);
-      if (account.accountType == AccountType.credit.name) {
+      if (account.accountType == AccountType.credit.name || formatMoneyAmountToDouble(account.bankBalance) < 0.0) {
         liabilityValue += double.parse(account.bankBalance.substring(0, account.bankBalance.length - 2).replaceAll('.', '').replaceAll(',', '.'));
       }
     }
-    return liabilityValue;
+    return liabilityValue.abs();
   }
 
   static Future<Map<String, double>> getAccountTypeBalance(List<Account> accountList) async {
@@ -203,6 +238,11 @@ class Account extends HiveObject {
       ..bankBalance = '0 €'
       ..accountType = AccountType.account.name;
     giroAccount.createAccount(giroAccount);
+    Account billingAccount = Account()
+      ..name = 'Verechnungskonto'
+      ..bankBalance = '0 €'
+      ..accountType = AccountType.account.name;
+    billingAccount.createAccount(billingAccount);
     Account capitalInvestmentAccount = Account()
       ..name = 'Aktiendepot'
       ..bankBalance = '0 €'

@@ -232,7 +232,7 @@ class MonthlyBarChartState extends State<MonthlyBarChart> {
         BarChartRodData(
           toY: y1,
           color: Colors.cyanAccent,
-          width: 8.0,
+          width: 10.0,
         ),
       ],
     );

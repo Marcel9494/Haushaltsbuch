@@ -1,5 +1,5 @@
-import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:fl_chart/fl_chart.dart';
 
 import '/components/cards/percentage_card.dart';
 import '/components/deco/loading_indicator.dart';
@@ -18,22 +18,29 @@ class AssetAllocationStatisticTabView extends StatefulWidget {
 
 class _AssetAllocationStatisticTabViewState extends State<AssetAllocationStatisticTabView> {
   List<PercentageStats> _percentageStats = [];
-  String _currentAssetAllocationStatisticType = AssetAllocationStatisticType.individualAccounts.name;
-  double _totalAssets = 0.0;
+  String _assetAllocationStatisticType = AssetAllocationStatisticType.individualAccounts.name;
+  String _listStatisticType = 'Vermögen';
+  double _totalAmount = 0.0;
 
   Future<List<PercentageStats>> _loadAssetAllocationStatistic() async {
     _percentageStats = [];
     bool categorieStatsAreUpdated = false;
-    _totalAssets = await Account.getAssetValue();
-    List<Account> _accountList = await Account.loadAccounts();
+    List<Account> _accountList = [];
+    if (_listStatisticType == 'Vermögen') {
+      _accountList = await Account.loadAssetAccounts();
+      _totalAmount = await Account.getAssetValue();
+    } else {
+      _accountList = await Account.loadLiabilityAccounts();
+      _totalAmount = await Account.getLiabilityValue();
+    }
     for (int i = 0; i < _accountList.length; i++) {
       categorieStatsAreUpdated = false;
-      if (_currentAssetAllocationStatisticType == AssetAllocationStatisticType.individualAccounts.name) {
+      if (_assetAllocationStatisticType == AssetAllocationStatisticType.individualAccounts.name) {
         _percentageStats = PercentageStats.showSeparatePercentages(i, _accountList[i].bankBalance, _percentageStats, _accountList[i].name);
-      } else if (_currentAssetAllocationStatisticType == AssetAllocationStatisticType.individualAccountTypes.name) {
+      } else if (_assetAllocationStatisticType == AssetAllocationStatisticType.individualAccountTypes.name) {
         _percentageStats = PercentageStats.createOrUpdatePercentageStats(
             i, _accountList[i].bankBalance, _percentageStats, AccountTypeExtension.getAccountTypePluralName(_accountList[i].accountType), categorieStatsAreUpdated);
-      } else if (_currentAssetAllocationStatisticType == AssetAllocationStatisticType.capitalOrRiskFreeInvestments.name) {
+      } else if (_assetAllocationStatisticType == AssetAllocationStatisticType.capitalOrRiskFreeInvestments.name) {
         if (_accountList[i].accountType == AccountType.capitalInvestments.name) {
           _percentageStats =
               PercentageStats.createOrUpdatePercentageStats(i, _accountList[i].bankBalance, _percentageStats, AccountType.capitalInvestments.pluralName, categorieStatsAreUpdated);
@@ -42,18 +49,27 @@ class _AssetAllocationStatisticTabViewState extends State<AssetAllocationStatist
         }
       }
     }
-    _percentageStats = PercentageStats.calculatePercentage(_percentageStats, _totalAssets);
+    _percentageStats = PercentageStats.calculatePercentage(_percentageStats, _totalAmount);
     _percentageStats.sort((first, second) => second.percentage.compareTo(first.percentage));
     return _percentageStats;
   }
 
   void _changeAssetAllocationStatisticType() {
-    if (_currentAssetAllocationStatisticType == AssetAllocationStatisticType.individualAccounts.name) {
-      _currentAssetAllocationStatisticType = AssetAllocationStatisticType.individualAccountTypes.name;
-    } else if (_currentAssetAllocationStatisticType == AssetAllocationStatisticType.individualAccountTypes.name) {
-      _currentAssetAllocationStatisticType = AssetAllocationStatisticType.capitalOrRiskFreeInvestments.name;
-    } else if (_currentAssetAllocationStatisticType == AssetAllocationStatisticType.capitalOrRiskFreeInvestments.name) {
-      _currentAssetAllocationStatisticType = AssetAllocationStatisticType.individualAccounts.name;
+    if (_assetAllocationStatisticType == AssetAllocationStatisticType.individualAccounts.name) {
+      _assetAllocationStatisticType = AssetAllocationStatisticType.individualAccountTypes.name;
+    } else if (_assetAllocationStatisticType == AssetAllocationStatisticType.individualAccountTypes.name) {
+      _assetAllocationStatisticType = AssetAllocationStatisticType.capitalOrRiskFreeInvestments.name;
+    } else if (_assetAllocationStatisticType == AssetAllocationStatisticType.capitalOrRiskFreeInvestments.name) {
+      _assetAllocationStatisticType = AssetAllocationStatisticType.individualAccounts.name;
+    }
+    setState(() {});
+  }
+
+  void _changeListStatisticType() {
+    if (_listStatisticType == 'Vermögen') {
+      _listStatisticType = 'Schulden';
+    } else if (_listStatisticType == 'Schulden') {
+      _listStatisticType = 'Vermögen';
     }
     setState(() {});
   }
@@ -83,20 +99,30 @@ class _AssetAllocationStatisticTabViewState extends State<AssetAllocationStatist
                       ),
                     ),
                   ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(left: 12.0),
-                        child: OutlinedButton(
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        OutlinedButton(
                           onPressed: () => _changeAssetAllocationStatisticType(),
                           child: Text(
-                            _currentAssetAllocationStatisticType,
+                            _assetAllocationStatisticType,
                             style: const TextStyle(color: Colors.cyanAccent),
                           ),
                         ),
-                      ),
-                    ],
+                        _assetAllocationStatisticType == AssetAllocationStatisticType.individualAccounts.name ||
+                                _assetAllocationStatisticType == AssetAllocationStatisticType.individualAccountTypes.name
+                            ? OutlinedButton(
+                                onPressed: () => _changeListStatisticType(),
+                                child: Text(
+                                  _listStatisticType,
+                                  style: const TextStyle(color: Colors.cyanAccent),
+                                ),
+                              )
+                            : const SizedBox(),
+                      ],
+                    ),
                   ),
                   RefreshIndicator(
                     onRefresh: () async {
@@ -132,13 +158,13 @@ class _AssetAllocationStatisticTabViewState extends State<AssetAllocationStatist
     return List.generate(_percentageStats.length, (i) {
       return PieChartSectionData(
         color: _percentageStats[i].statColor,
-        value: _percentageStats[i].percentage,
-        title: _percentageStats[i].percentage.toStringAsFixed(1) + '%',
+        value: _percentageStats[i].percentage.abs(),
+        title: _percentageStats[i].percentage.abs().toStringAsFixed(1).replaceAll('.', ',') + '%',
         badgeWidget: Text(_percentageStats[i].name),
         badgePositionPercentageOffset: 1.3,
-        radius: 50.0,
+        radius: 46.0,
         titleStyle: const TextStyle(
-          fontSize: 16.0,
+          fontSize: 14.0,
           fontWeight: FontWeight.bold,
           color: Colors.white70,
         ),

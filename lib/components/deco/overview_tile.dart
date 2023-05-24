@@ -54,7 +54,7 @@ class OverviewTile extends StatelessWidget {
             text: TextSpan(children: [
               TextSpan(text: '$haveText\n'),
               TextSpan(
-                text: formatToMoneyAmount(have.toString()) + '\n',
+                text: formatToMoneyAmount(have.abs().toString()) + '\n',
                 style: const TextStyle(height: 1.5, color: Color(0xfff4634f), fontSize: 15.0),
               ),
               showAverageValuesPerDay
@@ -70,13 +70,13 @@ class OverviewTile extends StatelessWidget {
             text: TextSpan(children: [
               TextSpan(text: '$balanceText\n'),
               TextSpan(
-                text: formatToMoneyAmount((should - have).toString()) + '\n',
-                style: TextStyle(height: 1.5, color: (should - have) >= 0 ? Colors.greenAccent : Colors.redAccent, fontSize: 15.0),
+                text: formatToMoneyAmount((should - have.abs()).toString()) + '\n',
+                style: TextStyle(height: 1.5, color: (should - have.abs()) >= 0 ? Colors.greenAccent : Colors.redAccent, fontSize: 15.0),
               ),
               showAverageValuesPerDay
                   ? TextSpan(
-                      text: 'Ø ${formatToMoneyAmount(((should - have) / DateTime(DateTime.now().year, DateTime.now().month + 1, 0).day).toString())}',
-                      style: TextStyle(color: (should - have) >= 0 ? Colors.greenAccent : Colors.redAccent, fontSize: 15.0),
+                      text: 'Ø ${formatToMoneyAmount(((should - have.abs()) / DateTime(DateTime.now().year, DateTime.now().month + 1, 0).day).toString())}',
+                      style: TextStyle(color: (should - have.abs()) >= 0 ? Colors.greenAccent : Colors.redAccent, fontSize: 15.0),
                     )
                   : const WidgetSpan(child: SizedBox()),
             ]),

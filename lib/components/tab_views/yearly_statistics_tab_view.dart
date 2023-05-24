@@ -270,8 +270,8 @@ class _YearlyStatisticsTabViewState extends State<YearlyStatisticsTabView> {
                                 child: CircularPercentIndicator(
                                   radius: 20.0,
                                   lineWidth: 2.0,
-                                  percent: _checkPercentageValue(_savingPercentage),
-                                  center: Text('${_savingPercentage.toStringAsFixed(0)}%', style: const TextStyle(fontSize: 12.0)),
+                                  percent: _checkPercentageValue(_savingPercentage + _investmentPercentage),
+                                  center: Text('${(_savingPercentage + _investmentPercentage).toStringAsFixed(0)}%', style: const TextStyle(fontSize: 12.0)),
                                   progressColor: Colors.cyanAccent,
                                   backgroundWidth: 1.0,
                                   circularStrokeCap: CircularStrokeCap.round,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:haushaltsbuch/utils/number_formatters/number_formatter.dart';
 
 import '/models/percentage_stats.dart';
 import '/models/screen_arguments/categorie_amount_list_screen_arguments.dart';
@@ -39,7 +40,7 @@ class PercentageCard extends StatelessWidget {
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 10.0),
                     child: Text(
-                      '${percentageStats.percentage.toStringAsFixed(1).replaceAll('.', ',')} %\t\t${percentageStats.name}',
+                      '${percentageStats.percentage.abs().toStringAsFixed(1).replaceAll('.', ',')} %\t\t${percentageStats.name}',
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
@@ -49,7 +50,7 @@ class PercentageCard extends StatelessWidget {
                   child: Padding(
                     padding: const EdgeInsets.only(top: 16.0, bottom: 16.0, right: 16.0),
                     child: Text(
-                      percentageStats.amount,
+                      formatToMoneyAmount(formatMoneyAmountToDouble(percentageStats.amount).abs().toString()),
                       textAlign: TextAlign.right,
                       overflow: TextOverflow.ellipsis,
                     ),
