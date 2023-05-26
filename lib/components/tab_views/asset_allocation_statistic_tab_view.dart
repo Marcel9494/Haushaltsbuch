@@ -7,6 +7,7 @@ import '/components/deco/loading_indicator.dart';
 import '/models/account.dart';
 import '/models/percentage_stats.dart';
 import '/models/enums/account_types.dart';
+import '/models/enums/statistic_types.dart';
 import '/models/enums/asset_allocation_statistic_types.dart';
 
 class AssetAllocationStatisticTabView extends StatefulWidget {
@@ -19,14 +20,14 @@ class AssetAllocationStatisticTabView extends StatefulWidget {
 class _AssetAllocationStatisticTabViewState extends State<AssetAllocationStatisticTabView> {
   List<PercentageStats> _percentageStats = [];
   String _assetAllocationStatisticType = AssetAllocationStatisticType.individualAccounts.name;
-  String _listStatisticType = 'Vermögen';
+  String _listStatisticType = StatisticType.assets.name;
   double _totalAmount = 0.0;
 
   Future<List<PercentageStats>> _loadAssetAllocationStatistic() async {
     _percentageStats = [];
     bool categorieStatsAreUpdated = false;
     List<Account> _accountList = [];
-    if (_listStatisticType == 'Vermögen') {
+    if (_listStatisticType == StatisticType.assets.name || _assetAllocationStatisticType == AssetAllocationStatisticType.capitalOrRiskFreeInvestments.name) {
       _accountList = await Account.loadAssetAccounts();
       _totalAmount = await Account.getAssetValue();
     } else {
@@ -66,10 +67,10 @@ class _AssetAllocationStatisticTabViewState extends State<AssetAllocationStatist
   }
 
   void _changeListStatisticType() {
-    if (_listStatisticType == 'Vermögen') {
-      _listStatisticType = 'Schulden';
-    } else if (_listStatisticType == 'Schulden') {
-      _listStatisticType = 'Vermögen';
+    if (_listStatisticType == StatisticType.assets.name) {
+      _listStatisticType = StatisticType.debts.name;
+    } else if (_listStatisticType == StatisticType.debts.name) {
+      _listStatisticType = StatisticType.assets.name;
     }
     setState(() {});
   }

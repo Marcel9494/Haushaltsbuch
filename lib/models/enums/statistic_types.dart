@@ -1,12 +1,12 @@
-enum StatisticType { assetDevelopment, assetAllocation }
+enum StatisticType { assets, debts }
 
 extension StatisticTypeExtension on StatisticType {
   String get name {
     switch (this) {
-      case StatisticType.assetDevelopment:
-        return 'Vermögensentwicklung';
-      case StatisticType.assetAllocation:
-        return 'Vermögensaufteilung';
+      case StatisticType.assets:
+        return 'Vermögen';
+      case StatisticType.debts:
+        return 'Schulden';
       default:
         throw Exception('$name is not a valid Statistic type.');
     }
