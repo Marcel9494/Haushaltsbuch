@@ -1,6 +1,16 @@
+import 'booking.dart';
+
 class WealthDevelopmentStats {
   late String month;
   late double wealth;
+
+  static Future<double> calculatePastWealthForMonth(DateTime currentDate, double currentBalance, List<Booking> bookingList) async {
+    double monthExpenditures = Booking.getExpenditures(bookingList);
+    double monthRevenues = Booking.getRevenues(bookingList);
+    double monthInvestments = Booking.getInvestments(bookingList);
+    double monthWealth = currentBalance + monthRevenues + monthInvestments - monthExpenditures;
+    return monthWealth;
+  }
 
   static double calculateAverageWealthGrowth(List<double> revenues, List<double> expenditures) {
     double balance = 0.0;

@@ -17,11 +17,16 @@ class AssetDevelopmentStatisticTabView extends StatefulWidget {
 class _AssetDevelopmentStatisticTabViewState extends State<AssetDevelopmentStatisticTabView> {
   List<Color> gradientColors = [Colors.cyanAccent, Colors.cyan];
   bool showAvg = false;
+  bool _showSaldoLine = true;
+  bool _showInvestmentLine = true;
   double _assets = 0.0;
   double _liabilities = 0.0;
   double _maxWealthValue = 0.0;
   double _currentYearPeriod = 1;
   List<WealthDevelopmentStats> _wealthDevelopmentStats = [];
+  List<double> monthRevenues = [];
+  List<double> monthExpenditures = [];
+  List<double> monthInvestments = [];
   List<bool> _selectedAssetDevelopmentStatisticTabOption = [true, false, false, false];
 
   Future<List<WealthDevelopmentStats>> _loadChartBarData() async {
@@ -29,9 +34,9 @@ class _AssetDevelopmentStatisticTabViewState extends State<AssetDevelopmentStati
     _assets = await Account.getAssetValue();
     _liabilities = await Account.getLiabilityValue();
     List<double> wealthValues = [];
-    List<double> monthRevenues = [];
-    List<double> monthExpenditures = [];
-    List<double> monthInvestments = [];
+    //List<double> monthRevenues = [];
+    //List<double> monthExpenditures = [];
+    //List<double> monthInvestments = [];
     for (int i = 0; i < 12; i++) {
       List<Booking> _bookingList = await Booking.loadMonthlyBookingList(i + 1, DateTime.now().year);
       monthRevenues.add(Booking.getRevenues(_bookingList));
@@ -64,6 +69,31 @@ class _AssetDevelopmentStatisticTabViewState extends State<AssetDevelopmentStati
     }
     _maxWealthValue = wealthValues.reduce(max);
     return _wealthDevelopmentStats;
+  }
+
+  Future<List<WealthDevelopmentStats>> _calculatePastAssetDevelopment() async {
+    for (int i = 0; i < 12; i++) {
+      List<Booking> _bookingList = await Booking.loadMonthlyBookingList(i + 1, DateTime.now().year);
+      monthRevenues.add(Booking.getRevenues(_bookingList));
+      monthExpenditures.add(Booking.getExpenditures(_bookingList));
+      monthInvestments.add(Booking.getInvestments(_bookingList));
+      WealthDevelopmentStats wealthDevelopmentStat = WealthDevelopmentStats();
+      wealthDevelopmentStat.month = i.toString();
+      wealthDevelopmentStat.wealth = 0.0;
+      _wealthDevelopmentStats.add(wealthDevelopmentStat);
+      double currentAssets = await Account.getAssetValue();
+      double currentLiabilities = await Account.getLiabilityValue();
+      double monthWealth = await WealthDevelopmentStats.calculatePastWealthForMonth(DateTime.now(), currentAssets - currentLiabilities, _bookingList);
+    }
+    return _wealthDevelopmentStats;
+  }
+
+  void _calculateFutureAssetDevelopment() {
+    // TODO
+  }
+
+  void _calculateFutureInvestmentDevelopment() {
+    // TODO
   }
 
   LineChartBarData getLineChartData() {
@@ -123,28 +153,29 @@ class _AssetDevelopmentStatisticTabViewState extends State<AssetDevelopmentStati
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12.0),
-              child: ToggleButtons(
-                onPressed: (selectedIndex) => _setSelectedAssetDevelopmentStatisticTab(selectedIndex),
-                borderRadius: BorderRadius.circular(6.0),
-                selectedBorderColor: Colors.cyanAccent,
-                fillColor: Colors.cyanAccent.shade700,
-                selectedColor: Colors.white,
-                color: Colors.white60,
-                constraints: const BoxConstraints(
-                  minHeight: 30.0,
-                  minWidth: 50.0,
-                ),
-                isSelected: _selectedAssetDevelopmentStatisticTabOption,
-                children: const [
-                  Text('1 J.'),
-                  Text('5 J.'),
-                  Text('10 J.'),
-                  Text('40 J.'),
-                ],
+            Expanded(
+              child: CheckboxListTile(
+                title: const Text('Saldo'),
+                value: _showSaldoLine,
+                onChanged: (value) {
+                  setState(() {
+                    _showSaldoLine = value!;
+                  });
+                },
+                controlAffinity: ListTileControlAffinity.leading,
+              ),
+            ),
+            Expanded(
+              child: CheckboxListTile(
+                title: const Text('Mit Investitionen'),
+                value: _showInvestmentLine,
+                onChanged: (value) {
+                  setState(() {
+                    _showInvestmentLine = value!;
+                  });
+                },
+                controlAffinity: ListTileControlAffinity.leading,
               ),
             ),
           ],
@@ -159,38 +190,65 @@ class _AssetDevelopmentStatisticTabViewState extends State<AssetDevelopmentStati
                 if (_wealthDevelopmentStats.isEmpty) {
                   return const Text('Noch keine Daten vorhanden.');
                 } else {
-                  return Stack(
-                    children: <Widget>[
-                      AspectRatio(
-                        aspectRatio: 1.7,
-                        child: Padding(
-                          padding: const EdgeInsets.only(
-                            right: 18.0,
-                            left: 12.0,
-                            top: 24.0,
-                            bottom: 12.0,
-                          ),
-                          child: LineChart(
-                            showAvg ? avgData() : mainData(_wealthDevelopmentStats),
-                          ),
-                        ),
-                      ),
-                      SizedBox(
-                        width: 60,
-                        height: 34,
-                        child: TextButton(
-                          onPressed: () {
-                            setState(() {
-                              showAvg = !showAvg;
-                            });
-                          },
-                          child: Text(
-                            'avg',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: showAvg ? Colors.white.withOpacity(0.5) : Colors.white,
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Stack(
+                        children: <Widget>[
+                          AspectRatio(
+                            aspectRatio: 1.7,
+                            child: Padding(
+                              padding: const EdgeInsets.only(
+                                right: 18.0,
+                                left: 12.0,
+                                top: 24.0,
+                                bottom: 12.0,
+                              ),
+                              child: LineChart(
+                                showAvg ? avgData() : mainData(_wealthDevelopmentStats),
+                              ),
                             ),
                           ),
+                          SizedBox(
+                            width: 60,
+                            height: 34,
+                            child: TextButton(
+                              onPressed: () {
+                                setState(() {
+                                  showAvg = !showAvg;
+                                });
+                              },
+                              child: Text(
+                                'avg',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: showAvg ? Colors.white.withOpacity(0.5) : Colors.white,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                        child: ToggleButtons(
+                          onPressed: (selectedIndex) => _setSelectedAssetDevelopmentStatisticTab(selectedIndex),
+                          borderRadius: BorderRadius.circular(6.0),
+                          selectedBorderColor: Colors.cyanAccent,
+                          fillColor: Colors.cyanAccent.shade700,
+                          selectedColor: Colors.white,
+                          color: Colors.white60,
+                          constraints: const BoxConstraints(
+                            minHeight: 30.0,
+                            minWidth: 50.0,
+                          ),
+                          isSelected: _selectedAssetDevelopmentStatisticTabOption,
+                          children: const [
+                            Text('1 J.'),
+                            Text('5 J.'),
+                            Text('10 J.'),
+                            Text('40 J.'),
+                          ],
                         ),
                       ),
                     ],
@@ -302,6 +360,7 @@ class _AssetDevelopmentStatisticTabViewState extends State<AssetDevelopmentStati
       maxY: _maxWealthValue / 1000,
       lineBarsData: [
         getLineChartData(),
+        // TODO Linien hinzufügen
       ],
     );
   }
