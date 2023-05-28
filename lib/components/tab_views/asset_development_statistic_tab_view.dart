@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
+import '../../utils/date_formatters/date_formatter.dart';
 import '/models/account.dart';
 import '/models/booking.dart';
 import '/models/wealth_development_stats.dart';
@@ -72,24 +73,51 @@ class _AssetDevelopmentStatisticTabViewState extends State<AssetDevelopmentStati
   }
 
   Future<List<WealthDevelopmentStats>> _calculatePastAssetDevelopment() async {
+    List<double> wealthValues = [];
+    List<WealthDevelopmentStats> wealthList = [];
     for (int i = 0; i < 12; i++) {
-      List<Booking> _bookingList = await Booking.loadMonthlyBookingList(i + 1, DateTime.now().year);
-      monthRevenues.add(Booking.getRevenues(_bookingList));
-      monthExpenditures.add(Booking.getExpenditures(_bookingList));
-      monthInvestments.add(Booking.getInvestments(_bookingList));
       WealthDevelopmentStats wealthDevelopmentStat = WealthDevelopmentStats();
-      wealthDevelopmentStat.month = i.toString();
+      wealthDevelopmentStat.month = DateTime(DateTime.now().year, i).toString();
       wealthDevelopmentStat.wealth = 0.0;
+      wealthList.add(wealthDevelopmentStat);
       _wealthDevelopmentStats.add(wealthDevelopmentStat);
-      double currentAssets = await Account.getAssetValue();
-      double currentLiabilities = await Account.getLiabilityValue();
-      double monthWealth = await WealthDevelopmentStats.calculatePastWealthForMonth(DateTime.now(), currentAssets - currentLiabilities, _bookingList);
+    }
+    _assets = await Account.getAssetValue();
+    _liabilities = await Account.getLiabilityValue();
+    double currentBalance = _assets - _liabilities;
+    // TODO hier weitermachen und alle Werte currentBalance, monthExpenditures, monthRevenues & monthInvestments anzeigen lassen
+    // und currentBalance richtig berechnen.
+    for (int i = DateTime.now().month; i >= 0; i--) {
+      //print(dateFormatterMMMM.format(i));
+      List<Booking> _bookingList = await Booking.loadMonthlyBookingList(i, DateTime.now().year);
+      double monthExpenditures = Booking.getExpenditures(_bookingList);
+      double monthRevenues = Booking.getRevenues(_bookingList);
+      double monthInvestments = Booking.getInvestments(_bookingList);
+      print("Revenues" + monthRevenues.toString());
+      currentBalance = currentBalance - (monthRevenues + monthInvestments - monthExpenditures);
+      _wealthDevelopmentStats[i - 1].month = (i - 1).toString();
+      _wealthDevelopmentStats[i - 1].wealth = currentBalance;
+      //print(_wealthDevelopmentStats[i - 1].wealth);
+      wealthValues.add(_wealthDevelopmentStats[i - 1].wealth);
+      _maxWealthValue = wealthValues.reduce(max);
     }
     return _wealthDevelopmentStats;
   }
 
-  void _calculateFutureAssetDevelopment() {
+  void _calculateFutureAssetDevelopment() async {
     // TODO
+    /*for (int i = DateTime.now().month; i < 12; i++) {
+      List<Booking> _bookingList = await Booking.loadMonthlyBookingList(i, DateTime.now().year);
+      double monthExpenditures = Booking.getExpenditures(_bookingList);
+      double monthRevenues = Booking.getRevenues(_bookingList);
+      double monthInvestments = Booking.getInvestments(_bookingList);
+      double monthWealth = monthRevenues + monthInvestments - monthExpenditures;
+      _wealthDevelopmentStats[i].month = i.toString();
+      _wealthDevelopmentStats[i].wealth = monthWealth;
+      print(_wealthDevelopmentStats[i].wealth);
+      wealthValues.add(_wealthDevelopmentStats[i].wealth);
+      _maxWealthValue = wealthValues.reduce(max);
+    }*/
   }
 
   void _calculateFutureInvestmentDevelopment() {
@@ -99,6 +127,7 @@ class _AssetDevelopmentStatisticTabViewState extends State<AssetDevelopmentStati
   LineChartBarData getLineChartData() {
     List<FlSpot> spotList = [];
     for (int i = 0; i < _wealthDevelopmentStats.length; i++) {
+      print(_wealthDevelopmentStats[i].wealth);
       spotList.add(FlSpot(i.toDouble(), double.parse((_wealthDevelopmentStats[i].wealth / 1000).toStringAsFixed(2))));
     }
     LineChartBarData lineChartBarData = LineChartBarData(
@@ -181,7 +210,7 @@ class _AssetDevelopmentStatisticTabViewState extends State<AssetDevelopmentStati
           ],
         ),
         FutureBuilder(
-          future: _loadChartBarData(),
+          future: _calculatePastAssetDevelopment(), //_loadChartBarData(),
           builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
             switch (snapshot.connectionState) {
               case ConnectionState.waiting:
@@ -266,14 +295,14 @@ class _AssetDevelopmentStatisticTabViewState extends State<AssetDevelopmentStati
   Widget bottomTitleWidgets(double value, TitleMeta meta) {
     Widget text;
     switch (value.toInt()) {
-      case 2:
-        text = Text('März\n${_wealthDevelopmentStats[value.toInt()].wealth.toStringAsFixed(2)}€', textAlign: TextAlign.center, style: const TextStyle(fontSize: 10));
+      case 0:
+        text = Text('Januar\n${_wealthDevelopmentStats[value.toInt()].wealth.toStringAsFixed(2)}€', textAlign: TextAlign.center, style: const TextStyle(fontSize: 10));
         break;
       case 5:
         text = Text('Juni\n${_wealthDevelopmentStats[value.toInt()].wealth.toStringAsFixed(2)}€', textAlign: TextAlign.center, style: const TextStyle(fontSize: 10));
         break;
-      case 8:
-        text = Text('September\n${_wealthDevelopmentStats[value.toInt()].wealth.toStringAsFixed(2)}€', textAlign: TextAlign.center, style: const TextStyle(fontSize: 10));
+      case 11:
+        text = Text('Dezember\n${_wealthDevelopmentStats[value.toInt()].wealth.toStringAsFixed(2)}€', textAlign: TextAlign.center, style: const TextStyle(fontSize: 10));
         break;
       default:
         text = const Text('', style: TextStyle(fontSize: 10));
@@ -289,18 +318,12 @@ class _AssetDevelopmentStatisticTabViewState extends State<AssetDevelopmentStati
   Widget leftTitleWidgets(double value, TitleMeta meta) {
     const style = TextStyle(fontSize: 10);
     String text = '';
-    switch (value.toInt()) {
-      case 1:
-        text = '0 €';
-        break;
-      case 3:
-        text = (_maxWealthValue / 2).toStringAsFixed(0) + ' €';
-        break;
-      case 5:
-        text = _maxWealthValue.toStringAsFixed(0) + ' €';
-        break;
-      default:
-        return Container();
+    //print("Value " + value.toInt().floor().toString());
+    //print("Max " + ((_maxWealthValue / 1000) / 2).floor().toString());
+    if (value.toInt() == 0) {
+      text = '0 €';
+    } else if (value.toInt().floor() == (_maxWealthValue / 1000).floor()) {
+      text = _maxWealthValue.toStringAsFixed(0) + ' €';
     }
     return Text(text, style: style, textAlign: TextAlign.left);
   }

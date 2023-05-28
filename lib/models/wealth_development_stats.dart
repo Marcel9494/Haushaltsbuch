@@ -4,10 +4,12 @@ class WealthDevelopmentStats {
   late String month;
   late double wealth;
 
-  static Future<double> calculatePastWealthForMonth(DateTime currentDate, double currentBalance, List<Booking> bookingList) async {
-    double monthExpenditures = Booking.getExpenditures(bookingList);
-    double monthRevenues = Booking.getRevenues(bookingList);
-    double monthInvestments = Booking.getInvestments(bookingList);
+  // TODO hier weitermachen und Vermögensenticklung für die Vergangenheit pro Monat berechnen.
+  static Future<double> calculatePastWealth(DateTime currentDate, double currentBalance) async {
+    List<Booking> _bookingList = await Booking.loadMonthlyBookingList(currentDate.month - 1, currentDate.year);
+    double monthExpenditures = Booking.getExpenditures(_bookingList);
+    double monthRevenues = Booking.getRevenues(_bookingList);
+    double monthInvestments = Booking.getInvestments(_bookingList);
     double monthWealth = currentBalance + monthRevenues + monthInvestments - monthExpenditures;
     return monthWealth;
   }

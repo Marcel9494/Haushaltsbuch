@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../deco/total_text.dart';
 import '/models/booking.dart';
 import '/models/enums/transaction_types.dart';
 
@@ -13,17 +12,18 @@ import '/utils/number_formatters/number_formatter.dart';
 import '../charts/monthly_bar_chart.dart';
 
 import '../deco/date_text.dart';
-import '../deco/loading_indicator.dart';
+import '../deco/total_text.dart';
 import '../deco/overview_tile.dart';
+import '../deco/loading_indicator.dart';
 
 class MonthlyBookingTabView extends StatefulWidget {
-  final DateTime selectedDate;
+  DateTime selectedDate;
   final String categorie;
   final String account;
   final bool showOverviewTile;
   final bool showBarChart;
 
-  const MonthlyBookingTabView({
+  MonthlyBookingTabView({
     Key? key,
     required this.selectedDate,
     required this.categorie,
@@ -38,12 +38,11 @@ class MonthlyBookingTabView extends StatefulWidget {
 
 class _MonthlyBookingTabViewState extends State<MonthlyBookingTabView> {
   late List<Booking> _bookingList = [];
-  late DateTime _selectedDate = widget.selectedDate;
   late final Map<DateTime, double> _todayExpendituresMap = {};
   late final Map<DateTime, double> _todayRevenuesMap = {};
 
   Future<List<Booking>> _loadMonthlyBookingList() async {
-    _bookingList = await Booking.loadMonthlyBookingList(_selectedDate.month, _selectedDate.year, widget.categorie, widget.account);
+    _bookingList = await Booking.loadMonthlyBookingList(widget.selectedDate.month, widget.selectedDate.year, widget.categorie, widget.account);
     _prepareMaps(_bookingList);
     _getTodayExpenditures(_bookingList);
     _getTodayRevenues(_bookingList);
@@ -115,10 +114,10 @@ class _MonthlyBookingTabViewState extends State<MonthlyBookingTabView> {
                               Expanded(
                                 flex: 2,
                                 child: MonthPickerButtons(
-                                  selectedDate: _selectedDate,
+                                  selectedDate: widget.selectedDate,
                                   selectedDateCallback: (DateTime selectedDate) {
                                     setState(() {
-                                      _selectedDate = selectedDate;
+                                      widget.selectedDate = selectedDate;
                                     });
                                   },
                                 ),
@@ -158,10 +157,10 @@ class _MonthlyBookingTabViewState extends State<MonthlyBookingTabView> {
                                   Expanded(
                                     flex: 2,
                                     child: MonthPickerButtons(
-                                      selectedDate: _selectedDate,
+                                      selectedDate: widget.selectedDate,
                                       selectedDateCallback: (DateTime selectedDate) {
                                         setState(() {
-                                          _selectedDate = selectedDate;
+                                          widget.selectedDate = selectedDate;
                                         });
                                       },
                                     ),
@@ -169,7 +168,7 @@ class _MonthlyBookingTabViewState extends State<MonthlyBookingTabView> {
                                   TotalText(total: formatToMoneyAmount(Booking.getExpenditures(_bookingList, _bookingList[0].categorie).toString())),
                                 ],
                               ),
-                              MonthlyBarChart(selectedDate: _selectedDate, categorie: _bookingList[0].categorie),
+                              MonthlyBarChart(selectedDate: widget.selectedDate, categorie: _bookingList[0].categorie),
                             ],
                           )
                         : const SizedBox(),
