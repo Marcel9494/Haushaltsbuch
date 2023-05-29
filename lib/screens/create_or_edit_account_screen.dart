@@ -3,6 +3,11 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 
+import '../components/dialogs/choice_dialog.dart';
+import '../models/booking.dart';
+import '../models/enums/repeat_types.dart';
+import '../models/enums/transaction_types.dart';
+import '../utils/number_formatters/number_formatter.dart';
 import '/components/deco/loading_indicator.dart';
 import '/components/input_fields/account_type_input_field.dart';
 import '/components/input_fields/money_input_field.dart';
@@ -37,6 +42,7 @@ class _CreateOrEditAccountScreenState extends State<CreateOrEditAccountScreen> {
   String _accountGroupErrorText = '';
   String _bankBalanceErrorText = '';
   late Account _loadedAccount;
+  double _oldBankBalance = 0.0;
 
   @override
   void initState() {
@@ -51,6 +57,7 @@ class _CreateOrEditAccountScreenState extends State<CreateOrEditAccountScreen> {
     _accountName = _loadedAccount.name;
     _accountGroupTextController.text = _loadedAccount.accountType;
     _bankBalanceTextController.text = _loadedAccount.bankBalance;
+    _oldBankBalance = formatMoneyAmountToDouble(_loadedAccount.bankBalance);
     _isAccountEdited = true;
   }
 
@@ -67,17 +74,21 @@ class _CreateOrEditAccountScreenState extends State<CreateOrEditAccountScreen> {
       if (widget.accountBoxIndex == -1) {
         _account.createAccount(_account);
       } else {
-        _account.updateAccount(_account, widget.accountBoxIndex);
-      }
-      _setSaveButtonAnimation(true);
-      Timer(const Duration(milliseconds: 1000), () {
-        if (mounted) {
-          FocusScope.of(context).requestFocus(FocusNode());
-          Navigator.pop(context);
-          Navigator.pop(context);
-          Navigator.pushNamed(context, bottomNavBarRoute, arguments: BottomNavBarScreenArguments(2));
+        if (_oldBankBalance != formatMoneyAmountToDouble(_bankBalanceTextController.text)) {
+          showChoiceDialog(context, 'Buchung erfassen?', _recordBooking, _noPressed, 'Buchung wurde erstellt', 'Buchung wurde erfolgreich erstellt.', Icons.info_outline);
+        } else {
+          _account.updateAccount(_account, widget.accountBoxIndex);
+          _setSaveButtonAnimation(true);
+          Timer(const Duration(milliseconds: 700), () {
+            if (mounted) {
+              FocusScope.of(context).requestFocus(FocusNode());
+              Navigator.pop(context);
+              Navigator.pop(context);
+              Navigator.pushNamed(context, bottomNavBarRoute, arguments: BottomNavBarScreenArguments(2));
+            }
+          });
         }
-      });
+      }
     }
   }
 
@@ -135,6 +146,50 @@ class _CreateOrEditAccountScreenState extends State<CreateOrEditAccountScreen> {
   void _setAccountNameState(String accountName) {
     setState(() {
       _accountName = accountName;
+    });
+  }
+
+  void _recordBooking() {
+    String transactionType = '';
+    double difference = 0.0;
+    if (_oldBankBalance >= formatMoneyAmountToDouble(_bankBalanceTextController.text)) {
+      transactionType = TransactionType.outcome.name;
+    } else {
+      transactionType = TransactionType.income.name;
+    }
+    difference = (_oldBankBalance - formatMoneyAmountToDouble(_bankBalanceTextController.text)).abs();
+    Booking newBooking = Booking()
+      ..transactionType = transactionType
+      ..bookingRepeats = RepeatType.noRepetition.name
+      ..title = 'Bestand Änderung'
+      ..date = DateTime.now().toString()
+      ..amount = formatToMoneyAmount(difference.toString())
+      ..categorie = 'Differenz'
+      ..fromAccount = _accountGroupTextController.text
+      ..toAccount = _accountGroupTextController.text;
+    newBooking.createBooking(newBooking);
+    _account.updateAccount(_account, widget.accountBoxIndex);
+    _setSaveButtonAnimation(true);
+    Timer(const Duration(milliseconds: 700), () {
+      if (mounted) {
+        FocusScope.of(context).requestFocus(FocusNode());
+        Navigator.pop(context);
+        Navigator.pop(context);
+        Navigator.pushNamed(context, bottomNavBarRoute, arguments: BottomNavBarScreenArguments(2));
+      }
+    });
+  }
+
+  void _noPressed() {
+    _account.updateAccount(_account, widget.accountBoxIndex);
+    _setSaveButtonAnimation(true);
+    Timer(const Duration(milliseconds: 700), () {
+      if (mounted) {
+        FocusScope.of(context).requestFocus(FocusNode());
+        Navigator.pop(context);
+        Navigator.pop(context);
+        Navigator.pushNamed(context, bottomNavBarRoute, arguments: BottomNavBarScreenArguments(2));
+      }
     });
   }
 

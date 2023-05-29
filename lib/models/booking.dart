@@ -18,7 +18,7 @@ class Booking extends HiveObject {
   @HiveField(3)
   late String bookingRepeats;
   @HiveField(4)
-  late String amount;
+  late String amount; // Format: 8,30 €
   @HiveField(5)
   late String categorie;
   @HiveField(6)

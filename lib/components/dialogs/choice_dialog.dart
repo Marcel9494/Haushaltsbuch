@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 
 import 'package:another_flushbar/flushbar.dart';
 
-void showChoiceDialog(BuildContext context, String title, Function yesPressed, Function noPressed, String flushbarTitle, String flushbarMessage, IconData flushbarIcon) {
+void showChoiceDialog(BuildContext context, String title, Function yesPressed, Function noPressed, String flushbarTitle, String flushbarMessage, IconData flushbarIcon,
+    [String content = '']) {
   showDialog(
     context: context,
     builder: (context) {
       return AlertDialog(
         title: Text(title),
+        content: Text(content),
         actions: <Widget>[
           TextButton(
             child: const Text(
@@ -20,8 +22,8 @@ void showChoiceDialog(BuildContext context, String title, Function yesPressed, F
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-              primary: Colors.cyanAccent,
-              onPrimary: Colors.black87,
+              foregroundColor: Colors.black87,
+              backgroundColor: Colors.cyanAccent,
             ),
             onPressed: () => {
               yesPressed(),

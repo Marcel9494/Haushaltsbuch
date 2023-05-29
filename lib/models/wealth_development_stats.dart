@@ -15,7 +15,13 @@ class WealthDevelopmentStats {
   }
 
   static double calculateAverageWealthGrowth(List<double> revenues, List<double> expenditures) {
-    double balance = 0.0;
+    double averageWealthGrowth = 0.0;
+    for (int i = 0; i < revenues.length; i++) {
+      averageWealthGrowth = revenues[i] - expenditures[i];
+    }
+    return averageWealthGrowth / revenues.length;
+  }
+  /*double balance = 0.0;
     List<double> monthBalances = [];
     for (int i = 0; i < revenues.length; i++) {
       print(expenditures[i]);
@@ -32,5 +38,5 @@ class WealthDevelopmentStats {
       return 0.0;
     }
     return balance / monthBalances.length;
-  }
+  }*/
 }

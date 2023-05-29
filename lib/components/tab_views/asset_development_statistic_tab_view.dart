@@ -23,6 +23,7 @@ class _AssetDevelopmentStatisticTabViewState extends State<AssetDevelopmentStati
   double _assets = 0.0;
   double _liabilities = 0.0;
   double _maxWealthValue = 0.0;
+  double _minWealthValue = 0.0;
   double _currentYearPeriod = 1;
   List<WealthDevelopmentStats> _wealthDevelopmentStats = [];
   List<double> monthRevenues = [];
@@ -87,37 +88,45 @@ class _AssetDevelopmentStatisticTabViewState extends State<AssetDevelopmentStati
     double currentBalance = _assets - _liabilities;
     // TODO hier weitermachen und alle Werte currentBalance, monthExpenditures, monthRevenues & monthInvestments anzeigen lassen
     // und currentBalance richtig berechnen.
-    for (int i = DateTime.now().month; i >= 0; i--) {
+    // TODO Neuer Wert für Konto als Buchung erfassen implementieren?!
+    for (int i = DateTime.now().month - 1; i >= 0; i--) {
       //print(dateFormatterMMMM.format(i));
-      List<Booking> _bookingList = await Booking.loadMonthlyBookingList(i, DateTime.now().year);
-      double monthExpenditures = Booking.getExpenditures(_bookingList);
-      double monthRevenues = Booking.getRevenues(_bookingList);
-      double monthInvestments = Booking.getInvestments(_bookingList);
-      print("Revenues" + monthRevenues.toString());
-      currentBalance = currentBalance - (monthRevenues + monthInvestments - monthExpenditures);
-      _wealthDevelopmentStats[i - 1].month = (i - 1).toString();
-      _wealthDevelopmentStats[i - 1].wealth = currentBalance;
-      //print(_wealthDevelopmentStats[i - 1].wealth);
-      wealthValues.add(_wealthDevelopmentStats[i - 1].wealth);
+      if (i == DateTime.now().month - 1) {
+        _wealthDevelopmentStats[i].month = i.toString();
+        _wealthDevelopmentStats[i].wealth = currentBalance;
+        wealthValues.add(_wealthDevelopmentStats[i].wealth);
+      } else {
+        List<Booking> _bookingList = await Booking.loadMonthlyBookingList(i, DateTime.now().year);
+        double monthExpenditures = Booking.getExpenditures(_bookingList);
+        double monthRevenues = Booking.getRevenues(_bookingList);
+        //double monthInvestments = Booking.getInvestments(_bookingList);
+        print("Revenues" + monthRevenues.toString());
+        currentBalance = currentBalance - (monthRevenues - monthExpenditures);
+        _wealthDevelopmentStats[i].month = i.toString();
+        _wealthDevelopmentStats[i].wealth = currentBalance;
+        //print(_wealthDevelopmentStats[i - 1].wealth);
+        wealthValues.add(_wealthDevelopmentStats[i].wealth);
+      }
       _maxWealthValue = wealthValues.reduce(max);
+      _minWealthValue = wealthValues.reduce(min);
     }
+    _calculateFutureAssetDevelopment();
     return _wealthDevelopmentStats;
   }
 
   void _calculateFutureAssetDevelopment() async {
-    // TODO
-    /*for (int i = DateTime.now().month; i < 12; i++) {
+    for (int i = DateTime.now().month - 1; i >= 0; i--) {
       List<Booking> _bookingList = await Booking.loadMonthlyBookingList(i, DateTime.now().year);
-      double monthExpenditures = Booking.getExpenditures(_bookingList);
-      double monthRevenues = Booking.getRevenues(_bookingList);
-      double monthInvestments = Booking.getInvestments(_bookingList);
-      double monthWealth = monthRevenues + monthInvestments - monthExpenditures;
-      _wealthDevelopmentStats[i].month = i.toString();
-      _wealthDevelopmentStats[i].wealth = monthWealth;
-      print(_wealthDevelopmentStats[i].wealth);
-      wealthValues.add(_wealthDevelopmentStats[i].wealth);
-      _maxWealthValue = wealthValues.reduce(max);
-    }*/
+      monthRevenues.add(Booking.getRevenues(_bookingList));
+      monthExpenditures.add(Booking.getExpenditures(_bookingList));
+      //_wealthDevelopmentStats[i].month = i.toString();
+      //_wealthDevelopmentStats[i].wealth = monthWealth;
+      //print(_wealthDevelopmentStats[i].wealth);
+      //wealthValues.add(_wealthDevelopmentStats[i].wealth);
+      //_maxWealthValue = wealthValues.reduce(max);
+    }
+    double averageWealthGrowth = WealthDevelopmentStats.calculateAverageWealthGrowth(monthRevenues, monthExpenditures);
+    print("Average Wealth Growth: " + averageWealthGrowth.toString());
   }
 
   void _calculateFutureInvestmentDevelopment() {
