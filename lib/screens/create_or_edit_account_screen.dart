@@ -3,11 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 
-import '../components/dialogs/choice_dialog.dart';
-import '../models/booking.dart';
-import '../models/enums/repeat_types.dart';
-import '../models/enums/transaction_types.dart';
-import '../utils/number_formatters/number_formatter.dart';
+import '/components/dialogs/choice_dialog.dart';
 import '/components/deco/loading_indicator.dart';
 import '/components/input_fields/account_type_input_field.dart';
 import '/components/input_fields/money_input_field.dart';
@@ -15,9 +11,14 @@ import '/components/input_fields/text_input_field.dart';
 import '/components/buttons/save_button.dart';
 
 import '/models/account.dart';
+import '/models/booking.dart';
+import '/models/enums/repeat_types.dart';
+import '/models/enums/transaction_types.dart';
 import '/models/screen_arguments/bottom_nav_bar_screen_arguments.dart';
 
 import '/utils/consts/route_consts.dart';
+import '/utils/consts/global_consts.dart';
+import '/utils/number_formatters/number_formatter.dart';
 
 class CreateOrEditAccountScreen extends StatefulWidget {
   final int accountBoxIndex;
@@ -75,18 +76,16 @@ class _CreateOrEditAccountScreenState extends State<CreateOrEditAccountScreen> {
         _account.createAccount(_account);
       } else {
         if (_oldBankBalance != formatMoneyAmountToDouble(_bankBalanceTextController.text)) {
-          showChoiceDialog(context, 'Buchung erfassen?', _recordBooking, _noPressed, 'Buchung wurde erstellt', 'Buchung wurde erfolgreich erstellt.', Icons.info_outline);
+          String text = '';
+          if (_oldBankBalance >= formatMoneyAmountToDouble(_bankBalanceTextController.text)) {
+            text = 'Ausgabe';
+          } else {
+            text = 'Einkommen';
+          }
+          showChoiceDialog(context, 'Buchung erfassen?', _recordBooking, _noPressed, 'Buchung wurde erstellt', 'Buchung wurde erfolgreich erstellt.', Icons.info_outline,
+              'Der Betragsunterschied wurde in deinem Account gespeichert. Möchtest du die Differenz als $text erfassen?');
         } else {
-          _account.updateAccount(_account, widget.accountBoxIndex);
-          _setSaveButtonAnimation(true);
-          Timer(const Duration(milliseconds: 700), () {
-            if (mounted) {
-              FocusScope.of(context).requestFocus(FocusNode());
-              Navigator.pop(context);
-              Navigator.pop(context);
-              Navigator.pushNamed(context, bottomNavBarRoute, arguments: BottomNavBarScreenArguments(2));
-            }
-          });
+          _updateAccount();
         }
       }
     }
@@ -161,29 +160,25 @@ class _CreateOrEditAccountScreenState extends State<CreateOrEditAccountScreen> {
     Booking newBooking = Booking()
       ..transactionType = transactionType
       ..bookingRepeats = RepeatType.noRepetition.name
-      ..title = 'Bestand Änderung'
+      ..title = 'Betrag Änderung'
       ..date = DateTime.now().toString()
       ..amount = formatToMoneyAmount(difference.toString())
       ..categorie = 'Differenz'
-      ..fromAccount = _accountGroupTextController.text
-      ..toAccount = _accountGroupTextController.text;
+      ..fromAccount = _accountName
+      ..toAccount = _accountName;
     newBooking.createBooking(newBooking);
-    _account.updateAccount(_account, widget.accountBoxIndex);
-    _setSaveButtonAnimation(true);
-    Timer(const Duration(milliseconds: 700), () {
-      if (mounted) {
-        FocusScope.of(context).requestFocus(FocusNode());
-        Navigator.pop(context);
-        Navigator.pop(context);
-        Navigator.pushNamed(context, bottomNavBarRoute, arguments: BottomNavBarScreenArguments(2));
-      }
-    });
+    _updateAccount();
   }
 
   void _noPressed() {
+    _updateAccount();
+  }
+
+  // TODO hier weitermachen und mit Navigator.pop(context); den choiceDialog ebenfalls wieder vom Stack nehmen um richtige Route zu bekommen.
+  void _updateAccount() {
     _account.updateAccount(_account, widget.accountBoxIndex);
     _setSaveButtonAnimation(true);
-    Timer(const Duration(milliseconds: 700), () {
+    Timer(const Duration(milliseconds: transitionInMs), () {
       if (mounted) {
         FocusScope.of(context).requestFocus(FocusNode());
         Navigator.pop(context);

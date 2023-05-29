@@ -5,6 +5,7 @@ import 'package:another_flushbar/flushbar.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 
 import '/utils/consts/route_consts.dart';
+import '/utils/consts/global_consts.dart';
 import '/utils/date_formatters/date_formatter.dart';
 
 import '/components/buttons/transaction_toggle_buttons.dart';
@@ -110,7 +111,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
       booking.updateBooking(booking, widget.bookingBoxIndex);
     }
     _setSaveButtonAnimation(true);
-    Timer(const Duration(milliseconds: 700), () {
+    Timer(const Duration(milliseconds: transitionInMs), () {
       if (mounted) {
         FocusScope.of(context).requestFocus(FocusNode());
         Navigator.pop(context);

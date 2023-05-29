@@ -3,8 +3,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 
-import '/utils/number_formatters/number_formatter.dart';
+import '/utils/consts/global_consts.dart';
 import '/utils/consts/route_consts.dart';
+import '/utils/number_formatters/number_formatter.dart';
 
 import '/components/input_fields/categorie_input_field.dart';
 import '/components/input_fields/money_input_field.dart';
@@ -90,7 +91,7 @@ class _CreateOrEditBudgetScreenState extends State<CreateOrEditBudgetScreen> {
       updatedBudget.updateBudget(updatedBudget, widget.budgetBoxIndex);
     }
     _setSaveButtonAnimation(true);
-    Timer(const Duration(milliseconds: 700), () {
+    Timer(const Duration(milliseconds: transitionInMs), () {
       if (mounted) {
         FocusScope.of(context).requestFocus(FocusNode());
         Navigator.pop(context);
