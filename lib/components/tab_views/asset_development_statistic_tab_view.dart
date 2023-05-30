@@ -2,7 +2,9 @@ import 'dart:math';
 
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:haushaltsbuch/utils/number_formatters/number_formatter.dart';
 
+import '../../utils/date_formatters/date_formatter.dart';
 import '/models/account.dart';
 import '/models/booking.dart';
 import '/models/wealth_development_stats.dart';
@@ -345,61 +347,20 @@ class _AssetDevelopmentStatisticTabViewState extends State<AssetDevelopmentStati
     return LineChartData(
       lineTouchData: LineTouchData(
         touchTooltipData: LineTouchTooltipData(
-          tooltipBgColor: Colors.red,
+          tooltipBgColor: Colors.black45,
           getTooltipItems: (List<LineBarSpot> touchedBarSpots) {
             return touchedBarSpots.map((barSpot) {
-              final flSpot = barSpot;
-              if (flSpot.x == 0 || flSpot.x == 6) {
-                return null;
-              }
-
-              TextAlign textAlign;
-              switch (flSpot.x.toInt()) {
-                case 1:
-                  textAlign = TextAlign.left;
-                  break;
-                case 5:
-                  textAlign = TextAlign.right;
-                  break;
-                default:
-                  textAlign = TextAlign.center;
-              }
-
               return LineTooltipItem(
-                'Test\n',
-                TextStyle(
+                '${dateFormatterMMMM.format(DateTime(DateTime.now().year, int.parse(_wealthDevelopmentStats[barSpot.spotIndex].month) + 1))}\n${formatToMoneyAmount((barSpot.y * 1000).toString())}',
+                const TextStyle(
                   color: Colors.cyanAccent,
                   fontWeight: FontWeight.bold,
                 ),
-                children: [
-                  TextSpan(
-                    text: flSpot.y.toString(),
-                    style: TextStyle(
-                      color: Colors.cyanAccent,
-                      fontWeight: FontWeight.w900,
-                    ),
-                  ),
-                  const TextSpan(
-                    text: ' k ',
-                    style: TextStyle(
-                      fontStyle: FontStyle.italic,
-                      fontWeight: FontWeight.w900,
-                    ),
-                  ),
-                  const TextSpan(
-                    text: 'calories',
-                    style: TextStyle(
-                      fontWeight: FontWeight.normal,
-                    ),
-                  ),
-                ],
-                textAlign: textAlign,
               );
             }).toList();
           },
         ),
       ),
-
       gridData: FlGridData(
         show: true,
         drawVerticalLine: true,
