@@ -17,7 +17,10 @@ class WealthDevelopmentStats {
   static double calculateAverageWealthGrowth(List<double> revenues, List<double> expenditures) {
     double averageWealthGrowth = 0.0;
     for (int i = 0; i < revenues.length; i++) {
-      averageWealthGrowth = revenues[i] - expenditures[i];
+      //print("Revenues: " + revenues[i].toString());
+      //print("Expenditures: " + expenditures[i].toString());
+      averageWealthGrowth = averageWealthGrowth + revenues[i] - expenditures[i];
+      print("Average Wealth Growth 1: " + averageWealthGrowth.toString());
     }
     return averageWealthGrowth / revenues.length;
   }

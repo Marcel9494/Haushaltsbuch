@@ -89,6 +89,10 @@ class _AccountsScreenState extends State<AccountsScreen> {
         title: const Text('Konten'),
         actions: [
           IconButton(
+            onPressed: () => Navigator.pushNamed(context, settingsRoute),
+            icon: const Icon(Icons.settings_rounded),
+          ),
+          IconButton(
             onPressed: () => _openBottomSheetMenu(context),
             icon: const Icon(Icons.more_vert_rounded),
           ),

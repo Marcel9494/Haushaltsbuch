@@ -9,3 +9,4 @@ const editBudgetRoute = '/editBudget';
 const categoriesRoute = '/categories';
 const accountDetailsRoute = '/accountDetails';
 const categorieAmountListRoute = '/categorieAmountList';
+const settingsRoute = '/settings';

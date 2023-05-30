@@ -3,7 +3,6 @@ import 'dart:math';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
-import '../../utils/date_formatters/date_formatter.dart';
 import '/models/account.dart';
 import '/models/booking.dart';
 import '/models/wealth_development_stats.dart';
@@ -29,16 +28,15 @@ class _AssetDevelopmentStatisticTabViewState extends State<AssetDevelopmentStati
   List<double> monthRevenues = [];
   List<double> monthExpenditures = [];
   List<double> monthInvestments = [];
+  List<double> wealthValues = [];
   List<bool> _selectedAssetDevelopmentStatisticTabOption = [true, false, false, false];
+  double _currentBalance = 0.0;
 
   Future<List<WealthDevelopmentStats>> _loadChartBarData() async {
     _wealthDevelopmentStats = [];
     _assets = await Account.getAssetValue();
     _liabilities = await Account.getLiabilityValue();
     List<double> wealthValues = [];
-    //List<double> monthRevenues = [];
-    //List<double> monthExpenditures = [];
-    //List<double> monthInvestments = [];
     for (int i = 0; i < 12; i++) {
       List<Booking> _bookingList = await Booking.loadMonthlyBookingList(i + 1, DateTime.now().year);
       monthRevenues.add(Booking.getRevenues(_bookingList));
@@ -74,36 +72,32 @@ class _AssetDevelopmentStatisticTabViewState extends State<AssetDevelopmentStati
   }
 
   Future<List<WealthDevelopmentStats>> _calculatePastAssetDevelopment() async {
-    List<double> wealthValues = [];
-    List<WealthDevelopmentStats> wealthList = [];
     for (int i = 0; i < 12; i++) {
       WealthDevelopmentStats wealthDevelopmentStat = WealthDevelopmentStats();
       wealthDevelopmentStat.month = DateTime(DateTime.now().year, i).toString();
       wealthDevelopmentStat.wealth = 0.0;
-      wealthList.add(wealthDevelopmentStat);
       _wealthDevelopmentStats.add(wealthDevelopmentStat);
     }
     _assets = await Account.getAssetValue();
     _liabilities = await Account.getLiabilityValue();
-    double currentBalance = _assets - _liabilities;
+    _currentBalance = _assets - _liabilities;
     // TODO hier weitermachen und alle Werte currentBalance, monthExpenditures, monthRevenues & monthInvestments anzeigen lassen
     // und currentBalance richtig berechnen.
-    // TODO Neuer Wert für Konto als Buchung erfassen implementieren?!
     for (int i = DateTime.now().month - 1; i >= 0; i--) {
       //print(dateFormatterMMMM.format(i));
       if (i == DateTime.now().month - 1) {
         _wealthDevelopmentStats[i].month = i.toString();
-        _wealthDevelopmentStats[i].wealth = currentBalance;
+        _wealthDevelopmentStats[i].wealth = _currentBalance;
         wealthValues.add(_wealthDevelopmentStats[i].wealth);
       } else {
         List<Booking> _bookingList = await Booking.loadMonthlyBookingList(i, DateTime.now().year);
         double monthExpenditures = Booking.getExpenditures(_bookingList);
         double monthRevenues = Booking.getRevenues(_bookingList);
         //double monthInvestments = Booking.getInvestments(_bookingList);
-        print("Revenues" + monthRevenues.toString());
-        currentBalance = currentBalance - (monthRevenues - monthExpenditures);
+        //print("Revenues" + monthRevenues.toString());
+        _currentBalance = _currentBalance - (monthRevenues - monthExpenditures);
         _wealthDevelopmentStats[i].month = i.toString();
-        _wealthDevelopmentStats[i].wealth = currentBalance;
+        _wealthDevelopmentStats[i].wealth = _currentBalance;
         //print(_wealthDevelopmentStats[i - 1].wealth);
         wealthValues.add(_wealthDevelopmentStats[i].wealth);
       }
@@ -115,7 +109,9 @@ class _AssetDevelopmentStatisticTabViewState extends State<AssetDevelopmentStati
   }
 
   void _calculateFutureAssetDevelopment() async {
-    for (int i = DateTime.now().month - 1; i >= 0; i--) {
+    monthRevenues = [];
+    monthExpenditures = [];
+    for (int i = DateTime.now().month; i >= 0; i--) {
       List<Booking> _bookingList = await Booking.loadMonthlyBookingList(i, DateTime.now().year);
       monthRevenues.add(Booking.getRevenues(_bookingList));
       monthExpenditures.add(Booking.getExpenditures(_bookingList));
@@ -126,7 +122,15 @@ class _AssetDevelopmentStatisticTabViewState extends State<AssetDevelopmentStati
       //_maxWealthValue = wealthValues.reduce(max);
     }
     double averageWealthGrowth = WealthDevelopmentStats.calculateAverageWealthGrowth(monthRevenues, monthExpenditures);
-    print("Average Wealth Growth: " + averageWealthGrowth.toString());
+    print(averageWealthGrowth);
+    for (int i = DateTime.now().month; i < 12; i++) {
+      _currentBalance += averageWealthGrowth;
+      _wealthDevelopmentStats[i].month = i.toString();
+      _wealthDevelopmentStats[i].wealth = _currentBalance;
+      wealthValues.add(_wealthDevelopmentStats[i].wealth);
+      _maxWealthValue = wealthValues.reduce(max);
+      _minWealthValue = wealthValues.reduce(min);
+    }
   }
 
   void _calculateFutureInvestmentDevelopment() {
@@ -136,7 +140,7 @@ class _AssetDevelopmentStatisticTabViewState extends State<AssetDevelopmentStati
   LineChartBarData getLineChartData() {
     List<FlSpot> spotList = [];
     for (int i = 0; i < _wealthDevelopmentStats.length; i++) {
-      print(_wealthDevelopmentStats[i].wealth);
+      //print(_wealthDevelopmentStats[i].wealth);
       spotList.add(FlSpot(i.toDouble(), double.parse((_wealthDevelopmentStats[i].wealth / 1000).toStringAsFixed(2))));
     }
     LineChartBarData lineChartBarData = LineChartBarData(
@@ -339,6 +343,63 @@ class _AssetDevelopmentStatisticTabViewState extends State<AssetDevelopmentStati
 
   LineChartData mainData(List<WealthDevelopmentStats> wealthDevelopmentStats) {
     return LineChartData(
+      lineTouchData: LineTouchData(
+        touchTooltipData: LineTouchTooltipData(
+          tooltipBgColor: Colors.red,
+          getTooltipItems: (List<LineBarSpot> touchedBarSpots) {
+            return touchedBarSpots.map((barSpot) {
+              final flSpot = barSpot;
+              if (flSpot.x == 0 || flSpot.x == 6) {
+                return null;
+              }
+
+              TextAlign textAlign;
+              switch (flSpot.x.toInt()) {
+                case 1:
+                  textAlign = TextAlign.left;
+                  break;
+                case 5:
+                  textAlign = TextAlign.right;
+                  break;
+                default:
+                  textAlign = TextAlign.center;
+              }
+
+              return LineTooltipItem(
+                'Test\n',
+                TextStyle(
+                  color: Colors.cyanAccent,
+                  fontWeight: FontWeight.bold,
+                ),
+                children: [
+                  TextSpan(
+                    text: flSpot.y.toString(),
+                    style: TextStyle(
+                      color: Colors.cyanAccent,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                  const TextSpan(
+                    text: ' k ',
+                    style: TextStyle(
+                      fontStyle: FontStyle.italic,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                  const TextSpan(
+                    text: 'calories',
+                    style: TextStyle(
+                      fontWeight: FontWeight.normal,
+                    ),
+                  ),
+                ],
+                textAlign: textAlign,
+              );
+            }).toList();
+          },
+        ),
+      ),
+
       gridData: FlGridData(
         show: true,
         drawVerticalLine: true,

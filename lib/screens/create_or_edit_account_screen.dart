@@ -76,14 +76,8 @@ class _CreateOrEditAccountScreenState extends State<CreateOrEditAccountScreen> {
         _account.createAccount(_account);
       } else {
         if (_oldBankBalance != formatMoneyAmountToDouble(_bankBalanceTextController.text)) {
-          String text = '';
-          if (_oldBankBalance >= formatMoneyAmountToDouble(_bankBalanceTextController.text)) {
-            text = 'Ausgabe';
-          } else {
-            text = 'Einkommen';
-          }
           showChoiceDialog(context, 'Buchung erfassen?', _recordBooking, _noPressed, 'Buchung wurde erstellt', 'Buchung wurde erfolgreich erstellt.', Icons.info_outline,
-              'Der Betragsunterschied wurde in deinem Account gespeichert. Möchtest du die Differenz als $text erfassen?');
+              'Der Betragsunterschied wurde in deinem Account gespeichert. Möchtest du die Differenz als ${_oldBankBalance >= formatMoneyAmountToDouble(_bankBalanceTextController.text) ? TransactionType.outcome.name : TransactionType.income.name} erfassen?');
         } else {
           _updateAccount();
         }
@@ -168,13 +162,18 @@ class _CreateOrEditAccountScreenState extends State<CreateOrEditAccountScreen> {
       ..toAccount = _accountName;
     newBooking.createBooking(newBooking);
     _updateAccount();
+    Navigator.pop(context);
+    Navigator.pop(context);
+    Navigator.pop(context);
   }
 
   void _noPressed() {
     _updateAccount();
+    Navigator.pop(context);
+    Navigator.pop(context);
+    Navigator.pop(context);
   }
 
-  // TODO hier weitermachen und mit Navigator.pop(context); den choiceDialog ebenfalls wieder vom Stack nehmen um richtige Route zu bekommen.
   void _updateAccount() {
     _account.updateAccount(_account, widget.accountBoxIndex);
     _setSaveButtonAnimation(true);

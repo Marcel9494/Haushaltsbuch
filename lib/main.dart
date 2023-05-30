@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:haushaltsbuch/screens/edit_budget_screen.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
@@ -31,6 +30,8 @@ import '/screens/categories_screen.dart';
 import '/screens/account_details_screen.dart';
 import '/screens/create_or_edit_budget_screen.dart';
 import '/screens/categorie_amount_list_screen.dart';
+import '/screens/edit_budget_screen.dart';
+import '/screens/settings_screen.dart';
 
 void main() async {
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
@@ -76,6 +77,7 @@ class BudgetBookApp extends StatelessWidget {
       routes: {
         categoriesRoute: (context) => const CategoriesScreen(),
         overviewBudgetsRoute: (context) => const OverviewBudgetsScreen(),
+        settingsRoute: (context) => const SettingsScreen(),
       },
       onGenerateRoute: (RouteSettings settings) {
         switch (settings.name) {

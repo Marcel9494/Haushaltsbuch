@@ -1,2 +1,2 @@
-const bool demoMode = false;
+const bool demoMode = true;
 const int transitionInMs = 700;
