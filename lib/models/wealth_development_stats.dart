@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'booking.dart';
 
 class WealthDevelopmentStats {
@@ -24,22 +26,19 @@ class WealthDevelopmentStats {
     }
     return averageWealthGrowth / revenues.length;
   }
-  /*double balance = 0.0;
-    List<double> monthBalances = [];
+
+  static double calculateAverageInvestmentGrowth(List<double> revenues, List<double> expenditures, List<double> investments) {
+    double averageWealthGrowth = 0.0;
     for (int i = 0; i < revenues.length; i++) {
-      print(expenditures[i]);
-      if (revenues[i] == 0.0 && expenditures[i] == 0.0) {
-        continue;
-      }
-      monthBalances.add(revenues[i] - expenditures[i]);
-      print(monthBalances);
+      //print("Revenues: " + revenues[i].toString());
+      //print("Expenditures: " + expenditures[i].toString());
+      averageWealthGrowth = averageWealthGrowth + revenues[i] - expenditures[i];
+      print("Average Wealth Growth 1: " + averageWealthGrowth.toString());
     }
-    for (int i = 0; i < monthBalances.length; i++) {
-      balance += monthBalances[i];
-    }
-    if (monthBalances.isEmpty) {
-      return 0.0;
-    }
-    return balance / monthBalances.length;
-  }*/
+    return averageWealthGrowth / revenues.length;
+  }
+
+  static double calculateCompoundInterest(double startCapital, int year) {
+    return startCapital * pow((1 + 0.5 / 100), year);
+  }
 }

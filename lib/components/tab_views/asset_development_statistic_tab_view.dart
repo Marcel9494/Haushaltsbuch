@@ -17,7 +17,8 @@ class AssetDevelopmentStatisticTabView extends StatefulWidget {
 }
 
 class _AssetDevelopmentStatisticTabViewState extends State<AssetDevelopmentStatisticTabView> {
-  List<Color> gradientColors = [Colors.cyanAccent, Colors.cyan];
+  List<Color> revenueColors = [Colors.cyanAccent, Colors.cyan];
+  List<Color> investmentColors = [Colors.greenAccent, Colors.green];
   bool showAvg = false;
   bool _showSaldoLine = true;
   bool _showInvestmentLine = true;
@@ -27,6 +28,7 @@ class _AssetDevelopmentStatisticTabViewState extends State<AssetDevelopmentStati
   double _minWealthValue = 0.0;
   double _currentYearPeriod = 1;
   List<WealthDevelopmentStats> _wealthDevelopmentStats = [];
+  List<WealthDevelopmentStats> _investmentDevelopmentStats = [];
   List<double> monthRevenues = [];
   List<double> monthExpenditures = [];
   List<double> monthInvestments = [];
@@ -107,6 +109,7 @@ class _AssetDevelopmentStatisticTabViewState extends State<AssetDevelopmentStati
       _minWealthValue = wealthValues.reduce(min);
     }
     _calculateFutureAssetDevelopment();
+    _calculateFutureInvestmentDevelopment();
     return _wealthDevelopmentStats;
   }
 
@@ -135,8 +138,35 @@ class _AssetDevelopmentStatisticTabViewState extends State<AssetDevelopmentStati
     }
   }
 
-  void _calculateFutureInvestmentDevelopment() {
-    // TODO
+  void _calculateFutureInvestmentDevelopment() async {
+    monthRevenues = [];
+    monthExpenditures = [];
+    for (int i = 0; i < 12; i++) {
+      WealthDevelopmentStats investmentDevelopmentStat = WealthDevelopmentStats();
+      investmentDevelopmentStat.month = DateTime(DateTime.now().year, i).toString();
+      investmentDevelopmentStat.wealth = 0.0;
+      _investmentDevelopmentStats.add(investmentDevelopmentStat);
+    }
+    for (int i = DateTime.now().month; i >= 0; i--) {
+      List<Booking> _bookingList = await Booking.loadMonthlyBookingList(i, DateTime.now().year);
+      monthRevenues.add(Booking.getRevenues(_bookingList));
+      monthExpenditures.add(Booking.getExpenditures(_bookingList));
+      monthInvestments.add(Booking.getInvestments(_bookingList));
+      //_wealthDevelopmentStats[i].month = i.toString();
+      //_wealthDevelopmentStats[i].wealth = monthWealth;
+      //print(_wealthDevelopmentStats[i].wealth);
+      //wealthValues.add(_wealthDevelopmentStats[i].wealth);
+      //_maxWealthValue = wealthValues.reduce(max);
+    }
+    double averageInvestmentGrowth = WealthDevelopmentStats.calculateAverageInvestmentGrowth(monthRevenues, monthExpenditures, monthInvestments);
+    for (int i = DateTime.now().month; i < 12; i++) {
+      //_currentBalance += averageInvestmentGrowth;
+      _investmentDevelopmentStats[i].month = i.toString();
+      _investmentDevelopmentStats[i].wealth = WealthDevelopmentStats.calculateCompoundInterest(_currentBalance, i);
+      wealthValues.add(_investmentDevelopmentStats[i].wealth);
+      _maxWealthValue = wealthValues.reduce(max);
+      _minWealthValue = wealthValues.reduce(min);
+    }
   }
 
   LineChartBarData getLineChartData() {
@@ -148,7 +178,7 @@ class _AssetDevelopmentStatisticTabViewState extends State<AssetDevelopmentStati
     LineChartBarData lineChartBarData = LineChartBarData(
       spots: _getSpotList(spotList),
       gradient: LinearGradient(
-        colors: gradientColors,
+        colors: revenueColors,
       ),
       barWidth: 2.0,
       isStrokeCapRound: true,
@@ -158,7 +188,33 @@ class _AssetDevelopmentStatisticTabViewState extends State<AssetDevelopmentStati
       belowBarData: BarAreaData(
         show: true,
         gradient: LinearGradient(
-          colors: gradientColors.map((color) => color.withOpacity(0.3)).toList(),
+          colors: revenueColors.map((color) => color.withOpacity(0.3)).toList(),
+        ),
+      ),
+    );
+    return lineChartBarData;
+  }
+
+  LineChartBarData getInvestmentChartData() {
+    List<FlSpot> spotList = [];
+    for (int i = 0; i < _investmentDevelopmentStats.length; i++) {
+      //print(_wealthDevelopmentStats[i].wealth);
+      spotList.add(FlSpot(i.toDouble(), double.parse((_investmentDevelopmentStats[i].wealth / 1000).toStringAsFixed(2))));
+    }
+    LineChartBarData lineChartBarData = LineChartBarData(
+      spots: _getSpotList(spotList),
+      gradient: LinearGradient(
+        colors: investmentColors,
+      ),
+      barWidth: 2.0,
+      isStrokeCapRound: true,
+      dotData: FlDotData(
+        show: true,
+      ),
+      belowBarData: BarAreaData(
+        show: true,
+        gradient: LinearGradient(
+          colors: investmentColors.map((color) => color.withOpacity(0.3)).toList(),
         ),
       ),
     );
@@ -225,7 +281,7 @@ class _AssetDevelopmentStatisticTabViewState extends State<AssetDevelopmentStati
           ],
         ),
         FutureBuilder(
-          future: _calculatePastAssetDevelopment(), //_loadChartBarData(),
+          future: _calculatePastAssetDevelopment(),
           builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
             switch (snapshot.connectionState) {
               case ConnectionState.waiting:
@@ -414,7 +470,7 @@ class _AssetDevelopmentStatisticTabViewState extends State<AssetDevelopmentStati
       maxY: _maxWealthValue / 1000,
       lineBarsData: [
         getLineChartData(),
-        // TODO Linien hinzufügen
+        getInvestmentChartData(),
       ],
     );
   }
@@ -487,8 +543,8 @@ class _AssetDevelopmentStatisticTabViewState extends State<AssetDevelopmentStati
           isCurved: true,
           gradient: LinearGradient(
             colors: [
-              ColorTween(begin: gradientColors[0], end: gradientColors[1]).lerp(0.2)!,
-              ColorTween(begin: gradientColors[0], end: gradientColors[1]).lerp(0.2)!,
+              ColorTween(begin: revenueColors[0], end: revenueColors[1]).lerp(0.2)!,
+              ColorTween(begin: revenueColors[0], end: revenueColors[1]).lerp(0.2)!,
             ],
           ),
           barWidth: 5,
@@ -500,8 +556,8 @@ class _AssetDevelopmentStatisticTabViewState extends State<AssetDevelopmentStati
             show: true,
             gradient: LinearGradient(
               colors: [
-                ColorTween(begin: gradientColors[0], end: gradientColors[1]).lerp(0.2)!.withOpacity(0.1),
-                ColorTween(begin: gradientColors[0], end: gradientColors[1]).lerp(0.2)!.withOpacity(0.1),
+                ColorTween(begin: revenueColors[0], end: revenueColors[1]).lerp(0.2)!.withOpacity(0.1),
+                ColorTween(begin: revenueColors[0], end: revenueColors[1]).lerp(0.2)!.withOpacity(0.1),
               ],
             ),
           ),

@@ -1,6 +1,6 @@
-import 'global_consts.dart';
+import '../settings/settings.dart';
 
-const bookingsBox = demoMode ? 'DEMO_bookings' : 'bookings';
-const accountsBox = demoMode ? 'DEMO_accounts' : 'accounts';
-const categoriesBox = demoMode ? 'DEMO_categories' : 'categories';
-const budgetsBox = demoMode ? 'DEMO_budgets' : 'budgets';
+var bookingsBox = demoMode ? 'DEMO_bookings' : 'bookings';
+var accountsBox = demoMode ? 'DEMO_accounts' : 'accounts';
+var categoriesBox = demoMode ? 'DEMO_categories' : 'categories';
+var budgetsBox = demoMode ? 'DEMO_budgets' : 'budgets';
