@@ -39,6 +39,6 @@ class WealthDevelopmentStats {
   }
 
   static double calculateCompoundInterest(double startCapital, int year) {
-    return startCapital * pow((1 + 0.5 / 100), year);
+    return startCapital * pow((1 + 0.6 / 100), year);
   }
 }

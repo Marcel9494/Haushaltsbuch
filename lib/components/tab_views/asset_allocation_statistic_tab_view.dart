@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:haushaltsbuch/utils/number_formatters/number_formatter.dart';
 
 import '/components/cards/percentage_card.dart';
 import '/components/deco/loading_indicator.dart';
@@ -25,7 +26,6 @@ class _AssetAllocationStatisticTabViewState extends State<AssetAllocationStatist
 
   Future<List<PercentageStats>> _loadAssetAllocationStatistic() async {
     _percentageStats = [];
-    bool categorieStatsAreUpdated = false;
     List<Account> _accountList = [];
     if (_listStatisticType == StatisticType.assets.name || _assetAllocationStatisticType == AssetAllocationStatisticType.capitalOrRiskFreeInvestments.name) {
       _accountList = await Account.loadAssetAccounts();
@@ -35,18 +35,16 @@ class _AssetAllocationStatisticTabViewState extends State<AssetAllocationStatist
       _totalAmount = await Account.getLiabilityValue();
     }
     for (int i = 0; i < _accountList.length; i++) {
-      categorieStatsAreUpdated = false;
-      if (_assetAllocationStatisticType == AssetAllocationStatisticType.individualAccounts.name) {
+      if (_assetAllocationStatisticType == AssetAllocationStatisticType.individualAccounts.name && formatMoneyAmountToDouble(_accountList[i].bankBalance) != 0.0) {
         _percentageStats = PercentageStats.showSeparatePercentages(i, _accountList[i].bankBalance, _percentageStats, _accountList[i].name);
-      } else if (_assetAllocationStatisticType == AssetAllocationStatisticType.individualAccountTypes.name) {
+      } else if (_assetAllocationStatisticType == AssetAllocationStatisticType.individualAccountTypes.name && formatMoneyAmountToDouble(_accountList[i].bankBalance) != 0.0) {
         _percentageStats = PercentageStats.createOrUpdatePercentageStats(
-            i, _accountList[i].bankBalance, _percentageStats, AccountTypeExtension.getAccountTypePluralName(_accountList[i].accountType), categorieStatsAreUpdated);
+            i, _accountList[i].bankBalance, _percentageStats, AccountTypeExtension.getAccountTypePluralName(_accountList[i].accountType), false);
       } else if (_assetAllocationStatisticType == AssetAllocationStatisticType.capitalOrRiskFreeInvestments.name) {
         if (_accountList[i].accountType == AccountType.capitalInvestments.name) {
-          _percentageStats =
-              PercentageStats.createOrUpdatePercentageStats(i, _accountList[i].bankBalance, _percentageStats, AccountType.capitalInvestments.pluralName, categorieStatsAreUpdated);
+          _percentageStats = PercentageStats.createOrUpdatePercentageStats(i, _accountList[i].bankBalance, _percentageStats, AccountType.capitalInvestments.pluralName, false);
         } else {
-          _percentageStats = PercentageStats.createOrUpdatePercentageStats(i, _accountList[i].bankBalance, _percentageStats, 'risikolose Anlagen', categorieStatsAreUpdated);
+          _percentageStats = PercentageStats.createOrUpdatePercentageStats(i, _accountList[i].bankBalance, _percentageStats, 'risikolose Anlagen', false);
         }
       }
     }

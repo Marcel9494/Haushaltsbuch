@@ -42,7 +42,14 @@ class MonthlyBarChartState extends State<MonthlyBarChart> {
     _reversedMonthlyExpendituresBarGroups = [];
     _showingMonthlyExpendituresBarGroups = [];
     for (int i = 0; i < 7; i++) {
-      _bookingList = await Booking.loadMonthlyBookingList(widget.selectedDate.month - i, widget.selectedDate.year, widget.categorie);
+      int currentYear = widget.selectedDate.year;
+      int currentMonth = widget.selectedDate.month - i;
+      // Vergangenes Jahr z.B.: 2023 => 2022 & Januar => Dezember
+      if (widget.selectedDate.month - i <= 0) {
+        currentYear = widget.selectedDate.year - 1;
+        currentMonth = widget.selectedDate.month + 12 - i;
+      }
+      _bookingList = await Booking.loadMonthlyBookingList(currentMonth, currentYear, widget.categorie);
       if (_bookingList.isEmpty) {
         _monthlyExpenditures.insert(i, 0.0);
         _monthlyExpendituresBarGroups.add(makeGroupData(i, _monthlyExpenditures[i]));

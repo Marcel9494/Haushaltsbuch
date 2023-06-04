@@ -11,6 +11,7 @@ typedef BookingDateCallback = void Function(DateTime bookingDate);
 typedef RepeatCallback = void Function(String repeat);
 
 class DateInputField extends StatefulWidget {
+  final DateTime currentDate;
   final TextEditingController textController;
   final BookingDateCallback bookingDateCallback;
   final String repeat;
@@ -18,6 +19,7 @@ class DateInputField extends StatefulWidget {
 
   const DateInputField({
     Key? key,
+    required this.currentDate,
     required this.textController,
     required this.bookingDateCallback,
     required this.repeat,
@@ -109,7 +111,7 @@ class _DateInputFieldState extends State<DateInputField> {
             DateTime? parsedDate = await showDatePicker(
               context: context,
               locale: const Locale('de', 'DE'),
-              initialDate: DateTime.now(),
+              initialDate: widget.currentDate == DateTime.now() ? DateTime.now() : widget.currentDate,
               firstDate: DateTime(1900),
               lastDate: DateTime(2100),
               builder: (context, child) {

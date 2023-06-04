@@ -52,7 +52,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
   String _fromAccountErrorText = '';
   String _toAccountErrorText = '';
   String _bookingRepeat = '';
-  DateTime? _parsedBookingDate;
+  DateTime _parsedBookingDate = DateTime.now();
   late Booking _loadedBooking;
 
   @override
@@ -60,7 +60,6 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
     super.initState();
     if (widget.bookingBoxIndex == -1) {
       _currentTransaction = TransactionType.outcome.name;
-      _parsedBookingDate = DateTime.now();
       _bookingRepeat = RepeatType.noRepetition.name;
       _bookingDateTextController.text = dateFormatterDDMMYYYYEE.format(DateTime.now());
     } else {
@@ -282,6 +281,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
                         TransactionToggleButtons(
                             currentTransaction: _currentTransaction, transactionStringCallback: (transaction) => setState(() => _currentTransaction = transaction)),
                         DateInputField(
+                            currentDate: _parsedBookingDate,
                             textController: _bookingDateTextController,
                             bookingDateCallback: (bookingDate) => setState(() => _parsedBookingDate = bookingDate),
                             repeat: _bookingRepeat,

@@ -159,7 +159,7 @@ class _AssetDevelopmentStatisticTabViewState extends State<AssetDevelopmentStati
       //_maxWealthValue = wealthValues.reduce(max);
     }
     double averageInvestmentGrowth = WealthDevelopmentStats.calculateAverageInvestmentGrowth(monthRevenues, monthExpenditures, monthInvestments);
-    for (int i = DateTime.now().month; i < 12; i++) {
+    for (int i = 0 /*DateTime.now().month*/; i < 12; i++) {
       //_currentBalance += averageInvestmentGrowth;
       _investmentDevelopmentStats[i].month = i.toString();
       _investmentDevelopmentStats[i].wealth = WealthDevelopmentStats.calculateCompoundInterest(_currentBalance, i);
