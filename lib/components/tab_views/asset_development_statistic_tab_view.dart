@@ -2,9 +2,10 @@ import 'dart:math';
 
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:haushaltsbuch/utils/number_formatters/number_formatter.dart';
 
-import '../../utils/date_formatters/date_formatter.dart';
+import '/utils/date_formatters/date_formatter.dart';
+import '/utils/number_formatters/number_formatter.dart';
+
 import '/models/account.dart';
 import '/models/booking.dart';
 import '/models/wealth_development_stats.dart';
@@ -27,6 +28,7 @@ class _AssetDevelopmentStatisticTabViewState extends State<AssetDevelopmentStati
   double _maxWealthValue = 0.0;
   double _minWealthValue = 0.0;
   double _currentYearPeriod = 1;
+  List<WealthDevelopmentStats> _pastWealthDevelopmentStats = [];
   List<WealthDevelopmentStats> _wealthDevelopmentStats = [];
   List<WealthDevelopmentStats> _investmentDevelopmentStats = [];
   List<double> monthRevenues = [];
@@ -110,6 +112,7 @@ class _AssetDevelopmentStatisticTabViewState extends State<AssetDevelopmentStati
     }
     _calculateFutureAssetDevelopment();
     _calculateFutureInvestmentDevelopment();
+    _calculatePastWealthDevelopment();
     return _wealthDevelopmentStats;
   }
 
@@ -167,6 +170,69 @@ class _AssetDevelopmentStatisticTabViewState extends State<AssetDevelopmentStati
       _maxWealthValue = wealthValues.reduce(max);
       _minWealthValue = wealthValues.reduce(min);
     }
+  }
+
+  Future<List<WealthDevelopmentStats>> _calculatePastWealthDevelopment() async {
+    _assets = await Account.getAssetValue();
+    _liabilities = await Account.getLiabilityValue();
+    _currentBalance = _assets - _liabilities;
+    for (int i = 0; i < 12; i++) {
+      if (i == 0) {
+        WealthDevelopmentStats pastWealthDevelopmentStat = WealthDevelopmentStats();
+        pastWealthDevelopmentStat.month = DateTime.now().month.toString();
+        pastWealthDevelopmentStat.wealth = _currentBalance;
+        _pastWealthDevelopmentStats.add(pastWealthDevelopmentStat);
+      } else {
+        int currentYear = DateTime.now().year;
+        int currentMonth = DateTime.now().month - i;
+        // Vergangenes Jahr z.B.: 2023 => 2022 & Januar => Dezember
+        if (DateTime.now().month - i <= 0) {
+          currentYear = DateTime.now().year - 1;
+          currentMonth = DateTime.now().month + 12 - i;
+        }
+        List<Booking> bookingList = await Booking.loadMonthlyBookingList(currentMonth, currentYear);
+        double revenues = Booking.getRevenues(bookingList);
+        double expenditures = Booking.getExpenditures(bookingList);
+        double investments = Booking.getInvestments(bookingList);
+        // TODO hier weitermachen und vergangene Vermögensentwicklung weiter implementieren
+        _currentBalance = _currentBalance + revenues - expenditures;
+        WealthDevelopmentStats pastWealthDevelopmentStat = WealthDevelopmentStats();
+        pastWealthDevelopmentStat.month = DateTime.now().month.toString();
+        pastWealthDevelopmentStat.wealth = _currentBalance;
+        print(_currentBalance);
+        _pastWealthDevelopmentStats.add(pastWealthDevelopmentStat);
+        wealthValues.add(_wealthDevelopmentStats[i].wealth);
+        _maxWealthValue = wealthValues.reduce(max);
+        _minWealthValue = wealthValues.reduce(min);
+      }
+    }
+    //_pastWealthDevelopmentStats.reversed;
+    return _pastWealthDevelopmentStats;
+  }
+
+  LineChartBarData getPastWealthDevelopmentChartData() {
+    List<FlSpot> spotList = [];
+    for (int i = 0; i < _pastWealthDevelopmentStats.length; i++) {
+      spotList.add(FlSpot(i.toDouble(), double.parse((_pastWealthDevelopmentStats[i].wealth / 1000).toStringAsFixed(2))));
+    }
+    LineChartBarData lineChartBarData = LineChartBarData(
+      spots: _getSpotList(spotList),
+      gradient: LinearGradient(
+        colors: revenueColors,
+      ),
+      barWidth: 2.0,
+      isStrokeCapRound: true,
+      dotData: FlDotData(
+        show: true,
+      ),
+      belowBarData: BarAreaData(
+        show: true,
+        gradient: LinearGradient(
+          colors: revenueColors.map((color) => color.withOpacity(0.3)).toList(),
+        ),
+      ),
+    );
+    return lineChartBarData;
   }
 
   LineChartBarData getLineChartData() {
@@ -469,8 +535,9 @@ class _AssetDevelopmentStatisticTabViewState extends State<AssetDevelopmentStati
       minY: 0.0,
       maxY: _maxWealthValue / 1000,
       lineBarsData: [
-        getLineChartData(),
-        getInvestmentChartData(),
+        getPastWealthDevelopmentChartData(),
+        //getLineChartData(),
+        //getInvestmentChartData(),
       ],
     );
   }

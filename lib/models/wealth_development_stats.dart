@@ -22,7 +22,7 @@ class WealthDevelopmentStats {
       //print("Revenues: " + revenues[i].toString());
       //print("Expenditures: " + expenditures[i].toString());
       averageWealthGrowth = averageWealthGrowth + revenues[i] - expenditures[i];
-      print("Average Wealth Growth 1: " + averageWealthGrowth.toString());
+      //print("Average Wealth Growth 1: " + averageWealthGrowth.toString());
     }
     return averageWealthGrowth / revenues.length;
   }
@@ -33,7 +33,7 @@ class WealthDevelopmentStats {
       //print("Revenues: " + revenues[i].toString());
       //print("Expenditures: " + expenditures[i].toString());
       averageWealthGrowth = averageWealthGrowth + revenues[i] - expenditures[i];
-      print("Average Wealth Growth 1: " + averageWealthGrowth.toString());
+      //print("Average Wealth Growth 1: " + averageWealthGrowth.toString());
     }
     return averageWealthGrowth / revenues.length;
   }
