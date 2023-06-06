@@ -2,7 +2,9 @@ import 'dart:math';
 
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
+import '../buttons/month_picker_buttons.dart';
 import '/utils/date_formatters/date_formatter.dart';
 import '/utils/number_formatters/number_formatter.dart';
 
@@ -18,6 +20,7 @@ class AssetDevelopmentStatisticTabView extends StatefulWidget {
 }
 
 class _AssetDevelopmentStatisticTabViewState extends State<AssetDevelopmentStatisticTabView> {
+  DateTime _selectedDate = DateTime.now();
   List<Color> revenueColors = [Colors.cyanAccent, Colors.cyan];
   List<Color> investmentColors = [Colors.greenAccent, Colors.green];
   bool showAvg = false;
@@ -29,8 +32,8 @@ class _AssetDevelopmentStatisticTabViewState extends State<AssetDevelopmentStati
   double _minWealthValue = 0.0;
   double _currentYearPeriod = 1;
   List<WealthDevelopmentStats> _pastWealthDevelopmentStats = [];
-  List<WealthDevelopmentStats> _wealthDevelopmentStats = [];
-  List<WealthDevelopmentStats> _investmentDevelopmentStats = [];
+  //List<WealthDevelopmentStats> _wealthDevelopmentStats = [];
+  //List<WealthDevelopmentStats> _investmentDevelopmentStats = [];
   List<double> monthRevenues = [];
   List<double> monthExpenditures = [];
   List<double> monthInvestments = [];
@@ -38,7 +41,7 @@ class _AssetDevelopmentStatisticTabViewState extends State<AssetDevelopmentStati
   List<bool> _selectedAssetDevelopmentStatisticTabOption = [true, false, false, false];
   double _currentBalance = 0.0;
 
-  Future<List<WealthDevelopmentStats>> _loadChartBarData() async {
+  /*Future<List<WealthDevelopmentStats>> _loadChartBarData() async {
     _wealthDevelopmentStats = [];
     _assets = await Account.getAssetValue();
     _liabilities = await Account.getLiabilityValue();
@@ -170,50 +173,91 @@ class _AssetDevelopmentStatisticTabViewState extends State<AssetDevelopmentStati
       _maxWealthValue = wealthValues.reduce(max);
       _minWealthValue = wealthValues.reduce(min);
     }
-  }
+  }*/
 
   Future<List<WealthDevelopmentStats>> _calculatePastWealthDevelopment() async {
+    _pastWealthDevelopmentStats = [];
     _assets = await Account.getAssetValue();
     _liabilities = await Account.getLiabilityValue();
     _currentBalance = _assets - _liabilities;
+    print('Current Balance: ' + _currentBalance.toString());
     for (int i = 0; i < 12; i++) {
-      if (i == 0) {
-        WealthDevelopmentStats pastWealthDevelopmentStat = WealthDevelopmentStats();
-        pastWealthDevelopmentStat.month = DateTime.now().month.toString();
-        pastWealthDevelopmentStat.wealth = _currentBalance;
-        _pastWealthDevelopmentStats.add(pastWealthDevelopmentStat);
-      } else {
-        int currentYear = DateTime.now().year;
-        int currentMonth = DateTime.now().month - i;
-        // Vergangenes Jahr z.B.: 2023 => 2022 & Januar => Dezember
-        if (DateTime.now().month - i <= 0) {
-          currentYear = DateTime.now().year - 1;
-          currentMonth = DateTime.now().month + 12 - i;
-        }
-        List<Booking> bookingList = await Booking.loadMonthlyBookingList(currentMonth, currentYear);
-        double revenues = Booking.getRevenues(bookingList);
-        double expenditures = Booking.getExpenditures(bookingList);
-        double investments = Booking.getInvestments(bookingList);
-        // TODO hier weitermachen und vergangene Vermögensentwicklung weiter implementieren
-        _currentBalance = _currentBalance + revenues - expenditures;
-        WealthDevelopmentStats pastWealthDevelopmentStat = WealthDevelopmentStats();
-        pastWealthDevelopmentStat.month = DateTime.now().month.toString();
-        pastWealthDevelopmentStat.wealth = _currentBalance;
-        print(_currentBalance);
-        _pastWealthDevelopmentStats.add(pastWealthDevelopmentStat);
-        wealthValues.add(_wealthDevelopmentStats[i].wealth);
-        _maxWealthValue = wealthValues.reduce(max);
-        _minWealthValue = wealthValues.reduce(min);
+      int currentYear = _selectedDate.year;
+      int currentMonth = _selectedDate.month - i;
+      // Vergangenes Jahr z.B.: 2023 => 2022 & Januar => Dezember
+      if (_selectedDate.month - i <= 0) {
+        currentYear = _selectedDate.year - 1;
+        currentMonth = _selectedDate.month + 12 - i;
       }
+      List<Booking> bookingList = await Booking.loadMonthlyBookingList(currentMonth, currentYear);
+      double revenues = Booking.getRevenues(bookingList);
+      double expenditures = Booking.getExpenditures(bookingList);
+      WealthDevelopmentStats pastWealthDevelopmentStat = WealthDevelopmentStats();
+      pastWealthDevelopmentStat.month = currentMonth.toString();
+      if (i == 0) {
+        pastWealthDevelopmentStat.wealth = _currentBalance;
+      } else {
+        // TODO hier weitermachen und Berechnungen überprüfen
+        _currentBalance = _currentBalance + revenues - expenditures;
+        pastWealthDevelopmentStat.wealth = _currentBalance;
+      }
+      _pastWealthDevelopmentStats.insert(i, pastWealthDevelopmentStat);
+      wealthValues.add(_pastWealthDevelopmentStats[i].wealth);
+      _maxWealthValue = wealthValues.reduce(max);
+      _minWealthValue = wealthValues.reduce(min);
     }
-    //_pastWealthDevelopmentStats.reversed;
+    for (int i = 0; i < _pastWealthDevelopmentStats.length; i++) {
+      print(_pastWealthDevelopmentStats[i].month);
+      print(_pastWealthDevelopmentStats[i].wealth);
+    }
+    /*for (int i = 0; i < 12; i++) {
+      WealthDevelopmentStats pastWealthDevelopmentStat = WealthDevelopmentStats();
+      if (_selectedDate.month - i <= 0) {
+        pastWealthDevelopmentStat.month = (_selectedDate.month + 12 - i).toString();
+      } else {
+        pastWealthDevelopmentStat.month = (_selectedDate.month - i).toString();
+      }
+      pastWealthDevelopmentStat.wealth = _currentBalance;
+      _pastWealthDevelopmentStats.add(pastWealthDevelopmentStat);
+    }
+    for (int i = 0; i < 12; i++) {
+      WealthDevelopmentStats pastWealthDevelopmentStat = WealthDevelopmentStats();
+      pastWealthDevelopmentStat.month = i.toString();
+      pastWealthDevelopmentStat.wealth = 0.0;
+      _pastWealthDevelopmentStats.add(pastWealthDevelopmentStat);
+    }*/
+    /*for (int i = 0; i < 12; i++) {
+      int currentYear = _selectedDate.year;
+      int currentMonth = _selectedDate.month - i;
+      // Vergangenes Jahr z.B.: 2023 => 2022 & Januar => Dezember
+      if (_selectedDate.month - i <= 0) {
+        currentYear = _selectedDate.year - 1;
+        currentMonth = _selectedDate.month + 12 - i;
+      }
+      List<Booking> bookingList = await Booking.loadMonthlyBookingList(currentMonth, currentYear);
+      double revenues = Booking.getRevenues(bookingList);
+      double expenditures = Booking.getExpenditures(bookingList);
+      if (currentMonth == DateTime.now().month) {
+        _currentBalance = _currentBalance;
+      } else {
+        _currentBalance = _currentBalance + revenues - expenditures;
+      }
+      WealthDevelopmentStats pastWealthDevelopmentStat = WealthDevelopmentStats();
+      pastWealthDevelopmentStat.month = currentMonth.toString();
+      pastWealthDevelopmentStat.wealth = _currentBalance;
+      print(_currentBalance);
+      _pastWealthDevelopmentStats[_pastWealthDevelopmentStats.indexWhere((element) => element.month == pastWealthDevelopmentStat.month)] = pastWealthDevelopmentStat;
+      wealthValues.add(_pastWealthDevelopmentStats[i].wealth);
+      _maxWealthValue = wealthValues.reduce(max);
+      _minWealthValue = wealthValues.reduce(min);
+    }*/
     return _pastWealthDevelopmentStats;
   }
 
   LineChartBarData getPastWealthDevelopmentChartData() {
     List<FlSpot> spotList = [];
-    for (int i = 0; i < _pastWealthDevelopmentStats.length; i++) {
-      spotList.add(FlSpot(i.toDouble(), double.parse((_pastWealthDevelopmentStats[i].wealth / 1000).toStringAsFixed(2))));
+    for (int i = _pastWealthDevelopmentStats.length - 1; i >= 0; i--) {
+      spotList.add(FlSpot(i.toDouble(), double.parse((_pastWealthDevelopmentStats[11 - i].wealth / 1000).toStringAsFixed(2))));
     }
     LineChartBarData lineChartBarData = LineChartBarData(
       spots: _getSpotList(spotList),
@@ -235,7 +279,7 @@ class _AssetDevelopmentStatisticTabViewState extends State<AssetDevelopmentStati
     return lineChartBarData;
   }
 
-  LineChartBarData getLineChartData() {
+  /*LineChartBarData getLineChartData() {
     List<FlSpot> spotList = [];
     for (int i = 0; i < _wealthDevelopmentStats.length; i++) {
       //print(_wealthDevelopmentStats[i].wealth);
@@ -285,7 +329,7 @@ class _AssetDevelopmentStatisticTabViewState extends State<AssetDevelopmentStati
       ),
     );
     return lineChartBarData;
-  }
+  }*/
 
   List<FlSpot> _getSpotList(List<FlSpot> spotList) {
     for (int i = 0; i < spotList.length; i++) {
@@ -318,47 +362,27 @@ class _AssetDevelopmentStatisticTabViewState extends State<AssetDevelopmentStati
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          children: [
-            Expanded(
-              child: CheckboxListTile(
-                title: const Text('Saldo'),
-                value: _showSaldoLine,
-                onChanged: (value) {
-                  setState(() {
-                    _showSaldoLine = value!;
-                  });
-                },
-                controlAffinity: ListTileControlAffinity.leading,
-              ),
-            ),
-            Expanded(
-              child: CheckboxListTile(
-                title: const Text('Mit Investitionen'),
-                value: _showInvestmentLine,
-                onChanged: (value) {
-                  setState(() {
-                    _showInvestmentLine = value!;
-                  });
-                },
-                controlAffinity: ListTileControlAffinity.leading,
-              ),
-            ),
-          ],
-        ),
         FutureBuilder(
-          future: _calculatePastAssetDevelopment(),
+          future: _calculatePastWealthDevelopment(),
           builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
             switch (snapshot.connectionState) {
               case ConnectionState.waiting:
                 return const SizedBox();
               case ConnectionState.done:
-                if (_wealthDevelopmentStats.isEmpty) {
+                if (_pastWealthDevelopmentStats.isEmpty) {
                   return const Text('Noch keine Daten vorhanden.');
                 } else {
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      MonthPickerButtons(
+                        selectedDate: _selectedDate,
+                        selectedDateCallback: (DateTime selectedDate) {
+                          setState(() {
+                            _selectedDate = selectedDate;
+                          });
+                        },
+                      ),
                       Stack(
                         children: <Widget>[
                           AspectRatio(
@@ -371,7 +395,7 @@ class _AssetDevelopmentStatisticTabViewState extends State<AssetDevelopmentStati
                                 bottom: 12.0,
                               ),
                               child: LineChart(
-                                showAvg ? avgData() : mainData(_wealthDevelopmentStats),
+                                showAvg ? avgData() : mainData(),
                               ),
                             ),
                           ),
@@ -433,13 +457,22 @@ class _AssetDevelopmentStatisticTabViewState extends State<AssetDevelopmentStati
     Widget text;
     switch (value.toInt()) {
       case 0:
-        text = Text('Januar\n${_wealthDevelopmentStats[value.toInt()].wealth.toStringAsFixed(2)}€', textAlign: TextAlign.center, style: const TextStyle(fontSize: 10));
+        text = Text(
+            '${DateFormat('MMMM', 'de-DE').format(DateTime(0, int.parse(_pastWealthDevelopmentStats[11].month)))}\n${_pastWealthDevelopmentStats[11].wealth.toStringAsFixed(2)}€',
+            textAlign: TextAlign.center,
+            style: const TextStyle(fontSize: 10));
         break;
       case 5:
-        text = Text('Juni\n${_wealthDevelopmentStats[value.toInt()].wealth.toStringAsFixed(2)}€', textAlign: TextAlign.center, style: const TextStyle(fontSize: 10));
+        text = Text(
+            '${DateFormat('MMMM', 'de-DE').format(DateTime(0, int.parse(_pastWealthDevelopmentStats[5].month)))}\n${_pastWealthDevelopmentStats[5].wealth.toStringAsFixed(2)}€',
+            textAlign: TextAlign.center,
+            style: const TextStyle(fontSize: 10));
         break;
       case 11:
-        text = Text('Dezember\n${_wealthDevelopmentStats[value.toInt()].wealth.toStringAsFixed(2)}€', textAlign: TextAlign.center, style: const TextStyle(fontSize: 10));
+        text = Text(
+            '${DateFormat('MMMM', 'de-DE').format(DateTime(0, int.parse(_pastWealthDevelopmentStats[0].month)))}\n${_pastWealthDevelopmentStats[0].wealth.toStringAsFixed(2)}€',
+            textAlign: TextAlign.center,
+            style: const TextStyle(fontSize: 10));
         break;
       default:
         text = const Text('', style: TextStyle(fontSize: 10));
@@ -465,7 +498,7 @@ class _AssetDevelopmentStatisticTabViewState extends State<AssetDevelopmentStati
     return Text(text, style: style, textAlign: TextAlign.left);
   }
 
-  LineChartData mainData(List<WealthDevelopmentStats> wealthDevelopmentStats) {
+  LineChartData mainData() {
     return LineChartData(
       lineTouchData: LineTouchData(
         touchTooltipData: LineTouchTooltipData(
@@ -473,7 +506,7 @@ class _AssetDevelopmentStatisticTabViewState extends State<AssetDevelopmentStati
           getTooltipItems: (List<LineBarSpot> touchedBarSpots) {
             return touchedBarSpots.map((barSpot) {
               return LineTooltipItem(
-                '${dateFormatterMMMM.format(DateTime(DateTime.now().year, int.parse(_wealthDevelopmentStats[barSpot.spotIndex].month) + 1))}\n${formatToMoneyAmount((barSpot.y * 1000).toString())}',
+                '${dateFormatterMMMM.format(DateTime(_selectedDate.year, int.parse(_pastWealthDevelopmentStats[barSpot.spotIndex].month)))}\n${formatToMoneyAmount((_pastWealthDevelopmentStats[barSpot.spotIndex].wealth).toString())}',
                 const TextStyle(
                   color: Colors.cyanAccent,
                   fontWeight: FontWeight.bold,
@@ -531,7 +564,7 @@ class _AssetDevelopmentStatisticTabViewState extends State<AssetDevelopmentStati
         border: Border.all(color: const Color(0xff37434d)),
       ),
       minX: 0.0,
-      maxX: 11.0, // TODO dynamich machen * 5,
+      maxX: 11.0,
       minY: 0.0,
       maxY: _maxWealthValue / 1000,
       lineBarsData: [
