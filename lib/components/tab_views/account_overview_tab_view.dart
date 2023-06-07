@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:haushaltsbuch/utils/number_formatters/number_formatter.dart';
 
-import '../../models/account.dart';
+import '/utils/number_formatters/number_formatter.dart';
+
+import '/models/account.dart';
 
 import '../cards/account_card.dart';
 

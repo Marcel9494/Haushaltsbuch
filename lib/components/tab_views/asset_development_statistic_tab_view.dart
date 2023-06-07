@@ -5,6 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../buttons/month_picker_buttons.dart';
+
+import '../input_fields/year_slider_input_field.dart';
+
 import '/utils/date_formatters/date_formatter.dart';
 import '/utils/number_formatters/number_formatter.dart';
 
@@ -17,22 +20,21 @@ class AssetDevelopmentStatisticTabView extends StatefulWidget {
 
   @override
   State<AssetDevelopmentStatisticTabView> createState() => _AssetDevelopmentStatisticTabViewState();
+
+  static _AssetDevelopmentStatisticTabViewState? of(BuildContext context) => context.findAncestorStateOfType<_AssetDevelopmentStatisticTabViewState>();
 }
 
 class _AssetDevelopmentStatisticTabViewState extends State<AssetDevelopmentStatisticTabView> {
   DateTime _selectedDate = DateTime.now();
   List<Color> revenueColors = [Colors.cyanAccent, Colors.cyan];
   List<Color> investmentColors = [Colors.greenAccent, Colors.green];
-  bool showAvg = false;
-  bool _showSaldoLine = true;
-  bool _showInvestmentLine = true;
   double _assets = 0.0;
   double _liabilities = 0.0;
   double _maxWealthValue = 0.0;
   double _minWealthValue = 0.0;
   double _currentYearPeriod = 1;
   List<WealthDevelopmentStats> _pastWealthDevelopmentStats = [];
-  //List<WealthDevelopmentStats> _wealthDevelopmentStats = [];
+  List<WealthDevelopmentStats> _futureWealthDevelopmentStats = [];
   //List<WealthDevelopmentStats> _investmentDevelopmentStats = [];
   List<double> monthRevenues = [];
   List<double> monthExpenditures = [];
@@ -40,6 +42,7 @@ class _AssetDevelopmentStatisticTabViewState extends State<AssetDevelopmentStati
   List<double> wealthValues = [];
   List<bool> _selectedAssetDevelopmentStatisticTabOption = [true, false, false, false];
   double _currentBalance = 0.0;
+  double years = 1;
 
   /*Future<List<WealthDevelopmentStats>> _loadChartBarData() async {
     _wealthDevelopmentStats = [];
@@ -180,7 +183,6 @@ class _AssetDevelopmentStatisticTabViewState extends State<AssetDevelopmentStati
     _assets = await Account.getAssetValue();
     _liabilities = await Account.getLiabilityValue();
     _currentBalance = _assets - _liabilities;
-    print('Current Balance: ' + _currentBalance.toString());
     for (int i = 0; i < 12; i++) {
       int currentYear = _selectedDate.year;
       int currentMonth = _selectedDate.month - i;
@@ -194,39 +196,57 @@ class _AssetDevelopmentStatisticTabViewState extends State<AssetDevelopmentStati
       double expenditures = Booking.getExpenditures(bookingList);
       WealthDevelopmentStats pastWealthDevelopmentStat = WealthDevelopmentStats();
       pastWealthDevelopmentStat.month = currentMonth.toString();
-      if (i == 0) {
-        pastWealthDevelopmentStat.wealth = _currentBalance;
-      } else {
-        // TODO hier weitermachen und Berechnungen überprüfen
-        _currentBalance = _currentBalance + revenues - expenditures;
-        pastWealthDevelopmentStat.wealth = _currentBalance;
-      }
+      _currentBalance = _currentBalance + revenues - expenditures;
+      pastWealthDevelopmentStat.wealth = _currentBalance;
       _pastWealthDevelopmentStats.insert(i, pastWealthDevelopmentStat);
       wealthValues.add(_pastWealthDevelopmentStats[i].wealth);
       _maxWealthValue = wealthValues.reduce(max);
       _minWealthValue = wealthValues.reduce(min);
     }
-    for (int i = 0; i < _pastWealthDevelopmentStats.length; i++) {
-      print(_pastWealthDevelopmentStats[i].month);
-      print(_pastWealthDevelopmentStats[i].wealth);
+    return _pastWealthDevelopmentStats;
+  }
+
+  LineChartBarData _getPastWealthDevelopmentChartData() {
+    List<FlSpot> spotList = [];
+    for (int i = _pastWealthDevelopmentStats.length - 1; i >= 0; i--) {
+      spotList.add(FlSpot(i.toDouble(), double.parse((_pastWealthDevelopmentStats[11 - i].wealth / 1000).toStringAsFixed(2))));
     }
-    /*for (int i = 0; i < 12; i++) {
-      WealthDevelopmentStats pastWealthDevelopmentStat = WealthDevelopmentStats();
-      if (_selectedDate.month - i <= 0) {
-        pastWealthDevelopmentStat.month = (_selectedDate.month + 12 - i).toString();
-      } else {
-        pastWealthDevelopmentStat.month = (_selectedDate.month - i).toString();
-      }
-      pastWealthDevelopmentStat.wealth = _currentBalance;
-      _pastWealthDevelopmentStats.add(pastWealthDevelopmentStat);
+    LineChartBarData lineChartBarData = LineChartBarData(
+      spots: _getSpotList(spotList),
+      gradient: LinearGradient(
+        colors: revenueColors,
+      ),
+      barWidth: 2.0,
+      isStrokeCapRound: true,
+      dotData: FlDotData(
+        show: true,
+      ),
+      belowBarData: BarAreaData(
+        show: true,
+        gradient: LinearGradient(
+          colors: revenueColors.map((color) => color.withOpacity(0.3)).toList(),
+        ),
+      ),
+    );
+    return lineChartBarData;
+  }
+
+  Future<List<WealthDevelopmentStats>> _calculateFutureWealthDevelopment(double years) async {
+    double averageWealthGrowth = 0.0;
+    _futureWealthDevelopmentStats = [];
+    // TODO hier weitermachen und überall 12 durch die Anzahl der Monate ersetzen die in die Zukunft gerechnet werden soll
+    print(years);
+    for (int i = 0; i < 12 * years; i++) {
+      WealthDevelopmentStats futureWealthDevelopmentStat = WealthDevelopmentStats();
+      futureWealthDevelopmentStat.month = i.toString();
+      futureWealthDevelopmentStat.wealth = 1.0;
+      _futureWealthDevelopmentStats.insert(i, futureWealthDevelopmentStat);
     }
     for (int i = 0; i < 12; i++) {
-      WealthDevelopmentStats pastWealthDevelopmentStat = WealthDevelopmentStats();
-      pastWealthDevelopmentStat.month = i.toString();
-      pastWealthDevelopmentStat.wealth = 0.0;
-      _pastWealthDevelopmentStats.add(pastWealthDevelopmentStat);
-    }*/
-    /*for (int i = 0; i < 12; i++) {
+      //WealthDevelopmentStats futureWealthDevelopmentStat = WealthDevelopmentStats();
+      //futureWealthDevelopmentStat.month = i.toString();
+      //futureWealthDevelopmentStat.wealth = 1.0;
+      //_futureWealthDevelopmentStats.insert(i, futureWealthDevelopmentStat);
       int currentYear = _selectedDate.year;
       int currentMonth = _selectedDate.month - i;
       // Vergangenes Jahr z.B.: 2023 => 2022 & Januar => Dezember
@@ -235,29 +255,20 @@ class _AssetDevelopmentStatisticTabViewState extends State<AssetDevelopmentStati
         currentMonth = _selectedDate.month + 12 - i;
       }
       List<Booking> bookingList = await Booking.loadMonthlyBookingList(currentMonth, currentYear);
-      double revenues = Booking.getRevenues(bookingList);
-      double expenditures = Booking.getExpenditures(bookingList);
-      if (currentMonth == DateTime.now().month) {
-        _currentBalance = _currentBalance;
-      } else {
-        _currentBalance = _currentBalance + revenues - expenditures;
-      }
-      WealthDevelopmentStats pastWealthDevelopmentStat = WealthDevelopmentStats();
-      pastWealthDevelopmentStat.month = currentMonth.toString();
-      pastWealthDevelopmentStat.wealth = _currentBalance;
-      print(_currentBalance);
-      _pastWealthDevelopmentStats[_pastWealthDevelopmentStats.indexWhere((element) => element.month == pastWealthDevelopmentStat.month)] = pastWealthDevelopmentStat;
-      wealthValues.add(_pastWealthDevelopmentStats[i].wealth);
-      _maxWealthValue = wealthValues.reduce(max);
-      _minWealthValue = wealthValues.reduce(min);
-    }*/
-    return _pastWealthDevelopmentStats;
+      //monthInvestments.add(Booking.getInvestments(bookingList));
+      averageWealthGrowth += Booking.getRevenues(bookingList) - Booking.getExpenditures(bookingList);
+    }
+    averageWealthGrowth /= 12;
+    for (int i = 0; i < _futureWealthDevelopmentStats.length; i++) {
+      _futureWealthDevelopmentStats[i].wealth = (averageWealthGrowth * i) + _currentBalance;
+    }
+    return _futureWealthDevelopmentStats;
   }
 
-  LineChartBarData getPastWealthDevelopmentChartData() {
+  LineChartBarData _getFutureWealthDevelopmentChartData() {
     List<FlSpot> spotList = [];
-    for (int i = _pastWealthDevelopmentStats.length - 1; i >= 0; i--) {
-      spotList.add(FlSpot(i.toDouble(), double.parse((_pastWealthDevelopmentStats[11 - i].wealth / 1000).toStringAsFixed(2))));
+    for (int i = 0; i < _futureWealthDevelopmentStats.length; i++) {
+      spotList.add(FlSpot(i.toDouble(), double.parse((_futureWealthDevelopmentStats[i].wealth / 1000).toStringAsFixed(2))));
     }
     LineChartBarData lineChartBarData = LineChartBarData(
       spots: _getSpotList(spotList),
@@ -359,97 +370,116 @@ class _AssetDevelopmentStatisticTabViewState extends State<AssetDevelopmentStati
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        FutureBuilder(
-          future: _calculatePastWealthDevelopment(),
-          builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
-            switch (snapshot.connectionState) {
-              case ConnectionState.waiting:
-                return const SizedBox();
-              case ConnectionState.done:
-                if (_pastWealthDevelopmentStats.isEmpty) {
-                  return const Text('Noch keine Daten vorhanden.');
-                } else {
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      MonthPickerButtons(
-                        selectedDate: _selectedDate,
-                        selectedDateCallback: (DateTime selectedDate) {
-                          setState(() {
-                            _selectedDate = selectedDate;
-                          });
-                        },
-                      ),
-                      Stack(
-                        children: <Widget>[
-                          AspectRatio(
-                            aspectRatio: 1.7,
-                            child: Padding(
-                              padding: const EdgeInsets.only(
-                                right: 18.0,
-                                left: 12.0,
-                                top: 24.0,
-                                bottom: 12.0,
-                              ),
-                              child: LineChart(
-                                showAvg ? avgData() : mainData(),
-                              ),
-                            ),
-                          ),
-                          SizedBox(
-                            width: 60,
-                            height: 34,
-                            child: TextButton(
-                              onPressed: () {
-                                setState(() {
-                                  showAvg = !showAvg;
-                                });
-                              },
-                              child: Text(
-                                'avg',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: showAvg ? Colors.white.withOpacity(0.5) : Colors.white,
+    return Expanded(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          FutureBuilder(
+            future: _calculatePastWealthDevelopment(),
+            builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
+              switch (snapshot.connectionState) {
+                case ConnectionState.waiting:
+                  return const SizedBox();
+                case ConnectionState.done:
+                  if (_pastWealthDevelopmentStats.isEmpty) {
+                    return const Text('Noch keine Daten vorhanden.');
+                  } else {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        MonthPickerButtons(
+                          selectedDate: _selectedDate,
+                          selectedDateCallback: (DateTime selectedDate) {
+                            setState(() {
+                              _selectedDate = selectedDate;
+                            });
+                          },
+                        ),
+                        Stack(
+                          children: <Widget>[
+                            AspectRatio(
+                              aspectRatio: 1.7,
+                              child: Padding(
+                                padding: const EdgeInsets.only(
+                                  right: 18.0,
+                                  left: 12.0,
+                                  top: 24.0,
+                                  bottom: 12.0,
+                                ),
+                                child: LineChart(
+                                  pastData(),
                                 ),
                               ),
                             ),
-                          ),
-                        ],
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                        child: ToggleButtons(
-                          onPressed: (selectedIndex) => _setSelectedAssetDevelopmentStatisticTab(selectedIndex),
-                          borderRadius: BorderRadius.circular(6.0),
-                          selectedBorderColor: Colors.cyanAccent,
-                          fillColor: Colors.cyanAccent.shade700,
-                          selectedColor: Colors.white,
-                          color: Colors.white60,
-                          constraints: const BoxConstraints(
-                            minHeight: 30.0,
-                            minWidth: 50.0,
-                          ),
-                          isSelected: _selectedAssetDevelopmentStatisticTabOption,
-                          children: const [
-                            Text('1 J.'),
-                            Text('5 J.'),
-                            Text('10 J.'),
-                            Text('40 J.'),
                           ],
                         ),
-                      ),
-                    ],
-                  );
-                }
-              default:
-                return const SizedBox();
-            }
-          },
-        ),
-      ],
+                      ],
+                    );
+                  }
+                default:
+                  return const SizedBox();
+              }
+            },
+          ),
+          Expanded(
+            child: SingleChildScrollView(
+              child: FutureBuilder(
+                future: _calculateFutureWealthDevelopment(years),
+                builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
+                  switch (snapshot.connectionState) {
+                    case ConnectionState.waiting:
+                      return const SizedBox();
+                    case ConnectionState.done:
+                      if (_futureWealthDevelopmentStats.isEmpty) {
+                        return const Text('Noch keine Daten vorhanden.');
+                      } else {
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Padding(
+                              padding: EdgeInsets.only(left: 12.0),
+                              child: Text(
+                                'Zukünftige Vermögensentwicklung:',
+                                style: TextStyle(fontSize: 16.0),
+                              ),
+                            ),
+                            YearSliderInputField(
+                                years: years,
+                                // TODO hier weitermachen ohne _ und ohne setState oder mit?
+                                onChanged: (_) {
+                                  _calculateFutureWealthDevelopment;
+                                  setState(() {});
+                                }),
+                            Stack(
+                              children: <Widget>[
+                                AspectRatio(
+                                  aspectRatio: 1.7,
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(
+                                      right: 18.0,
+                                      left: 12.0,
+                                      top: 24.0,
+                                      bottom: 12.0,
+                                    ),
+                                    child: LineChart(
+                                      futureData(),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        );
+                      }
+                    default:
+                      return const SizedBox();
+                  }
+                },
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -498,7 +528,7 @@ class _AssetDevelopmentStatisticTabViewState extends State<AssetDevelopmentStati
     return Text(text, style: style, textAlign: TextAlign.left);
   }
 
-  LineChartData mainData() {
+  LineChartData pastData() {
     return LineChartData(
       lineTouchData: LineTouchData(
         touchTooltipData: LineTouchTooltipData(
@@ -568,100 +598,86 @@ class _AssetDevelopmentStatisticTabViewState extends State<AssetDevelopmentStati
       minY: 0.0,
       maxY: _maxWealthValue / 1000,
       lineBarsData: [
-        getPastWealthDevelopmentChartData(),
+        _getPastWealthDevelopmentChartData(),
         //getLineChartData(),
         //getInvestmentChartData(),
       ],
     );
   }
 
-  LineChartData avgData() {
+  LineChartData futureData() {
     return LineChartData(
-      lineTouchData: LineTouchData(enabled: false),
+      lineTouchData: LineTouchData(
+        touchTooltipData: LineTouchTooltipData(
+          tooltipBgColor: Colors.black45,
+          getTooltipItems: (List<LineBarSpot> touchedBarSpots) {
+            return touchedBarSpots.map((barSpot) {
+              return LineTooltipItem(
+                '${dateFormatterMMMM.format(DateTime(_selectedDate.year, int.parse(_futureWealthDevelopmentStats[barSpot.spotIndex].month)))}\n${formatToMoneyAmount((_futureWealthDevelopmentStats[barSpot.spotIndex].wealth).toString())}',
+                const TextStyle(
+                  color: Colors.cyanAccent,
+                  fontWeight: FontWeight.bold,
+                ),
+              );
+            }).toList();
+          },
+        ),
+      ),
       gridData: FlGridData(
         show: true,
-        drawHorizontalLine: true,
+        drawVerticalLine: true,
+        horizontalInterval: 1000,
         verticalInterval: 1,
-        horizontalInterval: 1,
-        getDrawingVerticalLine: (value) {
+        getDrawingHorizontalLine: (value) {
           return FlLine(
-            color: const Color(0xff37434d),
+            color: Colors.white70,
             strokeWidth: 1,
           );
         },
-        getDrawingHorizontalLine: (value) {
+        getDrawingVerticalLine: (value) {
           return FlLine(
-            color: const Color(0xff37434d),
+            color: Colors.white70,
             strokeWidth: 1,
           );
         },
       ),
       titlesData: FlTitlesData(
         show: true,
+        rightTitles: AxisTitles(
+          sideTitles: SideTitles(showTitles: false),
+        ),
+        topTitles: AxisTitles(
+          sideTitles: SideTitles(showTitles: false),
+        ),
         bottomTitles: AxisTitles(
           sideTitles: SideTitles(
             showTitles: true,
-            reservedSize: 30,
-            getTitlesWidget: bottomTitleWidgets,
+            reservedSize: 35,
             interval: 1,
+            getTitlesWidget: bottomTitleWidgets,
           ),
         ),
         leftTitles: AxisTitles(
           sideTitles: SideTitles(
             showTitles: true,
+            interval: 1,
             getTitlesWidget: leftTitleWidgets,
             reservedSize: 42,
-            interval: 1,
           ),
-        ),
-        topTitles: AxisTitles(
-          sideTitles: SideTitles(showTitles: false),
-        ),
-        rightTitles: AxisTitles(
-          sideTitles: SideTitles(showTitles: false),
         ),
       ),
       borderData: FlBorderData(
         show: true,
         border: Border.all(color: const Color(0xff37434d)),
       ),
-      minX: 0,
-      maxX: 11,
-      minY: 0,
-      maxY: 6,
+      minX: 0.0,
+      maxX: 11.0,
+      minY: 0.0,
+      maxY: _maxWealthValue / 1000,
       lineBarsData: [
-        LineChartBarData(
-          spots: const [
-            FlSpot(0, 3.44),
-            FlSpot(2.6, 3.44),
-            FlSpot(4.9, 3.44),
-            FlSpot(6.8, 3.44),
-            FlSpot(8, 3.44),
-            FlSpot(9.5, 3.44),
-            FlSpot(11, 3.44),
-          ],
-          isCurved: true,
-          gradient: LinearGradient(
-            colors: [
-              ColorTween(begin: revenueColors[0], end: revenueColors[1]).lerp(0.2)!,
-              ColorTween(begin: revenueColors[0], end: revenueColors[1]).lerp(0.2)!,
-            ],
-          ),
-          barWidth: 5,
-          isStrokeCapRound: true,
-          dotData: FlDotData(
-            show: false,
-          ),
-          belowBarData: BarAreaData(
-            show: true,
-            gradient: LinearGradient(
-              colors: [
-                ColorTween(begin: revenueColors[0], end: revenueColors[1]).lerp(0.2)!.withOpacity(0.1),
-                ColorTween(begin: revenueColors[0], end: revenueColors[1]).lerp(0.2)!.withOpacity(0.1),
-              ],
-            ),
-          ),
-        ),
+        _getFutureWealthDevelopmentChartData(),
+        //getLineChartData(),
+        //getInvestmentChartData(),
       ],
     );
   }
