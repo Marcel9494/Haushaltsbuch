@@ -3,13 +3,13 @@ import 'package:flutter/material.dart';
 import '/components/tab_views/asset_development_statistic_tab_view.dart';
 
 class YearSliderInputField extends StatefulWidget {
-  final double years;
-  final Function onChanged;
+  double years;
+  final Function onChangeEnd;
 
-  const YearSliderInputField({
+  YearSliderInputField({
     Key? key,
     required this.years,
-    required this.onChanged,
+    required this.onChangeEnd,
   }) : super(key: key);
 
   @override
@@ -23,12 +23,12 @@ class _YearSliderInputFieldState extends State<YearSliderInputField> {
   Widget build(BuildContext context) {
     return Slider(
       value: _years,
-      onChanged: (years) => setState(() {
-        _years = years;
-        //AssetDevelopmentStatisticTabView.of(context)!.years = _years;
-      }),
-      onChangeEnd: (years) => setState(() {
-        widget.onChanged(_years);
+      onChanged: (years) {
+        setState(() => _years = years);
+      },
+      onChangeEnd: (double years) => setState(() {
+        widget.years = years;
+        widget.onChangeEnd;
       }),
       divisions: 50,
       min: 1,

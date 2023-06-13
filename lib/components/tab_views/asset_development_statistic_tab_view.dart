@@ -1,4 +1,4 @@
-import 'dart:math';
+import 'dart:math' as math;
 
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
@@ -32,17 +32,21 @@ class _AssetDevelopmentStatisticTabViewState extends State<AssetDevelopmentStati
   double _liabilities = 0.0;
   double _maxWealthValue = 0.0;
   double _minWealthValue = 0.0;
+  double _maxFutureWealthValue = 0.0;
+  double _minFutureWealthValue = 0.0;
   double _currentYearPeriod = 1;
   List<WealthDevelopmentStats> _pastWealthDevelopmentStats = [];
   List<WealthDevelopmentStats> _futureWealthDevelopmentStats = [];
+  List<WealthDevelopmentStats> _futureWealthWithCompoundInterestStats = [];
   //List<WealthDevelopmentStats> _investmentDevelopmentStats = [];
   List<double> monthRevenues = [];
   List<double> monthExpenditures = [];
   List<double> monthInvestments = [];
   List<double> wealthValues = [];
-  List<bool> _selectedAssetDevelopmentStatisticTabOption = [true, false, false, false];
+  List<double> _futureWealthValues = [];
+  List<bool> _selectedAssetDevelopmentStatisticTabOption = [true, false, false, false, false, false];
   double _currentBalance = 0.0;
-  double years = 1;
+  double _years = 1;
 
   /*Future<List<WealthDevelopmentStats>> _loadChartBarData() async {
     _wealthDevelopmentStats = [];
@@ -200,8 +204,8 @@ class _AssetDevelopmentStatisticTabViewState extends State<AssetDevelopmentStati
       pastWealthDevelopmentStat.wealth = _currentBalance;
       _pastWealthDevelopmentStats.insert(i, pastWealthDevelopmentStat);
       wealthValues.add(_pastWealthDevelopmentStats[i].wealth);
-      _maxWealthValue = wealthValues.reduce(max);
-      _minWealthValue = wealthValues.reduce(min);
+      _maxWealthValue = wealthValues.reduce(math.max);
+      _minWealthValue = wealthValues.reduce(math.min);
     }
     return _pastWealthDevelopmentStats;
   }
@@ -231,12 +235,15 @@ class _AssetDevelopmentStatisticTabViewState extends State<AssetDevelopmentStati
     return lineChartBarData;
   }
 
-  Future<List<WealthDevelopmentStats>> _calculateFutureWealthDevelopment(double years) async {
+  Future<List<WealthDevelopmentStats>> _calculateFutureWealthValues() {
+    _calculateFutureWealthDevelopment();
+    return _calculateFutureWealthWithCompoundInterest();
+  }
+
+  Future<List<WealthDevelopmentStats>> _calculateFutureWealthDevelopment() async {
     double averageWealthGrowth = 0.0;
     _futureWealthDevelopmentStats = [];
-    // TODO hier weitermachen und überall 12 durch die Anzahl der Monate ersetzen die in die Zukunft gerechnet werden soll
-    print(years);
-    for (int i = 0; i < 12 * years; i++) {
+    for (int i = 0; i < 12 * _years; i++) {
       WealthDevelopmentStats futureWealthDevelopmentStat = WealthDevelopmentStats();
       futureWealthDevelopmentStat.month = i.toString();
       futureWealthDevelopmentStat.wealth = 1.0;
@@ -261,14 +268,19 @@ class _AssetDevelopmentStatisticTabViewState extends State<AssetDevelopmentStati
     averageWealthGrowth /= 12;
     for (int i = 0; i < _futureWealthDevelopmentStats.length; i++) {
       _futureWealthDevelopmentStats[i].wealth = (averageWealthGrowth * i) + _currentBalance;
+      _futureWealthValues.add(_futureWealthDevelopmentStats[i].wealth);
+      _maxFutureWealthValue = _futureWealthValues.reduce(math.max);
+      _minFutureWealthValue = _futureWealthValues.reduce(math.min);
     }
     return _futureWealthDevelopmentStats;
   }
 
   LineChartBarData _getFutureWealthDevelopmentChartData() {
     List<FlSpot> spotList = [];
-    for (int i = 0; i < _futureWealthDevelopmentStats.length; i++) {
-      spotList.add(FlSpot(i.toDouble(), double.parse((_futureWealthDevelopmentStats[i].wealth / 1000).toStringAsFixed(2))));
+    int stepSize = _getStepSizeForFutureWealthValues();
+    int spotX = 0;
+    for (int i = 0; i < _futureWealthDevelopmentStats.length; i = i + stepSize, spotX++) {
+      spotList.add(FlSpot(spotX.toDouble(), double.parse((_futureWealthDevelopmentStats[i].wealth / 1000).toStringAsFixed(2))));
     }
     LineChartBarData lineChartBarData = LineChartBarData(
       spots: _getSpotList(spotList),
@@ -284,6 +296,69 @@ class _AssetDevelopmentStatisticTabViewState extends State<AssetDevelopmentStati
         show: true,
         gradient: LinearGradient(
           colors: revenueColors.map((color) => color.withOpacity(0.3)).toList(),
+        ),
+      ),
+    );
+    return lineChartBarData;
+  }
+
+  Future<List<WealthDevelopmentStats>> _calculateFutureWealthWithCompoundInterest() async {
+    double averageWealthGrowth = 0.0;
+    _futureWealthWithCompoundInterestStats = [];
+    for (int i = 0; i < 12 * _years; i++) {
+      WealthDevelopmentStats futureWealthDevelopmentStat = WealthDevelopmentStats();
+      futureWealthDevelopmentStat.month = i.toString();
+      futureWealthDevelopmentStat.wealth = 1.0;
+      _futureWealthWithCompoundInterestStats.insert(i, futureWealthDevelopmentStat);
+    }
+    for (int i = 0; i < 12; i++) {
+      //WealthDevelopmentStats futureWealthDevelopmentStat = WealthDevelopmentStats();
+      //futureWealthDevelopmentStat.month = i.toString();
+      //futureWealthDevelopmentStat.wealth = 1.0;
+      //_futureWealthDevelopmentStats.insert(i, futureWealthDevelopmentStat);
+      int currentYear = _selectedDate.year;
+      int currentMonth = _selectedDate.month - i;
+      // Vergangenes Jahr z.B.: 2023 => 2022 & Januar => Dezember
+      if (_selectedDate.month - i <= 0) {
+        currentYear = _selectedDate.year - 1;
+        currentMonth = _selectedDate.month + 12 - i;
+      }
+      List<Booking> bookingList = await Booking.loadMonthlyBookingList(currentMonth, currentYear);
+      //monthInvestments.add(Booking.getInvestments(bookingList));
+      averageWealthGrowth += Booking.getRevenues(bookingList) - Booking.getExpenditures(bookingList);
+    }
+    averageWealthGrowth /= 12;
+    for (int i = 0; i < _futureWealthWithCompoundInterestStats.length; i++) {
+      _futureWealthWithCompoundInterestStats[i].wealth = _currentBalance * math.pow((1 + 5 / 100), i - 1);
+      //_futureWealthWithCompoundInterestStats[i].wealth = (averageWealthGrowth * i * 2) + _currentBalance;
+      _futureWealthValues.add(_futureWealthWithCompoundInterestStats[i].wealth);
+      _maxFutureWealthValue = _futureWealthValues.reduce(math.max);
+      _minFutureWealthValue = _futureWealthValues.reduce(math.min);
+    }
+    return _futureWealthWithCompoundInterestStats;
+  }
+
+  LineChartBarData _getFutureWealthWithCompoundInterestChartData() {
+    List<FlSpot> spotList = [];
+    int stepSize = _getStepSizeForFutureWealthValues();
+    int spotX = 0;
+    for (int i = 0; i < _futureWealthWithCompoundInterestStats.length; i = i + stepSize, spotX++) {
+      spotList.add(FlSpot(spotX.toDouble(), double.parse((_futureWealthWithCompoundInterestStats[i].wealth / 1000).toStringAsFixed(2))));
+    }
+    LineChartBarData lineChartBarData = LineChartBarData(
+      spots: _getSpotList(spotList),
+      gradient: LinearGradient(
+        colors: investmentColors,
+      ),
+      barWidth: 2.0,
+      isStrokeCapRound: true,
+      dotData: FlDotData(
+        show: true,
+      ),
+      belowBarData: BarAreaData(
+        show: true,
+        gradient: LinearGradient(
+          colors: investmentColors.map((color) => color.withOpacity(0.8)).toList(),
         ),
       ),
     );
@@ -355,15 +430,26 @@ class _AssetDevelopmentStatisticTabViewState extends State<AssetDevelopmentStati
         _selectedAssetDevelopmentStatisticTabOption[i] = i == selectedIndex;
       }
       if (_selectedAssetDevelopmentStatisticTabOption[0]) {
-        _selectedAssetDevelopmentStatisticTabOption = [true, false, false, false];
+        _selectedAssetDevelopmentStatisticTabOption = [true, false, false, false, false, false];
+        _years = 1;
       } else if (_selectedAssetDevelopmentStatisticTabOption[1]) {
-        _selectedAssetDevelopmentStatisticTabOption = [false, true, false, false];
+        _selectedAssetDevelopmentStatisticTabOption = [false, true, false, false, false, false];
+        _years = 5;
       } else if (_selectedAssetDevelopmentStatisticTabOption[2]) {
-        _selectedAssetDevelopmentStatisticTabOption = [false, false, true, false];
+        _selectedAssetDevelopmentStatisticTabOption = [false, false, true, false, false, false];
+        _years = 10;
       } else if (_selectedAssetDevelopmentStatisticTabOption[3]) {
-        _selectedAssetDevelopmentStatisticTabOption = [false, false, false, true];
+        _selectedAssetDevelopmentStatisticTabOption = [false, false, false, true, false, false];
+        _years = 20;
+      } else if (_selectedAssetDevelopmentStatisticTabOption[4]) {
+        _selectedAssetDevelopmentStatisticTabOption = [false, false, false, false, true, false];
+        _years = 40;
+      } else if (_selectedAssetDevelopmentStatisticTabOption[5]) {
+        _selectedAssetDevelopmentStatisticTabOption = [false, false, false, false, false, true];
+        _years = 50;
       } else {
-        _selectedAssetDevelopmentStatisticTabOption = [true, false, false, false];
+        _selectedAssetDevelopmentStatisticTabOption = [true, false, false, false, false, false];
+        _years = 1;
       }
     });
   }
@@ -424,7 +510,7 @@ class _AssetDevelopmentStatisticTabViewState extends State<AssetDevelopmentStati
           Expanded(
             child: SingleChildScrollView(
               child: FutureBuilder(
-                future: _calculateFutureWealthDevelopment(years),
+                future: _calculateFutureWealthValues(),
                 builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
                   switch (snapshot.connectionState) {
                     case ConnectionState.waiting:
@@ -443,13 +529,30 @@ class _AssetDevelopmentStatisticTabViewState extends State<AssetDevelopmentStati
                                 style: TextStyle(fontSize: 16.0),
                               ),
                             ),
-                            YearSliderInputField(
-                                years: years,
-                                // TODO hier weitermachen ohne _ und ohne setState oder mit?
-                                onChanged: (_) {
-                                  _calculateFutureWealthDevelopment;
-                                  setState(() {});
-                                }),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                              child: ToggleButtons(
+                                onPressed: (selectedIndex) => _setSelectedAssetDevelopmentStatisticTab(selectedIndex),
+                                borderRadius: BorderRadius.circular(6.0),
+                                selectedBorderColor: Colors.cyanAccent,
+                                fillColor: Colors.cyanAccent.shade700,
+                                selectedColor: Colors.white,
+                                color: Colors.white60,
+                                constraints: const BoxConstraints(
+                                  minHeight: 30.0,
+                                  minWidth: 50.0,
+                                ),
+                                isSelected: _selectedAssetDevelopmentStatisticTabOption,
+                                children: const [
+                                  Text('1 J.'),
+                                  Text('5 J.'),
+                                  Text('10 J.'),
+                                  Text('20 J.'),
+                                  Text('40 J.'),
+                                  Text('50 J.'),
+                                ],
+                              ),
+                            ),
                             Stack(
                               children: <Widget>[
                                 AspectRatio(
@@ -671,14 +774,47 @@ class _AssetDevelopmentStatisticTabViewState extends State<AssetDevelopmentStati
         border: Border.all(color: const Color(0xff37434d)),
       ),
       minX: 0.0,
-      maxX: 11.0,
+      maxX: _getMaxXForFutureWealthValues(),
       minY: 0.0,
-      maxY: _maxWealthValue / 1000,
+      maxY: _maxFutureWealthValue / 1000,
       lineBarsData: [
         _getFutureWealthDevelopmentChartData(),
-        //getLineChartData(),
-        //getInvestmentChartData(),
+        _getFutureWealthWithCompoundInterestChartData(),
       ],
     );
+  }
+
+  double _getMaxXForFutureWealthValues() {
+    if (_years == 1) {
+      return 11.0;
+    } else if (_years == 5) {
+      return 10.0;
+    } else if (_years == 10) {
+      return 10.0;
+    } else if (_years == 20) {
+      return 20.0;
+    } else if (_years == 40) {
+      return 20.0;
+    } else if (_years == 50) {
+      return 25.0;
+    }
+    return 11.0;
+  }
+
+  int _getStepSizeForFutureWealthValues() {
+    if (_years == 1) {
+      return 1;
+    } else if (_years == 5) {
+      return 6;
+    } else if (_years == 10) {
+      return 12;
+    } else if (_years == 20) {
+      return 12;
+    } else if (_years == 40) {
+      return 24;
+    } else if (_years == 50) {
+      return 24;
+    }
+    return 1;
   }
 }
