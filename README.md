@@ -1,6 +1,6 @@
-# haushaltsbuch
+# Haushaltsbuch
 
-Haushaltsbuch um Einnahmen & Ausgaben zu tracken.
+Haushaltsbuch um Einnahmen, Ausgaben & Investitionen zu tracken.
 
 ## Getting Started
 
