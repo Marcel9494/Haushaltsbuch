@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../cards/overview_tile_card.dart';
 import '/utils/number_formatters/number_formatter.dart';
 
 class OverviewTile extends StatelessWidget {
@@ -10,7 +11,9 @@ class OverviewTile extends StatelessWidget {
   final String balanceText;
   final String investmentText;
   final double investmentAmount;
+  final String availableText;
   final bool showInvestments;
+  final bool showAvailable;
   final bool showAverageValuesPerDay;
 
   const OverviewTile({
@@ -22,81 +25,49 @@ class OverviewTile extends StatelessWidget {
     required this.balanceText,
     this.investmentText = '',
     this.investmentAmount = 0.0,
+    this.availableText = '',
     this.showInvestments = false,
+    this.showAvailable = false,
     this.showAverageValuesPerDay = false,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 8.0),
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          RichText(
-            textAlign: TextAlign.center,
-            text: TextSpan(children: [
-              TextSpan(text: '$shouldText\n'),
-              TextSpan(
-                text: formatToMoneyAmount(should.toString()) + '\n',
-                style: const TextStyle(height: 1.5, color: Colors.greenAccent, fontSize: 15.0),
-              ),
-              showAverageValuesPerDay
-                  ? TextSpan(
-                      text: 'Ø ${formatToMoneyAmount((should / DateTime(DateTime.now().year, DateTime.now().month + 1, 0).day).toString())}',
-                      style: const TextStyle(color: Colors.greenAccent, fontSize: 15.0),
-                    )
-                  : const WidgetSpan(child: SizedBox()),
-            ]),
+          OverviewTileCard(
+            text: shouldText,
+            amount: should,
+            showAverageValuesPerDay: showAverageValuesPerDay,
+            color: Colors.greenAccent,
           ),
-          RichText(
-            textAlign: TextAlign.center,
-            text: TextSpan(children: [
-              TextSpan(text: '$haveText\n'),
-              TextSpan(
-                text: formatToMoneyAmount(have.abs().toString()) + '\n',
-                style: const TextStyle(height: 1.5, color: Color(0xfff4634f), fontSize: 15.0),
-              ),
-              showAverageValuesPerDay
-                  ? TextSpan(
-                      text: 'Ø ${formatToMoneyAmount((have / DateTime(DateTime.now().year, DateTime.now().month + 1, 0).day).toString())}',
-                      style: const TextStyle(color: Color(0xfff4634f), fontSize: 15.0),
-                    )
-                  : const WidgetSpan(child: SizedBox()),
-            ]),
+          OverviewTileCard(
+            text: haveText,
+            amount: have,
+            showAverageValuesPerDay: showAverageValuesPerDay,
+            color: const Color(0xfff4634f),
           ),
-          RichText(
-            textAlign: TextAlign.center,
-            text: TextSpan(children: [
-              TextSpan(text: '$balanceText\n'),
-              TextSpan(
-                text: formatToMoneyAmount((should - have.abs()).toString()) + '\n',
-                style: TextStyle(height: 1.5, color: (should - have.abs()) >= 0 ? Colors.greenAccent : Colors.redAccent, fontSize: 15.0),
-              ),
-              showAverageValuesPerDay
-                  ? TextSpan(
-                      text: 'Ø ${formatToMoneyAmount(((should - have.abs()) / DateTime(DateTime.now().year, DateTime.now().month + 1, 0).day).toString())}',
-                      style: TextStyle(color: (should - have.abs()) >= 0 ? Colors.greenAccent : Colors.redAccent, fontSize: 15.0),
-                    )
-                  : const WidgetSpan(child: SizedBox()),
-            ]),
+          OverviewTileCard(
+            text: balanceText,
+            amount: should - have.abs(),
+            showAverageValuesPerDay: showAverageValuesPerDay,
+            color: (should - have.abs()) >= 0 ? Colors.greenAccent : Colors.redAccent,
           ),
           if (showInvestments)
-            RichText(
-              textAlign: TextAlign.center,
-              text: TextSpan(children: [
-                TextSpan(text: '$investmentText\n'),
-                TextSpan(
-                  text: formatToMoneyAmount(investmentAmount.toString()) + '\n',
-                  style: const TextStyle(height: 1.5, color: Colors.cyanAccent, fontSize: 15.0),
-                ),
-                showAverageValuesPerDay
-                    ? TextSpan(
-                        text: 'Ø ${formatToMoneyAmount((investmentAmount / DateTime(DateTime.now().year, DateTime.now().month + 1, 0).day).toString())}',
-                        style: const TextStyle(color: Colors.cyanAccent, fontSize: 15.0),
-                      )
-                    : const WidgetSpan(child: SizedBox()),
-              ]),
+            OverviewTileCard(
+              text: investmentText,
+              amount: investmentAmount,
+              showAverageValuesPerDay: showAverageValuesPerDay,
+              color: Colors.cyanAccent,
+            ),
+          if (showAvailable)
+            OverviewTileCard(
+              text: availableText,
+              amount: should - have.abs() - investmentAmount.abs(),
+              showAverageValuesPerDay: showAverageValuesPerDay,
+              color: (should - have.abs() - investmentAmount.abs()) >= 0 ? Colors.greenAccent : Colors.redAccent,
             ),
         ],
       ),

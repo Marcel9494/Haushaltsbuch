@@ -99,13 +99,15 @@ class _MonthlyBookingTabViewState extends State<MonthlyBookingTabView> {
                     widget.showOverviewTile
                         ? const OverviewTile(
                             shouldText: 'Einnahmen',
-                            should: 0,
+                            should: 0.0,
                             haveText: 'Ausgaben',
-                            have: 0,
+                            have: 0.0,
                             balanceText: 'Saldo',
                             showAverageValuesPerDay: true,
                             investmentText: 'Investitionen',
+                            availableText: 'Verfügbar',
                             showInvestments: true,
+                            showAvailable: true,
                           )
                         : const SizedBox(),
                     widget.showBarChart
@@ -146,6 +148,8 @@ class _MonthlyBookingTabViewState extends State<MonthlyBookingTabView> {
                             showAverageValuesPerDay: true,
                             investmentText: 'Investitionen',
                             investmentAmount: Booking.getInvestments(_bookingList),
+                            availableText: 'Verfügbar',
+                            showAvailable: true,
                             showInvestments: true,
                           )
                         : const SizedBox(),

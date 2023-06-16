@@ -102,7 +102,7 @@ class _AccountsScreenState extends State<AccountsScreen> {
         child: Column(
           children: [
             SizedBox(
-              height: 46.0,
+              height: 74.0,
               child: FutureBuilder(
                 future: _getAssetAndLiabilityValues(),
                 builder: (BuildContext context, AsyncSnapshot<void> snapshot) {

@@ -81,13 +81,14 @@ class _YearlyBookingTabViewState extends State<YearlyBookingTabView> {
                   children: const [
                     OverviewTile(
                       shouldText: 'Einnahmen',
-                      should: 0,
+                      should: 0.0,
                       haveText: 'Ausgaben',
-                      have: 0,
+                      have: 0.0,
                       balanceText: 'Saldo',
-                      showAverageValuesPerDay: true,
                       investmentText: 'Investitionen',
+                      availableText: 'Verfügbar',
                       showInvestments: true,
+                      showAvailable: true,
                     ),
                     Expanded(
                       child: Center(
@@ -106,8 +107,10 @@ class _YearlyBookingTabViewState extends State<YearlyBookingTabView> {
                       have: _getYearlyExpenditures(),
                       balanceText: 'Saldo',
                       investmentText: 'Investitionen',
+                      availableText: 'Verfügbar',
                       investmentAmount: _getYearlyInvestments(),
                       showInvestments: true,
+                      showAvailable: true,
                     ),
                     Expanded(
                       child: RefreshIndicator(

@@ -157,10 +157,16 @@ class _FutureWealthDevelopmentChartState extends State<FutureWealthDevelopmentCh
     int spotX = 0;
     for (int i = 0; i < _futureWealthWithCompoundInterestStats.length; i = i + stepSize, spotX++) {
       print(_futureWealthWithCompoundInterestStats[i].wealth);
-      for (int j = 0; j < ; j++) {
-
+      print("Max: " + _maxFutureWealthValue.toString());
+      // TODO hier weitermachen und zoom bzw. scale richtig implementieren
+      int zoom = 1;
+      while (_maxFutureWealthValue / 100 >= 100) {
+        _maxFutureWealthValue /= 100;
+        zoom *= 100;
+        print(zoom);
       }
-      spotList.add(FlSpot(spotX.toDouble(), double.parse((_futureWealthWithCompoundInterestStats[i].wealth / 10000).toStringAsFixed(2))));
+      //print(zoom);
+      spotList.add(FlSpot(spotX.toDouble(), double.parse((_futureWealthWithCompoundInterestStats[i].wealth / 1000).toStringAsFixed(2))));
     }
     LineChartBarData lineChartBarData = LineChartBarData(
       spots: _getSpotList(spotList),
