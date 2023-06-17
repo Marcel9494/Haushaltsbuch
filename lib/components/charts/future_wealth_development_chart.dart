@@ -155,18 +155,18 @@ class _FutureWealthDevelopmentChartState extends State<FutureWealthDevelopmentCh
     List<FlSpot> spotList = [];
     int stepSize = _getStepSizeForFutureWealthValues();
     int spotX = 0;
-    for (int i = 0; i < _futureWealthWithCompoundInterestStats.length; i = i + stepSize, spotX++) {
-      print(_futureWealthWithCompoundInterestStats[i].wealth);
-      print("Max: " + _maxFutureWealthValue.toString());
-      // TODO hier weitermachen und zoom bzw. scale richtig implementieren
-      int zoom = 1;
-      while (_maxFutureWealthValue / 100 >= 100) {
-        _maxFutureWealthValue /= 100;
-        zoom *= 100;
-        print(zoom);
+    double maxWealth = 0.0;
+    for (int i = 0; i < _futureWealthWithCompoundInterestStats.length; i = i + stepSize) {
+      if (_futureWealthWithCompoundInterestStats[i].wealth > maxWealth) {
+        maxWealth = _futureWealthWithCompoundInterestStats[i].wealth;
       }
-      //print(zoom);
-      spotList.add(FlSpot(spotX.toDouble(), double.parse((_futureWealthWithCompoundInterestStats[i].wealth / 1000).toStringAsFixed(2))));
+    }
+    double onePercentValue = maxWealth / 100;
+    for (int i = 0; i < _futureWealthWithCompoundInterestStats.length; i = i + stepSize, spotX++) {
+      print("Wealth Stats: " + _futureWealthWithCompoundInterestStats[i].wealth.toString());
+      print("Max: " + maxWealth.toString());
+      double spotY = _futureWealthWithCompoundInterestStats[i].wealth / onePercentValue;
+      spotList.add(FlSpot(spotX.toDouble(), double.parse((spotY).toStringAsFixed(2))));
     }
     LineChartBarData lineChartBarData = LineChartBarData(
       spots: _getSpotList(spotList),
