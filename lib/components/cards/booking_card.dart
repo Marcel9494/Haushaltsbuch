@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
+import '../deco/bottom_sheet_line.dart';
 import '/models/booking.dart';
+import '/models/enums/repeat_types.dart';
 import '/models/enums/transaction_types.dart';
 import '/models/screen_arguments/create_or_edit_booking_screen_arguments.dart';
 
@@ -27,10 +30,55 @@ class BookingCard extends StatelessWidget {
     return Colors.cyanAccent;
   }
 
+  void _editBooking(BuildContext context) {
+    if (booking.bookingRepeats == RepeatType.noRepetition.name) {
+      Navigator.pushNamed(context, createOrEditBookingRoute, arguments: CreateOrEditBookingScreenArguments(booking.boxIndex, -1));
+    } else {
+      showCupertinoModalBottomSheet<void>(
+        context: context,
+        builder: (BuildContext context) {
+          return Material(
+            child: SizedBox(
+              height: 230.0,
+              child: ListView(
+                children: [
+                  const BottomSheetLine(),
+                  const Padding(
+                    padding: EdgeInsets.only(top: 16.0, left: 20.0),
+                    child: Text('Buchung bearbeiten:', style: TextStyle(fontSize: 18.0)),
+                  ),
+                  Column(
+                    children: [
+                      ListTile(
+                        onTap: () => Navigator.popAndPushNamed(context, createOrEditBookingRoute, arguments: CreateOrEditBookingScreenArguments(booking.boxIndex, 0)),
+                        leading: const Icon(Icons.looks_one_outlined, color: Colors.cyanAccent),
+                        title: const Text('Nur diese Buchung'),
+                      ),
+                      ListTile(
+                        onTap: () => Navigator.popAndPushNamed(context, createOrEditBookingRoute, arguments: CreateOrEditBookingScreenArguments(booking.boxIndex, 1)),
+                        leading: const Icon(Icons.repeat_on_outlined, color: Colors.cyanAccent),
+                        title: const Text('Alle zukünftige Buchungen'),
+                      ),
+                      ListTile(
+                        onTap: () => Navigator.popAndPushNamed(context, createOrEditBookingRoute, arguments: CreateOrEditBookingScreenArguments(booking.boxIndex, 2)),
+                        leading: const Icon(Icons.all_inclusive_rounded, color: Colors.cyanAccent),
+                        title: const Text('Alle Buchungen'),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => Navigator.pushNamed(context, createOrEditBookingRoute, arguments: CreateOrEditBookingScreenArguments(booking.boxIndex)),
+      onTap: () => _editBooking(context),
       child: Card(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(14.0),

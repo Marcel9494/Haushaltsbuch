@@ -10,6 +10,7 @@ import 'models/account.dart';
 import 'models/categorie.dart';
 import 'models/budget.dart';
 import 'models/enums/transaction_types.dart';
+import 'models/global_state.dart';
 import 'models/screen_arguments/edit_budget_screen_arguments.dart';
 import 'models/screen_arguments/bottom_nav_bar_screen_arguments.dart';
 import 'models/screen_arguments/account_details_screen_arguments.dart';
@@ -43,6 +44,7 @@ void main() async {
   Hive.registerAdapter(CategorieAdapter());
   Hive.registerAdapter(BudgetAdapter());
   Hive.registerAdapter(TransactionTypeAdapter());
+  Hive.registerAdapter(GlobalStateAdapter());
   runApp(const BudgetBookApp());
 }
 
@@ -102,6 +104,7 @@ class BudgetBookApp extends StatelessWidget {
             return MaterialPageRoute<String>(
               builder: (BuildContext context) => CreateOrEditBookingScreen(
                 bookingBoxIndex: args.bookingBoxIndex,
+                serieEditMode: args.serieEditMode,
               ),
               settings: settings,
             );

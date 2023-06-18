@@ -5,6 +5,7 @@ import '/utils/consts/hive_consts.dart';
 
 import 'enums/repeat_types.dart';
 import 'enums/transaction_types.dart';
+import 'global_state.dart';
 
 @HiveType(typeId: 0)
 class Booking extends HiveObject {
@@ -25,8 +26,11 @@ class Booking extends HiveObject {
   late String fromAccount;
   @HiveField(7)
   late String toAccount;
+  @HiveField(8)
+  late int serieId;
 
-  Booking createBookingInstance(Booking newBooking) {
+  Future<Booking> createBookingInstance(Booking newBooking) async {
+    int bookingSerieIndex = await GlobalState.getBookingSerieIndex();
     return Booking()
       ..transactionType = newBooking.transactionType
       ..bookingRepeats = newBooking.bookingRepeats
@@ -35,7 +39,22 @@ class Booking extends HiveObject {
       ..amount = newBooking.amount
       ..categorie = newBooking.categorie
       ..fromAccount = newBooking.fromAccount
-      ..toAccount = newBooking.toAccount;
+      ..toAccount = newBooking.toAccount
+      ..serieId = bookingSerieIndex;
+  }
+
+  Future<Booking> updateBookingInstance(Booking updatedBooking, Booking oldBooking) async {
+    int bookingSerieIndex = await GlobalState.getBookingSerieIndex();
+    return Booking()
+      ..transactionType = updatedBooking.transactionType
+      ..bookingRepeats = updatedBooking.bookingRepeats
+      ..title = updatedBooking.title
+      ..date = oldBooking.date
+      ..amount = updatedBooking.amount
+      ..categorie = updatedBooking.categorie
+      ..fromAccount = updatedBooking.fromAccount
+      ..toAccount = updatedBooking.toAccount
+      ..serieId = bookingSerieIndex;
   }
 
   // TODO Anzahl der Buchungen erhöhen, damit für die nächsten 10 Jahre Buchungen erstellt werden. 3 nur als Test.
@@ -46,28 +65,28 @@ class Booking extends HiveObject {
     } else if (newBooking.bookingRepeats == RepeatType.everyWeek.name) {
       for (int i = 0; i < 3; i++) {
         DateTime bookingDate = DateTime.parse(date);
-        Booking nextBooking = createBookingInstance(newBooking);
+        Booking nextBooking = await createBookingInstance(newBooking);
         nextBooking.date = DateTime(bookingDate.year, bookingDate.month, bookingDate.day + (i * 7)).toString();
         bookingBox.add(nextBooking);
       }
     } else if (newBooking.bookingRepeats == RepeatType.everyTwoWeeks.name) {
       for (int i = 0; i < 3; i++) {
         DateTime bookingDate = DateTime.parse(date);
-        Booking nextBooking = createBookingInstance(newBooking);
+        Booking nextBooking = await createBookingInstance(newBooking);
         nextBooking.date = DateTime(bookingDate.year, bookingDate.month, bookingDate.day + (i * 14)).toString();
         bookingBox.add(nextBooking);
       }
     } else if (newBooking.bookingRepeats == RepeatType.beginningOfMonth.name) {
       for (int i = 0; i < 3; i++) {
         DateTime bookingDate = DateTime.parse(date);
-        Booking nextBooking = createBookingInstance(newBooking);
+        Booking nextBooking = await createBookingInstance(newBooking);
         nextBooking.date = DateTime(bookingDate.year, bookingDate.month + i + 1, 1).toString();
         bookingBox.add(nextBooking);
       }
     } else if (newBooking.bookingRepeats == RepeatType.endOfMonth.name) {
       for (int i = 0; i < 3; i++) {
         DateTime bookingDate = DateTime.parse(date);
-        Booking nextBooking = createBookingInstance(newBooking);
+        Booking nextBooking = await createBookingInstance(newBooking);
         int lastDayOfMonth = DateTime(bookingDate.year, bookingDate.month + i + 1, 0).day;
         nextBooking.date = DateTime(bookingDate.year, bookingDate.month + i, lastDayOfMonth).toString();
         bookingBox.add(nextBooking);
@@ -75,28 +94,28 @@ class Booking extends HiveObject {
     } else if (newBooking.bookingRepeats == RepeatType.everyMonth.name) {
       for (int i = 0; i < 3; i++) {
         DateTime bookingDate = DateTime.parse(date);
-        Booking nextBooking = createBookingInstance(newBooking);
+        Booking nextBooking = await createBookingInstance(newBooking);
         nextBooking.date = DateTime(bookingDate.year, bookingDate.month + i, bookingDate.day).toString();
         bookingBox.add(nextBooking);
       }
     } else if (newBooking.bookingRepeats == RepeatType.everyThreeMonths.name) {
       for (int i = 0; i < 3; i++) {
         DateTime bookingDate = DateTime.parse(date);
-        Booking nextBooking = createBookingInstance(newBooking);
+        Booking nextBooking = await createBookingInstance(newBooking);
         nextBooking.date = DateTime(bookingDate.year, bookingDate.month + (i * 3), bookingDate.day).toString();
         bookingBox.add(nextBooking);
       }
     } else if (newBooking.bookingRepeats == RepeatType.everySixMonths.name) {
       for (int i = 0; i < 3; i++) {
         DateTime bookingDate = DateTime.parse(date);
-        Booking nextBooking = createBookingInstance(newBooking);
+        Booking nextBooking = await createBookingInstance(newBooking);
         nextBooking.date = DateTime(bookingDate.year, bookingDate.month + (i * 6), bookingDate.day).toString();
         bookingBox.add(nextBooking);
       }
     } else if (newBooking.bookingRepeats == RepeatType.everyYear.name) {
       for (int i = 0; i < 3; i++) {
         DateTime bookingDate = DateTime.parse(date);
-        Booking nextBooking = createBookingInstance(newBooking);
+        Booking nextBooking = await createBookingInstance(newBooking);
         nextBooking.date = DateTime(bookingDate.year + i, bookingDate.month, bookingDate.day).toString();
         bookingBox.add(nextBooking);
       }
@@ -106,6 +125,32 @@ class Booking extends HiveObject {
   void updateBooking(Booking updatedBooking, int bookingBoxIndex) async {
     var bookingBox = await Hive.openBox(bookingsBox);
     bookingBox.putAt(bookingBoxIndex, updatedBooking);
+  }
+
+  void updateFutureSerieBookings(Booking updatedBooking, int bookingBoxIndex) async {
+    var bookingBox = await Hive.openBox(bookingsBox);
+    bookingBox.putAt(bookingBoxIndex, updatedBooking);
+    for (int i = 0; i < bookingBox.length; i++) {
+      Booking booking = await bookingBox.getAt(i);
+      if (booking.serieId == updatedBooking.serieId && DateTime.parse(booking.date).isAfter(DateTime.parse(updatedBooking.date))) {
+        bookingBox.putAt(i, updatedBooking);
+      }
+    }
+  }
+
+  void updateAllSerieBookings(Booking templateBooking, int bookingBoxIndex) async {
+    var bookingBox = await Hive.openBox(bookingsBox);
+    bookingBox.putAt(bookingBoxIndex, templateBooking);
+    for (int i = 0; i < bookingBox.length; i++) {
+      Booking booking = await bookingBox.getAt(i);
+      print(booking.serieId);
+      print(templateBooking.serieId);
+      if (booking.serieId == templateBooking.serieId) {
+        print('Test');
+        Booking updatedBooking = await updateBookingInstance(templateBooking, booking);
+        bookingBox.putAt(i, updatedBooking);
+      }
+    }
   }
 
   void deleteBooking(int bookingBoxIndex) async {
@@ -181,7 +226,8 @@ class BookingAdapter extends TypeAdapter<Booking> {
       ..amount = reader.read()
       ..categorie = reader.read()
       ..fromAccount = reader.read()
-      ..toAccount = reader.read();
+      ..toAccount = reader.read()
+      ..serieId = reader.read();
   }
 
   @override
@@ -194,5 +240,6 @@ class BookingAdapter extends TypeAdapter<Booking> {
     writer.write(obj.categorie);
     writer.write(obj.fromAccount);
     writer.write(obj.toAccount);
+    writer.write(obj.serieId);
   }
 }
