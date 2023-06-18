@@ -121,7 +121,6 @@ class _FutureWealthDevelopmentChartState extends State<FutureWealthDevelopmentCh
   }
 
   Future<List<WealthDevelopmentStats>> _calculateFutureWealthWithCompoundInterest() async {
-    //double averageWealthGrowth = 0.0;
     _futureWealthWithCompoundInterestStats = [];
     for (int i = 0; i < 12 * _years; i++) {
       WealthDevelopmentStats futureWealthDevelopmentStat = WealthDevelopmentStats();
@@ -416,7 +415,7 @@ class _FutureWealthDevelopmentChartState extends State<FutureWealthDevelopmentCh
       minX: 0.0,
       maxX: _getMaxXForFutureWealthValues(),
       minY: 0.0,
-      maxY: 100.0, // TODO _maxFutureWealthValue / 1000,
+      maxY: 100.0,
       lineBarsData: [
         _getFutureWealthDevelopmentChartData(),
         _getFutureWealthWithCompoundInterestChartData(),

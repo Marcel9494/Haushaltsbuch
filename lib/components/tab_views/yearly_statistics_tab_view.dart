@@ -1,8 +1,8 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:percent_indicator/circular_percent_indicator.dart';
 
-import '../buttons/transaction_stats_button.dart';
+import '../buttons/transaction_stats_toggle_buttons.dart';
+
 import '/models/booking.dart';
 import '/models/percentage_stats.dart';
 import '/models/enums/categorie_types.dart';
@@ -24,26 +24,22 @@ class YearlyStatisticsTabView extends StatefulWidget {
 
   @override
   State<YearlyStatisticsTabView> createState() => _YearlyStatisticsTabViewState();
+
+  static _YearlyStatisticsTabViewState? of(BuildContext context) => context.findAncestorStateOfType<_YearlyStatisticsTabViewState>();
 }
 
 class _YearlyStatisticsTabViewState extends State<YearlyStatisticsTabView> {
   List<PercentageStats> _percentageStats = [];
   List<Booking> _bookingList = [];
   String _currentCategorieType = CategorieType.outcome.pluralName;
-  double _totalSavings = 0.0;
-  double _savingPercentage = 0.0;
-  double _totalInvestments = 0.0;
-  double _investmentPercentage = 0.0;
+
+  set currentCategorieType(String categorie) => setState(() => {_currentCategorieType = categorie});
 
   Future<List<PercentageStats>> _loadStatistics() async {
     _bookingList = [];
     for (int i = 0; i < 12; i++) {
       _bookingList += await Booking.loadMonthlyBookingList(i + 1, widget.selectedDate.year);
     }
-    _totalSavings = await _getYearlySavings();
-    _totalInvestments = Booking.getInvestments(_bookingList);
-    _savingPercentage = await _getYearlySavingRate();
-    _investmentPercentage = await _getYearlyInvestmentRate();
     if (_currentCategorieType == CategorieType.outcome.pluralName) {
       return _loadYearlyStatistic(TransactionType.outcome);
     } else if (_currentCategorieType == CategorieType.income.pluralName) {
@@ -66,39 +62,6 @@ class _YearlyStatisticsTabViewState extends State<YearlyStatisticsTabView> {
     _percentageStats = PercentageStats.calculatePercentage(_percentageStats, total);
     _percentageStats.sort((first, second) => second.percentage.compareTo(first.percentage));
     return _percentageStats;
-  }
-
-  Future<double> _getYearlySavings() async {
-    double totalRevenues = Booking.getRevenues(_bookingList);
-    double totalExpenditures = Booking.getExpenditures(_bookingList);
-    double totalInvestments = Booking.getInvestments(_bookingList);
-    return totalRevenues - totalExpenditures - totalInvestments;
-  }
-
-  Future<double> _getYearlySavingRate() async {
-    double totalRevenues = Booking.getRevenues(_bookingList);
-    if (totalRevenues <= 0.0) {
-      return 0.0;
-    }
-    return (_totalSavings * 100) / totalRevenues;
-  }
-
-  Future<double> _getYearlyInvestmentRate() async {
-    double totalInvestments = Booking.getInvestments(_bookingList);
-    double totalRevenues = Booking.getRevenues(_bookingList);
-    if (totalRevenues <= 0.0) {
-      return 0.0;
-    }
-    return (totalInvestments * 100) / totalRevenues;
-  }
-
-  double _checkPercentageValue(double value) {
-    if (value / 100 >= 1.0) {
-      return 1.0;
-    } else if (value / 100 <= 0.0) {
-      return 0.0;
-    }
-    return value / 100;
   }
 
   List<PieChartSectionData> _showingSections() {
@@ -139,21 +102,12 @@ class _YearlyStatisticsTabViewState extends State<YearlyStatisticsTabView> {
       builder: (BuildContext context, AsyncSnapshot<List<PercentageStats>> snapshot) {
         switch (snapshot.connectionState) {
           case ConnectionState.waiting:
-            return const LoadingIndicator();
+            return const SizedBox();
           case ConnectionState.done:
             if (_percentageStats.isEmpty) {
               return Expanded(
                 child: Column(
                   children: [
-                    Row(
-                      mainAxisAlignment: _currentCategorieType == CategorieType.income.pluralName ? MainAxisAlignment.start : MainAxisAlignment.spaceBetween,
-                      children: [
-                        TransactionStatsButton(
-                          categorieType: _currentCategorieType,
-                          selectedCategorieTypeCallback: (String categorieType) => setState(() => _currentCategorieType = categorieType),
-                        ),
-                      ],
-                    ),
                     AspectRatio(
                       aspectRatio: 2.0,
                       child: PieChart(
@@ -167,6 +121,12 @@ class _YearlyStatisticsTabViewState extends State<YearlyStatisticsTabView> {
                         ),
                       ),
                     ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        TransactionStatsToggleButtons(currentTransaction: _currentCategorieType, monthlyStatistics: false),
+                      ],
+                    ),
                     Expanded(
                       child: Center(
                         child: Text('Noch keine $_currentCategorieType vorhanden.'),
@@ -178,15 +138,6 @@ class _YearlyStatisticsTabViewState extends State<YearlyStatisticsTabView> {
             } else {
               return Column(
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      TransactionStatsButton(
-                        categorieType: _currentCategorieType,
-                        selectedCategorieTypeCallback: (String categorieType) => setState(() => _currentCategorieType = categorieType),
-                      ),
-                    ],
-                  ),
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 8.0),
                     child: AspectRatio(
@@ -203,94 +154,11 @@ class _YearlyStatisticsTabViewState extends State<YearlyStatisticsTabView> {
                       ),
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        Expanded(
-                          child: Row(
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                                child: CircularPercentIndicator(
-                                  radius: 20.0,
-                                  lineWidth: 2.0,
-                                  percent: _checkPercentageValue(_savingPercentage),
-                                  center: Text('${_savingPercentage.toStringAsFixed(0)}%', style: const TextStyle(fontSize: 12.0)),
-                                  progressColor: Colors.cyanAccent,
-                                  backgroundWidth: 1.0,
-                                  circularStrokeCap: CircularStrokeCap.round,
-                                  animation: true,
-                                  animateFromLastPercent: true,
-                                ),
-                              ),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(formatToMoneyAmount(_totalSavings.toString()), style: const TextStyle(fontSize: 12.0)),
-                                  const Text('Gespart', style: TextStyle(color: Colors.grey, fontSize: 12.0)),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                        Expanded(
-                          child: Row(
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                                child: CircularPercentIndicator(
-                                  radius: 20.0,
-                                  lineWidth: 2.0,
-                                  percent: _checkPercentageValue(_investmentPercentage),
-                                  center: Text('${_investmentPercentage.toStringAsFixed(0)}%', style: const TextStyle(fontSize: 12.0)),
-                                  progressColor: Colors.cyanAccent,
-                                  backgroundWidth: 1.0,
-                                  circularStrokeCap: CircularStrokeCap.round,
-                                  animation: true,
-                                  animateFromLastPercent: true,
-                                ),
-                              ),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(formatToMoneyAmount(_totalInvestments.toString()), style: const TextStyle(fontSize: 12.0)),
-                                  const Text('Investiert', style: TextStyle(color: Colors.grey, fontSize: 12.0)),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                        Expanded(
-                          child: Row(
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                                child: CircularPercentIndicator(
-                                  radius: 20.0,
-                                  lineWidth: 2.0,
-                                  percent: _checkPercentageValue(_savingPercentage + _investmentPercentage),
-                                  center: Text('${(_savingPercentage + _investmentPercentage).toStringAsFixed(0)}%', style: const TextStyle(fontSize: 12.0)),
-                                  progressColor: Colors.cyanAccent,
-                                  backgroundWidth: 1.0,
-                                  circularStrokeCap: CircularStrokeCap.round,
-                                  animation: true,
-                                  animateFromLastPercent: true,
-                                ),
-                              ),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(formatToMoneyAmount((_totalSavings + _totalInvestments).toString()), style: const TextStyle(fontSize: 12.0)),
-                                  const Text('Gesamt', style: TextStyle(color: Colors.grey, fontSize: 12.0)),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      TransactionStatsToggleButtons(currentTransaction: _currentCategorieType, monthlyStatistics: false),
+                    ],
                   ),
                   RefreshIndicator(
                     onRefresh: () async {

@@ -196,7 +196,7 @@ class _AssetDevelopmentStatisticTabViewState extends State<AssetDevelopmentStati
               }
             },
           ),
-          const FutureWealthDevelopmentChart(),
+          // TODO const FutureWealthDevelopmentChart(),
         ],
       ),
     );

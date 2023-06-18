@@ -19,6 +19,21 @@ extension TransactionTypeExtension on TransactionType {
     }
   }
 
+  String get pluralName {
+    switch (this) {
+      case TransactionType.income:
+        return 'Einnahmen';
+      case TransactionType.outcome:
+        return 'Ausgaben';
+      case TransactionType.transfer:
+        return 'Überträge';
+      case TransactionType.investment:
+        return 'Investitionen';
+      default:
+        throw Exception('$name is not a valid Transaction.');
+    }
+  }
+
   TransactionType getTransactionType(String transaction) {
     try {
       if (transaction == TransactionType.income.name) {
