@@ -82,6 +82,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
     _fromAccountTextController.text = _loadedBooking.fromAccount;
     _toAccountTextController.text = _loadedBooking.toAccount;
     _isBookingEdited = true;
+    print("Loaded Index: " + _loadedBooking.serieId.toString());
   }
 
   void _createOrUpdateBooking() async {
@@ -93,7 +94,9 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
       return;
     }
     int bookingSerieIndex = -1;
-    if (_bookingRepeat != RepeatType.noRepetition.name) {
+    if (widget.bookingBoxIndex != -1) {
+      bookingSerieIndex = _loadedBooking.serieId;
+    } else if (widget.bookingBoxIndex == -1 && _bookingRepeat != RepeatType.noRepetition.name) {
       bookingSerieIndex = await GlobalState.getBookingSerieIndex();
     }
     Booking booking = Booking()
@@ -118,9 +121,9 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
       if (widget.serieEditMode == -1 || widget.serieEditMode == 0) {
         booking.updateBooking(booking, widget.bookingBoxIndex);
       } else if (widget.serieEditMode == 1) {
-        booking.updateFutureSerieBookings(booking, widget.bookingBoxIndex);
+        booking.updateFutureBookingsFromSerie(booking, widget.bookingBoxIndex);
       } else if (widget.serieEditMode == 2) {
-        booking.updateAllSerieBookings(booking, widget.bookingBoxIndex);
+        booking.updateAllBookingsFromSerie(booking, widget.bookingBoxIndex);
       }
     }
     if (_bookingRepeat != RepeatType.noRepetition.name) {

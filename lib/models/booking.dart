@@ -30,7 +30,7 @@ class Booking extends HiveObject {
   late int serieId;
 
   Future<Booking> createBookingInstance(Booking newBooking) async {
-    int bookingSerieIndex = await GlobalState.getBookingSerieIndex();
+    // TODO int bookingSerieIndex = await GlobalState.getBookingSerieIndex();
     return Booking()
       ..transactionType = newBooking.transactionType
       ..bookingRepeats = newBooking.bookingRepeats
@@ -40,21 +40,20 @@ class Booking extends HiveObject {
       ..categorie = newBooking.categorie
       ..fromAccount = newBooking.fromAccount
       ..toAccount = newBooking.toAccount
-      ..serieId = bookingSerieIndex;
+      ..serieId = newBooking.serieId;
   }
 
-  Future<Booking> updateBookingInstance(Booking updatedBooking, Booking oldBooking) async {
-    int bookingSerieIndex = await GlobalState.getBookingSerieIndex();
+  Future<Booking> updateBookingInstance(Booking templateBooking, Booking oldBooking) async {
     return Booking()
-      ..transactionType = updatedBooking.transactionType
-      ..bookingRepeats = updatedBooking.bookingRepeats
-      ..title = updatedBooking.title
+      ..transactionType = templateBooking.transactionType
+      ..bookingRepeats = templateBooking.bookingRepeats
+      ..title = templateBooking.title
       ..date = oldBooking.date
-      ..amount = updatedBooking.amount
-      ..categorie = updatedBooking.categorie
-      ..fromAccount = updatedBooking.fromAccount
-      ..toAccount = updatedBooking.toAccount
-      ..serieId = bookingSerieIndex;
+      ..amount = templateBooking.amount
+      ..categorie = templateBooking.categorie
+      ..fromAccount = templateBooking.fromAccount
+      ..toAccount = templateBooking.toAccount
+      ..serieId = templateBooking.serieId;
   }
 
   // TODO Anzahl der Buchungen erhöhen, damit für die nächsten 10 Jahre Buchungen erstellt werden. 3 nur als Test.
@@ -127,26 +126,24 @@ class Booking extends HiveObject {
     bookingBox.putAt(bookingBoxIndex, updatedBooking);
   }
 
-  void updateFutureSerieBookings(Booking updatedBooking, int bookingBoxIndex) async {
+  void updateFutureBookingsFromSerie(Booking templateBooking, int bookingBoxIndex) async {
     var bookingBox = await Hive.openBox(bookingsBox);
-    bookingBox.putAt(bookingBoxIndex, updatedBooking);
+    bookingBox.putAt(bookingBoxIndex, templateBooking);
     for (int i = 0; i < bookingBox.length; i++) {
       Booking booking = await bookingBox.getAt(i);
-      if (booking.serieId == updatedBooking.serieId && DateTime.parse(booking.date).isAfter(DateTime.parse(updatedBooking.date))) {
+      if (booking.serieId == templateBooking.serieId && DateTime.parse(booking.date).isAfter(DateTime.parse(templateBooking.date))) {
+        Booking updatedBooking = await updateBookingInstance(templateBooking, booking);
         bookingBox.putAt(i, updatedBooking);
       }
     }
   }
 
-  void updateAllSerieBookings(Booking templateBooking, int bookingBoxIndex) async {
+  void updateAllBookingsFromSerie(Booking templateBooking, int bookingBoxIndex) async {
     var bookingBox = await Hive.openBox(bookingsBox);
     bookingBox.putAt(bookingBoxIndex, templateBooking);
     for (int i = 0; i < bookingBox.length; i++) {
       Booking booking = await bookingBox.getAt(i);
-      print(booking.serieId);
-      print(templateBooking.serieId);
       if (booking.serieId == templateBooking.serieId) {
-        print('Test');
         Booking updatedBooking = await updateBookingInstance(templateBooking, booking);
         bookingBox.putAt(i, updatedBooking);
       }
