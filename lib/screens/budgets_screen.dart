@@ -89,30 +89,40 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
                         child: Column(
                           children: [
                             SizedBox(
-                              height: 136,
-                              child: SingleChildScrollView(
-                                child: CircularPercentIndicator(
-                                  radius: 84.0,
-                                  lineWidth: 10.0,
-                                  percent: _completeBudgetPercentage / 100 >= 1.0 ? 1.0 : _completeBudgetPercentage / 100,
-                                  center: Text('${_completeBudgetPercentage.toStringAsFixed(1)} %', style: const TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold)),
-                                  header: Padding(
-                                    padding: const EdgeInsets.only(bottom: 12.0),
-                                    child: Text('${formatToMoneyAmount(_completeBudgetExpenditures.toString())} / ${formatToMoneyAmount(_completeBudgetAmount.toString())}',
-                                        style: const TextStyle(fontSize: 16.0)),
+                              height: 160.0,
+                              width: MediaQuery.of(context).size.width,
+                              child: Card(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(14.0),
+                                ),
+                                child: SingleChildScrollView(
+                                  child: CircularPercentIndicator(
+                                    radius: 84.0,
+                                    lineWidth: 10.0,
+                                    percent: _completeBudgetPercentage / 100 >= 1.0 ? 1.0 : _completeBudgetPercentage / 100,
+                                    center: Text('${_completeBudgetPercentage.toStringAsFixed(1)} %', style: const TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold)),
+                                    header: Padding(
+                                      padding: const EdgeInsets.symmetric(vertical: 12.0),
+                                      child: Text('${formatToMoneyAmount(_completeBudgetExpenditures.toString())} / ${formatToMoneyAmount(_completeBudgetAmount.toString())}',
+                                          style: const TextStyle(fontSize: 16.0)),
+                                    ),
+                                    progressColor: _completeBudgetPercentage < 80.0
+                                        ? Colors.greenAccent
+                                        : _completeBudgetPercentage < 100.0
+                                            ? Colors.yellowAccent.shade700
+                                            : Colors.redAccent,
+                                    arcType: ArcType.HALF,
+                                    circularStrokeCap: CircularStrokeCap.round,
+                                    arcBackgroundColor: Colors.grey,
+                                    animation: true,
+                                    animateFromLastPercent: true,
                                   ),
-                                  progressColor: _completeBudgetPercentage < 80.0
-                                      ? Colors.greenAccent
-                                      : _completeBudgetPercentage < 100.0
-                                          ? Colors.yellowAccent.shade700
-                                          : Colors.redAccent,
-                                  arcType: ArcType.HALF,
-                                  circularStrokeCap: CircularStrokeCap.round,
-                                  arcBackgroundColor: Colors.grey,
-                                  animation: true,
-                                  animateFromLastPercent: true,
                                 ),
                               ),
+                            ),
+                            const Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 12.0, vertical: 6.0),
+                              child: Divider(),
                             ),
                             Expanded(
                               child: RefreshIndicator(

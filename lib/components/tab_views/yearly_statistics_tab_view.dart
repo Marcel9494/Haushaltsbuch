@@ -108,16 +108,19 @@ class _YearlyStatisticsTabViewState extends State<YearlyStatisticsTabView> {
               return Expanded(
                 child: Column(
                   children: [
-                    AspectRatio(
-                      aspectRatio: 2.0,
-                      child: PieChart(
-                        PieChartData(
-                          borderData: FlBorderData(
-                            show: false,
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8.0),
+                      child: AspectRatio(
+                        aspectRatio: 2.0,
+                        child: PieChart(
+                          PieChartData(
+                            borderData: FlBorderData(
+                              show: false,
+                            ),
+                            sectionsSpace: 4.0,
+                            centerSpaceRadius: 30.0,
+                            sections: _showingEmptyDiagram(),
                           ),
-                          sectionsSpace: 4.0,
-                          centerSpaceRadius: 30.0,
-                          sections: _showingEmptyDiagram(),
                         ),
                       ),
                     ),

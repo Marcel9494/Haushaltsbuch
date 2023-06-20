@@ -28,9 +28,14 @@ class Booking extends HiveObject {
   late String toAccount;
   @HiveField(8)
   late int serieId;
+  @HiveField(9)
+  late bool booked;
 
   Future<Booking> createBookingInstance(Booking newBooking) async {
-    // TODO int bookingSerieIndex = await GlobalState.getBookingSerieIndex();
+    bool booked = true;
+    if (DateTime.parse(newBooking.date).isAfter(DateTime.now())) {
+      booked = false;
+    }
     return Booking()
       ..transactionType = newBooking.transactionType
       ..bookingRepeats = newBooking.bookingRepeats
@@ -40,10 +45,29 @@ class Booking extends HiveObject {
       ..categorie = newBooking.categorie
       ..fromAccount = newBooking.fromAccount
       ..toAccount = newBooking.toAccount
-      ..serieId = newBooking.serieId;
+      ..serieId = newBooking.serieId
+      ..booked = booked;
+  }
+
+  Future<Booking> updateBookingBookedState(Booking updatedBooking) async {
+    return Booking()
+      ..transactionType = updatedBooking.transactionType
+      ..bookingRepeats = updatedBooking.bookingRepeats
+      ..title = updatedBooking.title
+      ..date = updatedBooking.date
+      ..amount = updatedBooking.amount
+      ..categorie = updatedBooking.categorie
+      ..fromAccount = updatedBooking.fromAccount
+      ..toAccount = updatedBooking.toAccount
+      ..serieId = updatedBooking.serieId
+      ..booked = true;
   }
 
   Future<Booking> updateBookingInstance(Booking templateBooking, Booking oldBooking) async {
+    bool booked = true;
+    if (DateTime.parse(oldBooking.date).isAfter(DateTime.now())) {
+      booked = false;
+    }
     return Booking()
       ..transactionType = templateBooking.transactionType
       ..bookingRepeats = templateBooking.bookingRepeats
@@ -53,7 +77,8 @@ class Booking extends HiveObject {
       ..categorie = templateBooking.categorie
       ..fromAccount = templateBooking.fromAccount
       ..toAccount = templateBooking.toAccount
-      ..serieId = templateBooking.serieId;
+      ..serieId = templateBooking.serieId
+      ..booked = booked;
   }
 
   // TODO Anzahl der Buchungen erhöhen, damit für die nächsten 10 Jahre Buchungen erstellt werden. 3 nur als Test.
@@ -207,6 +232,22 @@ class Booking extends HiveObject {
     }
     return investments;
   }
+
+  // TODO Funktion implementieren, ob seit letztem mal eine neue Buchung z.B. eine angelegte Serienbuchung als Abrechnung
+  // TODO dazu gekommen ist. Extra Variable bei Buchungen einführen, ob Buchung bereits auf ein Konto verbucht wurde oder nicht?!
+  // TODO testen bei Konto Übersichtsseite
+  static void checkNewSerieBookings() async {
+    var bookingBox = await Hive.openBox(bookingsBox);
+    for (int i = 0; i < bookingBox.length; i++) {
+      Booking booking = await bookingBox.getAt(i);
+      if (booking.serieId != -1 && booking.booked == false) {
+        if (DateTime.parse(booking.date).isAfter(DateTime.now())) {
+          booking.updateBookingBookedState(booking);
+          bookingBox.putAt(i, booking);
+        }
+      }
+    }
+  }
 }
 
 class BookingAdapter extends TypeAdapter<Booking> {
@@ -224,7 +265,8 @@ class BookingAdapter extends TypeAdapter<Booking> {
       ..categorie = reader.read()
       ..fromAccount = reader.read()
       ..toAccount = reader.read()
-      ..serieId = reader.read();
+      ..serieId = reader.read()
+      ..booked = reader.read();
   }
 
   @override
@@ -238,5 +280,6 @@ class BookingAdapter extends TypeAdapter<Booking> {
     writer.write(obj.fromAccount);
     writer.write(obj.toAccount);
     writer.write(obj.serieId);
+    writer.write(obj.booked);
   }
 }

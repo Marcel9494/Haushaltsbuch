@@ -82,7 +82,6 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
     _fromAccountTextController.text = _loadedBooking.fromAccount;
     _toAccountTextController.text = _loadedBooking.toAccount;
     _isBookingEdited = true;
-    print("Loaded Index: " + _loadedBooking.serieId.toString());
   }
 
   void _createOrUpdateBooking() async {
@@ -108,10 +107,13 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
       ..categorie = _categorieTextController.text
       ..fromAccount = _fromAccountTextController.text
       ..toAccount = _toAccountTextController.text
-      ..serieId = bookingSerieIndex;
+      ..serieId = bookingSerieIndex
+      ..booked = true;
     if (_currentTransaction == TransactionType.transfer.name || _currentTransaction == TransactionType.investment.name) {
+      // TODO transferMoney bei Serien ggf. öfters ausführen
       Account.transferMoney(_fromAccountTextController.text, _toAccountTextController.text, _amountTextController.text);
     } else {
+      // TODO calculateNewAccountBalance bei Serien ggf. öfters ausführen
       Account.calculateNewAccountBalance(_fromAccountTextController.text, _amountTextController.text, _currentTransaction);
     }
     if (widget.bookingBoxIndex == -1) {

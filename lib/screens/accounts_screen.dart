@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
+import '../components/tab_views/asset_future_development_statistic_tab_view.dart';
 import '/components/tab_views/asset_development_statistic_tab_view.dart';
 import '/components/tab_views/asset_allocation_statistic_tab_view.dart';
 import '/components/tab_views/account_overview_tab_view.dart';
@@ -24,7 +25,7 @@ class AccountsScreen extends StatefulWidget {
 class _AccountsScreenState extends State<AccountsScreen> {
   double _assetValues = 0.0;
   double _liabilityValues = 0.0;
-  List<bool> _selectedTabOption = [true, false, false];
+  List<bool> _selectedTabOption = [true, false, false, false];
 
   void _openBottomSheetMenu(BuildContext context) {
     showCupertinoModalBottomSheet<void>(
@@ -71,15 +72,31 @@ class _AccountsScreenState extends State<AccountsScreen> {
         _selectedTabOption[i] = i == selectedIndex;
       }
       if (_selectedTabOption[0]) {
-        _selectedTabOption = [true, false, false];
+        _selectedTabOption = [true, false, false, false];
       } else if (_selectedTabOption[1]) {
-        _selectedTabOption = [false, true, false];
+        _selectedTabOption = [false, true, false, false];
       } else if (_selectedTabOption[2]) {
-        _selectedTabOption = [false, false, true];
+        _selectedTabOption = [false, false, true, false];
+      } else if (_selectedTabOption[3]) {
+        _selectedTabOption = [false, false, false, true];
       } else {
-        _selectedTabOption = [true, false, false];
+        _selectedTabOption = [true, false, false, false];
       }
     });
+  }
+
+  Widget _showSelectedTabView() {
+    if (_selectedTabOption[0]) {
+      return const AccountOverviewTabView();
+    } else if (_selectedTabOption[1]) {
+      return const AssetDevelopmentStatisticTabView();
+    } else if (_selectedTabOption[2]) {
+      return const AssetFutureDevelopmentStatisticTabView();
+    } else if (_selectedTabOption[3]) {
+      return const AssetAllocationStatisticTabView();
+    } else {
+      return const AccountOverviewTabView();
+    }
   }
 
   @override
@@ -137,17 +154,14 @@ class _AccountsScreenState extends State<AccountsScreen> {
                     children: const [
                       Icon(Icons.account_balance_wallet_rounded, size: 20.0),
                       Icon(Icons.show_chart_rounded, size: 20.0),
+                      Icon(Icons.auto_graph_rounded, size: 20.0),
                       Icon(Icons.pie_chart_rounded, size: 20.0),
                     ],
                   ),
                 ),
               ],
             ),
-            _selectedTabOption[0]
-                ? const AccountOverviewTabView()
-                : _selectedTabOption[1]
-                    ? const AssetDevelopmentStatisticTabView()
-                    : const AssetAllocationStatisticTabView(),
+            _showSelectedTabView(),
           ],
         ),
       ),
