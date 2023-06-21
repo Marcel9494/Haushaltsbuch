@@ -31,22 +31,22 @@ class Booking extends HiveObject {
   @HiveField(9)
   late bool booked;
 
-  Future<Booking> createBookingInstance(Booking newBooking) async {
-    bool booked = true;
-    if (DateTime.parse(newBooking.date).isAfter(DateTime.now())) {
-      booked = false;
-    }
-    return Booking()
-      ..transactionType = newBooking.transactionType
-      ..bookingRepeats = newBooking.bookingRepeats
-      ..title = newBooking.title
-      ..date = newBooking.date
-      ..amount = newBooking.amount
-      ..categorie = newBooking.categorie
-      ..fromAccount = newBooking.fromAccount
-      ..toAccount = newBooking.toAccount
-      ..serieId = newBooking.serieId
+  void createBooking(String title, String transactionType, String date, String bookingRepeats, String amount, String categorie, String fromAccount, String toAccount,
+      [int serieId = -1, bool booked = true]) async {
+    var bookingBox = await Hive.openBox(bookingsBox);
+    Booking newBooking = Booking()
+      ..transactionType = transactionType
+      ..bookingRepeats = bookingRepeats
+      ..title = title
+      ..date = date
+      ..amount = amount
+      ..categorie = categorie
+      ..fromAccount = fromAccount
+      ..toAccount = toAccount
+      ..serieId = serieId
+      ..serieId = serieId
       ..booked = booked;
+    bookingBox.add(newBooking);
   }
 
   Future<Booking> updateBookingBookedState(Booking updatedBooking) async {
@@ -82,10 +82,17 @@ class Booking extends HiveObject {
   }
 
   // TODO Anzahl der Buchungen erhöhen, damit für die nächsten 10 Jahre Buchungen erstellt werden. 3 nur als Test.
-  void createBooking(Booking newBooking) async {
+  /*void createBooking(Booking newBooking) async {
     var bookingBox = await Hive.openBox(bookingsBox);
     if (newBooking.bookingRepeats == RepeatType.noRepetition.name) {
       bookingBox.add(newBooking);
+    } else if (newBooking.bookingRepeats == RepeatType.everyDay.name) {
+      for (int i = 0; i < 3; i++) {
+        DateTime bookingDate = DateTime.parse(date);
+        Booking nextBooking = await createBookingInstance(newBooking);
+        nextBooking.date = DateTime(bookingDate.year, bookingDate.month, bookingDate.day + i).toString();
+        bookingBox.add(nextBooking);
+      }
     } else if (newBooking.bookingRepeats == RepeatType.everyWeek.name) {
       for (int i = 0; i < 3; i++) {
         DateTime bookingDate = DateTime.parse(date);
@@ -144,6 +151,89 @@ class Booking extends HiveObject {
         bookingBox.add(nextBooking);
       }
     }
+  }*/
+
+  // TODO hier weitermachen und Serien Buchungen weiter implementieren und Prozess / Code vereinfachen
+  void createBookingSerie() async {
+    var bookingBox = await Hive.openBox(bookingsBox);
+    if (bookingRepeats == RepeatType.everyDay.name) {
+      for (int i = 0; i < 3; i++) {
+        //DateTime bookingDate = DateTime(DateTime.parse(date).year, DateTime.parse(date).month, DateTime.parse(date).day + i);
+        bool booked = true;
+        if (DateTime.parse(date).isAfter(DateTime.now())) {
+          booked = false;
+        }
+        Booking nextBooking = Booking()
+          ..transactionType = transactionType
+          ..bookingRepeats = bookingRepeats
+          ..title = title
+          ..date = DateTime(DateTime.parse(date).year, DateTime.parse(date).month, DateTime.parse(date).day + i).toString()
+          ..amount = amount
+          ..categorie = categorie
+          ..fromAccount = fromAccount
+          ..toAccount = toAccount
+          ..serieId = await GlobalState.getBookingSerieIndex()
+          ..booked = booked;
+        bookingBox.add(nextBooking);
+      }
+    } /*else if (newBooking.bookingRepeats == RepeatType.everyWeek.name) {
+      for (int i = 0; i < 3; i++) {
+        DateTime bookingDate = DateTime.parse(date);
+        Booking nextBooking = await createBookingInstance(newBooking);
+        nextBooking.date = DateTime(bookingDate.year, bookingDate.month, bookingDate.day + (i * 7)).toString();
+        bookingBox.add(nextBooking);
+      }
+    } else if (newBooking.bookingRepeats == RepeatType.everyTwoWeeks.name) {
+      for (int i = 0; i < 3; i++) {
+        DateTime bookingDate = DateTime.parse(date);
+        Booking nextBooking = await createBookingInstance(newBooking);
+        nextBooking.date = DateTime(bookingDate.year, bookingDate.month, bookingDate.day + (i * 14)).toString();
+        bookingBox.add(nextBooking);
+      }
+    } else if (newBooking.bookingRepeats == RepeatType.beginningOfMonth.name) {
+      for (int i = 0; i < 3; i++) {
+        DateTime bookingDate = DateTime.parse(date);
+        Booking nextBooking = await createBookingInstance(newBooking);
+        nextBooking.date = DateTime(bookingDate.year, bookingDate.month + i + 1, 1).toString();
+        bookingBox.add(nextBooking);
+      }
+    } else if (newBooking.bookingRepeats == RepeatType.endOfMonth.name) {
+      for (int i = 0; i < 3; i++) {
+        DateTime bookingDate = DateTime.parse(date);
+        Booking nextBooking = await createBookingInstance(newBooking);
+        int lastDayOfMonth = DateTime(bookingDate.year, bookingDate.month + i + 1, 0).day;
+        nextBooking.date = DateTime(bookingDate.year, bookingDate.month + i, lastDayOfMonth).toString();
+        bookingBox.add(nextBooking);
+      }
+    } else if (newBooking.bookingRepeats == RepeatType.everyMonth.name) {
+      for (int i = 0; i < 3; i++) {
+        DateTime bookingDate = DateTime.parse(date);
+        Booking nextBooking = await createBookingInstance(newBooking);
+        nextBooking.date = DateTime(bookingDate.year, bookingDate.month + i, bookingDate.day).toString();
+        bookingBox.add(nextBooking);
+      }
+    } else if (newBooking.bookingRepeats == RepeatType.everyThreeMonths.name) {
+      for (int i = 0; i < 3; i++) {
+        DateTime bookingDate = DateTime.parse(date);
+        Booking nextBooking = await createBookingInstance(newBooking);
+        nextBooking.date = DateTime(bookingDate.year, bookingDate.month + (i * 3), bookingDate.day).toString();
+        bookingBox.add(nextBooking);
+      }
+    } else if (newBooking.bookingRepeats == RepeatType.everySixMonths.name) {
+      for (int i = 0; i < 3; i++) {
+        DateTime bookingDate = DateTime.parse(date);
+        Booking nextBooking = await createBookingInstance(newBooking);
+        nextBooking.date = DateTime(bookingDate.year, bookingDate.month + (i * 6), bookingDate.day).toString();
+        bookingBox.add(nextBooking);
+      }
+    } else if (newBooking.bookingRepeats == RepeatType.everyYear.name) {
+      for (int i = 0; i < 3; i++) {
+        DateTime bookingDate = DateTime.parse(date);
+        Booking nextBooking = await createBookingInstance(newBooking);
+        nextBooking.date = DateTime(bookingDate.year + i, bookingDate.month, bookingDate.day).toString();
+        bookingBox.add(nextBooking);
+      }
+    }*/
   }
 
   void updateBooking(Booking updatedBooking, int bookingBoxIndex) async {
@@ -236,12 +326,16 @@ class Booking extends HiveObject {
   // TODO Funktion implementieren, ob seit letztem mal eine neue Buchung z.B. eine angelegte Serienbuchung als Abrechnung
   // TODO dazu gekommen ist. Extra Variable bei Buchungen einführen, ob Buchung bereits auf ein Konto verbucht wurde oder nicht?!
   // TODO testen bei Konto Übersichtsseite
-  static void checkNewSerieBookings() async {
+  static void checkForNewSerieBookings() async {
     var bookingBox = await Hive.openBox(bookingsBox);
     for (int i = 0; i < bookingBox.length; i++) {
       Booking booking = await bookingBox.getAt(i);
+      print(booking.booked);
       if (booking.serieId != -1 && booking.booked == false) {
-        if (DateTime.parse(booking.date).isAfter(DateTime.now())) {
+        DateTime today = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
+        DateTime dateToCheck = DateTime(DateTime.parse(booking.date).year, DateTime.parse(booking.date).month, DateTime.parse(booking.date).day);
+        print(DateTime.parse(booking.date).isAfter(DateTime.now()) || dateToCheck == today);
+        if (DateTime.parse(booking.date).isBefore(DateTime.now()) || dateToCheck == today) {
           booking.updateBookingBookedState(booking);
           bookingBox.putAt(i, booking);
         }

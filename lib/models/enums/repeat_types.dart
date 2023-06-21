@@ -1,10 +1,12 @@
-enum RepeatType { noRepetition, everyWeek, everyTwoWeeks, everyMonth, beginningOfMonth, endOfMonth, everyThreeMonths, everySixMonths, everyYear }
+enum RepeatType { noRepetition, everyDay, everyWeek, everyTwoWeeks, everyMonth, beginningOfMonth, endOfMonth, everyThreeMonths, everySixMonths, everyYear }
 
 extension RepeatTypeExtension on RepeatType {
   String get name {
     switch (this) {
       case RepeatType.noRepetition:
         return 'Keine Wiederholung';
+      case RepeatType.everyDay:
+        return 'Jeden Tag';
       case RepeatType.everyWeek:
         return 'Jede Woche';
       case RepeatType.everyTwoWeeks:

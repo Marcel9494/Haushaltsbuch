@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 import '../components/tab_views/asset_future_development_statistic_tab_view.dart';
+import '../models/booking.dart';
 import '/components/tab_views/asset_development_statistic_tab_view.dart';
 import '/components/tab_views/asset_allocation_statistic_tab_view.dart';
 import '/components/tab_views/account_overview_tab_view.dart';
@@ -86,6 +87,7 @@ class _AccountsScreenState extends State<AccountsScreen> {
   }
 
   Widget _showSelectedTabView() {
+    Booking.checkForNewSerieBookings();
     if (_selectedTabOption[0]) {
       return const AccountOverviewTabView();
     } else if (_selectedTabOption[1]) {

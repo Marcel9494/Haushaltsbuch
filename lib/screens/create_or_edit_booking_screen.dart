@@ -92,40 +92,50 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
       _setSaveButtonAnimation(false);
       return;
     }
-    int bookingSerieIndex = -1;
+    /*int bookingSerieIndex = -1;
     if (widget.bookingBoxIndex != -1) {
       bookingSerieIndex = _loadedBooking.serieId;
     } else if (widget.bookingBoxIndex == -1 && _bookingRepeat != RepeatType.noRepetition.name) {
       bookingSerieIndex = await GlobalState.getBookingSerieIndex();
-    }
-    Booking booking = Booking()
-      ..transactionType = _currentTransaction
-      ..bookingRepeats = _bookingRepeat
-      ..title = _title
-      ..date = _parsedBookingDate.toString()
-      ..amount = _amountTextController.text
-      ..categorie = _categorieTextController.text
-      ..fromAccount = _fromAccountTextController.text
-      ..toAccount = _toAccountTextController.text
-      ..serieId = bookingSerieIndex
-      ..booked = true;
+    }*/
     if (_currentTransaction == TransactionType.transfer.name || _currentTransaction == TransactionType.investment.name) {
-      // TODO transferMoney bei Serien ggf. öfters ausführen
       Account.transferMoney(_fromAccountTextController.text, _toAccountTextController.text, _amountTextController.text);
     } else {
-      // TODO calculateNewAccountBalance bei Serien ggf. öfters ausführen
       Account.calculateNewAccountBalance(_fromAccountTextController.text, _amountTextController.text, _currentTransaction);
     }
-    if (widget.bookingBoxIndex == -1) {
-      booking.createBooking(booking);
-    } else {
+    Booking booking = Booking();
+    if (widget.bookingBoxIndex == -1 && _bookingRepeat == RepeatType.noRepetition.name) {
+      booking.createBooking(_title, _currentTransaction, _parsedBookingDate.toString(), _bookingRepeat, _amountTextController.text, _categorieTextController.text,
+          _fromAccountTextController.text, _toAccountTextController.text);
+    } else if (widget.bookingBoxIndex != -1 && _bookingRepeat != RepeatType.noRepetition.name) {
+      booking.createBookingSerie();
+    }
+    //if (widget.bookingBoxIndex == -1) {
+    //  booking.createBooking(booking);
+    //}
+    else {
+      // TODO undoneAccountBooking bei Serien ggf. öfters ausführen, wenn booked == true
       Account.undoneAccountBooking(_loadedBooking);
       if (widget.serieEditMode == -1 || widget.serieEditMode == 0) {
         booking.updateBooking(booking, widget.bookingBoxIndex);
       } else if (widget.serieEditMode == 1) {
         booking.updateFutureBookingsFromSerie(booking, widget.bookingBoxIndex);
+        if (booking.booked) {
+          if (_currentTransaction == TransactionType.transfer.name || _currentTransaction == TransactionType.investment.name) {
+            Account.transferMoney(_fromAccountTextController.text, _toAccountTextController.text, _amountTextController.text);
+          } else {
+            Account.calculateNewAccountBalance(_fromAccountTextController.text, _amountTextController.text, _currentTransaction);
+          }
+        }
       } else if (widget.serieEditMode == 2) {
         booking.updateAllBookingsFromSerie(booking, widget.bookingBoxIndex);
+        if (booking.booked) {
+          if (_currentTransaction == TransactionType.transfer.name || _currentTransaction == TransactionType.investment.name) {
+            Account.transferMoney(_fromAccountTextController.text, _toAccountTextController.text, _amountTextController.text);
+          } else {
+            Account.calculateNewAccountBalance(_fromAccountTextController.text, _amountTextController.text, _currentTransaction);
+          }
+        }
       }
     }
     if (_bookingRepeat != RepeatType.noRepetition.name) {

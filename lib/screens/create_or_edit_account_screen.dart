@@ -160,7 +160,8 @@ class _CreateOrEditAccountScreenState extends State<CreateOrEditAccountScreen> {
       ..categorie = 'Differenz'
       ..fromAccount = _accountName
       ..toAccount = _accountName;
-    newBooking.createBooking(newBooking);
+    // TODO newBooking.createBooking();
+    // TODO entfernen? newBooking.createBooking(newBooking);
     _updateAccount();
     Navigator.pop(context);
     Navigator.pop(context);
