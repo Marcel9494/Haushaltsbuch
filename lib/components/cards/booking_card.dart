@@ -18,7 +18,9 @@ class BookingCard extends StatelessWidget {
   }) : super(key: key);
 
   Color _getTransactionTypeColor() {
-    if (booking.transactionType == TransactionType.income.name) {
+    if (booking.booked == false) {
+      return Colors.grey.shade600;
+    } else if (booking.transactionType == TransactionType.income.name) {
       return Colors.greenAccent;
     } else if (booking.transactionType == TransactionType.outcome.name) {
       return const Color(0xfff4634f);

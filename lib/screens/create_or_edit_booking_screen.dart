@@ -107,13 +107,10 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
     if (widget.bookingBoxIndex == -1 && _bookingRepeat == RepeatType.noRepetition.name) {
       booking.createBooking(_title, _currentTransaction, _parsedBookingDate.toString(), _bookingRepeat, _amountTextController.text, _categorieTextController.text,
           _fromAccountTextController.text, _toAccountTextController.text);
-    } else if (widget.bookingBoxIndex != -1 && _bookingRepeat != RepeatType.noRepetition.name) {
-      booking.createBookingSerie();
-    }
-    //if (widget.bookingBoxIndex == -1) {
-    //  booking.createBooking(booking);
-    //}
-    else {
+    } else if (widget.bookingBoxIndex == -1 && _bookingRepeat != RepeatType.noRepetition.name) {
+      booking.createBookingSerie(_title, _currentTransaction, _parsedBookingDate.toString(), _bookingRepeat, _amountTextController.text, _categorieTextController.text,
+          _fromAccountTextController.text, _toAccountTextController.text);
+    } else {
       // TODO undoneAccountBooking bei Serien ggf. öfters ausführen, wenn booked == true
       Account.undoneAccountBooking(_loadedBooking);
       if (widget.serieEditMode == -1 || widget.serieEditMode == 0) {
