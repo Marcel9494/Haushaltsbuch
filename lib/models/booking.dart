@@ -44,7 +44,6 @@ class Booking extends HiveObject {
       ..fromAccount = fromAccount
       ..toAccount = toAccount
       ..serieId = serieId
-      ..serieId = serieId
       ..booked = booked;
     bookingBox.add(newBooking);
   }
@@ -91,6 +90,7 @@ class Booking extends HiveObject {
         if (bookingDate.isAfter(DateTime.now())) {
           booked = false;
         }
+        print(GlobalState.getBookingSerieIndex());
         createBooking(title, transactionType, bookingDate.toString(), bookingRepeats, amount, categorie, fromAccount, toAccount, await GlobalState.getBookingSerieIndex(), booked);
       }
     } else if (bookingRepeats == RepeatType.everyWeek.name) {
@@ -178,6 +178,7 @@ class Booking extends HiveObject {
     bookingBox.putAt(bookingBoxIndex, templateBooking);
     for (int i = 0; i < bookingBox.length; i++) {
       Booking booking = await bookingBox.getAt(i);
+      print("Template ID: " + templateBooking.serieId.toString());
       if (booking.serieId == templateBooking.serieId && DateTime.parse(booking.date).isAfter(DateTime.parse(templateBooking.date))) {
         Booking updatedBooking = await updateBookingInstance(templateBooking, booking);
         bookingBox.putAt(i, updatedBooking);
@@ -262,11 +263,9 @@ class Booking extends HiveObject {
     var bookingBox = await Hive.openBox(bookingsBox);
     for (int i = 0; i < bookingBox.length; i++) {
       Booking booking = await bookingBox.getAt(i);
-      print(booking.booked);
       if (booking.serieId != -1 && booking.booked == false) {
         DateTime today = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
         DateTime dateToCheck = DateTime(DateTime.parse(booking.date).year, DateTime.parse(booking.date).month, DateTime.parse(booking.date).day);
-        print(DateTime.parse(booking.date).isAfter(DateTime.now()) || dateToCheck == today);
         if (DateTime.parse(booking.date).isBefore(DateTime.now()) || dateToCheck == today) {
           booking.updateBookingBookedState(booking);
           bookingBox.putAt(i, booking);

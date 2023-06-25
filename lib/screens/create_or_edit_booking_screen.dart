@@ -92,26 +92,35 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
       _setSaveButtonAnimation(false);
       return;
     }
-    /*int bookingSerieIndex = -1;
-    if (widget.bookingBoxIndex != -1) {
-      bookingSerieIndex = _loadedBooking.serieId;
-    } else if (widget.bookingBoxIndex == -1 && _bookingRepeat != RepeatType.noRepetition.name) {
-      bookingSerieIndex = await GlobalState.getBookingSerieIndex();
-    }*/
     if (_currentTransaction == TransactionType.transfer.name || _currentTransaction == TransactionType.investment.name) {
       Account.transferMoney(_fromAccountTextController.text, _toAccountTextController.text, _amountTextController.text);
     } else {
       Account.calculateNewAccountBalance(_fromAccountTextController.text, _amountTextController.text, _currentTransaction);
     }
-    Booking booking = Booking();
-    if (widget.bookingBoxIndex == -1 && _bookingRepeat == RepeatType.noRepetition.name) {
-      booking.createBooking(_title, _currentTransaction, _parsedBookingDate.toString(), _bookingRepeat, _amountTextController.text, _categorieTextController.text,
-          _fromAccountTextController.text, _toAccountTextController.text);
-    } else if (widget.bookingBoxIndex == -1 && _bookingRepeat != RepeatType.noRepetition.name) {
-      booking.createBookingSerie(_title, _currentTransaction, _parsedBookingDate.toString(), _bookingRepeat, _amountTextController.text, _categorieTextController.text,
-          _fromAccountTextController.text, _toAccountTextController.text);
+    if (widget.bookingBoxIndex == -1) {
+      Booking booking = Booking();
+      if (_bookingRepeat == RepeatType.noRepetition.name) {
+        booking.createBooking(_title, _currentTransaction, _parsedBookingDate.toString(), _bookingRepeat, _amountTextController.text, _categorieTextController.text,
+            _fromAccountTextController.text, _toAccountTextController.text);
+      } else if (_bookingRepeat != RepeatType.noRepetition.name) {
+        booking.createBookingSerie(_title, _currentTransaction, _parsedBookingDate.toString(), _bookingRepeat, _amountTextController.text, _categorieTextController.text,
+            _fromAccountTextController.text, _toAccountTextController.text);
+      }
+      // TODO hier weitermachen und Buchungen und Serien Buchungen bearbeiten weiter implementieren und Code ebenfalls verbessern
     } else {
       // TODO undoneAccountBooking bei Serien ggf. öfters ausführen, wenn booked == true
+      Booking booking = Booking()
+        ..transactionType = _currentTransaction
+        ..bookingRepeats = _bookingRepeat
+        ..title = _title
+        ..date = _parsedBookingDate.toString()
+        ..amount = _amountTextController.text
+        ..categorie = _categorieTextController.text
+        ..fromAccount = _fromAccountTextController.text
+        ..toAccount = _toAccountTextController.text
+        ..serieId = _loadedBooking.serieId
+        ..booked = _loadedBooking.booked;
+      print(_loadedBooking.serieId);
       Account.undoneAccountBooking(_loadedBooking);
       if (widget.serieEditMode == -1 || widget.serieEditMode == 0) {
         booking.updateBooking(booking, widget.bookingBoxIndex);
