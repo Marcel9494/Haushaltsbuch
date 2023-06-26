@@ -97,7 +97,7 @@ class Account extends HiveObject {
           bankBalance += amount;
         } else if (loadedBooking.transactionType == TransactionType.income.name) {
           bankBalance -= amount;
-        } else if (loadedBooking.transactionType == TransactionType.transfer.name) {
+        } else if (loadedBooking.transactionType == TransactionType.transfer.name || loadedBooking.transactionType == TransactionType.investment.name) {
           for (int j = 0; j < accountBox.length; j++) {
             Account toAccount = await accountBox.getAt(j);
             if (loadedBooking.toAccount == toAccount.name) {

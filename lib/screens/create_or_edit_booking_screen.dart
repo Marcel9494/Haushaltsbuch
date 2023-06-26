@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:another_flushbar/flushbar.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 
-import '../models/global_state.dart';
 import '/utils/consts/route_consts.dart';
 import '/utils/consts/global_consts.dart';
 import '/utils/date_formatters/date_formatter.dart';
@@ -21,12 +20,13 @@ import '/components/deco/loading_indicator.dart';
 import '/models/booking.dart';
 import '/models/account.dart';
 import '/models/enums/repeat_types.dart';
+import '/models/enums/serie_edit_modes.dart';
 import '/models/enums/transaction_types.dart';
 import '/models/screen_arguments/bottom_nav_bar_screen_arguments.dart';
 
 class CreateOrEditBookingScreen extends StatefulWidget {
   final int bookingBoxIndex;
-  final int serieEditMode;
+  final SerieEditModeType serieEditMode;
 
   const CreateOrEditBookingScreen({
     Key? key,
@@ -120,32 +120,19 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
         ..toAccount = _toAccountTextController.text
         ..serieId = _loadedBooking.serieId
         ..booked = _loadedBooking.booked;
-      print(_loadedBooking.serieId);
-      Account.undoneAccountBooking(_loadedBooking);
-      if (widget.serieEditMode == -1 || widget.serieEditMode == 0) {
+      if (widget.serieEditMode == SerieEditModeType.none || widget.serieEditMode == SerieEditModeType.single) {
         booking.updateBooking(booking, widget.bookingBoxIndex);
-      } else if (widget.serieEditMode == 1) {
-        booking.updateFutureBookingsFromSerie(booking, widget.bookingBoxIndex);
         if (booking.booked) {
-          if (_currentTransaction == TransactionType.transfer.name || _currentTransaction == TransactionType.investment.name) {
-            Account.transferMoney(_fromAccountTextController.text, _toAccountTextController.text, _amountTextController.text);
+          Account.undoneAccountBooking(_loadedBooking);
+          if (booking.transactionType == TransactionType.transfer.name || booking.transactionType == TransactionType.investment.name) {
+            Account.transferMoney(booking.fromAccount, booking.toAccount, booking.amount);
           } else {
-            Account.calculateNewAccountBalance(_fromAccountTextController.text, _amountTextController.text, _currentTransaction);
+            Account.calculateNewAccountBalance(booking.fromAccount, booking.amount, booking.transactionType);
           }
         }
-      } else if (widget.serieEditMode == 2) {
-        booking.updateAllBookingsFromSerie(booking, widget.bookingBoxIndex);
-        if (booking.booked) {
-          if (_currentTransaction == TransactionType.transfer.name || _currentTransaction == TransactionType.investment.name) {
-            Account.transferMoney(_fromAccountTextController.text, _toAccountTextController.text, _amountTextController.text);
-          } else {
-            Account.calculateNewAccountBalance(_fromAccountTextController.text, _amountTextController.text, _currentTransaction);
-          }
-        }
+      } else if (widget.serieEditMode == SerieEditModeType.onlyFuture || widget.serieEditMode == SerieEditModeType.all) {
+        booking.updateSerieBookings(booking, _loadedBooking, widget.bookingBoxIndex, widget.serieEditMode);
       }
-    }
-    if (_bookingRepeat != RepeatType.noRepetition.name) {
-      GlobalState.increaseBookingSerieIndex();
     }
     _setSaveButtonAnimation(true);
     Timer(const Duration(milliseconds: transitionInMs), () {

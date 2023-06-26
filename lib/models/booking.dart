@@ -1,9 +1,11 @@
 import 'package:hive/hive.dart';
 
-import '/utils/number_formatters/number_formatter.dart';
 import '/utils/consts/hive_consts.dart';
+import '/utils/number_formatters/number_formatter.dart';
 
+import 'account.dart';
 import 'enums/repeat_types.dart';
+import 'enums/serie_edit_modes.dart';
 import 'enums/transaction_types.dart';
 import 'global_state.dart';
 
@@ -166,6 +168,7 @@ class Booking extends HiveObject {
         createBooking(title, transactionType, bookingDate.toString(), bookingRepeats, amount, categorie, fromAccount, toAccount, await GlobalState.getBookingSerieIndex(), booked);
       }
     }
+    GlobalState.increaseBookingSerieIndex();
   }
 
   void updateBooking(Booking updatedBooking, int bookingBoxIndex) async {
@@ -178,10 +181,45 @@ class Booking extends HiveObject {
     bookingBox.putAt(bookingBoxIndex, templateBooking);
     for (int i = 0; i < bookingBox.length; i++) {
       Booking booking = await bookingBox.getAt(i);
-      print("Template ID: " + templateBooking.serieId.toString());
       if (booking.serieId == templateBooking.serieId && DateTime.parse(booking.date).isAfter(DateTime.parse(templateBooking.date))) {
         Booking updatedBooking = await updateBookingInstance(templateBooking, booking);
         bookingBox.putAt(i, updatedBooking);
+      }
+    }
+  }
+
+  void updateSerieBookings(Booking templateBooking, Booking oldBooking, int bookingBoxIndex, SerieEditModeType serieEditMode) async {
+    var bookingBox = await Hive.openBox(bookingsBox);
+    bookingBox.putAt(bookingBoxIndex, templateBooking);
+    for (int i = 0; i < bookingBox.length; i++) {
+      Booking booking = await bookingBox.getAt(i);
+      if (serieEditMode == SerieEditModeType.onlyFuture) {
+        if (booking.serieId == templateBooking.serieId && DateTime.parse(booking.date).isAfter(DateTime.parse(templateBooking.date))) {
+          Booking updatedBooking = await updateBookingInstance(templateBooking, booking);
+          bookingBox.putAt(i, updatedBooking);
+          if (booking.booked) {
+            // TODO hier weitermachen Kontostand wird noch nicht richtig zurückgesetzt und neu berechnet, wenn eine Serienbuchung bearbeitet wird
+            Account.undoneAccountBooking(booking);
+            if (booking.transactionType == TransactionType.transfer.name || booking.transactionType == TransactionType.investment.name) {
+              Account.transferMoney(booking.fromAccount, booking.toAccount, booking.amount);
+            } else {
+              Account.calculateNewAccountBalance(booking.fromAccount, booking.amount, booking.transactionType);
+            }
+          }
+        }
+      } else if (serieEditMode == SerieEditModeType.all) {
+        if (booking.serieId == templateBooking.serieId) {
+          Booking updatedBooking = await updateBookingInstance(templateBooking, booking);
+          bookingBox.putAt(i, updatedBooking);
+          if (booking.booked) {
+            Account.undoneAccountBooking(booking);
+            if (booking.transactionType == TransactionType.transfer.name || booking.transactionType == TransactionType.investment.name) {
+              Account.transferMoney(booking.fromAccount, booking.toAccount, booking.amount);
+            } else {
+              Account.calculateNewAccountBalance(booking.fromAccount, booking.amount, booking.transactionType);
+            }
+          }
+        }
       }
     }
   }

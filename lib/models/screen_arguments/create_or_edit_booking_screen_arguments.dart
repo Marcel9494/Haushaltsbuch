@@ -1,6 +1,8 @@
+import '../enums/serie_edit_modes.dart';
+
 class CreateOrEditBookingScreenArguments {
   final int bookingBoxIndex;
-  final int serieEditMode;
+  final SerieEditModeType serieEditMode;
 
   CreateOrEditBookingScreenArguments(
     this.bookingBoxIndex,
