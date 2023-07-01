@@ -92,9 +92,12 @@ class Account extends HiveObject {
       Account fromAccount = await accountBox.getAt(i);
       if (loadedBooking.fromAccount == fromAccount.name) {
         double amount = formatMoneyAmountToDouble(loadedBooking.amount);
+        print("loadedBooking.amount: " + loadedBooking.amount.toString());
         double bankBalance = formatMoneyAmountToDouble(fromAccount.bankBalance);
+        print("fromAccount.bankBalance: " + bankBalance.toString());
         if (loadedBooking.transactionType == TransactionType.outcome.name) {
           bankBalance += amount;
+          print("Balance: " + bankBalance.toString());
         } else if (loadedBooking.transactionType == TransactionType.income.name) {
           bankBalance -= amount;
         } else if (loadedBooking.transactionType == TransactionType.transfer.name || loadedBooking.transactionType == TransactionType.investment.name) {
@@ -111,6 +114,24 @@ class Account extends HiveObject {
           }
         }
         fromAccount.bankBalance = formatToMoneyAmount(bankBalance.toString());
+        accountBox.putAt(fromAccount.boxIndex, fromAccount);
+        break;
+      }
+    }
+  }
+
+  static void undoneSerieAccountBooking(Booking oldBooking) async {
+    var accountBox = await Hive.openBox(accountsBox);
+    for (int i = 0; i < accountBox.length; i++) {
+      Account fromAccount = await accountBox.getAt(i);
+      if (oldBooking.fromAccount == fromAccount.name) {
+        double oldAmount = formatMoneyAmountToDouble(oldBooking.amount);
+        print("oldAmount " + oldAmount.toString());
+        double bankBalance = formatMoneyAmountToDouble(fromAccount.bankBalance);
+        print("bankBalance " + bankBalance.toString());
+        double newBankBalance = bankBalance - oldAmount;
+        print("newBankBalance " + newBankBalance.toString());
+        fromAccount.bankBalance = formatToMoneyAmount(newBankBalance.toString());
         accountBox.putAt(fromAccount.boxIndex, fromAccount);
         break;
       }

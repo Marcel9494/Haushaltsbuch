@@ -92,12 +92,12 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
       _setSaveButtonAnimation(false);
       return;
     }
-    if (_currentTransaction == TransactionType.transfer.name || _currentTransaction == TransactionType.investment.name) {
-      Account.transferMoney(_fromAccountTextController.text, _toAccountTextController.text, _amountTextController.text);
-    } else {
-      Account.calculateNewAccountBalance(_fromAccountTextController.text, _amountTextController.text, _currentTransaction);
-    }
     if (widget.bookingBoxIndex == -1) {
+      if (_currentTransaction == TransactionType.transfer.name || _currentTransaction == TransactionType.investment.name) {
+        Account.transferMoney(_fromAccountTextController.text, _toAccountTextController.text, _amountTextController.text);
+      } else {
+        Account.calculateNewAccountBalance(_fromAccountTextController.text, _amountTextController.text, _currentTransaction);
+      }
       Booking booking = Booking();
       if (_bookingRepeat == RepeatType.noRepetition.name) {
         booking.createBooking(_title, _currentTransaction, _parsedBookingDate.toString(), _bookingRepeat, _amountTextController.text, _categorieTextController.text,
@@ -120,6 +120,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
         ..toAccount = _toAccountTextController.text
         ..serieId = _loadedBooking.serieId
         ..booked = _loadedBooking.booked;
+      print("Loaded booked: " + _loadedBooking.booked.toString());
       if (widget.serieEditMode == SerieEditModeType.none || widget.serieEditMode == SerieEditModeType.single) {
         booking.updateBooking(booking, widget.bookingBoxIndex);
         if (booking.booked) {
