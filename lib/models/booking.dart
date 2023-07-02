@@ -243,26 +243,54 @@ class Booking extends HiveObject {
             Account.calculateNewAccountBalance(templateBooking.fromAccount, templateBooking.amount, templateBooking.transactionType);
           }
         }
-      }
-      /*if (serieEditMode == SerieEditModeType.onlyFuture) {
-        if (booking.serieId == templateBooking.serieId && DateTime.parse(booking.date).isAfter(DateTime.parse(templateBooking.date)) ||
-            (DateTime.parse(booking.date).year == DateTime.parse(templateBooking.date).year &&
-                DateTime.parse(booking.date).month == DateTime.parse(templateBooking.date).month &&
-                DateTime.parse(booking.date).day == DateTime.parse(templateBooking.date).day)) {
-          Booking updatedBooking = await updateBookingInstance(templateBooking, booking);
-          bookingBox.putAt(i, updatedBooking);
-          if (updatedBooking.booked) {
-            // TODO hier weitermachen Kontostand wird noch nicht richtig zurückgesetzt und neu berechnet, wenn eine Serienbuchung bearbeitet wird
-            Account.undoneAccountBooking(updatedBooking);
-            //Account.undoneSerieAccountBooking(oldBooking, updatedBooking);
-            if (updatedBooking.transactionType == TransactionType.transfer.name || updatedBooking.transactionType == TransactionType.investment.name) {
-              Account.transferMoney(updatedBooking.fromAccount, updatedBooking.toAccount, updatedBooking.amount);
+      } else if (serieEditMode == SerieEditModeType.onlyFuture) {
+        print("Booking Date: " + DateTime.parse(booking.date).toString());
+        print("Template Booking Date: " + DateTime.parse(templateBooking.date).toString());
+        if (booking.serieId == templateBooking.serieId && booking.boxIndex == bookingBoxIndex) {
+          if (booking.booked) {
+            Account.undoneAccountBooking(oldBooking);
+          }
+          bookingBox.putAt(bookingBoxIndex, templateBooking);
+          if (booking.booked) {
+            if (templateBooking.transactionType == TransactionType.transfer.name || templateBooking.transactionType == TransactionType.investment.name) {
+              Account.transferMoney(templateBooking.fromAccount, templateBooking.toAccount, templateBooking.amount);
             } else {
-              Account.calculateNewAccountBalance(updatedBooking.fromAccount, updatedBooking.amount, updatedBooking.transactionType);
+              Account.calculateNewAccountBalance(templateBooking.fromAccount, templateBooking.amount, templateBooking.transactionType);
+            }
+          }
+        } else if (booking.serieId == templateBooking.serieId && DateTime.parse(booking.date).isAfter(DateTime.parse(templateBooking.date))) {
+          print("Test");
+          if (booking.booked) {
+            Account.undoneAccountBooking(booking);
+          }
+          bool booked = true;
+          if (DateTime.parse(booking.date).isAfter(DateTime.now())) {
+            booked = false;
+          }
+          print("Booked After Update: $booked");
+          Booking newBooking = Booking()
+            ..transactionType = templateBooking.transactionType
+            ..bookingRepeats = templateBooking.bookingRepeats
+            ..title = templateBooking.title
+            ..date = booking.date
+            ..amount = templateBooking.amount
+            ..categorie = templateBooking.categorie
+            ..fromAccount = templateBooking.fromAccount
+            ..toAccount = templateBooking.toAccount
+            ..serieId = templateBooking.serieId
+            ..booked = booked;
+          bookingBox.putAt(booking.boxIndex, newBooking);
+          if (newBooking.booked) {
+            if (newBooking.transactionType == TransactionType.transfer.name || newBooking.transactionType == TransactionType.investment.name) {
+              Account.transferMoney(newBooking.fromAccount, newBooking.toAccount, newBooking.amount);
+            } else {
+              Account.calculateNewAccountBalance(newBooking.fromAccount, newBooking.amount, newBooking.transactionType);
             }
           }
         }
-      } else if (serieEditMode == SerieEditModeType.all) {
+      }
+      // TODO hier weitermachen und alle Buchungen richtig aktualisieren implementieren => dann saubere Aufteilung von allen drei Serien Edit Modi
+      /*else if (serieEditMode == SerieEditModeType.all) {
         if (booking.serieId == templateBooking.serieId) {
           Booking updatedBooking = await updateBookingInstance(templateBooking, booking);
           bookingBox.putAt(i, updatedBooking);
