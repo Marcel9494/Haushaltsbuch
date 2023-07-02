@@ -199,10 +199,6 @@ class Booking extends HiveObject {
             (DateTime.parse(booking.date).year == DateTime.parse(templateBooking.date).year &&
                 DateTime.parse(booking.date).month == DateTime.parse(templateBooking.date).month &&
                 DateTime.parse(booking.date).day == DateTime.parse(templateBooking.date).day)) {
-          // TODO hier weitermachen und booking richtig kopieren in andere Booking Datenstruktur, damit alter Wert nicht verloren geht?
-          if (booking.booked) {
-            Account.undoneSerieAccountBooking(booking);
-          }
           Booking updatedBooking = await updateBookingInstance(templateBooking, booking);
           bookingBox.putAt(i, updatedBooking);
           if (updatedBooking.booked) {
@@ -230,6 +226,56 @@ class Booking extends HiveObject {
           }
         }
       }
+    }
+  }
+
+  static void updateSerieBookings2(Booking templateBooking, Booking oldBooking, int bookingBoxIndex, SerieEditModeType serieEditMode) async {
+    var bookingBox = await Hive.openBox(bookingsBox);
+    for (int i = 0; i < bookingBox.length; i++) {
+      Booking booking = await bookingBox.getAt(i);
+      if (serieEditMode == SerieEditModeType.none || serieEditMode == SerieEditModeType.single) {
+        if (booking.serieId == templateBooking.serieId && booking.boxIndex == bookingBoxIndex && booking.booked) {
+          Account.undoneAccountBooking(oldBooking);
+          bookingBox.putAt(bookingBoxIndex, templateBooking);
+          if (templateBooking.transactionType == TransactionType.transfer.name || templateBooking.transactionType == TransactionType.investment.name) {
+            Account.transferMoney(templateBooking.fromAccount, templateBooking.toAccount, templateBooking.amount);
+          } else {
+            Account.calculateNewAccountBalance(templateBooking.fromAccount, templateBooking.amount, templateBooking.transactionType);
+          }
+        }
+      }
+      /*if (serieEditMode == SerieEditModeType.onlyFuture) {
+        if (booking.serieId == templateBooking.serieId && DateTime.parse(booking.date).isAfter(DateTime.parse(templateBooking.date)) ||
+            (DateTime.parse(booking.date).year == DateTime.parse(templateBooking.date).year &&
+                DateTime.parse(booking.date).month == DateTime.parse(templateBooking.date).month &&
+                DateTime.parse(booking.date).day == DateTime.parse(templateBooking.date).day)) {
+          Booking updatedBooking = await updateBookingInstance(templateBooking, booking);
+          bookingBox.putAt(i, updatedBooking);
+          if (updatedBooking.booked) {
+            // TODO hier weitermachen Kontostand wird noch nicht richtig zurückgesetzt und neu berechnet, wenn eine Serienbuchung bearbeitet wird
+            Account.undoneAccountBooking(updatedBooking);
+            //Account.undoneSerieAccountBooking(oldBooking, updatedBooking);
+            if (updatedBooking.transactionType == TransactionType.transfer.name || updatedBooking.transactionType == TransactionType.investment.name) {
+              Account.transferMoney(updatedBooking.fromAccount, updatedBooking.toAccount, updatedBooking.amount);
+            } else {
+              Account.calculateNewAccountBalance(updatedBooking.fromAccount, updatedBooking.amount, updatedBooking.transactionType);
+            }
+          }
+        }
+      } else if (serieEditMode == SerieEditModeType.all) {
+        if (booking.serieId == templateBooking.serieId) {
+          Booking updatedBooking = await updateBookingInstance(templateBooking, booking);
+          bookingBox.putAt(i, updatedBooking);
+          if (booking.booked) {
+            Account.undoneAccountBooking(booking);
+            if (booking.transactionType == TransactionType.transfer.name || booking.transactionType == TransactionType.investment.name) {
+              Account.transferMoney(booking.fromAccount, booking.toAccount, booking.amount);
+            } else {
+              Account.calculateNewAccountBalance(booking.fromAccount, booking.amount, booking.transactionType);
+            }
+          }
+        }
+      }*/
     }
   }
 

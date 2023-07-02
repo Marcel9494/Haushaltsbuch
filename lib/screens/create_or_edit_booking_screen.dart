@@ -106,9 +106,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
         booking.createBookingSerie(_title, _currentTransaction, _parsedBookingDate.toString(), _bookingRepeat, _amountTextController.text, _categorieTextController.text,
             _fromAccountTextController.text, _toAccountTextController.text);
       }
-      // TODO hier weitermachen und Buchungen und Serien Buchungen bearbeiten weiter implementieren und Code ebenfalls verbessern
     } else {
-      // TODO undoneAccountBooking bei Serien ggf. öfters ausführen, wenn booked == true
       Booking booking = Booking()
         ..transactionType = _currentTransaction
         ..bookingRepeats = _bookingRepeat
@@ -120,6 +118,10 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
         ..toAccount = _toAccountTextController.text
         ..serieId = _loadedBooking.serieId
         ..booked = _loadedBooking.booked;
+      Booking.updateSerieBookings2(booking, _loadedBooking, widget.bookingBoxIndex, widget.serieEditMode);
+      /*if (_loadedBooking.booked) {
+        Account.undoneSerieAccountBooking(_loadedBooking);
+      }
       print("Loaded booked: " + _loadedBooking.booked.toString());
       if (widget.serieEditMode == SerieEditModeType.none || widget.serieEditMode == SerieEditModeType.single) {
         booking.updateBooking(booking, widget.bookingBoxIndex);
@@ -133,7 +135,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
         }
       } else if (widget.serieEditMode == SerieEditModeType.onlyFuture || widget.serieEditMode == SerieEditModeType.all) {
         booking.updateSerieBookings(booking, _loadedBooking, widget.bookingBoxIndex, widget.serieEditMode);
-      }
+      }*/
     }
     _setSaveButtonAnimation(true);
     Timer(const Duration(milliseconds: transitionInMs), () {
