@@ -177,59 +177,7 @@ class Booking extends HiveObject {
     bookingBox.putAt(bookingBoxIndex, updatedBooking);
   }
 
-  void updateFutureBookingsFromSerie(Booking templateBooking, int bookingBoxIndex) async {
-    var bookingBox = await Hive.openBox(bookingsBox);
-    bookingBox.putAt(bookingBoxIndex, templateBooking);
-    for (int i = 0; i < bookingBox.length; i++) {
-      Booking booking = await bookingBox.getAt(i);
-      if (booking.serieId == templateBooking.serieId && DateTime.parse(booking.date).isAfter(DateTime.parse(templateBooking.date))) {
-        Booking updatedBooking = await updateBookingInstance(templateBooking, booking);
-        bookingBox.putAt(i, updatedBooking);
-      }
-    }
-  }
-
-  void updateSerieBookings(Booking templateBooking, Booking oldBooking, int bookingBoxIndex, SerieEditModeType serieEditMode) async {
-    var bookingBox = await Hive.openBox(bookingsBox);
-    bookingBox.putAt(bookingBoxIndex, templateBooking);
-    for (int i = 0; i < bookingBox.length; i++) {
-      Booking booking = await bookingBox.getAt(i);
-      if (serieEditMode == SerieEditModeType.onlyFuture) {
-        if (booking.serieId == templateBooking.serieId && DateTime.parse(booking.date).isAfter(DateTime.parse(templateBooking.date)) ||
-            (DateTime.parse(booking.date).year == DateTime.parse(templateBooking.date).year &&
-                DateTime.parse(booking.date).month == DateTime.parse(templateBooking.date).month &&
-                DateTime.parse(booking.date).day == DateTime.parse(templateBooking.date).day)) {
-          Booking updatedBooking = await updateBookingInstance(templateBooking, booking);
-          bookingBox.putAt(i, updatedBooking);
-          if (updatedBooking.booked) {
-            // TODO hier weitermachen Kontostand wird noch nicht richtig zurückgesetzt und neu berechnet, wenn eine Serienbuchung bearbeitet wird
-            Account.undoneAccountBooking(updatedBooking);
-            //Account.undoneSerieAccountBooking(oldBooking, updatedBooking);
-            if (updatedBooking.transactionType == TransactionType.transfer.name || updatedBooking.transactionType == TransactionType.investment.name) {
-              Account.transferMoney(updatedBooking.fromAccount, updatedBooking.toAccount, updatedBooking.amount);
-            } else {
-              Account.calculateNewAccountBalance(updatedBooking.fromAccount, updatedBooking.amount, updatedBooking.transactionType);
-            }
-          }
-        }
-      } else if (serieEditMode == SerieEditModeType.all) {
-        if (booking.serieId == templateBooking.serieId) {
-          Booking updatedBooking = await updateBookingInstance(templateBooking, booking);
-          bookingBox.putAt(i, updatedBooking);
-          if (booking.booked) {
-            Account.undoneAccountBooking(booking);
-            if (booking.transactionType == TransactionType.transfer.name || booking.transactionType == TransactionType.investment.name) {
-              Account.transferMoney(booking.fromAccount, booking.toAccount, booking.amount);
-            } else {
-              Account.calculateNewAccountBalance(booking.fromAccount, booking.amount, booking.transactionType);
-            }
-          }
-        }
-      }
-    }
-  }
-
-  static void updateSerieBookings2(Booking templateBooking, Booking oldBooking, int bookingBoxIndex, SerieEditModeType serieEditMode) async {
+  static void updateSerieBookings(Booking templateBooking, Booking oldBooking, int bookingBoxIndex, SerieEditModeType serieEditMode) async {
     var bookingBox = await Hive.openBox(bookingsBox);
     for (int i = 0; i < bookingBox.length; i++) {
       Booking booking = await bookingBox.getAt(i);
@@ -244,8 +192,6 @@ class Booking extends HiveObject {
           }
         }
       } else if (serieEditMode == SerieEditModeType.onlyFuture) {
-        print("Booking Date: " + DateTime.parse(booking.date).toString());
-        print("Template Booking Date: " + DateTime.parse(templateBooking.date).toString());
         if (booking.serieId == templateBooking.serieId && booking.boxIndex == bookingBoxIndex) {
           if (booking.booked) {
             Account.undoneAccountBooking(oldBooking);
@@ -259,7 +205,6 @@ class Booking extends HiveObject {
             }
           }
         } else if (booking.serieId == templateBooking.serieId && DateTime.parse(booking.date).isAfter(DateTime.parse(templateBooking.date))) {
-          print("Test");
           if (booking.booked) {
             Account.undoneAccountBooking(booking);
           }
@@ -267,7 +212,47 @@ class Booking extends HiveObject {
           if (DateTime.parse(booking.date).isAfter(DateTime.now())) {
             booked = false;
           }
-          print("Booked After Update: $booked");
+          Booking newBooking = Booking()
+            ..transactionType = templateBooking.transactionType
+            ..bookingRepeats = templateBooking.bookingRepeats
+            ..title = templateBooking.title
+            ..date = booking.date
+            ..amount = templateBooking.amount
+            ..categorie = templateBooking.categorie
+            ..fromAccount = templateBooking.fromAccount
+            ..toAccount = templateBooking.toAccount
+            ..serieId = templateBooking.serieId
+            ..booked = booked;
+          bookingBox.putAt(booking.boxIndex, newBooking);
+          if (newBooking.booked) {
+            if (newBooking.transactionType == TransactionType.transfer.name || newBooking.transactionType == TransactionType.investment.name) {
+              Account.transferMoney(newBooking.fromAccount, newBooking.toAccount, newBooking.amount);
+            } else {
+              Account.calculateNewAccountBalance(newBooking.fromAccount, newBooking.amount, newBooking.transactionType);
+            }
+          }
+        }
+      } else if (serieEditMode == SerieEditModeType.all) {
+        if (booking.serieId == templateBooking.serieId && booking.boxIndex == bookingBoxIndex) {
+          if (booking.booked) {
+            Account.undoneAccountBooking(oldBooking);
+          }
+          bookingBox.putAt(bookingBoxIndex, templateBooking);
+          if (booking.booked) {
+            if (templateBooking.transactionType == TransactionType.transfer.name || templateBooking.transactionType == TransactionType.investment.name) {
+              Account.transferMoney(templateBooking.fromAccount, templateBooking.toAccount, templateBooking.amount);
+            } else {
+              Account.calculateNewAccountBalance(templateBooking.fromAccount, templateBooking.amount, templateBooking.transactionType);
+            }
+          }
+        } else if (booking.serieId == templateBooking.serieId) {
+          if (booking.booked) {
+            Account.undoneAccountBooking(booking);
+          }
+          bool booked = true;
+          if (DateTime.parse(booking.date).isAfter(DateTime.now())) {
+            booked = false;
+          }
           Booking newBooking = Booking()
             ..transactionType = templateBooking.transactionType
             ..bookingRepeats = templateBooking.bookingRepeats
@@ -289,39 +274,39 @@ class Booking extends HiveObject {
           }
         }
       }
-      // TODO hier weitermachen und alle Buchungen richtig aktualisieren implementieren => dann saubere Aufteilung von allen drei Serien Edit Modi
-      /*else if (serieEditMode == SerieEditModeType.all) {
-        if (booking.serieId == templateBooking.serieId) {
-          Booking updatedBooking = await updateBookingInstance(templateBooking, booking);
-          bookingBox.putAt(i, updatedBooking);
-          if (booking.booked) {
-            Account.undoneAccountBooking(booking);
-            if (booking.transactionType == TransactionType.transfer.name || booking.transactionType == TransactionType.investment.name) {
-              Account.transferMoney(booking.fromAccount, booking.toAccount, booking.amount);
-            } else {
-              Account.calculateNewAccountBalance(booking.fromAccount, booking.amount, booking.transactionType);
-            }
-          }
-        }
-      }*/
-    }
-  }
-
-  void updateAllBookingsFromSerie(Booking templateBooking, int bookingBoxIndex) async {
-    var bookingBox = await Hive.openBox(bookingsBox);
-    bookingBox.putAt(bookingBoxIndex, templateBooking);
-    for (int i = 0; i < bookingBox.length; i++) {
-      Booking booking = await bookingBox.getAt(i);
-      if (booking.serieId == templateBooking.serieId) {
-        Booking updatedBooking = await updateBookingInstance(templateBooking, booking);
-        bookingBox.putAt(i, updatedBooking);
-      }
     }
   }
 
   void deleteBooking(int bookingBoxIndex) async {
     var bookingBox = await Hive.openBox(bookingsBox);
+    // TODO Buchung rückgängig machen, wenn diese schon gebucht wurde (booked == true)
     bookingBox.deleteAt(bookingBoxIndex);
+  }
+
+  // TODO Buchungen rückgängig machen, wenn diese schon gebucht wurde (booked == true)
+  void deleteSerieBookings(Booking templateBooking, int bookingBoxIndex, SerieEditModeType serieEditMode) async {
+    var bookingBox = await Hive.openBox(bookingsBox);
+    if (serieEditMode == SerieEditModeType.none || serieEditMode == SerieEditModeType.single) {
+      bookingBox.deleteAt(bookingBoxIndex);
+    } else if (serieEditMode == SerieEditModeType.onlyFuture) {
+      for (int i = 0; i < bookingBox.length; i++) {
+        Booking booking = await bookingBox.getAt(i);
+        if (booking.boxIndex == bookingBoxIndex) {
+          bookingBox.deleteAt(bookingBoxIndex);
+        } else if (booking.serieId == templateBooking.serieId && DateTime.parse(booking.date).isAfter(DateTime.parse(templateBooking.date))) {
+          bookingBox.deleteAt(bookingBoxIndex);
+        }
+      }
+    } else if (serieEditMode == SerieEditModeType.all) {
+      for (int i = 0; i < bookingBox.length; i++) {
+        Booking booking = await bookingBox.getAt(i);
+        if (booking.boxIndex == bookingBoxIndex) {
+          bookingBox.deleteAt(bookingBoxIndex);
+        } else if (booking.serieId == templateBooking.serieId) {
+          bookingBox.deleteAt(bookingBoxIndex);
+        }
+      }
+    }
   }
 
   static Future<Booking> loadBooking(int bookingBoxIndex) async {

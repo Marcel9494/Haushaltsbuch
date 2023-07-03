@@ -92,12 +92,9 @@ class Account extends HiveObject {
       Account fromAccount = await accountBox.getAt(i);
       if (loadedBooking.fromAccount == fromAccount.name) {
         double amount = formatMoneyAmountToDouble(loadedBooking.amount);
-        print("loadedBooking.amount: " + loadedBooking.amount.toString());
         double bankBalance = formatMoneyAmountToDouble(fromAccount.bankBalance);
-        print("fromAccount.bankBalance: " + bankBalance.toString());
         if (loadedBooking.transactionType == TransactionType.outcome.name) {
           bankBalance += amount;
-          print("Balance: " + bankBalance.toString());
         } else if (loadedBooking.transactionType == TransactionType.income.name) {
           bankBalance -= amount;
         } else if (loadedBooking.transactionType == TransactionType.transfer.name || loadedBooking.transactionType == TransactionType.investment.name) {

@@ -76,7 +76,7 @@ class BudgetCard extends StatelessWidget {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(formatToMoneyAmount((budget.budget - budget.currentExpenditure).toString()), overflow: TextOverflow.ellipsis),
+                              Text(formatToMoneyAmount((budget.budget - budget.currentExpenditure).abs().toString()), overflow: TextOverflow.ellipsis),
                               Padding(
                                 padding: const EdgeInsets.only(top: 2.0),
                                 child: budget.budget - budget.currentExpenditure >= 0.0
