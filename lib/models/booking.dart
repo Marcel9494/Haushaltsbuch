@@ -279,31 +279,41 @@ class Booking extends HiveObject {
 
   void deleteBooking(int bookingBoxIndex) async {
     var bookingBox = await Hive.openBox(bookingsBox);
-    // TODO Buchung rückgängig machen, wenn diese schon gebucht wurde (booked == true)
+    Booking booking = await bookingBox.getAt(bookingBoxIndex);
+    if (booking.booked) {
+      Account.undoneAccountBooking(booking);
+    }
     bookingBox.deleteAt(bookingBoxIndex);
   }
 
-  // TODO Buchungen rückgängig machen, wenn diese schon gebucht wurde (booked == true)
-  void deleteSerieBookings(Booking templateBooking, int bookingBoxIndex, SerieEditModeType serieEditMode) async {
+  static void deleteSerieBookings(Booking templateBooking, int bookingBoxIndex, SerieEditModeType serieEditMode) async {
     var bookingBox = await Hive.openBox(bookingsBox);
     if (serieEditMode == SerieEditModeType.none || serieEditMode == SerieEditModeType.single) {
+      Booking booking = await bookingBox.getAt(bookingBoxIndex);
+      if (booking.booked) {
+        Account.undoneAccountBooking(booking);
+      }
       bookingBox.deleteAt(bookingBoxIndex);
     } else if (serieEditMode == SerieEditModeType.onlyFuture) {
-      for (int i = 0; i < bookingBox.length; i++) {
+      for (int i = bookingBox.length - 1; i >= 0; i--) {
         Booking booking = await bookingBox.getAt(i);
+        if (booking.booked) {
+          Account.undoneAccountBooking(booking);
+        }
         if (booking.boxIndex == bookingBoxIndex) {
           bookingBox.deleteAt(bookingBoxIndex);
         } else if (booking.serieId == templateBooking.serieId && DateTime.parse(booking.date).isAfter(DateTime.parse(templateBooking.date))) {
-          bookingBox.deleteAt(bookingBoxIndex);
+          bookingBox.deleteAt(i);
         }
       }
     } else if (serieEditMode == SerieEditModeType.all) {
-      for (int i = 0; i < bookingBox.length; i++) {
+      for (int i = bookingBox.length - 1; i >= 0; i--) {
         Booking booking = await bookingBox.getAt(i);
-        if (booking.boxIndex == bookingBoxIndex) {
-          bookingBox.deleteAt(bookingBoxIndex);
-        } else if (booking.serieId == templateBooking.serieId) {
-          bookingBox.deleteAt(bookingBoxIndex);
+        if (booking.booked) {
+          Account.undoneAccountBooking(booking);
+        }
+        if (booking.serieId == templateBooking.serieId) {
+          bookingBox.deleteAt(i);
         }
       }
     }

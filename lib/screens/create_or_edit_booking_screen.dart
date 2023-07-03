@@ -107,7 +107,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
             _fromAccountTextController.text, _toAccountTextController.text);
       }
     } else {
-      Booking booking = Booking()
+      Booking currentBooking = Booking()
         ..transactionType = _currentTransaction
         ..bookingRepeats = _bookingRepeat
         ..title = _title
@@ -118,7 +118,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
         ..toAccount = _toAccountTextController.text
         ..serieId = _loadedBooking.serieId
         ..booked = _loadedBooking.booked;
-      Booking.updateSerieBookings(booking, _loadedBooking, widget.bookingBoxIndex, widget.serieEditMode);
+      Booking.updateSerieBookings(currentBooking, _loadedBooking, widget.bookingBoxIndex, widget.serieEditMode);
     }
     _setSaveButtonAnimation(true);
     Timer(const Duration(milliseconds: transitionInMs), () {
@@ -198,7 +198,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text('Buchung löschen?'),
+          title: Text(widget.serieEditMode == SerieEditModeType.none || widget.serieEditMode == SerieEditModeType.single ? 'Buchung löschen?' : 'Buchungen löschen?'),
           actions: <Widget>[
             TextButton(
               child: const Text(
@@ -217,8 +217,11 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
               onPressed: () => {
                 _yesPressed(index),
                 Flushbar(
-                  title: 'Buchung wurde gelöscht',
-                  message: 'Buchung wurde erfolgreich gelöscht.',
+                  title:
+                      widget.serieEditMode == SerieEditModeType.none || widget.serieEditMode == SerieEditModeType.single ? 'Buchung wurde gelöscht' : 'Buchungen wurden gelöscht',
+                  message: widget.serieEditMode == SerieEditModeType.none || widget.serieEditMode == SerieEditModeType.single
+                      ? 'Buchung wurde erfolgreich gelöscht.'
+                      : 'Buchungen wurden erfolgreich gelöscht',
                   icon: const Icon(
                     Icons.info_outline,
                     size: 28.0,
@@ -237,9 +240,26 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
   }
 
   void _yesPressed(int index) {
-    setState(() {
-      _loadedBooking.deleteBooking(widget.bookingBoxIndex);
-    });
+    if (widget.serieEditMode == SerieEditModeType.none) {
+      setState(() {
+        _loadedBooking.deleteBooking(widget.bookingBoxIndex);
+      });
+    } else {
+      setState(() {
+        Booking currentBooking = Booking()
+          ..transactionType = _currentTransaction
+          ..bookingRepeats = _bookingRepeat
+          ..title = _title
+          ..date = _parsedBookingDate.toString()
+          ..amount = _amountTextController.text
+          ..categorie = _categorieTextController.text
+          ..fromAccount = _fromAccountTextController.text
+          ..toAccount = _toAccountTextController.text
+          ..serieId = _loadedBooking.serieId
+          ..booked = _loadedBooking.booked;
+        Booking.deleteSerieBookings(currentBooking, widget.bookingBoxIndex, widget.serieEditMode);
+      });
+    }
     Navigator.pop(context);
     Navigator.pop(context);
     Navigator.popAndPushNamed(context, bottomNavBarRoute, arguments: BottomNavBarScreenArguments(0));
