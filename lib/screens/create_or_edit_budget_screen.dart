@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 
+import '../models/default_budget.dart';
 import '/utils/consts/global_consts.dart';
 import '/utils/consts/route_consts.dart';
 import '/utils/number_formatters/number_formatter.dart';
@@ -36,13 +37,13 @@ class _CreateOrEditBudgetScreenState extends State<CreateOrEditBudgetScreen> {
   String _categorieErrorText = '';
   String _budgetErrorText = '';
   late Budget _loadedBudget;
-  late Budget _standardBudget;
+  late DefaultBudget _loadedDefaultBudget;
 
   @override
   void initState() {
     super.initState();
     if (widget.budgetBoxIndex == -2) {
-      _loadStandardBudget();
+      _loadDefaultBudget();
     } else if (widget.budgetBoxIndex != -1) {
       _loadBudget();
     }
@@ -53,9 +54,9 @@ class _CreateOrEditBudgetScreenState extends State<CreateOrEditBudgetScreen> {
     _budgetTextController.text = formatToMoneyAmount(_loadedBudget.budget.toString());
   }
 
-  Future<void> _loadStandardBudget() async {
-    _standardBudget = await Budget.loadStandardBudget(widget.budgetCategorie!);
-    _budgetTextController.text = formatToMoneyAmount(_standardBudget.budget.toString());
+  Future<void> _loadDefaultBudget() async {
+    _loadedDefaultBudget = await DefaultBudget.loadDefaultBudget(widget.budgetCategorie!);
+    _budgetTextController.text = formatToMoneyAmount(_loadedDefaultBudget.defaultBudget.toString());
   }
 
   // TODO hier weitermachen und verhindern das für eine Kategorie mehrmals ein Budget angelegt wird.
@@ -73,14 +74,23 @@ class _CreateOrEditBudgetScreenState extends State<CreateOrEditBudgetScreen> {
         ..percentage = 0.0
         ..budgetDate = DateTime.now().toString();
       newBudget.createBudget(newBudget);
+      DefaultBudget newDefaultBudget = DefaultBudget()
+        ..categorie = _categorieTextController.text
+        ..defaultBudget = formatMoneyAmountToDouble(_budgetTextController.text);
+      newDefaultBudget.createDefaultBudget(newDefaultBudget);
     } else if (widget.budgetBoxIndex == -2) {
-      Budget updatedStandardBudget = Budget()
+      DefaultBudget updatedDefaultBudget = DefaultBudget()
+        ..categorie = _loadedDefaultBudget.categorie
+        ..defaultBudget = formatMoneyAmountToDouble(_budgetTextController.text);
+      updatedDefaultBudget.updateDefaultBudget(updatedDefaultBudget, _loadedDefaultBudget.categorie);
+      // TODO hier weitermachen und alle anderen Budgets ebenfalls setzen/updaten, wenn Standardbudget gesetzt wurde
+      /*Budget updatedStandardBudget = Budget()
         ..categorie = _standardBudget.categorie
         ..budget = formatMoneyAmountToDouble(_budgetTextController.text)
         ..currentExpenditure = _standardBudget.currentExpenditure
         ..percentage = _standardBudget.percentage
         ..budgetDate = _standardBudget.budgetDate.toString();
-      Budget.updateBudgetsFrom(updatedStandardBudget);
+      Budget.updateBudgetsFrom(updatedStandardBudget);*/
     } else {
       Budget updatedBudget = Budget()
         ..categorie = _loadedBudget.categorie

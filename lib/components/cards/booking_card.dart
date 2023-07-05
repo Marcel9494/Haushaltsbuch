@@ -43,13 +43,13 @@ class BookingCard extends StatelessWidget {
         builder: (BuildContext context) {
           return Material(
             child: SizedBox(
-              height: 230.0,
+              height: 244.0,
               child: ListView(
                 children: [
                   const BottomSheetLine(),
                   const Padding(
-                    padding: EdgeInsets.only(top: 16.0, left: 20.0),
-                    child: Text('Buchung bearbeiten:', style: TextStyle(fontSize: 18.0)),
+                    padding: EdgeInsets.only(top: 16.0, bottom: 12.0, left: 20.0),
+                    child: Text('Serienbuchung bearbeiten:', style: TextStyle(fontSize: 18.0)),
                   ),
                   Column(
                     children: [

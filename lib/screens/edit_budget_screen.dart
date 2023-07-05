@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 
-import '../components/cards/standard_budget_card.dart';
 import '/models/budget.dart';
+import '/models/default_budget.dart';
 
 import '/utils/consts/route_consts.dart';
 
 import '/components/dialogs/choice_dialog.dart';
 import '/components/deco/loading_indicator.dart';
+import '/components/cards/default_budget_card.dart';
 import '/components/cards/separate_budget_card.dart';
 import '/components/buttons/year_picker_buttons.dart';
 
@@ -24,9 +25,11 @@ class EditBudgetScreen extends StatefulWidget {
 
 class _EditBudgetScreenState extends State<EditBudgetScreen> {
   List<Budget> _budgetList = [];
+  DefaultBudget _defaultBudget = DefaultBudget();
   DateTime _selectedYear = DateTime.now();
 
   Future<List<Budget>> _loadOneBudgetCategorie() async {
+    _defaultBudget = await DefaultBudget.loadDefaultBudget(widget.budget.categorie);
     _budgetList = await Budget.loadOneBudgetCategorie(widget.budget.categorie, _selectedYear.year);
     return _budgetList;
   }
@@ -84,7 +87,7 @@ class _EditBudgetScreenState extends State<EditBudgetScreen> {
                     return Expanded(
                       child: Column(
                         children: [
-                          StandardBudgetCard(budgetList: _budgetList),
+                          DefaultBudgetCard(defaultBudget: _defaultBudget),
                           RefreshIndicator(
                             onRefresh: () async {
                               _budgetList = await _loadOneBudgetCategorie();
