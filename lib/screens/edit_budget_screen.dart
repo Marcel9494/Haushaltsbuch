@@ -41,7 +41,7 @@ class _EditBudgetScreenState extends State<EditBudgetScreen> {
 
   void _yesPressed() {
     setState(() {
-      widget.budget.deleteBudget(widget.budget);
+      widget.budget.deleteAllBudgetsFromCategorie(widget.budget.categorie);
     });
     Navigator.pop(context);
     Navigator.pop(context);

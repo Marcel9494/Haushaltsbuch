@@ -69,7 +69,6 @@ class Booking extends HiveObject {
     if (DateTime.parse(oldBooking.date).isAfter(DateTime.now())) {
       booked = false;
     }
-    print("Booked After Update: $booked");
     return Booking()
       ..transactionType = templateBooking.transactionType
       ..bookingRepeats = templateBooking.bookingRepeats
@@ -93,7 +92,6 @@ class Booking extends HiveObject {
         if (bookingDate.isAfter(DateTime.now())) {
           booked = false;
         }
-        print(GlobalState.getBookingSerieIndex());
         createBooking(title, transactionType, bookingDate.toString(), bookingRepeats, amount, categorie, fromAccount, toAccount, await GlobalState.getBookingSerieIndex(), booked);
       }
     } else if (bookingRepeats == RepeatType.everyWeek.name) {

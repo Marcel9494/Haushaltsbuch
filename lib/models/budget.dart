@@ -1,5 +1,7 @@
 import 'package:hive/hive.dart';
 
+import 'default_budget.dart';
+
 import '/models/booking.dart';
 
 import '/utils/consts/hive_consts.dart';
@@ -42,42 +44,33 @@ class Budget extends HiveObject {
     budgetBox.putAt(budgetBoxIndex, updatedBudget);
   }
 
-  static void updateBudgetsFrom(Budget standardBudget) async {
-    List<Budget> budgetList = await loadOneBudgetCategorie(standardBudget.categorie);
-    for (int i = 0; i < budgetList.length; i++) {
-      if (DateTime.parse(budgetList[i].budgetDate).isAfter(DateTime.parse(standardBudget.budgetDate))) {
-        budgetList[i].budget = standardBudget.budget;
+  static void updateAllFutureBudgetsFromCategorie(DefaultBudget defaultBudget) async {
+    var budgetBox = await Hive.openBox(budgetsBox);
+    for (int i = 0; i < budgetBox.length; i++) {
+      Budget budget = await budgetBox.getAt(i);
+      if ((DateTime.parse(budget.budgetDate).isAfter(DateTime.now()) ||
+              DateTime.parse(budget.budgetDate).month == DateTime.now().month && DateTime.parse(budget.budgetDate).year == DateTime.now().year) &&
+          budget.categorie == defaultBudget.categorie) {
+        budget.budget = defaultBudget.defaultBudget;
       }
     }
   }
 
-  void deleteBudget(Budget deleteBudget) async {
+  void deleteAllBudgetsFromCategorie(String budgetCategorie) async {
     var budgetBox = await Hive.openBox(budgetsBox);
-    for (int i = 0; i < budgetBox.length; i++) {
+    for (int i = budgetBox.length - 1; i >= 0; i--) {
       Budget budget = await budgetBox.getAt(i);
-      if (deleteBudget.categorie == budget.categorie) {
+      if (budget.categorie == budgetCategorie) {
         budgetBox.deleteAt(i);
       }
     }
+    DefaultBudget.deleteDefaultBudget(budgetCategorie);
   }
 
   static Future<Budget> loadBudget(int budgetBoxIndex) async {
     var budgetBox = await Hive.openBox(budgetsBox);
     Budget budget = await budgetBox.getAt(budgetBoxIndex);
     return budget;
-  }
-
-  static Future<Budget> loadStandardBudget(String budgetCategorie) async {
-    var budgetBox = await Hive.openBox(budgetsBox);
-    Budget standardBudget = Budget();
-    for (int i = 0; i < budgetBox.length; i++) {
-      Budget budget = await budgetBox.getAt(i);
-      if (DateTime.parse(budget.budgetDate).month == DateTime.now().month && budgetCategorie == budget.categorie) {
-        standardBudget = budget;
-        break;
-      }
-    }
-    return standardBudget;
   }
 
   static Future<List<Budget>> loadAllBudgetCategories() async {

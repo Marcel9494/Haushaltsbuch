@@ -25,6 +25,17 @@ class DefaultBudget extends HiveObject {
     }
   }
 
+  static void deleteDefaultBudget(String budgetCategorie) async {
+    var defaultBudgetBox = await Hive.openBox(defaultBudgetsBox);
+    for (int i = 0; i < defaultBudgetBox.length; i++) {
+      DefaultBudget defaultBudget = await defaultBudgetBox.getAt(i);
+      if (defaultBudget.categorie == budgetCategorie) {
+        defaultBudgetBox.deleteAt(i);
+        break;
+      }
+    }
+  }
+
   static Future<DefaultBudget> loadDefaultBudget(String defaultBudgetCategorie) async {
     var defaultBudgetBox = await Hive.openBox(defaultBudgetsBox);
     DefaultBudget defaultBudget = DefaultBudget()

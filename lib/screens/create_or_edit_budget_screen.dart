@@ -83,14 +83,7 @@ class _CreateOrEditBudgetScreenState extends State<CreateOrEditBudgetScreen> {
         ..categorie = _loadedDefaultBudget.categorie
         ..defaultBudget = formatMoneyAmountToDouble(_budgetTextController.text);
       updatedDefaultBudget.updateDefaultBudget(updatedDefaultBudget, _loadedDefaultBudget.categorie);
-      // TODO hier weitermachen und alle anderen Budgets ebenfalls setzen/updaten, wenn Standardbudget gesetzt wurde
-      /*Budget updatedStandardBudget = Budget()
-        ..categorie = _standardBudget.categorie
-        ..budget = formatMoneyAmountToDouble(_budgetTextController.text)
-        ..currentExpenditure = _standardBudget.currentExpenditure
-        ..percentage = _standardBudget.percentage
-        ..budgetDate = _standardBudget.budgetDate.toString();
-      Budget.updateBudgetsFrom(updatedStandardBudget);*/
+      Budget.updateAllFutureBudgetsFromCategorie(updatedDefaultBudget);
     } else {
       Budget updatedBudget = Budget()
         ..categorie = _loadedBudget.categorie
@@ -106,6 +99,10 @@ class _CreateOrEditBudgetScreenState extends State<CreateOrEditBudgetScreen> {
         FocusScope.of(context).requestFocus(FocusNode());
         Navigator.pop(context);
         Navigator.pop(context);
+        if (widget.budgetBoxIndex != -1) {
+          Navigator.pop(context);
+          Navigator.pop(context);
+        }
         Navigator.pushNamed(context, bottomNavBarRoute, arguments: BottomNavBarScreenArguments(1));
       }
     });

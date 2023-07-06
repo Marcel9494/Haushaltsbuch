@@ -82,7 +82,6 @@ class _TransactionStatsToggleButtonsState extends State<TransactionStatsToggleBu
     return Colors.white54;
   }
 
-  // TODO hier weitermachen und TransactionStatsToggleButtons in jährliche Statistik Ansicht implementieren
   @override
   Widget build(BuildContext context) {
     return ToggleButtons(
