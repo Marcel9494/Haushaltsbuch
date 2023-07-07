@@ -25,7 +25,15 @@ class _OverviewBudgetsScreenState extends State<OverviewBudgetsScreen> {
     return Scaffold(
       appBar: AppBar(title: const Text('Budgets verwalten')),
       body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 12.0, horizontal: 22.0),
+            child: Text(
+              'Budgetliste:',
+              style: TextStyle(fontSize: 18.0),
+            ),
+          ),
           FutureBuilder(
             future: _loadAllBudgetCategories(),
             builder: (BuildContext context, AsyncSnapshot<List<Budget>> snapshot) {

@@ -24,6 +24,9 @@ class _EditBudgetCardState extends State<EditBudgetCard> {
     return GestureDetector(
       onTap: () => Navigator.pushNamed(context, editBudgetRoute, arguments: EditBudgetScreenArguments(widget.budget)),
       child: Card(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(14.0),
+        ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
