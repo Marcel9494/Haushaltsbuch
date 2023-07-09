@@ -96,6 +96,7 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
                                   borderRadius: BorderRadius.circular(14.0),
                                 ),
                                 child: SingleChildScrollView(
+                                  physics: const NeverScrollableScrollPhysics(),
                                   child: CircularPercentIndicator(
                                     radius: 84.0,
                                     lineWidth: 10.0,

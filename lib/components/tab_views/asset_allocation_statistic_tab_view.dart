@@ -86,15 +86,15 @@ class _AssetAllocationStatisticTabViewState extends State<AssetAllocationStatist
               return Column(
                 children: [
                   AspectRatio(
-                    aspectRatio: 1.6,
+                    aspectRatio: 2.0,
                     child: PieChart(
                       PieChartData(
                         borderData: FlBorderData(
                           show: false,
                         ),
                         sectionsSpace: 4.0,
-                        centerSpaceRadius: 40.0,
-                        sections: showingSections(),
+                        centerSpaceRadius: 30.0,
+                        sections: _showingSections(),
                       ),
                     ),
                   ),
@@ -131,7 +131,7 @@ class _AssetAllocationStatisticTabViewState extends State<AssetAllocationStatist
                     },
                     color: Colors.cyanAccent,
                     child: SizedBox(
-                      height: 220.0,
+                      height: 235.0,
                       child: ListView.builder(
                         itemCount: _percentageStats.length,
                         itemBuilder: (BuildContext context, int index) {
@@ -153,7 +153,7 @@ class _AssetAllocationStatisticTabViewState extends State<AssetAllocationStatist
     );
   }
 
-  List<PieChartSectionData> showingSections() {
+  List<PieChartSectionData> _showingSections() {
     return List.generate(_percentageStats.length, (i) {
       return PieChartSectionData(
         color: _percentageStats[i].statColor,
