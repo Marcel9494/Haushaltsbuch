@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:haushaltsbuch/models/intro_screen.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
@@ -47,18 +48,20 @@ void main() async {
   Hive.registerAdapter(DefaultBudgetAdapter());
   Hive.registerAdapter(TransactionTypeAdapter());
   Hive.registerAdapter(GlobalStateAdapter());
+  Hive.registerAdapter(IntroScreenStateAdapter());
   runApp(const BudgetBookApp());
 }
 
 class BudgetBookApp extends StatelessWidget {
   const BudgetBookApp({Key? key}) : super(key: key);
-
+  
   @override
   Widget build(BuildContext context) {
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
     ]);
+
     return MaterialApp(
       title: 'Haushaltsbuch',
       debugShowCheckedModeBanner: false,
