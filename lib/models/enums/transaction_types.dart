@@ -1,6 +1,7 @@
 import 'package:hive/hive.dart';
+import '/utils/consts/hive_consts.dart';
 
-@HiveType(typeId: 1)
+@HiveType(typeId: transactionTypeId)
 enum TransactionType { income, outcome, transfer, investment }
 
 extension TransactionTypeExtension on TransactionType {
@@ -54,7 +55,7 @@ extension TransactionTypeExtension on TransactionType {
 
 class TransactionTypeAdapter extends TypeAdapter<TransactionType> {
   @override
-  final typeId = 1;
+  final typeId = transactionTypeId;
 
   @override
   TransactionType read(BinaryReader reader) {

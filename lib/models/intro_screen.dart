@@ -2,7 +2,7 @@ import 'package:hive/hive.dart';
 
 import '/utils/consts/hive_consts.dart';
 
-@HiveType(typeId: 20)
+@HiveType(typeId: introScreenTypeId)
 class IntroScreenState extends HiveObject {
   @HiveField(0)
   late bool introductionState;
@@ -29,7 +29,7 @@ class IntroScreenState extends HiveObject {
 
 class IntroScreenStateAdapter extends TypeAdapter<IntroScreenState> {
   @override
-  final typeId = 20;
+  final typeId = introScreenTypeId;
 
   @override
   IntroScreenState read(BinaryReader reader) {

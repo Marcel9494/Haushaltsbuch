@@ -9,7 +9,7 @@ import 'enums/serie_edit_modes.dart';
 import 'enums/transaction_types.dart';
 import 'global_state.dart';
 
-@HiveType(typeId: 0)
+@HiveType(typeId: bookingTypeId)
 class Booking extends HiveObject {
   late int boxIndex;
   @HiveField(0)
@@ -391,7 +391,7 @@ class Booking extends HiveObject {
 
 class BookingAdapter extends TypeAdapter<Booking> {
   @override
-  final typeId = 0;
+  final typeId = bookingTypeId;
 
   @override
   Booking read(BinaryReader reader) {
