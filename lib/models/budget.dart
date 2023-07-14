@@ -121,6 +121,17 @@ class Budget extends HiveObject {
     return budgetList;
   }
 
+  static Future<bool> existsBudgetCategorie(String budgetCategorie) async {
+    var budgetBox = await Hive.openBox(budgetsBox);
+    for (int i = 0; i < budgetBox.length; i++) {
+      Budget budget = await budgetBox.getAt(i);
+      if (budget.categorie == budgetCategorie) {
+        return Future.value(true);
+      }
+    }
+    return Future.value(false);
+  }
+
   static Future<List<Budget>> calculateCurrentExpenditure(List<Budget> budgetList, DateTime selectedDate) async {
     List<Booking> bookingList = await Booking.loadMonthlyBookingList(selectedDate.month, selectedDate.year);
     for (int i = 0; i < budgetList.length; i++) {

@@ -144,7 +144,7 @@ class _CreateOrEditBudgetScreenState extends State<CreateOrEditBudgetScreen> {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Budget erstellen'),
+          title: Text(widget.budgetBoxIndex == -1 ? 'Budget erstellen' : 'Budget bearbeiten'),
         ),
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 24.0),
@@ -157,7 +157,12 @@ class _CreateOrEditBudgetScreenState extends State<CreateOrEditBudgetScreen> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 widget.budgetBoxIndex == -1
-                    ? CategorieInputField(textController: _categorieTextController, errorText: _categorieErrorText, transactionType: TransactionType.outcome.name)
+                    ? CategorieInputField(
+                        textController: _categorieTextController,
+                        errorText: _categorieErrorText,
+                        transactionType: TransactionType.outcome.name,
+                        title: 'Kategorie für Budget auswählen:',
+                        autofocus: true)
                     : const SizedBox(),
                 MoneyInputField(textController: _budgetTextController, errorText: _budgetErrorText, hintText: 'Budget', bottomSheetTitle: 'Budget eingeben:'),
                 SaveButton(saveFunction: _createOrUpdateBudget, buttonController: _saveButtonController),
