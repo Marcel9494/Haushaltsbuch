@@ -60,7 +60,8 @@ class _BottomNavBarState extends State<BottomNavBar> {
                 width: 60,
                 height: 60,
                 decoration: BoxDecoration(
-                  shape: BoxShape.circle,
+                  shape: BoxShape.rectangle,
+                  borderRadius: const BorderRadius.all(Radius.circular(15)),
                   gradient: LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,

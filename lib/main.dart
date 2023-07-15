@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:haushaltsbuch/models/intro_screen.dart';
+import 'package:haushaltsbuch/models/intro_screen_state.dart';
+import 'package:haushaltsbuch/screens/splash_screen.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
@@ -49,12 +50,23 @@ void main() async {
   Hive.registerAdapter(TransactionTypeAdapter());
   Hive.registerAdapter(GlobalStateAdapter());
   Hive.registerAdapter(IntroScreenStateAdapter());
+  IntroScreenState.init();
   runApp(const BudgetBookApp());
 }
 
 class BudgetBookApp extends StatelessWidget {
   const BudgetBookApp({Key? key}) : super(key: key);
-  
+
+  Widget _testIT() {
+    Categorie.createStartExpenditureCategories();
+    Categorie.createStartRevenueCategories();
+    Categorie.createStartInvestmentCategories();
+    Account.createStartAccounts();
+    GlobalState.createGlobalState();
+    IntroScreenState.setIntroScreenState();
+    return const BottomNavBar(screenIndex: 0);
+  }
+
   @override
   Widget build(BuildContext context) {
     SystemChrome.setPreferredOrientations([
@@ -80,7 +92,7 @@ class BudgetBookApp extends StatelessWidget {
       supportedLocales: const [
         Locale('de', 'DE'),
       ],
-      home: const IntroductionScreens(),
+      home: SplashScreen(),
       routes: {
         categoriesRoute: (context) => const CategoriesScreen(),
         overviewBudgetsRoute: (context) => const OverviewBudgetsScreen(),

@@ -7,7 +7,7 @@ class IntroScreenState extends HiveObject {
   @HiveField(0)
   late bool introductionState;
 
-  static void createIntroScree() async {
+  static void init() async {
     var introBox = await Hive.openBox(introScreenBox);
     var startIntroScreenState = IntroScreenState()..introductionState = true;
     introBox.add(startIntroScreenState);
