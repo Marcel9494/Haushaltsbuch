@@ -82,7 +82,7 @@ class BudgetBookApp extends StatelessWidget {
       supportedLocales: const [
         Locale('de', 'DE'),
       ],
-      home: SplashScreen(),
+      home: const SplashScreen(),
       routes: {
         categoriesRoute: (context) => const CategoriesScreen(),
         overviewBudgetsRoute: (context) => const OverviewBudgetsScreen(),
