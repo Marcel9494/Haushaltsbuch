@@ -1,4 +1,7 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:haushaltsbuch/models/intro_screen_state.dart';
+import 'package:introduction_screen/introduction_screen.dart';
 import 'package:settings_ui/settings_ui.dart';
 
 import '/models/screen_arguments/bottom_nav_bar_screen_arguments.dart';
@@ -50,12 +53,44 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           print(demoMode);
                         });
                         Navigator.pop(context);
-                        Navigator.pushNamed(context, bottomNavBarRoute, arguments: BottomNavBarScreenArguments(0));
+                        Navigator.pushNamed(context, bottomNavBarRoute,
+                            arguments: BottomNavBarScreenArguments(0));
                       },
                     ),
                   ],
                 )
               : const SettingsSection(tiles: []),
+          SettingsSection(
+            title: const Text('Introduction Screen'),
+            tiles: <SettingsTile>[
+              SettingsTile.navigation(
+                leading: const Icon(Icons.restart_alt),
+                title: const Text('IntroScreen Reset'),
+                onPressed: (_) => showCupertinoDialog(
+                  context: context,
+                  builder: (context) {
+                    return CupertinoAlertDialog(
+                      content: const Text(
+                          "Beim nächsten Start wird der Introduction Screen erneut angezeigt."),
+                      title: const Text("Info"),
+                      actions: [
+                        TextButton(
+                            onPressed: () {
+                              IntroScreenState.setIntroScreenState();
+                              Navigator.pop(context);
+                              Navigator.popAndPushNamed(
+                                  context,
+                                  bottomNavBarRoute,
+                                  arguments: BottomNavBarScreenArguments(0));
+                            },
+                            child: const Text("OK"))
+                      ],
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
         ],
       ),
     );

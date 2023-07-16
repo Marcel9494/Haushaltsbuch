@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:haushaltsbuch/components/deco/loading_indicator.dart';
 import 'package:haushaltsbuch/screens/introduction_screens.dart';
 
 import '../components/bottom_nav_bar/bottom_nav_bar.dart';
@@ -8,67 +9,55 @@ import '../models/global_state.dart';
 import '/models/intro_screen_state.dart';
 
 class SplashScreen extends StatefulWidget {
+  const SplashScreen({Key? key}) : super(key: key);
+
   @override
   State<StatefulWidget> createState() {
-    return _SplashScreenState ();
+    return _SplashScreenState();
   }
 }
 
 class _SplashScreenState extends State<SplashScreen> {
-
   late Future<bool> _value;
 
   @override
   initState() {
     super.initState();
+    // Abfrage des States für die Anzeige des IntroductionScreens
     _value = IntroScreenState.getIntroScreenState();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        backgroundColor: Colors.black,
-        title: const Text('Flutter FutureBuilder Demo'),
-      ),
       body: SizedBox(
         width: double.infinity,
         child: Center(
           child: FutureBuilder<bool>(
-            future: _value,
+            future: _value, // IntroScreenState.getIntroScreenState(),
             initialData: true,
-            builder: (
-                BuildContext context,
-                AsyncSnapshot<bool> snapshot,
-                ) {
+            builder: (context, AsyncSnapshot<bool> snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const CircularProgressIndicator(),
-                    Visibility(
-                      visible: snapshot.hasData,
-                      child: const Text("Willkommen im Haushaltsbuch",
-                        style: TextStyle(color: Colors.black, fontSize: 24),
-                      ),
-                    )
-                  ],
+                  children: const [LoadingIndicator()],
                 );
               } else if (snapshot.connectionState == ConnectionState.done) {
                 if (snapshot.hasError) {
-                  return const Text('Fehler beim Laden!');
+                  return const Text('Fehler beim Laden des IntroductionScreens!');
                 } else if (snapshot.hasData) {
                   if (snapshot.data == true) {
+                    // Wenn State auf true => Anzeigen des IntroScreens
+                    IntroScreenState.setIntroScreenState();
                     return const IntroductionScreens();
                   } else {
+                    // Wenn State auf false => Initialisieren und ANzeigen der Buchungsseite
                     Categorie.createStartExpenditureCategories();
                     Categorie.createStartRevenueCategories();
                     Categorie.createStartInvestmentCategories();
                     Account.createStartAccounts();
                     GlobalState.createGlobalState();
-                    IntroScreenState.setIntroScreenState();
                     return const BottomNavBar(screenIndex: 0);
                   }
                 } else {

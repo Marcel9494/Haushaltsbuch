@@ -2,7 +2,7 @@
     package="de.mdm.haushaltsbuch">
    <application
         android:label="haushaltsbuch"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/launcher_icon">
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"

@@ -57,16 +57,6 @@ void main() async {
 class BudgetBookApp extends StatelessWidget {
   const BudgetBookApp({Key? key}) : super(key: key);
 
-  Widget _testIT() {
-    Categorie.createStartExpenditureCategories();
-    Categorie.createStartRevenueCategories();
-    Categorie.createStartInvestmentCategories();
-    Account.createStartAccounts();
-    GlobalState.createGlobalState();
-    IntroScreenState.setIntroScreenState();
-    return const BottomNavBar(screenIndex: 0);
-  }
-
   @override
   Widget build(BuildContext context) {
     SystemChrome.setPreferredOrientations([
