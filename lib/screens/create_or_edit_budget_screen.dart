@@ -3,16 +3,17 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 
-import '../models/default_budget.dart';
 import '/utils/consts/global_consts.dart';
 import '/utils/consts/route_consts.dart';
 import '/utils/number_formatters/number_formatter.dart';
 
+import '/components/dialogs/choice_dialog.dart';
 import '/components/input_fields/categorie_input_field.dart';
 import '/components/input_fields/money_input_field.dart';
 import '/components/buttons/save_button.dart';
 
 import '/models/budget.dart';
+import '/models/default_budget.dart';
 import '/models/enums/transaction_types.dart';
 import '/models/screen_arguments/bottom_nav_bar_screen_arguments.dart';
 
@@ -38,6 +39,7 @@ class _CreateOrEditBudgetScreenState extends State<CreateOrEditBudgetScreen> {
   String _budgetErrorText = '';
   late Budget _loadedBudget;
   late DefaultBudget _loadedDefaultBudget;
+  late bool _budgetExistsAlready;
 
   @override
   void initState() {
@@ -61,23 +63,36 @@ class _CreateOrEditBudgetScreenState extends State<CreateOrEditBudgetScreen> {
 
   // TODO hier weitermachen und verhindern das für eine Kategorie mehrmals ein Budget angelegt wird.
   // Idee: Überhaupt nicht mehr anbieten, wenn bereits ein Budget erstellt wurde oder bestehendes Budget updaten?
-  void _createOrUpdateBudget() {
+  void _createOrUpdateBudget() async {
     if (_validCategorie(_categorieTextController.text) == false || _validBudget(_budgetTextController.text) == false) {
       _setSaveButtonAnimation(false);
       return;
     }
     if (widget.budgetBoxIndex == -1) {
-      Budget newBudget = Budget()
-        ..categorie = _categorieTextController.text
-        ..budget = formatMoneyAmountToDouble(_budgetTextController.text)
-        ..currentExpenditure = 0.0
-        ..percentage = 0.0
-        ..budgetDate = DateTime.now().toString();
-      newBudget.createBudget(newBudget);
-      DefaultBudget newDefaultBudget = DefaultBudget()
-        ..categorie = _categorieTextController.text
-        ..defaultBudget = formatMoneyAmountToDouble(_budgetTextController.text);
-      newDefaultBudget.createDefaultBudget(newDefaultBudget);
+      _budgetExistsAlready = await Budget.existsBudgetCategorie(_categorieTextController.text);
+      if (_budgetExistsAlready) {
+        showChoiceDialog(
+            context,
+            'Budget aktualisieren?',
+            _yesPressed,
+            _noPressed,
+            'Budget wurde aktualisiert',
+            'Budget ${_categorieTextController.text} wurde erfolgreich aktualisiert.',
+            Icons.info_outline,
+            'Budget für ${_categorieTextController.text} wurde bereits angelegt möchten Sie alle Budgeteinträge aktualisieren?');
+      } else {
+        Budget newBudget = Budget()
+          ..categorie = _categorieTextController.text
+          ..budget = formatMoneyAmountToDouble(_budgetTextController.text)
+          ..currentExpenditure = 0.0
+          ..percentage = 0.0
+          ..budgetDate = DateTime.now().toString();
+        newBudget.createBudget(newBudget);
+        DefaultBudget newDefaultBudget = DefaultBudget()
+          ..categorie = _categorieTextController.text
+          ..defaultBudget = formatMoneyAmountToDouble(_budgetTextController.text);
+        newDefaultBudget.createDefaultBudget(newDefaultBudget);
+      }
     } else if (widget.budgetBoxIndex == -2) {
       DefaultBudget updatedDefaultBudget = DefaultBudget()
         ..categorie = _loadedDefaultBudget.categorie
@@ -93,19 +108,21 @@ class _CreateOrEditBudgetScreenState extends State<CreateOrEditBudgetScreen> {
         ..budgetDate = _loadedBudget.budgetDate.toString();
       updatedBudget.updateBudget(updatedBudget, widget.budgetBoxIndex);
     }
-    _setSaveButtonAnimation(true);
-    Timer(const Duration(milliseconds: transitionInMs), () {
-      if (mounted) {
-        FocusScope.of(context).requestFocus(FocusNode());
-        Navigator.pop(context);
-        Navigator.pop(context);
-        if (widget.budgetBoxIndex != -1) {
+    if (_budgetExistsAlready == false) {
+      _setSaveButtonAnimation(true);
+      Timer(const Duration(milliseconds: transitionInMs), () {
+        if (mounted) {
+          FocusScope.of(context).requestFocus(FocusNode());
           Navigator.pop(context);
           Navigator.pop(context);
+          if (widget.budgetBoxIndex != -1) {
+            Navigator.pop(context);
+            Navigator.pop(context);
+          }
+          Navigator.pushNamed(context, bottomNavBarRoute, arguments: BottomNavBarScreenArguments(1));
         }
-        Navigator.pushNamed(context, bottomNavBarRoute, arguments: BottomNavBarScreenArguments(1));
-      }
-    });
+      });
+    }
   }
 
   bool _validCategorie(String categorieInput) {
@@ -137,6 +154,27 @@ class _CreateOrEditBudgetScreenState extends State<CreateOrEditBudgetScreen> {
         _saveButtonController.reset();
       });
     }
+  }
+
+  void _yesPressed() {
+    setState(() {
+      DefaultBudget updatedDefaultBudget = DefaultBudget()
+        ..categorie = _categorieTextController.text
+        ..defaultBudget = formatMoneyAmountToDouble(_budgetTextController.text);
+      updatedDefaultBudget.updateDefaultBudget(updatedDefaultBudget, _categorieTextController.text);
+      Budget.updateAllBudgetsFromCategorie(updatedDefaultBudget);
+    });
+    _setSaveButtonAnimation(true);
+    Navigator.pop(context);
+    Navigator.pop(context);
+    Navigator.popAndPushNamed(context, bottomNavBarRoute, arguments: BottomNavBarScreenArguments(1));
+    FocusScope.of(context).unfocus();
+  }
+
+  void _noPressed() {
+    _setSaveButtonAnimation(false);
+    Navigator.pop(context);
+    FocusScope.of(context).unfocus();
   }
 
   @override
