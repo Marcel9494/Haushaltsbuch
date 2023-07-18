@@ -61,9 +61,6 @@ class Categorie extends HiveObject {
     return categorieList;
   }
 
-  // TODO hier weitermachen eigene Funktion für loadBudgetCategorien erstellen oder in diese Funktion mit aufnehmen und in categorie_input_field aufrufen?
-  // TODO [bool receiveExistingBudgetCategories = true, String budgetCategorie]
-  // TODO oder in budget existsBudgetCategorie Funktion?
   static Future<List<String>> loadCategorieNames(String transactionType) async {
     var categorieBox = await Hive.openBox(categoriesBox);
     List<String> categorieNameList = [];
@@ -120,8 +117,6 @@ class Categorie extends HiveObject {
     var categorieBox = await Hive.openBox(categoriesBox);
     for (int i = 0; i < categorieBox.length; i++) {
       Categorie categorie = await categorieBox.getAt(i);
-      // TODO print(categorieBox.length);
-      // TODO print(categorie.name);
       if (categorie.type == CategorieType.income.name) {
         return;
       }

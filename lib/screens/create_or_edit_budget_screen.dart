@@ -61,8 +61,6 @@ class _CreateOrEditBudgetScreenState extends State<CreateOrEditBudgetScreen> {
     _budgetTextController.text = formatToMoneyAmount(_loadedDefaultBudget.defaultBudget.toString());
   }
 
-  // TODO hier weitermachen und verhindern das für eine Kategorie mehrmals ein Budget angelegt wird.
-  // Idee: Überhaupt nicht mehr anbieten, wenn bereits ein Budget erstellt wurde oder bestehendes Budget updaten?
   void _createOrUpdateBudget() async {
     if (_validCategorie(_categorieTextController.text) == false || _validBudget(_budgetTextController.text) == false) {
       _setSaveButtonAnimation(false);

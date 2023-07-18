@@ -17,7 +17,7 @@ class CategorieInputField extends StatefulWidget {
     required this.textController,
     required this.errorText,
     required this.transactionType,
-    this.title = 'Kategorie auswählen',
+    this.title = 'Kategorie auswählen:',
     this.autofocus = false,
   }) : super(key: key);
 
