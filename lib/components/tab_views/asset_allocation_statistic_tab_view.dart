@@ -23,8 +23,10 @@ class _AssetAllocationStatisticTabViewState extends State<AssetAllocationStatist
   String _assetAllocationStatisticType = AssetAllocationStatisticType.individualAccounts.name;
   String _listStatisticType = StatisticType.assets.name;
   double _totalAmount = 0.0;
+  bool _emptyCapitalOrRiskFreeInvestments = false;
 
   Future<List<PercentageStats>> _loadAssetAllocationStatistic() async {
+    _emptyCapitalOrRiskFreeInvestments = false;
     _percentageStats = [];
     List<Account> _accountList = [];
     if (_listStatisticType == StatisticType.assets.name || _assetAllocationStatisticType == AssetAllocationStatisticType.capitalOrRiskFreeInvestments.name) {
@@ -48,9 +50,20 @@ class _AssetAllocationStatisticTabViewState extends State<AssetAllocationStatist
         }
       }
     }
+    if (_assetAllocationStatisticType == AssetAllocationStatisticType.capitalOrRiskFreeInvestments.name) {
+      checkIfCapitalOrRiskFreeInvestmentsAreEmpty();
+    }
     _percentageStats = PercentageStats.calculatePercentage(_percentageStats, _totalAmount);
     _percentageStats.sort((first, second) => second.percentage.compareTo(first.percentage));
     return _percentageStats;
+  }
+
+  void checkIfCapitalOrRiskFreeInvestmentsAreEmpty() {
+    for (int i = 0; i < _percentageStats.length; i++) {
+      if (_percentageStats[i].amount != "0.0") {
+        _emptyCapitalOrRiskFreeInvestments = true;
+      }
+    }
   }
 
   void _changeAssetAllocationStatisticType() {
@@ -83,65 +96,115 @@ class _AssetAllocationStatisticTabViewState extends State<AssetAllocationStatist
             case ConnectionState.waiting:
               return const LoadingIndicator();
             case ConnectionState.done:
-              return Column(
-                children: [
-                  AspectRatio(
-                    aspectRatio: 2.0,
-                    child: PieChart(
-                      PieChartData(
-                        borderData: FlBorderData(
-                          show: false,
-                        ),
-                        sectionsSpace: 4.0,
-                        centerSpaceRadius: 30.0,
-                        sections: _showingSections(),
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        OutlinedButton(
-                          onPressed: () => _changeAssetAllocationStatisticType(),
-                          child: Text(
-                            _assetAllocationStatisticType,
-                            style: const TextStyle(color: Colors.cyanAccent),
+              if (_percentageStats.isEmpty || _emptyCapitalOrRiskFreeInvestments) {
+                return Column(
+                  children: [
+                    AspectRatio(
+                      aspectRatio: 2.0,
+                      child: PieChart(
+                        PieChartData(
+                          borderData: FlBorderData(
+                            show: false,
                           ),
+                          sectionsSpace: 4.0,
+                          centerSpaceRadius: 30.0,
+                          sections: _showingEmptyDiagram(),
                         ),
-                        _assetAllocationStatisticType == AssetAllocationStatisticType.individualAccounts.name ||
-                                _assetAllocationStatisticType == AssetAllocationStatisticType.individualAccountTypes.name
-                            ? OutlinedButton(
-                                onPressed: () => _changeListStatisticType(),
-                                child: Text(
-                                  _listStatisticType,
-                                  style: const TextStyle(color: Colors.cyanAccent),
-                                ),
-                              )
-                            : const SizedBox(),
-                      ],
-                    ),
-                  ),
-                  RefreshIndicator(
-                    onRefresh: () async {
-                      _percentageStats = await _loadAssetAllocationStatistic();
-                      setState(() {});
-                      return;
-                    },
-                    color: Colors.cyanAccent,
-                    child: SizedBox(
-                      height: 235.0,
-                      child: ListView.builder(
-                        itemCount: _percentageStats.length,
-                        itemBuilder: (BuildContext context, int index) {
-                          return PercentageCard(percentageStats: _percentageStats[index]);
-                        },
                       ),
                     ),
-                  ),
-                ],
-              );
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          OutlinedButton(
+                            onPressed: () => _changeAssetAllocationStatisticType(),
+                            child: Text(
+                              _assetAllocationStatisticType,
+                              style: const TextStyle(color: Colors.cyanAccent),
+                            ),
+                          ),
+                          _assetAllocationStatisticType == AssetAllocationStatisticType.individualAccounts.name ||
+                                  _assetAllocationStatisticType == AssetAllocationStatisticType.individualAccountTypes.name
+                              ? OutlinedButton(
+                                  onPressed: () => _changeListStatisticType(),
+                                  child: Text(
+                                    _listStatisticType,
+                                    style: const TextStyle(color: Colors.cyanAccent),
+                                  ),
+                                )
+                              : const SizedBox(),
+                        ],
+                      ),
+                    ),
+                    const Expanded(
+                      child: Center(
+                        child: Text('Noch keine Kontobuchungen vorhanden.'),
+                      ),
+                    ),
+                  ],
+                );
+              } else {
+                return Column(
+                  children: [
+                    AspectRatio(
+                      aspectRatio: 2.0,
+                      child: PieChart(
+                        PieChartData(
+                          borderData: FlBorderData(
+                            show: false,
+                          ),
+                          sectionsSpace: 4.0,
+                          centerSpaceRadius: 30.0,
+                          sections: _showingSections(),
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          OutlinedButton(
+                            onPressed: () => _changeAssetAllocationStatisticType(),
+                            child: Text(
+                              _assetAllocationStatisticType,
+                              style: const TextStyle(color: Colors.cyanAccent),
+                            ),
+                          ),
+                          _assetAllocationStatisticType == AssetAllocationStatisticType.individualAccounts.name ||
+                                  _assetAllocationStatisticType == AssetAllocationStatisticType.individualAccountTypes.name
+                              ? OutlinedButton(
+                                  onPressed: () => _changeListStatisticType(),
+                                  child: Text(
+                                    _listStatisticType,
+                                    style: const TextStyle(color: Colors.cyanAccent),
+                                  ),
+                                )
+                              : const SizedBox(),
+                        ],
+                      ),
+                    ),
+                    RefreshIndicator(
+                      onRefresh: () async {
+                        _percentageStats = await _loadAssetAllocationStatistic();
+                        setState(() {});
+                        return;
+                      },
+                      color: Colors.cyanAccent,
+                      child: SizedBox(
+                        height: 235.0,
+                        child: ListView.builder(
+                          itemCount: _percentageStats.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            return PercentageCard(percentageStats: _percentageStats[index]);
+                          },
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              }
             default:
               if (snapshot.hasError) {
                 return const Text('Vermögensaufteilung konnte nicht geladen werden.');
@@ -167,6 +230,19 @@ class _AssetAllocationStatisticTabViewState extends State<AssetAllocationStatist
           fontWeight: FontWeight.bold,
           color: Colors.white70,
         ),
+      );
+    });
+  }
+
+  List<PieChartSectionData> _showingEmptyDiagram() {
+    return List.generate(1, (i) {
+      return PieChartSectionData(
+        color: Colors.grey,
+        value: 100,
+        title: '',
+        badgeWidget: const Text(''),
+        badgePositionPercentageOffset: 1.3,
+        radius: 46.0,
       );
     });
   }
