@@ -123,11 +123,8 @@ class Account extends HiveObject {
       Account fromAccount = await accountBox.getAt(i);
       if (oldBooking.fromAccount == fromAccount.name) {
         double oldAmount = formatMoneyAmountToDouble(oldBooking.amount);
-        print("oldAmount " + oldAmount.toString());
         double bankBalance = formatMoneyAmountToDouble(fromAccount.bankBalance);
-        print("bankBalance " + bankBalance.toString());
         double newBankBalance = bankBalance - oldAmount;
-        print("newBankBalance " + newBankBalance.toString());
         fromAccount.bankBalance = formatToMoneyAmount(newBankBalance.toString());
         accountBox.putAt(fromAccount.boxIndex, fromAccount);
         break;

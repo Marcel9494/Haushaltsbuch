@@ -9,12 +9,16 @@ class CategorieInputField extends StatefulWidget {
   final TextEditingController textController;
   final String errorText;
   final String transactionType;
+  final String title;
+  final bool autofocus;
 
   const CategorieInputField({
     Key? key,
     required this.textController,
     required this.errorText,
     required this.transactionType,
+    this.title = 'Kategorie auswählen:',
+    this.autofocus = false,
   }) : super(key: key);
 
   @override
@@ -23,6 +27,17 @@ class CategorieInputField extends StatefulWidget {
 
 class _CategorieInputFieldState extends State<CategorieInputField> {
   List<String> categorieNames = [];
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (widget.autofocus) {
+      // Future.delayed Grund siehe: https://stackoverflow.com/q/58027568/15943768
+      Future.delayed(Duration.zero, () {
+        _openBottomSheetWithCategorieList(context);
+      });
+    }
+  }
 
   void _openBottomSheetWithCategorieList(BuildContext context) {
     showCupertinoModalBottomSheet<void>(
@@ -34,9 +49,9 @@ class _CategorieInputFieldState extends State<CategorieInputField> {
             child: ListView(
               children: [
                 const BottomSheetLine(),
-                const Padding(
-                  padding: EdgeInsets.only(top: 16.0, left: 20.0),
-                  child: Text('Kategorie auswählen:', style: TextStyle(fontSize: 18.0)),
+                Padding(
+                  padding: const EdgeInsets.only(top: 16.0, left: 20.0),
+                  child: Text(widget.title, style: const TextStyle(fontSize: 18.0)),
                 ),
                 FutureBuilder(
                   future: _loadCategorieNameList(),
@@ -98,6 +113,7 @@ class _CategorieInputFieldState extends State<CategorieInputField> {
       textAlignVertical: TextAlignVertical.center,
       showCursor: false,
       readOnly: true,
+      autofocus: widget.autofocus,
       onTap: () => _openBottomSheetWithCategorieList(context),
       decoration: InputDecoration(
         hintText: 'Kategorie',

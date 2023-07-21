@@ -117,8 +117,6 @@ class Categorie extends HiveObject {
     var categorieBox = await Hive.openBox(categoriesBox);
     for (int i = 0; i < categorieBox.length; i++) {
       Categorie categorie = await categorieBox.getAt(i);
-      // TODO print(categorieBox.length);
-      // TODO print(categorie.name);
       if (categorie.type == CategorieType.income.name) {
         return;
       }
