@@ -9,7 +9,7 @@ void showChoiceDialog(BuildContext context, String title, Function yesPressed, F
     builder: (context) {
       return AlertDialog(
         title: Text(title),
-        content: Text(content),
+        content: content == '' ? null : Text(content),
         actions: <Widget>[
           TextButton(
             child: const Text(

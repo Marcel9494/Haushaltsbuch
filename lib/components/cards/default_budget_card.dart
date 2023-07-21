@@ -19,6 +19,9 @@ class DefaultBudgetCard extends StatelessWidget {
     return GestureDetector(
       onTap: () => Navigator.pushNamed(context, createOrEditBudgetRoute, arguments: CreateOrEditBudgetScreenArguments(-2, defaultBudget.categorie)),
       child: Card(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(14.0),
+        ),
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 8.0),
           child: Row(
@@ -32,10 +35,13 @@ class DefaultBudgetCard extends StatelessWidget {
                 ),
               ),
               Expanded(
-                flex: 1,
-                child: Text(
-                  formatToMoneyAmount(defaultBudget.defaultBudget.toString()),
-                  textAlign: TextAlign.right,
+                flex: 2,
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 10.0),
+                  child: Text(
+                    formatToMoneyAmount(defaultBudget.defaultBudget.toString()),
+                    textAlign: TextAlign.right,
+                  ),
                 ),
               ),
             ],
