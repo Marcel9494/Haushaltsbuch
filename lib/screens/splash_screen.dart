@@ -45,14 +45,14 @@ class _SplashScreenState extends State<SplashScreen> {
                 );
               } else if (snapshot.connectionState == ConnectionState.done) {
                 if (snapshot.hasError) {
-                  return const Text('Fehler beim Laden des IntroductionScreens!');
+                  return const Text('Fehler beim Laden des Startbildschirms!');
                 } else if (snapshot.hasData) {
                   if (snapshot.data == true) {
                     // Wenn State auf true => Anzeigen des IntroScreens
                     IntroScreenState.setIntroScreenState();
                     return const IntroductionScreens();
                   } else {
-                    // Wenn State auf false => Initialisieren und ANzeigen der Buchungsseite
+                    // Wenn State auf false => Initialisieren und Anzeigen der Buchungsseite
                     Categorie.createStartExpenditureCategories();
                     Categorie.createStartRevenueCategories();
                     Categorie.createStartInvestmentCategories();
@@ -61,7 +61,7 @@ class _SplashScreenState extends State<SplashScreen> {
                     return const BottomNavBar(screenIndex: 0);
                   }
                 } else {
-                  return const Text('Keine Daten vorhaden!');
+                  return const Text('Keine Daten vorhanden!');
                 }
               } else {
                 return Text('State: ${snapshot.connectionState}');
