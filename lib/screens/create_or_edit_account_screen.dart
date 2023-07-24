@@ -74,6 +74,7 @@ class _CreateOrEditAccountScreenState extends State<CreateOrEditAccountScreen> {
       _account.bankBalance = _bankBalanceTextController.text;
       if (widget.accountBoxIndex == -1) {
         _account.createAccount(_account);
+        _navigateToAccountScreen();
       } else {
         if (_oldBankBalance != formatMoneyAmountToDouble(_bankBalanceTextController.text)) {
           showChoiceDialog(context, 'Buchung erfassen?', _recordBooking, _noPressed, 'Buchung wurde erstellt', 'Buchung wurde erfolgreich erstellt.', Icons.info_outline,
@@ -177,6 +178,10 @@ class _CreateOrEditAccountScreenState extends State<CreateOrEditAccountScreen> {
 
   void _updateAccount() {
     _account.updateAccount(_account, widget.accountBoxIndex);
+    _navigateToAccountScreen();
+  }
+
+  void _navigateToAccountScreen() {
     _setSaveButtonAnimation(true);
     Timer(const Duration(milliseconds: transitionInMs), () {
       if (mounted) {
