@@ -8,7 +8,7 @@ import '/utils/number_formatters/number_formatter.dart';
 
 import 'booking.dart';
 
-@HiveType(typeId: 3)
+@HiveType(typeId: accountTypeId)
 class Account extends HiveObject {
   late int boxIndex;
   @HiveField(0)
@@ -268,7 +268,7 @@ class Account extends HiveObject {
 
 class AccountAdapter extends TypeAdapter<Account> {
   @override
-  final typeId = 3;
+  final typeId = accountTypeId;
 
   @override
   Account read(BinaryReader reader) {

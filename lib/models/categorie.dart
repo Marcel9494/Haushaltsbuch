@@ -3,7 +3,7 @@ import 'package:hive/hive.dart';
 import '/utils/consts/hive_consts.dart';
 import 'enums/categorie_types.dart';
 
-@HiveType(typeId: 4)
+@HiveType(typeId: categoryTypeId)
 class Categorie extends HiveObject {
   @HiveField(0)
   String? type;
@@ -150,7 +150,7 @@ class Categorie extends HiveObject {
 
 class CategorieAdapter extends TypeAdapter<Categorie> {
   @override
-  final typeId = 4;
+  final typeId = categoryTypeId;
 
   @override
   Categorie read(BinaryReader reader) {

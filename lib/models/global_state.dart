@@ -2,7 +2,7 @@ import 'package:hive/hive.dart';
 
 import '/utils/consts/hive_consts.dart';
 
-@HiveType(typeId: 6)
+@HiveType(typeId: globalStateTypeId)
 class GlobalState extends HiveObject {
   @HiveField(0)
   late int bookingSerieIndex;
@@ -29,7 +29,7 @@ class GlobalState extends HiveObject {
 
 class GlobalStateAdapter extends TypeAdapter<GlobalState> {
   @override
-  final typeId = 6;
+  final typeId = globalStateTypeId;
 
   @override
   GlobalState read(BinaryReader reader) {

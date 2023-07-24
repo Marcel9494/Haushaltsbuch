@@ -2,7 +2,7 @@ import 'package:hive/hive.dart';
 
 import '/utils/consts/hive_consts.dart';
 
-@HiveType(typeId: 7)
+@HiveType(typeId: defaultBudgetTypeId)
 class DefaultBudget extends HiveObject {
   late int boxIndex;
   @HiveField(0)
@@ -53,7 +53,7 @@ class DefaultBudget extends HiveObject {
 
 class DefaultBudgetAdapter extends TypeAdapter<DefaultBudget> {
   @override
-  final typeId = 7;
+  final typeId = defaultBudgetTypeId;
 
   @override
   DefaultBudget read(BinaryReader reader) {

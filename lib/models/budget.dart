@@ -6,7 +6,7 @@ import '/models/booking.dart';
 
 import '/utils/consts/hive_consts.dart';
 
-@HiveType(typeId: 5)
+@HiveType(typeId: budgetTypeId)
 class Budget extends HiveObject {
   late int boxIndex;
   late double currentExpenditure;
@@ -178,7 +178,7 @@ class Budget extends HiveObject {
 
 class BudgetAdapter extends TypeAdapter<Budget> {
   @override
-  final typeId = 5;
+  final typeId = budgetTypeId;
 
   @override
   Budget read(BinaryReader reader) {

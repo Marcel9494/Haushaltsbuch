@@ -1,6 +1,7 @@
+import '/utils/consts/hive_consts.dart';
 import 'package:hive/hive.dart';
 
-@HiveType(typeId: 5)
+@HiveType(typeId: categoryTypeTypeId)
 enum CategorieType { income, outcome, investment }
 
 extension CategorieTypeExtension on CategorieType {
@@ -48,7 +49,7 @@ extension CategorieTypeExtension on CategorieType {
 
 class CategorieTypeAdapter extends TypeAdapter<CategorieType> {
   @override
-  final typeId = 5;
+  final typeId = categoryTypeTypeId;
 
   @override
   CategorieType read(BinaryReader reader) {
