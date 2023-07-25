@@ -1,4 +1,5 @@
 import 'package:hive/hive.dart';
+
 import '/utils/consts/hive_consts.dart';
 
 @HiveType(typeId: transactionTypeId)

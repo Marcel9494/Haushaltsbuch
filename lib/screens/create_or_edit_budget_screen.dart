@@ -18,7 +18,7 @@ import '/models/enums/transaction_types.dart';
 import '/models/screen_arguments/bottom_nav_bar_screen_arguments.dart';
 
 class CreateOrEditBudgetScreen extends StatefulWidget {
-  final int budgetBoxIndex;
+  final int budgetBoxIndex; // budgetBoxIndex == -1 = Budget bearbeiten / -2 = Standardbudget bearbeiten / >= 0 = Budget erstellen
   final String? budgetCategorie;
 
   const CreateOrEditBudgetScreen({
@@ -35,11 +35,11 @@ class _CreateOrEditBudgetScreenState extends State<CreateOrEditBudgetScreen> {
   final TextEditingController _categorieTextController = TextEditingController();
   final TextEditingController _budgetTextController = TextEditingController();
   final RoundedLoadingButtonController _saveButtonController = RoundedLoadingButtonController();
+  late DefaultBudget _loadedDefaultBudget;
+  late Budget _loadedBudget;
   String _categorieErrorText = '';
   String _budgetErrorText = '';
-  late Budget _loadedBudget;
-  late DefaultBudget _loadedDefaultBudget;
-  late bool _budgetExistsAlready;
+  bool _budgetExistsAlready = false;
 
   @override
   void initState() {
@@ -101,8 +101,8 @@ class _CreateOrEditBudgetScreenState extends State<CreateOrEditBudgetScreen> {
       Budget updatedBudget = Budget()
         ..categorie = _loadedBudget.categorie
         ..budget = formatMoneyAmountToDouble(_budgetTextController.text)
-        ..currentExpenditure = _loadedBudget.currentExpenditure
-        ..percentage = _loadedBudget.percentage
+        ..currentExpenditure = 0.0
+        ..percentage = 0.0
         ..budgetDate = _loadedBudget.budgetDate.toString();
       updatedBudget.updateBudget(updatedBudget, widget.budgetBoxIndex);
     }
