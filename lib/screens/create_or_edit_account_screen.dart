@@ -163,17 +163,19 @@ class _CreateOrEditAccountScreenState extends State<CreateOrEditAccountScreen> {
       ..toAccount = _accountName;
     // TODO newBooking.createBooking();
     // TODO entfernen? newBooking.createBooking(newBooking);
-    _updateAccount();
-    Navigator.pop(context);
-    Navigator.pop(context);
-    Navigator.pop(context);
+    _account.updateAccount(_account, widget.accountBoxIndex);
+    for (int i = 0; i < 4; i++) {
+      Navigator.pop(context);
+    }
+    Navigator.pushNamed(context, bottomNavBarRoute, arguments: BottomNavBarScreenArguments(2));
   }
 
   void _noPressed() {
-    _updateAccount();
-    Navigator.pop(context);
-    Navigator.pop(context);
-    Navigator.pop(context);
+    _account.updateAccount(_account, widget.accountBoxIndex);
+    for (int i = 0; i < 4; i++) {
+      Navigator.pop(context);
+    }
+    Navigator.pushNamed(context, bottomNavBarRoute, arguments: BottomNavBarScreenArguments(2));
   }
 
   void _updateAccount() {
