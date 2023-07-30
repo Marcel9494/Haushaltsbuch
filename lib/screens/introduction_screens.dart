@@ -50,8 +50,8 @@ class _IntroductionScreensState extends State<IntroductionScreens> {
         ),
         PageViewModel(
           title: 'Budgets festlegen',
-          body: 'TODO',
-          image: Image.asset('assets/images/introduction_screen_image2.jpg'),
+          body: 'Budgets erstellen, Monat für Monat anpassen & Ausgaben verfolgen.',
+          image: Image.asset('assets/images/introduction_screen_image2.png'),
         ),
         PageViewModel(
           title: 'Konten und Vermögen verwalten',
@@ -60,8 +60,8 @@ class _IntroductionScreensState extends State<IntroductionScreens> {
         ),
         PageViewModel(
           title: 'Statistiken',
-          body: 'TODO',
-          image: Image.asset('assets/images/introduction_screen_image4.jpg'),
+          body: 'Statistische Auswertungen deiner Einnahmen und Ausgaben, sowie deiner Vermögensentwicklungen.',
+          image: Image.asset('assets/images/introduction_screen_image4.png'),
         ),
       ],
       showNextButton: true,
