@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../dialogs/list_dialog.dart';
+
 import '/models/enums/account_types.dart';
 
 class AccountTypeInputField extends StatelessWidget {

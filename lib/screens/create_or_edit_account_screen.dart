@@ -8,6 +8,7 @@ import '/components/deco/loading_indicator.dart';
 import '/components/input_fields/account_type_input_field.dart';
 import '/components/input_fields/money_input_field.dart';
 import '/components/input_fields/text_input_field.dart';
+import '/components/input_fields/preselect_account_input_field.dart';
 import '/components/buttons/save_button.dart';
 
 import '/models/account.dart';
@@ -35,6 +36,7 @@ class CreateOrEditAccountScreen extends StatefulWidget {
 class _CreateOrEditAccountScreenState extends State<CreateOrEditAccountScreen> {
   final TextEditingController _accountGroupTextController = TextEditingController();
   final TextEditingController _bankBalanceTextController = TextEditingController();
+  final TextEditingController _preselectedAccountTextController = TextEditingController();
   final RoundedLoadingButtonController _saveButtonController = RoundedLoadingButtonController();
   bool _isAccountEdited = false;
   final Account _account = Account();
@@ -227,6 +229,7 @@ class _CreateOrEditAccountScreenState extends State<CreateOrEditAccountScreen> {
                         TextInputField(input: _accountName, inputCallback: _setAccountNameState, errorText: _accountNameErrorText, hintText: 'Name'),
                         MoneyInputField(
                             textController: _bankBalanceTextController, errorText: _bankBalanceErrorText, hintText: 'Kontostand', bottomSheetTitle: 'Kontostand eingeben:'),
+                        PreselectAccountInputField(textController: _preselectedAccountTextController),
                         SaveButton(saveFunction: _createOrUpdateAccount, buttonController: _saveButtonController),
                       ],
                     );

@@ -17,6 +17,18 @@ class Account extends HiveObject {
   late String accountType;
   @HiveField(2)
   late String bankBalance;
+  @HiveField(3)
+  late bool primaryIncomeAccount;
+  @HiveField(4)
+  late bool primaryOutcomeAccount;
+  @HiveField(5)
+  late bool primaryTransferFromAccount;
+  @HiveField(6)
+  late bool primaryTransferToAccount;
+  @HiveField(7)
+  late bool primaryInvestmentFromAccount;
+  @HiveField(8)
+  late bool primaryInvestmentToAccount;
 
   void createAccount(Account newAccount) async {
     var accountBox = await Hive.openBox(accountsBox);
@@ -238,6 +250,12 @@ class Account extends HiveObject {
     return accountTypeBalanceMap;
   }
 
+  static Future<List<bool>> loadPreselectedAccountList() async {
+    var accountBox = await Hive.openBox(accountsBox);
+    // TODO
+    return [];
+  }
+
   static void createStartAccounts() async {
     var accountBox = await Hive.openBox(accountsBox);
     if (accountBox.isNotEmpty) {
@@ -246,22 +264,46 @@ class Account extends HiveObject {
     Account cashAccount = Account()
       ..name = 'Geldbeutel'
       ..bankBalance = '0 €'
-      ..accountType = AccountType.cash.name;
+      ..accountType = AccountType.cash.name
+      ..primaryIncomeAccount = false
+      ..primaryOutcomeAccount = false
+      ..primaryTransferFromAccount = false
+      ..primaryTransferToAccount = false
+      ..primaryInvestmentFromAccount = false
+      ..primaryInvestmentToAccount = false;
     cashAccount.createAccount(cashAccount);
     Account giroAccount = Account()
       ..name = 'Girokonto'
       ..bankBalance = '0 €'
-      ..accountType = AccountType.account.name;
+      ..accountType = AccountType.account.name
+      ..primaryIncomeAccount = false
+      ..primaryOutcomeAccount = false
+      ..primaryTransferFromAccount = false
+      ..primaryTransferToAccount = false
+      ..primaryInvestmentFromAccount = false
+      ..primaryInvestmentToAccount = false;
     giroAccount.createAccount(giroAccount);
     Account billingAccount = Account()
       ..name = 'Verechnungskonto'
       ..bankBalance = '0 €'
-      ..accountType = AccountType.account.name;
+      ..accountType = AccountType.account.name
+      ..primaryIncomeAccount = false
+      ..primaryOutcomeAccount = false
+      ..primaryTransferFromAccount = false
+      ..primaryTransferToAccount = false
+      ..primaryInvestmentFromAccount = false
+      ..primaryInvestmentToAccount = false;
     billingAccount.createAccount(billingAccount);
     Account capitalInvestmentAccount = Account()
       ..name = 'Aktiendepot'
       ..bankBalance = '0 €'
-      ..accountType = AccountType.capitalInvestments.name;
+      ..accountType = AccountType.capitalInvestments.name
+      ..primaryIncomeAccount = false
+      ..primaryOutcomeAccount = false
+      ..primaryTransferFromAccount = false
+      ..primaryTransferToAccount = false
+      ..primaryInvestmentFromAccount = false
+      ..primaryInvestmentToAccount = false;
     capitalInvestmentAccount.createAccount(capitalInvestmentAccount);
   }
 }
@@ -275,7 +317,13 @@ class AccountAdapter extends TypeAdapter<Account> {
     return Account()
       ..name = reader.read()
       ..accountType = reader.read()
-      ..bankBalance = reader.read();
+      ..bankBalance = reader.read()
+      ..primaryIncomeAccount = reader.read()
+      ..primaryOutcomeAccount = reader.read()
+      ..primaryTransferFromAccount = reader.read()
+      ..primaryTransferToAccount = reader.read()
+      ..primaryInvestmentFromAccount = reader.read()
+      ..primaryInvestmentToAccount = reader.read();
   }
 
   @override
@@ -283,5 +331,11 @@ class AccountAdapter extends TypeAdapter<Account> {
     writer.write(obj.name);
     writer.write(obj.accountType);
     writer.write(obj.bankBalance);
+    writer.write(obj.primaryIncomeAccount);
+    writer.write(obj.primaryOutcomeAccount);
+    writer.write(obj.primaryTransferFromAccount);
+    writer.write(obj.primaryTransferToAccount);
+    writer.write(obj.primaryInvestmentFromAccount);
+    writer.write(obj.primaryInvestmentToAccount);
   }
 }
