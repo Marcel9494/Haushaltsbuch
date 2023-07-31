@@ -51,36 +51,53 @@ class _IntroductionScreensState extends State<IntroductionScreens> {
         PageViewModel(
           title: 'Budgets festlegen',
           body: 'Budgets erstellen, Monat für Monat anpassen & Ausgaben verfolgen.',
-          image: Image.asset('assets/images/introduction_screen_image2.png'),
+          image: Image.asset('assets/images/introduction_screen_image2.jpg'),
         ),
         PageViewModel(
           title: 'Konten und Vermögen verwalten',
-          body: 'TODO',
+          body: 'Verwalte deine Konten & dein Vermögen & behalte stets den Überblick.',
+          image: Image.asset('assets/images/introduction_screen_image3.jpg'),
           //image: _buildImage('img2.jpg'),
         ),
         PageViewModel(
           title: 'Statistiken',
-          body: 'Statistische Auswertungen deiner Einnahmen und Ausgaben, sowie deiner Vermögensentwicklungen.',
-          image: Image.asset('assets/images/introduction_screen_image4.png'),
+          body: 'Statistische Auswertungen deiner Einnahmen & Ausgaben, sowie deiner Vermögensentwicklungen.',
+          image: Image.asset('assets/images/introduction_screen_image4.jpg'),
         ),
       ],
       showNextButton: true,
       showSkipButton: true,
       skip: const Text('Überspringen'),
       skipStyle: const ButtonStyle(
-        foregroundColor: MaterialStatePropertyAll<Color>(Colors.cyanAccent),
+        foregroundColor: MaterialStatePropertyAll<Color>(Colors.black),
       ),
       next: const Text('Weiter'),
       nextStyle: const ButtonStyle(
-        foregroundColor: MaterialStatePropertyAll<Color>(Colors.cyanAccent),
+        foregroundColor: MaterialStatePropertyAll<Color>(Colors.black),
       ),
       done: const Text('Fertig'),
       doneStyle: const ButtonStyle(
-        foregroundColor: MaterialStatePropertyAll<Color>(Colors.cyanAccent),
+        foregroundColor: MaterialStatePropertyAll<Color>(Colors.black),
       ),
       onDone: () {
         _createStartCategoriesAndAccounts();
       },
+      dotsDecorator: DotsDecorator(
+        size: const Size.square(10.0),
+        activeSize: const Size(20.0, 10.0),
+        activeColor: Theme.of(context).colorScheme.secondary,
+        color: Colors.white,
+        spacing: const EdgeInsets.symmetric(horizontal: 3.0),
+        activeShape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(25.0)
+        ),
+      ),
+      baseBtnStyle: TextButton.styleFrom(
+        backgroundColor: Colors.cyanAccent,
+      ),
+      curve: Curves.fastOutSlowIn,
+      animationDuration: 1000,
+      allowImplicitScrolling: false,
     );
   }
 }
