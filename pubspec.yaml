@@ -76,6 +76,7 @@ flutter:
   assets:
     - assets/images/introduction_screen_image1.jpg
     - assets/images/introduction_screen_image2.jpg
+    - assets/images/introduction_screen_image3.jpg
     - assets/images/introduction_screen_image4.jpg
     - assets/images/budget_app_icon.png
 

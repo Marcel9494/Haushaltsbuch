@@ -57,6 +57,13 @@ android {
             signingConfig signingConfigs.debug
         }
     }
+
+    // Options to change the output name of the build apk file
+    applicationVariants.all { variant ->
+        variant.outputs.all {
+            outputFileName = "budgetbook.apk"
+        }
+    }
 }
 
 flutter {
