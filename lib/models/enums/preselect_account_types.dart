@@ -8,13 +8,13 @@ extension PreselectAccountTypeExtension on PreselectAccountType {
       case PreselectAccountType.outcome:
         return 'Ausgabe';
       case PreselectAccountType.transferFrom:
-        return 'Übertrag von';
+        return 'Übertrag von ...';
       case PreselectAccountType.transferTo:
-        return 'Übertrag nach';
+        return 'Übertrag nach ...';
       case PreselectAccountType.investmentFrom:
-        return 'Investition von';
+        return 'Investition von ...';
       case PreselectAccountType.investmentTo:
-        return 'Investition nach';
+        return 'Investition nach ...';
       default:
         throw Exception('$name is not a valid preselect Account type.');
     }

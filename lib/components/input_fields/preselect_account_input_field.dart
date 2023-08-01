@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
-import '../../models/account.dart';
 import '/models/enums/preselect_account_types.dart';
 
 import '../deco/bottom_sheet_line.dart';
@@ -19,7 +18,7 @@ class PreselectAccountInputField extends StatefulWidget {
 }
 
 class _PreselectAccountInputFieldState extends State<PreselectAccountInputField> {
-  List<bool> preselectedAccount = [];
+  List<bool> preselectedAccount = [false, false, false, false, false, false];
 
   void _openBottomSheetWithTransactionTypes(BuildContext context) {
     showCupertinoModalBottomSheet<void>(
@@ -49,7 +48,6 @@ class _PreselectAccountInputFieldState extends State<PreselectAccountInputField>
                                 ),
                                 Column(
                                   children: [
-                                    // TODO hier weitermachen
                                     CheckboxListTile(
                                       title: Text(PreselectAccountType.income.name),
                                       controlAffinity: ListTileControlAffinity.leading,
@@ -57,6 +55,72 @@ class _PreselectAccountInputFieldState extends State<PreselectAccountInputField>
                                       onChanged: (bool? value) {
                                         setState(() {
                                           preselectedAccount[0] = value!;
+                                          _setPreselectedAccountText(preselectedAccount[0], PreselectAccountType.income.name);
+                                        });
+                                      },
+                                      activeColor: Colors.grey,
+                                      checkColor: Colors.cyanAccent,
+                                    ),
+                                    CheckboxListTile(
+                                      title: Text(PreselectAccountType.outcome.name),
+                                      controlAffinity: ListTileControlAffinity.leading,
+                                      value: preselectedAccount[1],
+                                      onChanged: (bool? value) {
+                                        setState(() {
+                                          preselectedAccount[1] = value!;
+                                          _setPreselectedAccountText(preselectedAccount[1], PreselectAccountType.outcome.name);
+                                        });
+                                      },
+                                      activeColor: Colors.grey,
+                                      checkColor: Colors.cyanAccent,
+                                    ),
+                                    CheckboxListTile(
+                                      title: Text(PreselectAccountType.transferFrom.name),
+                                      controlAffinity: ListTileControlAffinity.leading,
+                                      value: preselectedAccount[2],
+                                      onChanged: (bool? value) {
+                                        setState(() {
+                                          preselectedAccount[2] = value!;
+                                          _setPreselectedAccountText(preselectedAccount[2], PreselectAccountType.transferFrom.name);
+                                        });
+                                      },
+                                      activeColor: Colors.grey,
+                                      checkColor: Colors.cyanAccent,
+                                    ),
+                                    CheckboxListTile(
+                                      title: Text(PreselectAccountType.transferTo.name),
+                                      controlAffinity: ListTileControlAffinity.leading,
+                                      value: preselectedAccount[3],
+                                      onChanged: (bool? value) {
+                                        setState(() {
+                                          preselectedAccount[3] = value!;
+                                          _setPreselectedAccountText(preselectedAccount[3], PreselectAccountType.transferTo.name);
+                                        });
+                                      },
+                                      activeColor: Colors.grey,
+                                      checkColor: Colors.cyanAccent,
+                                    ),
+                                    CheckboxListTile(
+                                      title: Text(PreselectAccountType.investmentFrom.name),
+                                      controlAffinity: ListTileControlAffinity.leading,
+                                      value: preselectedAccount[4],
+                                      onChanged: (bool? value) {
+                                        setState(() {
+                                          preselectedAccount[4] = value!;
+                                          _setPreselectedAccountText(preselectedAccount[4], PreselectAccountType.investmentFrom.name);
+                                        });
+                                      },
+                                      activeColor: Colors.grey,
+                                      checkColor: Colors.cyanAccent,
+                                    ),
+                                    CheckboxListTile(
+                                      title: Text(PreselectAccountType.investmentTo.name),
+                                      controlAffinity: ListTileControlAffinity.leading,
+                                      value: preselectedAccount[5],
+                                      onChanged: (bool? value) {
+                                        setState(() {
+                                          preselectedAccount[5] = value!;
+                                          _setPreselectedAccountText(preselectedAccount[5], PreselectAccountType.investmentTo.name);
                                         });
                                       },
                                       activeColor: Colors.grey,
@@ -81,13 +145,36 @@ class _PreselectAccountInputFieldState extends State<PreselectAccountInputField>
     );
   }
 
-  Future<List<bool>> _loadPreselectedAccountList() async {
-    if (widget.textController.text.isEmpty) {
-      preselectedAccount = [false, false, false, false, false, false];
+  void _setPreselectedAccountText(bool isNewAccountSelected, String newText) {
+    String separator = ', ';
+    if (isNewAccountSelected) {
+      widget.textController.text += widget.textController.text.isEmpty ? newText : separator + newText;
     } else {
-      preselectedAccount = await Account.loadPreselectedAccountList();
+      widget.textController.text = widget.textController.text.replaceFirst(newText, '');
+      if (widget.textController.text.startsWith(separator)) {
+        widget.textController.text = widget.textController.text.replaceFirst(separator, '');
+      }
+      if (widget.textController.text.endsWith(separator)) {
+        widget.textController.text = widget.textController.text.substring(0, widget.textController.text.length - 2);
+      }
+      if (widget.textController.text.contains(separator + ',')) {
+        widget.textController.text = widget.textController.text.replaceFirst(separator + ',', ',');
+      }
     }
+  }
+
+  Future<List<bool>> _loadPreselectedAccountList() async {
+    _setPrimaryAccounts();
     return preselectedAccount;
+  }
+
+  void _setPrimaryAccounts() {
+    widget.textController.text.contains(PreselectAccountType.income.name) ? preselectedAccount[0] = true : preselectedAccount[0] = false;
+    widget.textController.text.contains(PreselectAccountType.outcome.name) ? preselectedAccount[1] = true : preselectedAccount[1] = false;
+    widget.textController.text.contains(PreselectAccountType.transferFrom.name) ? preselectedAccount[2] = true : preselectedAccount[2] = false;
+    widget.textController.text.contains(PreselectAccountType.transferTo.name) ? preselectedAccount[3] = true : preselectedAccount[3] = false;
+    widget.textController.text.contains(PreselectAccountType.investmentFrom.name) ? preselectedAccount[4] = true : preselectedAccount[4] = false;
+    widget.textController.text.contains(PreselectAccountType.investmentTo.name) ? preselectedAccount[5] = true : preselectedAccount[5] = false;
   }
 
   @override

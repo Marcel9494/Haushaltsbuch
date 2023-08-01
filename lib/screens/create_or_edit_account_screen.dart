@@ -15,6 +15,7 @@ import '/models/account.dart';
 import '/models/booking.dart';
 import '/models/enums/repeat_types.dart';
 import '/models/enums/transaction_types.dart';
+import '/models/enums/preselect_account_types.dart';
 import '/models/screen_arguments/bottom_nav_bar_screen_arguments.dart';
 
 import '/utils/consts/route_consts.dart';
@@ -61,6 +62,7 @@ class _CreateOrEditAccountScreenState extends State<CreateOrEditAccountScreen> {
     _accountGroupTextController.text = _loadedAccount.accountType;
     _bankBalanceTextController.text = _loadedAccount.bankBalance;
     _oldBankBalance = formatMoneyAmountToDouble(_loadedAccount.bankBalance);
+    _getPrimaryAccounts();
     _isAccountEdited = true;
   }
 
@@ -74,6 +76,7 @@ class _CreateOrEditAccountScreenState extends State<CreateOrEditAccountScreen> {
     } else {
       _account.accountType = _accountGroupTextController.text;
       _account.bankBalance = _bankBalanceTextController.text;
+      _setPrimaryAccounts();
       if (widget.accountBoxIndex == -1) {
         _account.createAccount(_account);
         _navigateToAccountScreen();
@@ -195,6 +198,45 @@ class _CreateOrEditAccountScreenState extends State<CreateOrEditAccountScreen> {
         Navigator.pushNamed(context, bottomNavBarRoute, arguments: BottomNavBarScreenArguments(2));
       }
     });
+  }
+
+  void _setPrimaryAccounts() {
+    _preselectedAccountTextController.text.contains(PreselectAccountType.income.name) ? _account.primaryIncomeAccount = true : _account.primaryIncomeAccount = false;
+    _preselectedAccountTextController.text.contains(PreselectAccountType.outcome.name) ? _account.primaryOutcomeAccount = true : _account.primaryOutcomeAccount = false;
+    _preselectedAccountTextController.text.contains(PreselectAccountType.transferFrom.name)
+        ? _account.primaryTransferFromAccount = true
+        : _account.primaryTransferFromAccount = false;
+    _preselectedAccountTextController.text.contains(PreselectAccountType.transferTo.name) ? _account.primaryTransferToAccount = true : _account.primaryTransferToAccount = false;
+    _preselectedAccountTextController.text.contains(PreselectAccountType.investmentFrom.name)
+        ? _account.primaryInvestmentFromAccount = true
+        : _account.primaryInvestmentFromAccount = false;
+    _preselectedAccountTextController.text.contains(PreselectAccountType.investmentTo.name)
+        ? _account.primaryInvestmentToAccount = true
+        : _account.primaryInvestmentToAccount = false;
+  }
+
+  void _getPrimaryAccounts() {
+    if (_loadedAccount.primaryIncomeAccount) {
+      _preselectedAccountTextController.text = PreselectAccountType.income.name;
+    }
+    if (_loadedAccount.primaryOutcomeAccount) {
+      _preselectedAccountTextController.text += _preselectedAccountTextController.text.isEmpty ? PreselectAccountType.outcome.name : ', ' + PreselectAccountType.outcome.name;
+    }
+    if (_loadedAccount.primaryTransferFromAccount) {
+      _preselectedAccountTextController.text +=
+          _preselectedAccountTextController.text.isEmpty ? PreselectAccountType.transferFrom.name : ', ' + PreselectAccountType.transferFrom.name;
+    }
+    if (_loadedAccount.primaryTransferToAccount) {
+      _preselectedAccountTextController.text += _preselectedAccountTextController.text.isEmpty ? PreselectAccountType.transferTo.name : ', ' + PreselectAccountType.transferTo.name;
+    }
+    if (_loadedAccount.primaryInvestmentFromAccount) {
+      _preselectedAccountTextController.text +=
+          _preselectedAccountTextController.text.isEmpty ? PreselectAccountType.investmentFrom.name : ', ' + PreselectAccountType.investmentFrom.name;
+    }
+    if (_loadedAccount.primaryInvestmentToAccount) {
+      _preselectedAccountTextController.text +=
+          _preselectedAccountTextController.text.isEmpty ? PreselectAccountType.investmentTo.name : ', ' + PreselectAccountType.investmentTo.name;
+    }
   }
 
   @override
