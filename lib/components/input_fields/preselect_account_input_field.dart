@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
+import '/models/account.dart';
 import '/models/enums/preselect_account_types.dart';
 
 import '../deco/bottom_sheet_line.dart';
@@ -19,6 +20,7 @@ class PreselectAccountInputField extends StatefulWidget {
 
 class _PreselectAccountInputFieldState extends State<PreselectAccountInputField> {
   List<bool> preselectedAccount = [false, false, false, false, false, false];
+  Map<String, String> _currentPreselectedAccountNames = {};
 
   void _openBottomSheetWithTransactionTypes(BuildContext context) {
     showCupertinoModalBottomSheet<void>(
@@ -26,118 +28,133 @@ class _PreselectAccountInputFieldState extends State<PreselectAccountInputField>
       builder: (BuildContext context) {
         return Material(
           child: SizedBox(
-            height: 400,
-            child: ListView(
-              children: [
-                FutureBuilder(
-                  future: _loadPreselectedAccountList(),
-                  builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
-                    switch (snapshot.connectionState) {
-                      case ConnectionState.waiting:
-                        return const SizedBox();
-                      case ConnectionState.done:
-                        return Center(
-                          child: StatefulBuilder(builder: (BuildContext context, StateSetter setState) {
-                            return ListView(
-                              shrinkWrap: true,
+            height: 520.0,
+            child: FutureBuilder(
+              future: _loadPreselectedAccountList(),
+              builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
+                switch (snapshot.connectionState) {
+                  case ConnectionState.waiting:
+                    return const SizedBox();
+                  case ConnectionState.done:
+                    return Center(
+                      child: StatefulBuilder(builder: (BuildContext context, StateSetter setState) {
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const BottomSheetLine(),
+                            const Padding(
+                              padding: EdgeInsets.only(top: 12.0, left: 28.0, bottom: 8.0),
+                              child: Text('Vorselektiertes Konto für:', style: TextStyle(fontSize: 18.0)),
+                            ),
+                            const Divider(),
+                            Column(
                               children: [
-                                const BottomSheetLine(),
-                                const Padding(
-                                  padding: EdgeInsets.only(top: 12.0, left: 20.0, bottom: 8.0),
-                                  child: Text('Vorselektiertes Konto für:', style: TextStyle(fontSize: 18.0)),
+                                CheckboxListTile(
+                                  title: Text(PreselectAccountType.income.name),
+                                  subtitle: _currentPreselectedAccountNames[PreselectAccountType.income.name] == null
+                                      ? null
+                                      : Text('Aktuelles Primärkonto: ' + _currentPreselectedAccountNames[PreselectAccountType.income.name].toString()),
+                                  controlAffinity: ListTileControlAffinity.leading,
+                                  value: preselectedAccount[0],
+                                  onChanged: (bool? value) {
+                                    setState(() {
+                                      preselectedAccount[0] = value!;
+                                      _setPreselectedAccountText(preselectedAccount[0], PreselectAccountType.income.name);
+                                    });
+                                  },
+                                  activeColor: Colors.grey,
+                                  checkColor: Colors.cyanAccent,
                                 ),
-                                Column(
-                                  children: [
-                                    CheckboxListTile(
-                                      title: Text(PreselectAccountType.income.name),
-                                      controlAffinity: ListTileControlAffinity.leading,
-                                      value: preselectedAccount[0],
-                                      onChanged: (bool? value) {
-                                        setState(() {
-                                          preselectedAccount[0] = value!;
-                                          _setPreselectedAccountText(preselectedAccount[0], PreselectAccountType.income.name);
-                                        });
-                                      },
-                                      activeColor: Colors.grey,
-                                      checkColor: Colors.cyanAccent,
-                                    ),
-                                    CheckboxListTile(
-                                      title: Text(PreselectAccountType.outcome.name),
-                                      controlAffinity: ListTileControlAffinity.leading,
-                                      value: preselectedAccount[1],
-                                      onChanged: (bool? value) {
-                                        setState(() {
-                                          preselectedAccount[1] = value!;
-                                          _setPreselectedAccountText(preselectedAccount[1], PreselectAccountType.outcome.name);
-                                        });
-                                      },
-                                      activeColor: Colors.grey,
-                                      checkColor: Colors.cyanAccent,
-                                    ),
-                                    CheckboxListTile(
-                                      title: Text(PreselectAccountType.transferFrom.name),
-                                      controlAffinity: ListTileControlAffinity.leading,
-                                      value: preselectedAccount[2],
-                                      onChanged: (bool? value) {
-                                        setState(() {
-                                          preselectedAccount[2] = value!;
-                                          _setPreselectedAccountText(preselectedAccount[2], PreselectAccountType.transferFrom.name);
-                                        });
-                                      },
-                                      activeColor: Colors.grey,
-                                      checkColor: Colors.cyanAccent,
-                                    ),
-                                    CheckboxListTile(
-                                      title: Text(PreselectAccountType.transferTo.name),
-                                      controlAffinity: ListTileControlAffinity.leading,
-                                      value: preselectedAccount[3],
-                                      onChanged: (bool? value) {
-                                        setState(() {
-                                          preselectedAccount[3] = value!;
-                                          _setPreselectedAccountText(preselectedAccount[3], PreselectAccountType.transferTo.name);
-                                        });
-                                      },
-                                      activeColor: Colors.grey,
-                                      checkColor: Colors.cyanAccent,
-                                    ),
-                                    CheckboxListTile(
-                                      title: Text(PreselectAccountType.investmentFrom.name),
-                                      controlAffinity: ListTileControlAffinity.leading,
-                                      value: preselectedAccount[4],
-                                      onChanged: (bool? value) {
-                                        setState(() {
-                                          preselectedAccount[4] = value!;
-                                          _setPreselectedAccountText(preselectedAccount[4], PreselectAccountType.investmentFrom.name);
-                                        });
-                                      },
-                                      activeColor: Colors.grey,
-                                      checkColor: Colors.cyanAccent,
-                                    ),
-                                    CheckboxListTile(
-                                      title: Text(PreselectAccountType.investmentTo.name),
-                                      controlAffinity: ListTileControlAffinity.leading,
-                                      value: preselectedAccount[5],
-                                      onChanged: (bool? value) {
-                                        setState(() {
-                                          preselectedAccount[5] = value!;
-                                          _setPreselectedAccountText(preselectedAccount[5], PreselectAccountType.investmentTo.name);
-                                        });
-                                      },
-                                      activeColor: Colors.grey,
-                                      checkColor: Colors.cyanAccent,
-                                    ),
-                                  ],
+                                CheckboxListTile(
+                                  title: Text(PreselectAccountType.outcome.name),
+                                  subtitle: _currentPreselectedAccountNames[PreselectAccountType.outcome.name] == null
+                                      ? null
+                                      : Text('Aktuelles Primärkonto: ' + _currentPreselectedAccountNames[PreselectAccountType.outcome.name].toString()),
+                                  controlAffinity: ListTileControlAffinity.leading,
+                                  value: preselectedAccount[1],
+                                  onChanged: (bool? value) {
+                                    setState(() {
+                                      preselectedAccount[1] = value!;
+                                      _setPreselectedAccountText(preselectedAccount[1], PreselectAccountType.outcome.name);
+                                    });
+                                  },
+                                  activeColor: Colors.grey,
+                                  checkColor: Colors.cyanAccent,
+                                ),
+                                CheckboxListTile(
+                                  title: Text(PreselectAccountType.transferFrom.name),
+                                  subtitle: _currentPreselectedAccountNames[PreselectAccountType.transferFrom.name] == null
+                                      ? null
+                                      : Text('Aktuelles Primärkonto: ' + _currentPreselectedAccountNames[PreselectAccountType.transferFrom.name].toString()),
+                                  controlAffinity: ListTileControlAffinity.leading,
+                                  value: preselectedAccount[2],
+                                  onChanged: (bool? value) {
+                                    setState(() {
+                                      preselectedAccount[2] = value!;
+                                      _setPreselectedAccountText(preselectedAccount[2], PreselectAccountType.transferFrom.name);
+                                    });
+                                  },
+                                  activeColor: Colors.grey,
+                                  checkColor: Colors.cyanAccent,
+                                ),
+                                CheckboxListTile(
+                                  title: Text(PreselectAccountType.transferTo.name),
+                                  subtitle: _currentPreselectedAccountNames[PreselectAccountType.transferTo.name] == null
+                                      ? null
+                                      : Text('Aktuelles Primärkonto: ' + _currentPreselectedAccountNames[PreselectAccountType.transferTo.name].toString()),
+                                  controlAffinity: ListTileControlAffinity.leading,
+                                  value: preselectedAccount[3],
+                                  onChanged: (bool? value) {
+                                    setState(() {
+                                      preselectedAccount[3] = value!;
+                                      _setPreselectedAccountText(preselectedAccount[3], PreselectAccountType.transferTo.name);
+                                    });
+                                  },
+                                  activeColor: Colors.grey,
+                                  checkColor: Colors.cyanAccent,
+                                ),
+                                CheckboxListTile(
+                                  title: Text(PreselectAccountType.investmentFrom.name),
+                                  subtitle: _currentPreselectedAccountNames[PreselectAccountType.investmentFrom.name] == null
+                                      ? null
+                                      : Text('Aktuelles Primärkonto: ' + _currentPreselectedAccountNames[PreselectAccountType.investmentFrom.name].toString()),
+                                  controlAffinity: ListTileControlAffinity.leading,
+                                  value: preselectedAccount[4],
+                                  onChanged: (bool? value) {
+                                    setState(() {
+                                      preselectedAccount[4] = value!;
+                                      _setPreselectedAccountText(preselectedAccount[4], PreselectAccountType.investmentFrom.name);
+                                    });
+                                  },
+                                  activeColor: Colors.grey,
+                                  checkColor: Colors.cyanAccent,
+                                ),
+                                CheckboxListTile(
+                                  title: Text(PreselectAccountType.investmentTo.name),
+                                  subtitle: _currentPreselectedAccountNames[PreselectAccountType.investmentTo.name] == null
+                                      ? null
+                                      : Text('Aktuelles Primärkonto: ' + _currentPreselectedAccountNames[PreselectAccountType.investmentTo.name].toString()),
+                                  controlAffinity: ListTileControlAffinity.leading,
+                                  value: preselectedAccount[5],
+                                  onChanged: (bool? value) {
+                                    setState(() {
+                                      preselectedAccount[5] = value!;
+                                      _setPreselectedAccountText(preselectedAccount[5], PreselectAccountType.investmentTo.name);
+                                    });
+                                  },
+                                  activeColor: Colors.grey,
+                                  checkColor: Colors.cyanAccent,
                                 ),
                               ],
-                            );
-                          }),
+                            ),
+                          ],
                         );
-                      default:
-                        return const SizedBox();
-                    }
-                  },
-                ),
-              ],
+                      }),
+                    );
+                  default:
+                    return const SizedBox();
+                }
+              },
             ),
           ),
         );
@@ -165,6 +182,8 @@ class _PreselectAccountInputFieldState extends State<PreselectAccountInputField>
 
   Future<List<bool>> _loadPreselectedAccountList() async {
     _setPrimaryAccounts();
+    _currentPreselectedAccountNames = await Account.loadCurrentPreselectedAccountNames();
+    print(_currentPreselectedAccountNames);
     return preselectedAccount;
   }
 

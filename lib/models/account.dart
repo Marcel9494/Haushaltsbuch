@@ -1,3 +1,4 @@
+import 'package:haushaltsbuch/models/enums/preselect_account_types.dart';
 import 'package:hive/hive.dart';
 
 import '/models/enums/transaction_types.dart';
@@ -250,10 +251,60 @@ class Account extends HiveObject {
     return accountTypeBalanceMap;
   }
 
-  static Future<List<bool>> loadPreselectedAccountList() async {
+  static Future<String> loadPreselectedAccountNameFor(String preselectedAccountType) async {
     var accountBox = await Hive.openBox(accountsBox);
-    // TODO
-    return [];
+    for (int i = 0; i < accountBox.length; i++) {
+      Account account = await accountBox.getAt(i);
+      if (preselectedAccountType == PreselectAccountType.income.name && account.primaryIncomeAccount) {
+        return account.name;
+      }
+      if (preselectedAccountType == PreselectAccountType.outcome.name && account.primaryOutcomeAccount) {
+        return account.name;
+      }
+      if (preselectedAccountType == PreselectAccountType.transferFrom.name && account.primaryTransferFromAccount) {
+        return account.name;
+      }
+      if (preselectedAccountType == PreselectAccountType.transferTo.name && account.primaryTransferToAccount) {
+        return account.name;
+      }
+      if (preselectedAccountType == PreselectAccountType.investmentFrom.name && account.primaryInvestmentFromAccount) {
+        return account.name;
+      }
+      if (preselectedAccountType == PreselectAccountType.investmentTo.name && account.primaryInvestmentToAccount) {
+        return account.name;
+      }
+    }
+    return '';
+  }
+
+  static Future<Map<String, String>> loadCurrentPreselectedAccountNames() async {
+    var accountBox = await Hive.openBox(accountsBox);
+    Map<String, String> primaryAccountNames = {};
+    for (int i = 0; i < accountBox.length; i++) {
+      Account account = await accountBox.getAt(i);
+      if (account.primaryIncomeAccount) {
+        primaryAccountNames.addAll({PreselectAccountType.income.name: account.name});
+      }
+      if (account.primaryOutcomeAccount) {
+        primaryAccountNames.addAll({PreselectAccountType.outcome.name: account.name});
+      }
+      if (account.primaryTransferFromAccount) {
+        primaryAccountNames.addAll({PreselectAccountType.transferFrom.name: account.name});
+      }
+      if (account.primaryTransferToAccount) {
+        primaryAccountNames.addAll({PreselectAccountType.transferTo.name: account.name});
+      }
+      if (account.primaryInvestmentFromAccount) {
+        primaryAccountNames.addAll({PreselectAccountType.investmentFrom.name: account.name});
+      }
+      if (account.primaryInvestmentToAccount) {
+        primaryAccountNames.addAll({PreselectAccountType.investmentTo.name: account.name});
+      }
+      if (primaryAccountNames.length == 6) {
+        break;
+      }
+    }
+    return primaryAccountNames;
   }
 
   static void createStartAccounts() async {
