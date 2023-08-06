@@ -1,8 +1,7 @@
-import 'package:haushaltsbuch/models/enums/preselect_account_types.dart';
 import 'package:hive/hive.dart';
 
-import '/models/enums/transaction_types.dart';
 import '/models/enums/account_types.dart';
+import '/models/enums/transaction_types.dart';
 
 import '/utils/consts/hive_consts.dart';
 import '/utils/number_formatters/number_formatter.dart';
@@ -18,7 +17,7 @@ class Account extends HiveObject {
   late String accountType;
   @HiveField(2)
   late String bankBalance;
-  @HiveField(3)
+  /*@HiveField(3)
   late bool primaryIncomeAccount;
   @HiveField(4)
   late bool primaryOutcomeAccount;
@@ -29,7 +28,7 @@ class Account extends HiveObject {
   @HiveField(7)
   late bool primaryInvestmentFromAccount;
   @HiveField(8)
-  late bool primaryInvestmentToAccount;
+  late bool primaryInvestmentToAccount;*/
 
   void createAccount(Account newAccount) async {
     var accountBox = await Hive.openBox(accountsBox);
@@ -251,62 +250,6 @@ class Account extends HiveObject {
     return accountTypeBalanceMap;
   }
 
-  static Future<String> loadPreselectedAccountNameFor(String preselectedAccountType) async {
-    var accountBox = await Hive.openBox(accountsBox);
-    for (int i = 0; i < accountBox.length; i++) {
-      Account account = await accountBox.getAt(i);
-      if (preselectedAccountType == PreselectAccountType.income.name && account.primaryIncomeAccount) {
-        return account.name;
-      }
-      if (preselectedAccountType == PreselectAccountType.outcome.name && account.primaryOutcomeAccount) {
-        return account.name;
-      }
-      if (preselectedAccountType == PreselectAccountType.transferFrom.name && account.primaryTransferFromAccount) {
-        return account.name;
-      }
-      if (preselectedAccountType == PreselectAccountType.transferTo.name && account.primaryTransferToAccount) {
-        return account.name;
-      }
-      if (preselectedAccountType == PreselectAccountType.investmentFrom.name && account.primaryInvestmentFromAccount) {
-        return account.name;
-      }
-      if (preselectedAccountType == PreselectAccountType.investmentTo.name && account.primaryInvestmentToAccount) {
-        return account.name;
-      }
-    }
-    return '';
-  }
-
-  static Future<Map<String, String>> loadCurrentPreselectedAccountNames() async {
-    var accountBox = await Hive.openBox(accountsBox);
-    Map<String, String> primaryAccountNames = {};
-    for (int i = 0; i < accountBox.length; i++) {
-      Account account = await accountBox.getAt(i);
-      if (account.primaryIncomeAccount) {
-        primaryAccountNames.addAll({PreselectAccountType.income.name: account.name});
-      }
-      if (account.primaryOutcomeAccount) {
-        primaryAccountNames.addAll({PreselectAccountType.outcome.name: account.name});
-      }
-      if (account.primaryTransferFromAccount) {
-        primaryAccountNames.addAll({PreselectAccountType.transferFrom.name: account.name});
-      }
-      if (account.primaryTransferToAccount) {
-        primaryAccountNames.addAll({PreselectAccountType.transferTo.name: account.name});
-      }
-      if (account.primaryInvestmentFromAccount) {
-        primaryAccountNames.addAll({PreselectAccountType.investmentFrom.name: account.name});
-      }
-      if (account.primaryInvestmentToAccount) {
-        primaryAccountNames.addAll({PreselectAccountType.investmentTo.name: account.name});
-      }
-      if (primaryAccountNames.length == 6) {
-        break;
-      }
-    }
-    return primaryAccountNames;
-  }
-
   static void createStartAccounts() async {
     var accountBox = await Hive.openBox(accountsBox);
     if (accountBox.isNotEmpty) {
@@ -315,46 +258,22 @@ class Account extends HiveObject {
     Account cashAccount = Account()
       ..name = 'Geldbeutel'
       ..bankBalance = '0 €'
-      ..accountType = AccountType.cash.name
-      ..primaryIncomeAccount = false
-      ..primaryOutcomeAccount = false
-      ..primaryTransferFromAccount = false
-      ..primaryTransferToAccount = false
-      ..primaryInvestmentFromAccount = false
-      ..primaryInvestmentToAccount = false;
+      ..accountType = AccountType.cash.name;
     cashAccount.createAccount(cashAccount);
     Account giroAccount = Account()
       ..name = 'Girokonto'
       ..bankBalance = '0 €'
-      ..accountType = AccountType.account.name
-      ..primaryIncomeAccount = false
-      ..primaryOutcomeAccount = false
-      ..primaryTransferFromAccount = false
-      ..primaryTransferToAccount = false
-      ..primaryInvestmentFromAccount = false
-      ..primaryInvestmentToAccount = false;
+      ..accountType = AccountType.account.name;
     giroAccount.createAccount(giroAccount);
     Account billingAccount = Account()
       ..name = 'Verechnungskonto'
       ..bankBalance = '0 €'
-      ..accountType = AccountType.account.name
-      ..primaryIncomeAccount = false
-      ..primaryOutcomeAccount = false
-      ..primaryTransferFromAccount = false
-      ..primaryTransferToAccount = false
-      ..primaryInvestmentFromAccount = false
-      ..primaryInvestmentToAccount = false;
+      ..accountType = AccountType.account.name;
     billingAccount.createAccount(billingAccount);
     Account capitalInvestmentAccount = Account()
       ..name = 'Aktiendepot'
       ..bankBalance = '0 €'
-      ..accountType = AccountType.capitalInvestments.name
-      ..primaryIncomeAccount = false
-      ..primaryOutcomeAccount = false
-      ..primaryTransferFromAccount = false
-      ..primaryTransferToAccount = false
-      ..primaryInvestmentFromAccount = false
-      ..primaryInvestmentToAccount = false;
+      ..accountType = AccountType.capitalInvestments.name;
     capitalInvestmentAccount.createAccount(capitalInvestmentAccount);
   }
 }
@@ -368,13 +287,7 @@ class AccountAdapter extends TypeAdapter<Account> {
     return Account()
       ..name = reader.read()
       ..accountType = reader.read()
-      ..bankBalance = reader.read()
-      ..primaryIncomeAccount = reader.read()
-      ..primaryOutcomeAccount = reader.read()
-      ..primaryTransferFromAccount = reader.read()
-      ..primaryTransferToAccount = reader.read()
-      ..primaryInvestmentFromAccount = reader.read()
-      ..primaryInvestmentToAccount = reader.read();
+      ..bankBalance = reader.read();
   }
 
   @override
@@ -382,11 +295,5 @@ class AccountAdapter extends TypeAdapter<Account> {
     writer.write(obj.name);
     writer.write(obj.accountType);
     writer.write(obj.bankBalance);
-    writer.write(obj.primaryIncomeAccount);
-    writer.write(obj.primaryOutcomeAccount);
-    writer.write(obj.primaryTransferFromAccount);
-    writer.write(obj.primaryTransferToAccount);
-    writer.write(obj.primaryInvestmentFromAccount);
-    writer.write(obj.primaryInvestmentToAccount);
   }
 }

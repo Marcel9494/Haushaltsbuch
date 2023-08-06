@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:haushaltsbuch/components/deco/loading_indicator.dart';
-import 'package:haushaltsbuch/screens/introduction_screens.dart';
 
-import '../components/bottom_nav_bar/bottom_nav_bar.dart';
-import '../models/account.dart';
-import '../models/categorie.dart';
-import '../models/global_state.dart';
+import '/screens/introduction_screens.dart';
+
+import '/components/deco/loading_indicator.dart';
+import '/components/bottom_nav_bar/bottom_nav_bar.dart';
+
+import '/models/account.dart';
+import '/models/categorie.dart';
+import '/models/global_state.dart';
+import '/models/primary_account.dart';
 import '/models/intro_screen_state.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -57,6 +60,7 @@ class _SplashScreenState extends State<SplashScreen> {
                     Categorie.createStartRevenueCategories();
                     Categorie.createStartInvestmentCategories();
                     Account.createStartAccounts();
+                    PrimaryAccount.createStartPrimaryAccounts();
                     GlobalState.createGlobalState();
                     return const BottomNavBar(screenIndex: 0);
                   }

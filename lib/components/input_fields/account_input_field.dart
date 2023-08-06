@@ -9,16 +9,12 @@ class AccountInputField extends StatefulWidget {
   final TextEditingController textController;
   final String errorText;
   final String hintText;
-  final bool checkPreselectedAccount;
-  final String preselectedAccountType;
 
   const AccountInputField({
     Key? key,
     required this.textController,
     required this.errorText,
     this.hintText = 'Konto',
-    this.checkPreselectedAccount = false,
-    this.preselectedAccountType = '',
   }) : super(key: key);
 
   @override
@@ -27,14 +23,6 @@ class AccountInputField extends StatefulWidget {
 
 class _AccountInputFieldState extends State<AccountInputField> {
   List<String> accountNames = [];
-
-  @override
-  void initState() {
-    super.initState();
-    if (widget.checkPreselectedAccount) {
-      _getPreselectedAccountName();
-    }
-  }
 
   void _openBottomSheetWithAccountList(BuildContext context) {
     showCupertinoModalBottomSheet<void>(
@@ -101,10 +89,6 @@ class _AccountInputFieldState extends State<AccountInputField> {
   Future<List<String>> _loadAccountNameList() async {
     accountNames = await Account.loadAccountNames();
     return accountNames;
-  }
-
-  void _getPreselectedAccountName() async {
-    widget.textController.text = await Account.loadPreselectedAccountNameFor(widget.preselectedAccountType);
   }
 
   @override

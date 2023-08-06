@@ -110,27 +110,30 @@ class BookingCard extends StatelessWidget {
                       decoration: BoxDecoration(
                         border: Border(right: BorderSide(color: Colors.grey.shade700, width: 0.5)),
                       ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          booking.transactionType == TransactionType.transfer.name || booking.transactionType == TransactionType.investment.name
-                              ? const SizedBox()
-                              : Text(booking.categorie, overflow: TextOverflow.ellipsis),
-                          Padding(
-                            padding: EdgeInsets.only(
-                                top: booking.transactionType == TransactionType.transfer.name || booking.transactionType == TransactionType.investment.name ? 0.0 : 8.0),
-                            child: Text(booking.fromAccount, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.grey)),
-                          ),
-                          booking.transactionType == TransactionType.transfer.name || booking.transactionType == TransactionType.investment.name
-                              ? Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    const Icon(Icons.keyboard_arrow_down_rounded, color: Colors.grey, size: 16.0),
-                                    Text(booking.toAccount, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.grey)),
-                                  ],
-                                )
-                              : const SizedBox(),
-                        ],
+                      child: Padding(
+                        padding: const EdgeInsets.only(right: 8.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            booking.transactionType == TransactionType.transfer.name || booking.transactionType == TransactionType.investment.name
+                                ? const SizedBox()
+                                : Text(booking.categorie, overflow: TextOverflow.ellipsis),
+                            Padding(
+                              padding: EdgeInsets.only(
+                                  top: booking.transactionType == TransactionType.transfer.name || booking.transactionType == TransactionType.investment.name ? 0.0 : 8.0),
+                              child: Text(booking.fromAccount, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.grey)),
+                            ),
+                            booking.transactionType == TransactionType.transfer.name || booking.transactionType == TransactionType.investment.name
+                                ? Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      const Icon(Icons.keyboard_arrow_down_rounded, color: Colors.grey, size: 16.0),
+                                      Text(booking.toAccount, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.grey)),
+                                    ],
+                                  )
+                                : const SizedBox(),
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -140,7 +143,7 @@ class BookingCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
                         Padding(
-                          padding: const EdgeInsets.only(left: 12.0),
+                          padding: const EdgeInsets.only(left: 8.0),
                           child: Text(booking.title),
                         ),
                       ],

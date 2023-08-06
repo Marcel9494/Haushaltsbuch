@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:another_flushbar/flushbar.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 
-import '../models/enums/preselect_account_types.dart';
 import '/utils/consts/route_consts.dart';
 import '/utils/consts/global_consts.dart';
 import '/utils/date_formatters/date_formatter.dart';
@@ -20,9 +19,11 @@ import '/components/deco/loading_indicator.dart';
 
 import '/models/booking.dart';
 import '/models/account.dart';
+import '/models/primary_account.dart';
 import '/models/enums/repeat_types.dart';
 import '/models/enums/serie_edit_modes.dart';
 import '/models/enums/transaction_types.dart';
+import '/models/enums/preselect_account_types.dart';
 import '/models/screen_arguments/bottom_nav_bar_screen_arguments.dart';
 
 class CreateOrEditBookingScreen extends StatefulWidget {
@@ -49,6 +50,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
   final TextEditingController _categorieTextController = TextEditingController();
   final RoundedLoadingButtonController _saveButtonController = RoundedLoadingButtonController();
   bool _isBookingEdited = false;
+  bool _isPreselectedAccountsLoaded = false;
   String _currentTransaction = '';
   String _title = '';
   String _amountErrorText = '';
@@ -57,6 +59,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
   String _toAccountErrorText = '';
   String _bookingRepeat = '';
   DateTime _parsedBookingDate = DateTime.now();
+  Map<String, String> _primaryAccounts = {};
   late Booking _loadedBooking;
 
   @override
@@ -272,46 +275,37 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
     FocusScope.of(context).unfocus();
   }
 
-  // TODO hier weitermachen und richtige vorselektierte Konten anzeigen lassen
+  Future<void> _loadPreselectedAccounts() async {
+    _primaryAccounts = await PrimaryAccount.getCurrentPrimaryAccounts();
+    _isPreselectedAccountsLoaded = true;
+  }
+
+  // TODO hier weitermachen beim Laden wird das Konto nicht geladen => Grund: _fromAccountTextController.text muss
+  // TODO nur bei bestimmten Bedingungen gesetzt werden Beispiel: if (widget.bookingBoxIndex != -1) {...} dann nicht setzen
+  // sondern _loadedBooking Werte setzen!
   Widget _getAccountInputField() {
     if (_currentTransaction == TransactionType.income.name) {
-      return AccountInputField(
-          textController: _fromAccountTextController, errorText: _fromAccountErrorText, checkPreselectedAccount: true, preselectedAccountType: PreselectAccountType.income.name);
+      _fromAccountTextController.text = _primaryAccounts[PreselectAccountType.income.name] ?? '';
+      return AccountInputField(textController: _fromAccountTextController, errorText: _fromAccountErrorText);
     } else if (_currentTransaction == TransactionType.outcome.name) {
-      return AccountInputField(
-          textController: _fromAccountTextController, errorText: _fromAccountErrorText, checkPreselectedAccount: true, preselectedAccountType: PreselectAccountType.outcome.name);
+      _fromAccountTextController.text = _primaryAccounts[PreselectAccountType.outcome.name] ?? '';
+      return AccountInputField(textController: _fromAccountTextController, errorText: _fromAccountErrorText);
     } else if (_currentTransaction == TransactionType.transfer.name) {
+      _fromAccountTextController.text = _primaryAccounts[PreselectAccountType.transferFrom.name] ?? '';
+      _toAccountTextController.text = _primaryAccounts[PreselectAccountType.transferTo.name] ?? '';
       return Column(
         children: [
-          AccountInputField(
-              textController: _fromAccountTextController,
-              errorText: _fromAccountErrorText,
-              hintText: 'Von',
-              checkPreselectedAccount: true,
-              preselectedAccountType: PreselectAccountType.transferFrom.name),
-          AccountInputField(
-              textController: _fromAccountTextController,
-              errorText: _fromAccountErrorText,
-              hintText: 'Nach',
-              checkPreselectedAccount: true,
-              preselectedAccountType: PreselectAccountType.transferTo.name)
+          AccountInputField(textController: _fromAccountTextController, errorText: _fromAccountErrorText, hintText: 'Von'),
+          AccountInputField(textController: _toAccountTextController, errorText: _toAccountErrorText, hintText: 'Nach')
         ],
       );
     } else if (_currentTransaction == TransactionType.investment.name) {
+      _fromAccountTextController.text = _primaryAccounts[PreselectAccountType.investmentFrom.name] ?? '';
+      _toAccountTextController.text = _primaryAccounts[PreselectAccountType.investmentTo.name] ?? '';
       return Column(
         children: [
-          AccountInputField(
-              textController: _fromAccountTextController,
-              errorText: _fromAccountErrorText,
-              hintText: 'Von',
-              checkPreselectedAccount: true,
-              preselectedAccountType: PreselectAccountType.investmentFrom.name),
-          AccountInputField(
-              textController: _fromAccountTextController,
-              errorText: _fromAccountErrorText,
-              hintText: 'Nach',
-              checkPreselectedAccount: true,
-              preselectedAccountType: PreselectAccountType.investmentTo.name)
+          AccountInputField(textController: _fromAccountTextController, errorText: _fromAccountErrorText, hintText: 'Von'),
+          AccountInputField(textController: _toAccountTextController, errorText: _toAccountErrorText, hintText: 'Nach'),
         ],
       );
     }
@@ -344,7 +338,9 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
             ),
             child: FutureBuilder(
               future: widget.bookingBoxIndex == -1
-                  ? null
+                  ? _isPreselectedAccountsLoaded
+                      ? null
+                      : _loadPreselectedAccounts()
                   : _isBookingEdited
                       ? null
                       : _loadBooking(),

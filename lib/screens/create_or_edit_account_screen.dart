@@ -13,6 +13,7 @@ import '/components/buttons/save_button.dart';
 
 import '/models/account.dart';
 import '/models/booking.dart';
+import '/models/primary_account.dart';
 import '/models/enums/repeat_types.dart';
 import '/models/enums/transaction_types.dart';
 import '/models/enums/preselect_account_types.dart';
@@ -46,6 +47,7 @@ class _CreateOrEditAccountScreenState extends State<CreateOrEditAccountScreen> {
   String _accountGroupErrorText = '';
   String _bankBalanceErrorText = '';
   late Account _loadedAccount;
+  late Map<String, String> _loadedPrimaryAccounts;
   double _oldBankBalance = 0.0;
 
   @override
@@ -201,22 +203,28 @@ class _CreateOrEditAccountScreenState extends State<CreateOrEditAccountScreen> {
   }
 
   void _setPrimaryAccounts() {
-    _preselectedAccountTextController.text.contains(PreselectAccountType.income.name) ? _account.primaryIncomeAccount = true : _account.primaryIncomeAccount = false;
-    _preselectedAccountTextController.text.contains(PreselectAccountType.outcome.name) ? _account.primaryOutcomeAccount = true : _account.primaryOutcomeAccount = false;
-    _preselectedAccountTextController.text.contains(PreselectAccountType.transferFrom.name)
-        ? _account.primaryTransferFromAccount = true
-        : _account.primaryTransferFromAccount = false;
-    _preselectedAccountTextController.text.contains(PreselectAccountType.transferTo.name) ? _account.primaryTransferToAccount = true : _account.primaryTransferToAccount = false;
-    _preselectedAccountTextController.text.contains(PreselectAccountType.investmentFrom.name)
-        ? _account.primaryInvestmentFromAccount = true
-        : _account.primaryInvestmentFromAccount = false;
-    _preselectedAccountTextController.text.contains(PreselectAccountType.investmentTo.name)
-        ? _account.primaryInvestmentToAccount = true
-        : _account.primaryInvestmentToAccount = false;
+    if (_preselectedAccountTextController.text.contains(PreselectAccountType.income.name)) {
+      _loadedPrimaryAccounts[PreselectAccountType.income.name] = _accountName;
+    } else if (_preselectedAccountTextController.text.contains(PreselectAccountType.outcome.name)) {
+      _loadedPrimaryAccounts[PreselectAccountType.outcome.name] = _accountName;
+    } else if (_preselectedAccountTextController.text.contains(PreselectAccountType.transferFrom.name)) {
+      _loadedPrimaryAccounts[PreselectAccountType.transferFrom.name] = _accountName;
+    } else if (_preselectedAccountTextController.text.contains(PreselectAccountType.transferTo.name)) {
+      _loadedPrimaryAccounts[PreselectAccountType.transferTo.name] = _accountName;
+    } else if (_preselectedAccountTextController.text.contains(PreselectAccountType.investmentFrom.name)) {
+      _loadedPrimaryAccounts[PreselectAccountType.investmentFrom.name] = _accountName;
+    } else if (_preselectedAccountTextController.text.contains(PreselectAccountType.investmentTo.name)) {
+      _loadedPrimaryAccounts[PreselectAccountType.investmentTo.name] = _accountName;
+    }
   }
 
+  // TODO hier weitermachen und _loadedPrimaryAccounts Map mithilfe der Funktion getCurrentPrimaryAccounts befüllen.
   void _getPrimaryAccounts() {
-    if (_loadedAccount.primaryIncomeAccount) {
+    Iterable<Object> primaryAccounts = _loadedPrimaryAccounts.values;
+    for (final primaryAccount in primaryAccounts) {
+      _preselectedAccountTextController.text = primaryAccount.toString() + ', ';
+    }
+    /*if (_loadedPrimaryAccounts) {
       _preselectedAccountTextController.text = PreselectAccountType.income.name;
     }
     if (_loadedAccount.primaryOutcomeAccount) {
@@ -236,7 +244,7 @@ class _CreateOrEditAccountScreenState extends State<CreateOrEditAccountScreen> {
     if (_loadedAccount.primaryInvestmentToAccount) {
       _preselectedAccountTextController.text +=
           _preselectedAccountTextController.text.isEmpty ? PreselectAccountType.investmentTo.name : ', ' + PreselectAccountType.investmentTo.name;
-    }
+    }*/
   }
 
   @override

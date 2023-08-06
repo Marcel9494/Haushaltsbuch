@@ -3,6 +3,7 @@ import '../settings/settings.dart';
 // Namen der Hive Boxen
 var bookingsBox = demoMode ? 'DEMO_bookings' : 'bookings';
 var accountsBox = demoMode ? 'DEMO_accounts' : 'accounts';
+var primaryAccountsBox = demoMode ? 'DEMO_primaryAccounts' : 'primaryAccounts';
 var categoriesBox = demoMode ? 'DEMO_categories' : 'categories';
 var budgetsBox = demoMode ? 'DEMO_budgets' : 'budgets';
 var defaultBudgetsBox = demoMode ? 'DEMO_defaultBudgets' : 'defaultBudgets';
@@ -20,3 +21,4 @@ const int budgetTypeId = 5;
 const int globalStateTypeId = 6;
 const int defaultBudgetTypeId = 7;
 const int categoryTypeTypeId = 8;
+const int primaryAccountTypeId = 9;

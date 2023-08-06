@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:haushaltsbuch/models/intro_screen_state.dart';
-import 'package:haushaltsbuch/screens/splash_screen.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
@@ -14,6 +12,8 @@ import 'models/budget.dart';
 import 'models/default_budget.dart';
 import 'models/enums/transaction_types.dart';
 import 'models/global_state.dart';
+import 'models/intro_screen_state.dart';
+import 'models/primary_account.dart';
 import 'models/screen_arguments/edit_budget_screen_arguments.dart';
 import 'models/screen_arguments/bottom_nav_bar_screen_arguments.dart';
 import 'models/screen_arguments/account_details_screen_arguments.dart';
@@ -26,7 +26,6 @@ import 'models/screen_arguments/create_or_edit_categorie_screen_arguments.dart';
 import '/components/bottom_nav_bar/bottom_nav_bar.dart';
 
 import '/screens/overview_budgets_screen.dart';
-import '/screens/introduction_screens.dart';
 import '/screens/create_or_edit_booking_screen.dart';
 import '/screens/create_or_edit_account_screen.dart';
 import '/screens/create_or_edit_categorie_screen.dart';
@@ -36,6 +35,7 @@ import '/screens/create_or_edit_budget_screen.dart';
 import '/screens/categorie_amount_list_screen.dart';
 import '/screens/edit_budget_screen.dart';
 import '/screens/settings_screen.dart';
+import '/screens/splash_screen.dart';
 
 void main() async {
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
@@ -44,6 +44,7 @@ void main() async {
   await Hive.initFlutter();
   Hive.registerAdapter(BookingAdapter());
   Hive.registerAdapter(AccountAdapter());
+  Hive.registerAdapter(PrimaryAccountAdapter());
   Hive.registerAdapter(CategorieAdapter());
   Hive.registerAdapter(BudgetAdapter());
   Hive.registerAdapter(DefaultBudgetAdapter());
