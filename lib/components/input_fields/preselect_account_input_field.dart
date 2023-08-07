@@ -20,7 +20,7 @@ class PreselectAccountInputField extends StatefulWidget {
 
 class _PreselectAccountInputFieldState extends State<PreselectAccountInputField> {
   List<bool> preselectedAccount = [false, false, false, false, false, false];
-  Map<String, String> _currentPrimaryAccounts = {};
+  List<PrimaryAccount> _currentPrimaryAccounts = [];
 
   void _openBottomSheetWithTransactionTypes(BuildContext context) {
     showCupertinoModalBottomSheet<void>(
@@ -50,10 +50,9 @@ class _PreselectAccountInputFieldState extends State<PreselectAccountInputField>
                             Column(
                               children: [
                                 CheckboxListTile(
-                                  title: Text(PreselectAccountType.income.name),
-                                  subtitle: _currentPrimaryAccounts[PreselectAccountType.income.name] == null
-                                      ? null
-                                      : Text('Aktuelles Primärkonto: ' + _currentPrimaryAccounts[PreselectAccountType.income.name].toString()),
+                                  title: Text(_currentPrimaryAccounts[0].transactionType),
+                                  subtitle:
+                                      _currentPrimaryAccounts[0].accountName == '' ? null : Text('Aktuelles Primärkonto: ' + _currentPrimaryAccounts[0].accountName.toString()),
                                   controlAffinity: ListTileControlAffinity.leading,
                                   value: preselectedAccount[0],
                                   onChanged: (bool? value) {
@@ -66,10 +65,9 @@ class _PreselectAccountInputFieldState extends State<PreselectAccountInputField>
                                   checkColor: Colors.cyanAccent,
                                 ),
                                 CheckboxListTile(
-                                  title: Text(PreselectAccountType.outcome.name),
-                                  subtitle: _currentPrimaryAccounts[PreselectAccountType.outcome.name] == null
-                                      ? null
-                                      : Text('Aktuelles Primärkonto: ' + _currentPrimaryAccounts[PreselectAccountType.outcome.name].toString()),
+                                  title: Text(_currentPrimaryAccounts[1].transactionType),
+                                  subtitle:
+                                      _currentPrimaryAccounts[1].accountName == '' ? null : Text('Aktuelles Primärkonto: ' + _currentPrimaryAccounts[1].accountName.toString()),
                                   controlAffinity: ListTileControlAffinity.leading,
                                   value: preselectedAccount[1],
                                   onChanged: (bool? value) {
@@ -82,10 +80,9 @@ class _PreselectAccountInputFieldState extends State<PreselectAccountInputField>
                                   checkColor: Colors.cyanAccent,
                                 ),
                                 CheckboxListTile(
-                                  title: Text(PreselectAccountType.transferFrom.name),
-                                  subtitle: _currentPrimaryAccounts[PreselectAccountType.transferFrom.name] == null
-                                      ? null
-                                      : Text('Aktuelles Primärkonto: ' + _currentPrimaryAccounts[PreselectAccountType.transferFrom.name].toString()),
+                                  title: Text(_currentPrimaryAccounts[2].transactionType),
+                                  subtitle:
+                                      _currentPrimaryAccounts[2].accountName == '' ? null : Text('Aktuelles Primärkonto: ' + _currentPrimaryAccounts[2].accountName.toString()),
                                   controlAffinity: ListTileControlAffinity.leading,
                                   value: preselectedAccount[2],
                                   onChanged: (bool? value) {
@@ -98,10 +95,9 @@ class _PreselectAccountInputFieldState extends State<PreselectAccountInputField>
                                   checkColor: Colors.cyanAccent,
                                 ),
                                 CheckboxListTile(
-                                  title: Text(PreselectAccountType.transferTo.name),
-                                  subtitle: _currentPrimaryAccounts[PreselectAccountType.transferTo.name] == null
-                                      ? null
-                                      : Text('Aktuelles Primärkonto: ' + _currentPrimaryAccounts[PreselectAccountType.transferTo.name].toString()),
+                                  title: Text(_currentPrimaryAccounts[3].transactionType),
+                                  subtitle:
+                                      _currentPrimaryAccounts[3].accountName == '' ? null : Text('Aktuelles Primärkonto: ' + _currentPrimaryAccounts[3].accountName.toString()),
                                   controlAffinity: ListTileControlAffinity.leading,
                                   value: preselectedAccount[3],
                                   onChanged: (bool? value) {
@@ -114,10 +110,9 @@ class _PreselectAccountInputFieldState extends State<PreselectAccountInputField>
                                   checkColor: Colors.cyanAccent,
                                 ),
                                 CheckboxListTile(
-                                  title: Text(PreselectAccountType.investmentFrom.name),
-                                  subtitle: _currentPrimaryAccounts[PreselectAccountType.investmentFrom.name] == null
-                                      ? null
-                                      : Text('Aktuelles Primärkonto: ' + _currentPrimaryAccounts[PreselectAccountType.investmentFrom.name].toString()),
+                                  title: Text(_currentPrimaryAccounts[4].transactionType),
+                                  subtitle:
+                                      _currentPrimaryAccounts[4].accountName == '' ? null : Text('Aktuelles Primärkonto: ' + _currentPrimaryAccounts[4].accountName.toString()),
                                   controlAffinity: ListTileControlAffinity.leading,
                                   value: preselectedAccount[4],
                                   onChanged: (bool? value) {
@@ -130,10 +125,9 @@ class _PreselectAccountInputFieldState extends State<PreselectAccountInputField>
                                   checkColor: Colors.cyanAccent,
                                 ),
                                 CheckboxListTile(
-                                  title: Text(PreselectAccountType.investmentTo.name),
-                                  subtitle: _currentPrimaryAccounts[PreselectAccountType.investmentTo.name] == null
-                                      ? null
-                                      : Text('Aktuelles Primärkonto: ' + _currentPrimaryAccounts[PreselectAccountType.investmentTo.name].toString()),
+                                  title: Text(_currentPrimaryAccounts[5].transactionType),
+                                  subtitle:
+                                      _currentPrimaryAccounts[5].accountName == '' ? null : Text('Aktuelles Primärkonto: ' + _currentPrimaryAccounts[5].accountName.toString()),
                                   controlAffinity: ListTileControlAffinity.leading,
                                   value: preselectedAccount[5],
                                   onChanged: (bool? value) {
@@ -182,7 +176,7 @@ class _PreselectAccountInputFieldState extends State<PreselectAccountInputField>
 
   Future<List<bool>> _loadPreselectedAccountList() async {
     _setPrimaryAccounts();
-    _currentPrimaryAccounts = await PrimaryAccount.getCurrentPrimaryAccounts();
+    _currentPrimaryAccounts = await PrimaryAccount.loadPrimaryAccountList();
     return preselectedAccount;
   }
 
