@@ -19,9 +19,11 @@ import '/components/deco/loading_indicator.dart';
 
 import '/models/booking.dart';
 import '/models/account.dart';
+import '/models/primary_account.dart';
 import '/models/enums/repeat_types.dart';
 import '/models/enums/serie_edit_modes.dart';
 import '/models/enums/transaction_types.dart';
+import '/models/enums/preselect_account_types.dart';
 import '/models/screen_arguments/bottom_nav_bar_screen_arguments.dart';
 
 class CreateOrEditBookingScreen extends StatefulWidget {
@@ -48,6 +50,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
   final TextEditingController _categorieTextController = TextEditingController();
   final RoundedLoadingButtonController _saveButtonController = RoundedLoadingButtonController();
   bool _isBookingEdited = false;
+  bool _isPreselectedAccountsLoaded = false;
   String _currentTransaction = '';
   String _title = '';
   String _amountErrorText = '';
@@ -56,6 +59,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
   String _toAccountErrorText = '';
   String _bookingRepeat = '';
   DateTime _parsedBookingDate = DateTime.now();
+  Map<String, String> _primaryAccounts = {};
   late Booking _loadedBooking;
 
   @override
@@ -271,6 +275,56 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
     FocusScope.of(context).unfocus();
   }
 
+  Future<void> _loadPreselectedAccounts() async {
+    _primaryAccounts = await PrimaryAccount.getCurrentPrimaryAccounts();
+    _isPreselectedAccountsLoaded = true;
+  }
+
+  Widget _getAccountInputField() {
+    if (widget.bookingBoxIndex == -1) {
+      if (_currentTransaction == TransactionType.income.name) {
+        _fromAccountTextController.text = _primaryAccounts[PreselectAccountType.income.name] ?? '';
+        return AccountInputField(textController: _fromAccountTextController, errorText: _fromAccountErrorText);
+      } else if (_currentTransaction == TransactionType.outcome.name) {
+        _fromAccountTextController.text = _primaryAccounts[PreselectAccountType.outcome.name] ?? '';
+        return AccountInputField(textController: _fromAccountTextController, errorText: _fromAccountErrorText);
+      } else if (_currentTransaction == TransactionType.transfer.name) {
+        _fromAccountTextController.text = _primaryAccounts[PreselectAccountType.transferFrom.name] ?? '';
+        _toAccountTextController.text = _primaryAccounts[PreselectAccountType.transferTo.name] ?? '';
+        return Column(
+          children: [
+            AccountInputField(textController: _fromAccountTextController, errorText: _fromAccountErrorText, hintText: 'Von'),
+            AccountInputField(textController: _toAccountTextController, errorText: _toAccountErrorText, hintText: 'Nach')
+          ],
+        );
+      } else if (_currentTransaction == TransactionType.investment.name) {
+        _fromAccountTextController.text = _primaryAccounts[PreselectAccountType.investmentFrom.name] ?? '';
+        _toAccountTextController.text = _primaryAccounts[PreselectAccountType.investmentTo.name] ?? '';
+        return Column(
+          children: [
+            AccountInputField(textController: _fromAccountTextController, errorText: _fromAccountErrorText, hintText: 'Von'),
+            AccountInputField(textController: _toAccountTextController, errorText: _toAccountErrorText, hintText: 'Nach'),
+          ],
+        );
+      }
+    } else {
+      if (_currentTransaction == TransactionType.income.name || _currentTransaction == TransactionType.outcome.name) {
+        _fromAccountTextController.text = _loadedBooking.fromAccount;
+        return AccountInputField(textController: _fromAccountTextController, errorText: _fromAccountErrorText);
+      } else {
+        _fromAccountTextController.text = _loadedBooking.fromAccount;
+        _toAccountTextController.text = _loadedBooking.toAccount;
+        return Column(
+          children: [
+            AccountInputField(textController: _fromAccountTextController, errorText: _fromAccountErrorText, hintText: 'Von'),
+            AccountInputField(textController: _toAccountTextController, errorText: _toAccountErrorText, hintText: 'Nach'),
+          ],
+        );
+      }
+    }
+    return const SizedBox();
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -297,7 +351,9 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
             ),
             child: FutureBuilder(
               future: widget.bookingBoxIndex == -1
-                  ? null
+                  ? _isPreselectedAccountsLoaded
+                      ? null
+                      : _loadPreselectedAccounts()
                   : _isBookingEdited
                       ? null
                       : _loadBooking(),
@@ -319,15 +375,10 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
                             repeatCallback: (repeat) => setState(() => _bookingRepeat = repeat)),
                         TextInputField(input: _title, inputCallback: _setTitleState, hintText: 'Titel'),
                         MoneyInputField(textController: _amountTextController, errorText: _amountErrorText, hintText: 'Betrag', bottomSheetTitle: 'Betrag eingeben:'),
+                        _getAccountInputField(),
                         _currentTransaction == TransactionType.transfer.name
                             ? const SizedBox()
                             : CategorieInputField(textController: _categorieTextController, errorText: _categorieErrorText, transactionType: _currentTransaction),
-                        _currentTransaction == TransactionType.transfer.name || _currentTransaction == TransactionType.investment.name
-                            ? AccountInputField(textController: _fromAccountTextController, errorText: _fromAccountErrorText, hintText: 'Von')
-                            : AccountInputField(textController: _fromAccountTextController, errorText: _fromAccountErrorText),
-                        _currentTransaction == TransactionType.transfer.name || _currentTransaction == TransactionType.investment.name
-                            ? AccountInputField(textController: _toAccountTextController, errorText: _toAccountErrorText, hintText: 'Nach')
-                            : const SizedBox(),
                         SaveButton(saveFunction: _createOrUpdateBooking, buttonController: _saveButtonController),
                       ],
                     );

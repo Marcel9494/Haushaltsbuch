@@ -1,7 +1,7 @@
 import 'package:hive/hive.dart';
 
-import '/models/enums/transaction_types.dart';
 import '/models/enums/account_types.dart';
+import '/models/enums/transaction_types.dart';
 
 import '/utils/consts/hive_consts.dart';
 import '/utils/number_formatters/number_formatter.dart';

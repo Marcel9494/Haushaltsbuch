@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:introduction_screen/introduction_screen.dart';
 
 import '../models/global_state.dart';
+import '../models/primary_account.dart';
 import '/models/account.dart';
 import '/models/categorie.dart';
 import '/models/screen_arguments/bottom_nav_bar_screen_arguments.dart';
@@ -35,6 +36,7 @@ class _IntroductionScreensState extends State<IntroductionScreens> {
     Categorie.createStartRevenueCategories();
     Categorie.createStartInvestmentCategories();
     Account.createStartAccounts();
+    PrimaryAccount.createStartPrimaryAccounts();
     GlobalState.createGlobalState();
     Navigator.popAndPushNamed(context, bottomNavBarRoute, arguments: BottomNavBarScreenArguments(0));
   }
@@ -88,9 +90,7 @@ class _IntroductionScreensState extends State<IntroductionScreens> {
         activeColor: Theme.of(context).colorScheme.secondary,
         color: Colors.white,
         spacing: const EdgeInsets.symmetric(horizontal: 3.0),
-        activeShape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(25.0)
-        ),
+        activeShape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25.0)),
       ),
       baseBtnStyle: TextButton.styleFrom(
         backgroundColor: Colors.cyanAccent,

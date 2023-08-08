@@ -8,10 +8,12 @@ import '/components/deco/loading_indicator.dart';
 import '/components/input_fields/account_type_input_field.dart';
 import '/components/input_fields/money_input_field.dart';
 import '/components/input_fields/text_input_field.dart';
+import '/components/input_fields/preselect_account_input_field.dart';
 import '/components/buttons/save_button.dart';
 
 import '/models/account.dart';
 import '/models/booking.dart';
+import '/models/primary_account.dart';
 import '/models/enums/repeat_types.dart';
 import '/models/enums/transaction_types.dart';
 import '/models/screen_arguments/bottom_nav_bar_screen_arguments.dart';
@@ -35,14 +37,17 @@ class CreateOrEditAccountScreen extends StatefulWidget {
 class _CreateOrEditAccountScreenState extends State<CreateOrEditAccountScreen> {
   final TextEditingController _accountGroupTextController = TextEditingController();
   final TextEditingController _bankBalanceTextController = TextEditingController();
+  final TextEditingController _preselectedAccountTextController = TextEditingController();
   final RoundedLoadingButtonController _saveButtonController = RoundedLoadingButtonController();
   bool _isAccountEdited = false;
+  bool _primaryAccountsLoaded = false;
   final Account _account = Account();
   String _accountName = '';
   String _accountNameErrorText = '';
   String _accountGroupErrorText = '';
   String _bankBalanceErrorText = '';
   late Account _loadedAccount;
+  late List<PrimaryAccount> _loadedPrimaryAccounts;
   double _oldBankBalance = 0.0;
 
   @override
@@ -60,6 +65,10 @@ class _CreateOrEditAccountScreenState extends State<CreateOrEditAccountScreen> {
     _bankBalanceTextController.text = _loadedAccount.bankBalance;
     _oldBankBalance = formatMoneyAmountToDouble(_loadedAccount.bankBalance);
     _isAccountEdited = true;
+    if (_primaryAccountsLoaded == false) {
+      _getPrimaryAccounts();
+      _primaryAccountsLoaded = true;
+    }
   }
 
   void _createOrUpdateAccount() async {
@@ -72,6 +81,7 @@ class _CreateOrEditAccountScreenState extends State<CreateOrEditAccountScreen> {
     } else {
       _account.accountType = _accountGroupTextController.text;
       _account.bankBalance = _bankBalanceTextController.text;
+      PrimaryAccount.setPrimaryAccountNames(_preselectedAccountTextController.text, _account.name);
       if (widget.accountBoxIndex == -1) {
         _account.createAccount(_account);
         _navigateToAccountScreen();
@@ -195,6 +205,18 @@ class _CreateOrEditAccountScreenState extends State<CreateOrEditAccountScreen> {
     });
   }
 
+  void _getPrimaryAccounts() async {
+    _loadedPrimaryAccounts = await PrimaryAccount.loadFilteredPrimaryAccountList(_accountName);
+    for (int i = 0; i < _loadedPrimaryAccounts.length; i++) {
+      if (_loadedPrimaryAccounts[i].accountName != '') {
+        if (_preselectedAccountTextController.text.isNotEmpty) {
+          _preselectedAccountTextController.text += ', ';
+        }
+        _preselectedAccountTextController.text += _loadedPrimaryAccounts[i].transactionType;
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -227,6 +249,7 @@ class _CreateOrEditAccountScreenState extends State<CreateOrEditAccountScreen> {
                         TextInputField(input: _accountName, inputCallback: _setAccountNameState, errorText: _accountNameErrorText, hintText: 'Name'),
                         MoneyInputField(
                             textController: _bankBalanceTextController, errorText: _bankBalanceErrorText, hintText: 'Kontostand', bottomSheetTitle: 'Kontostand eingeben:'),
+                        PreselectAccountInputField(textController: _preselectedAccountTextController),
                         SaveButton(saveFunction: _createOrUpdateAccount, buttonController: _saveButtonController),
                       ],
                     );

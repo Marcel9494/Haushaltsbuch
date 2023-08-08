@@ -3,7 +3,7 @@ import 'package:hive/hive.dart';
 import '/utils/consts/hive_consts.dart';
 
 @HiveType(typeId: transactionTypeId)
-enum TransactionType { income, outcome, transfer, investment }
+enum TransactionType { income, outcome, transfer, transferFrom, transferTo, investment, investmentFrom, investmentTo }
 
 extension TransactionTypeExtension on TransactionType {
   String get name {
@@ -14,8 +14,16 @@ extension TransactionTypeExtension on TransactionType {
         return 'Ausgabe';
       case TransactionType.transfer:
         return 'Übertrag';
+      case TransactionType.transferFrom:
+        return 'Übertrag von ...';
+      case TransactionType.transferTo:
+        return 'Übertrag nach ...';
       case TransactionType.investment:
         return 'Investition';
+      case TransactionType.investmentFrom:
+        return 'Investition von ...';
+      case TransactionType.investmentTo:
+        return 'Investition nach ...';
       default:
         throw Exception('$name is not a valid Transaction.');
     }
@@ -29,8 +37,16 @@ extension TransactionTypeExtension on TransactionType {
         return 'Ausgaben';
       case TransactionType.transfer:
         return 'Überträge';
+      case TransactionType.transferFrom:
+        return 'Überträge von ...';
+      case TransactionType.transferTo:
+        return 'Überträge nach ...';
       case TransactionType.investment:
         return 'Investitionen';
+      case TransactionType.investmentFrom:
+        return 'Investitionen von ...';
+      case TransactionType.investmentTo:
+        return 'Investitionen nach ...';
       default:
         throw Exception('$name is not a valid Transaction.');
     }
