@@ -23,7 +23,7 @@ class TextInputField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
-      textCapitalization: TextCapitalization.sentences,
+      textCapitalization: TextCapitalization.words,
       // initialValue: input,
       controller: textEditingController,
       maxLength: maxLength,
