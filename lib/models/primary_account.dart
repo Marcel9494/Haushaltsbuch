@@ -56,7 +56,7 @@ class PrimaryAccount extends HiveObject {
     List<String> transactionTypeList = transactionTypes.split(', ');
     for (int i = 0; i < primaryAccountBox.length; i++) {
       PrimaryAccount primaryAccount = await primaryAccountBox.getAt(i);
-      if (primaryAccount.accountName == accountName) {
+      if (primaryAccount.accountName == accountName.trim()) {
         PrimaryAccount updatedPrimaryAccount = PrimaryAccount()
           ..accountName = ''
           ..transactionType = primaryAccount.transactionType;
@@ -67,32 +67,32 @@ class PrimaryAccount extends HiveObject {
       PrimaryAccount updatedPrimaryAccount;
       if (transactionTypeList[i] == PreselectAccountType.income.name) {
         updatedPrimaryAccount = PrimaryAccount()
-          ..accountName = accountName
+          ..accountName = accountName.trim()
           ..transactionType = PreselectAccountType.income.name;
         primaryAccountBox.putAt(0, updatedPrimaryAccount);
       } else if (transactionTypeList[i] == PreselectAccountType.outcome.name) {
         updatedPrimaryAccount = PrimaryAccount()
-          ..accountName = accountName
+          ..accountName = accountName.trim()
           ..transactionType = PreselectAccountType.outcome.name;
         primaryAccountBox.putAt(1, updatedPrimaryAccount);
       } else if (transactionTypeList[i] == PreselectAccountType.transferFrom.name) {
         updatedPrimaryAccount = PrimaryAccount()
-          ..accountName = accountName
+          ..accountName = accountName.trim()
           ..transactionType = PreselectAccountType.transferFrom.name;
         primaryAccountBox.putAt(2, updatedPrimaryAccount);
       } else if (transactionTypeList[i] == PreselectAccountType.transferTo.name) {
         updatedPrimaryAccount = PrimaryAccount()
-          ..accountName = accountName
+          ..accountName = accountName.trim()
           ..transactionType = PreselectAccountType.transferTo.name;
         primaryAccountBox.putAt(3, updatedPrimaryAccount);
       } else if (transactionTypeList[i] == PreselectAccountType.investmentFrom.name) {
         updatedPrimaryAccount = PrimaryAccount()
-          ..accountName = accountName
+          ..accountName = accountName.trim()
           ..transactionType = PreselectAccountType.investmentFrom.name;
         primaryAccountBox.putAt(4, updatedPrimaryAccount);
       } else if (transactionTypeList[i] == PreselectAccountType.investmentTo.name) {
         updatedPrimaryAccount = PrimaryAccount()
-          ..accountName = accountName
+          ..accountName = accountName.trim()
           ..transactionType = PreselectAccountType.investmentTo.name;
         primaryAccountBox.putAt(5, updatedPrimaryAccount);
       }

@@ -280,34 +280,47 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
     _isPreselectedAccountsLoaded = true;
   }
 
-  // TODO hier weitermachen beim Laden wird das Konto nicht geladen => Grund: _fromAccountTextController.text muss
-  // TODO nur bei bestimmten Bedingungen gesetzt werden Beispiel: if (widget.bookingBoxIndex != -1) {...} dann nicht setzen
-  // sondern _loadedBooking Werte setzen!
   Widget _getAccountInputField() {
-    if (_currentTransaction == TransactionType.income.name) {
-      _fromAccountTextController.text = _primaryAccounts[PreselectAccountType.income.name] ?? '';
-      return AccountInputField(textController: _fromAccountTextController, errorText: _fromAccountErrorText);
-    } else if (_currentTransaction == TransactionType.outcome.name) {
-      _fromAccountTextController.text = _primaryAccounts[PreselectAccountType.outcome.name] ?? '';
-      return AccountInputField(textController: _fromAccountTextController, errorText: _fromAccountErrorText);
-    } else if (_currentTransaction == TransactionType.transfer.name) {
-      _fromAccountTextController.text = _primaryAccounts[PreselectAccountType.transferFrom.name] ?? '';
-      _toAccountTextController.text = _primaryAccounts[PreselectAccountType.transferTo.name] ?? '';
-      return Column(
-        children: [
-          AccountInputField(textController: _fromAccountTextController, errorText: _fromAccountErrorText, hintText: 'Von'),
-          AccountInputField(textController: _toAccountTextController, errorText: _toAccountErrorText, hintText: 'Nach')
-        ],
-      );
-    } else if (_currentTransaction == TransactionType.investment.name) {
-      _fromAccountTextController.text = _primaryAccounts[PreselectAccountType.investmentFrom.name] ?? '';
-      _toAccountTextController.text = _primaryAccounts[PreselectAccountType.investmentTo.name] ?? '';
-      return Column(
-        children: [
-          AccountInputField(textController: _fromAccountTextController, errorText: _fromAccountErrorText, hintText: 'Von'),
-          AccountInputField(textController: _toAccountTextController, errorText: _toAccountErrorText, hintText: 'Nach'),
-        ],
-      );
+    if (widget.bookingBoxIndex == -1) {
+      if (_currentTransaction == TransactionType.income.name) {
+        _fromAccountTextController.text = _primaryAccounts[PreselectAccountType.income.name] ?? '';
+        return AccountInputField(textController: _fromAccountTextController, errorText: _fromAccountErrorText);
+      } else if (_currentTransaction == TransactionType.outcome.name) {
+        _fromAccountTextController.text = _primaryAccounts[PreselectAccountType.outcome.name] ?? '';
+        return AccountInputField(textController: _fromAccountTextController, errorText: _fromAccountErrorText);
+      } else if (_currentTransaction == TransactionType.transfer.name) {
+        _fromAccountTextController.text = _primaryAccounts[PreselectAccountType.transferFrom.name] ?? '';
+        _toAccountTextController.text = _primaryAccounts[PreselectAccountType.transferTo.name] ?? '';
+        return Column(
+          children: [
+            AccountInputField(textController: _fromAccountTextController, errorText: _fromAccountErrorText, hintText: 'Von'),
+            AccountInputField(textController: _toAccountTextController, errorText: _toAccountErrorText, hintText: 'Nach')
+          ],
+        );
+      } else if (_currentTransaction == TransactionType.investment.name) {
+        _fromAccountTextController.text = _primaryAccounts[PreselectAccountType.investmentFrom.name] ?? '';
+        _toAccountTextController.text = _primaryAccounts[PreselectAccountType.investmentTo.name] ?? '';
+        return Column(
+          children: [
+            AccountInputField(textController: _fromAccountTextController, errorText: _fromAccountErrorText, hintText: 'Von'),
+            AccountInputField(textController: _toAccountTextController, errorText: _toAccountErrorText, hintText: 'Nach'),
+          ],
+        );
+      }
+    } else {
+      if (_currentTransaction == TransactionType.income.name || _currentTransaction == TransactionType.outcome.name) {
+        _fromAccountTextController.text = _loadedBooking.fromAccount;
+        return AccountInputField(textController: _fromAccountTextController, errorText: _fromAccountErrorText);
+      } else {
+        _fromAccountTextController.text = _loadedBooking.fromAccount;
+        _toAccountTextController.text = _loadedBooking.toAccount;
+        return Column(
+          children: [
+            AccountInputField(textController: _fromAccountTextController, errorText: _fromAccountErrorText, hintText: 'Von'),
+            AccountInputField(textController: _toAccountTextController, errorText: _toAccountErrorText, hintText: 'Nach'),
+          ],
+        );
+      }
     }
     return const SizedBox();
   }
