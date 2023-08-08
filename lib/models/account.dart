@@ -17,18 +17,6 @@ class Account extends HiveObject {
   late String accountType;
   @HiveField(2)
   late String bankBalance;
-  /*@HiveField(3)
-  late bool primaryIncomeAccount;
-  @HiveField(4)
-  late bool primaryOutcomeAccount;
-  @HiveField(5)
-  late bool primaryTransferFromAccount;
-  @HiveField(6)
-  late bool primaryTransferToAccount;
-  @HiveField(7)
-  late bool primaryInvestmentFromAccount;
-  @HiveField(8)
-  late bool primaryInvestmentToAccount;*/
 
   void createAccount(Account newAccount) async {
     var accountBox = await Hive.openBox(accountsBox);
