@@ -10,8 +10,9 @@ class MoneyInputField extends StatelessWidget {
   final String errorText;
   final String hintText;
   final String bottomSheetTitle;
+  bool _clearedInputField = false;
 
-  const MoneyInputField({
+  MoneyInputField({
     Key? key,
     required this.textController,
     required this.errorText,
@@ -20,6 +21,7 @@ class MoneyInputField extends StatelessWidget {
   }) : super(key: key);
 
   void _openBottomSheetForNumberInput(BuildContext context) {
+    _clearedInputField = textController.text.isEmpty ? true : false;
     showCupertinoModalBottomSheet<void>(
       context: context,
       builder: (BuildContext context) {
@@ -125,6 +127,12 @@ class MoneyInputField extends StatelessWidget {
   }
 
   void _setAmount(String amount) {
+    // Eingabefeld wird automatisch geleert => Benutzer muss das Eingabefeld nicht mehr mit X löschen, wenn
+    // ein neuer Betrag eingegeben wird.
+    if (_clearedInputField == false) {
+      textController.text = '';
+      _clearedInputField = true;
+    }
     if (amount == ',' && textController.text.contains(',')) {
       textController.text;
     } else {
