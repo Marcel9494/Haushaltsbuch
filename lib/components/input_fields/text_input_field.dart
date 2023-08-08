@@ -24,8 +24,8 @@ class TextInputField extends StatelessWidget {
   Widget build(BuildContext context) {
     return TextFormField(
       textCapitalization: TextCapitalization.sentences,
-      initialValue: input,
-      // controller: textEditingController,
+      // initialValue: input,
+      controller: textEditingController,
       maxLength: maxLength,
       autofocus: autofocus,
       onChanged: (input) => inputCallback(input),

@@ -61,7 +61,7 @@ class _CreateOrEditAccountScreenState extends State<CreateOrEditAccountScreen> {
 
   Future<void> _loadAccount() async {
     _loadedAccount = await Account.loadAccount(widget.accountBoxIndex);
-    _accountName = _loadedAccount.name;
+    // _accountName = _loadedAccount.name;
     _accountNameController.text = _loadedAccount.name;
     _accountGroupTextController.text = _loadedAccount.accountType;
     _bankBalanceTextController.text = _loadedAccount.bankBalance;
@@ -74,8 +74,12 @@ class _CreateOrEditAccountScreenState extends State<CreateOrEditAccountScreen> {
   }
 
   void _createOrUpdateAccount() async {
-    _account.name = _accountName;
-    bool validAccountName = await _validAccountName(_accountName);
+    // _account.name = _accountName;
+    _account.name = _accountNameController.text;
+
+    // bool validAccountName = await _validAccountName(_accountName);
+    bool validAccountName = await _validAccountName(_accountNameController.text);
+
     bool validAccountGroup = _validAccountGroup(_accountGroupTextController.text);
     bool validBankBalance = _validBankBalance(_bankBalanceTextController.text);
     if (validAccountGroup == false || validAccountName == false || validBankBalance == false) {
@@ -99,14 +103,16 @@ class _CreateOrEditAccountScreenState extends State<CreateOrEditAccountScreen> {
   }
 
   Future<bool> _validAccountName(String accountNameInput) async {
-    if (_accountName.isEmpty) {
+    // if (_accountName.isEmpty) {
+    if (_accountNameController.text.isEmpty) {
       setState(() {
         _accountNameErrorText = 'Bitte geben Sie einen Kontonamen ein.';
       });
       return false;
     }
     if (widget.accountBoxIndex == -1) {
-      bool accountNameExisting = await _account.existsAccountName(_accountName);
+      // bool accountNameExisting = await _account.existsAccountName(_accountName);
+      bool accountNameExisting = await _account.existsAccountName(_accountNameController.text);
       if (accountNameExisting) {
         setState(() {
           _accountNameErrorText = 'Konto ist bereits angelegt.';
@@ -151,7 +157,7 @@ class _CreateOrEditAccountScreenState extends State<CreateOrEditAccountScreen> {
 
   void _setAccountNameState(String accountName) {
     setState(() {
-      _accountName = accountName;
+      // _accountName = accountName;
     });
   }
 
@@ -171,8 +177,8 @@ class _CreateOrEditAccountScreenState extends State<CreateOrEditAccountScreen> {
       ..date = DateTime.now().toString()
       ..amount = formatToMoneyAmount(difference.toString())
       ..categorie = 'Differenz'
-      ..fromAccount = _accountName
-      ..toAccount = _accountName;
+      ..fromAccount = _accountNameController.text
+      ..toAccount = _accountNameController.text;
     // TODO newBooking.createBooking();
     // TODO entfernen? newBooking.createBooking(newBooking);
     _account.updateAccount(_account, widget.accountBoxIndex);
@@ -208,7 +214,7 @@ class _CreateOrEditAccountScreenState extends State<CreateOrEditAccountScreen> {
   }
 
   void _getPrimaryAccounts() async {
-    _loadedPrimaryAccounts = await PrimaryAccount.loadFilteredPrimaryAccountList(_accountName);
+    _loadedPrimaryAccounts = await PrimaryAccount.loadFilteredPrimaryAccountList(_accountNameController.text);
     for (int i = 0; i < _loadedPrimaryAccounts.length; i++) {
       if (_loadedPrimaryAccounts[i].accountName != '') {
         if (_preselectedAccountTextController.text.isNotEmpty) {

@@ -78,7 +78,8 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
   Future<void> _loadBooking() async {
     _loadedBooking = await Booking.loadBooking(widget.bookingBoxIndex);
     _currentTransaction = _loadedBooking.transactionType;
-    _title = _loadedBooking.title;
+    // _title = _loadedBooking.title;
+    _bookingNameController.text = _loadedBooking.title;
     _parsedBookingDate = DateTime.parse(_loadedBooking.date);
     _bookingDateTextController.text = dateFormatterDDMMYYYYEE.format(DateTime.parse(_loadedBooking.date));
     _bookingRepeat = _loadedBooking.bookingRepeats;
@@ -106,17 +107,17 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
       }
       Booking booking = Booking();
       if (_bookingRepeat == RepeatType.noRepetition.name) {
-        booking.createBooking(_title, _currentTransaction, _parsedBookingDate.toString(), _bookingRepeat, _amountTextController.text, _categorieTextController.text,
+        booking.createBooking(_bookingNameController.text, _currentTransaction, _parsedBookingDate.toString(), _bookingRepeat, _amountTextController.text, _categorieTextController.text,
             _fromAccountTextController.text, _toAccountTextController.text);
       } else if (_bookingRepeat != RepeatType.noRepetition.name) {
-        booking.createBookingSerie(_title, _currentTransaction, _parsedBookingDate.toString(), _bookingRepeat, _amountTextController.text, _categorieTextController.text,
+        booking.createBookingSerie(_bookingNameController.text, _currentTransaction, _parsedBookingDate.toString(), _bookingRepeat, _amountTextController.text, _categorieTextController.text,
             _fromAccountTextController.text, _toAccountTextController.text);
       }
     } else {
       Booking currentBooking = Booking()
         ..transactionType = _currentTransaction
         ..bookingRepeats = _bookingRepeat
-        ..title = _title
+        ..title = _bookingNameController.text
         ..date = _parsedBookingDate.toString()
         ..amount = _amountTextController.text
         ..categorie = _categorieTextController.text
@@ -195,7 +196,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
 
   void _setTitleState(String title) {
     setState(() {
-      _title = title;
+      // _title = title;
     });
   }
 
@@ -255,7 +256,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
         Booking currentBooking = Booking()
           ..transactionType = _currentTransaction
           ..bookingRepeats = _bookingRepeat
-          ..title = _title
+          ..title = _bookingNameController.text
           ..date = _parsedBookingDate.toString()
           ..amount = _amountTextController.text
           ..categorie = _categorieTextController.text
