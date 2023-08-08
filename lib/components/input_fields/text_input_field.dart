@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 class TextInputField extends StatelessWidget {
+  final TextEditingController textEditingController;
   final String input;
   final Function inputCallback;
   final String hintText;
@@ -10,6 +11,7 @@ class TextInputField extends StatelessWidget {
 
   const TextInputField({
     Key? key,
+    required this.textEditingController,
     required this.input,
     required this.inputCallback,
     required this.hintText,
@@ -21,7 +23,9 @@ class TextInputField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      textCapitalization: TextCapitalization.sentences,
       initialValue: input,
+      // controller: textEditingController,
       maxLength: maxLength,
       autofocus: autofocus,
       onChanged: (input) => inputCallback(input),
@@ -32,6 +36,15 @@ class TextInputField extends StatelessWidget {
         prefixIcon: const Icon(
           Icons.title_rounded,
           color: Colors.grey,
+        ),
+        suffixIcon: IconButton(
+          onPressed: () {
+            textEditingController.clear();
+          },
+          icon: const Icon(
+              Icons.clear,
+              color: Colors.grey,
+          ),
         ),
         focusedBorder: const UnderlineInputBorder(
           borderSide: BorderSide(color: Colors.cyanAccent, width: 1.5),

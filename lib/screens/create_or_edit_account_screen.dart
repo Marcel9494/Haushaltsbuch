@@ -36,6 +36,7 @@ class CreateOrEditAccountScreen extends StatefulWidget {
 
 class _CreateOrEditAccountScreenState extends State<CreateOrEditAccountScreen> {
   final TextEditingController _accountGroupTextController = TextEditingController();
+  final TextEditingController _accountNameController = TextEditingController();
   final TextEditingController _bankBalanceTextController = TextEditingController();
   final TextEditingController _preselectedAccountTextController = TextEditingController();
   final RoundedLoadingButtonController _saveButtonController = RoundedLoadingButtonController();
@@ -61,6 +62,7 @@ class _CreateOrEditAccountScreenState extends State<CreateOrEditAccountScreen> {
   Future<void> _loadAccount() async {
     _loadedAccount = await Account.loadAccount(widget.accountBoxIndex);
     _accountName = _loadedAccount.name;
+    _accountNameController.text = _loadedAccount.name;
     _accountGroupTextController.text = _loadedAccount.accountType;
     _bankBalanceTextController.text = _loadedAccount.bankBalance;
     _oldBankBalance = formatMoneyAmountToDouble(_loadedAccount.bankBalance);
@@ -221,6 +223,7 @@ class _CreateOrEditAccountScreenState extends State<CreateOrEditAccountScreen> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
+        resizeToAvoidBottomInset: false,
         appBar: AppBar(
           title: widget.accountBoxIndex == -1 ? const Text('Konto erstellen') : const Text('Konto bearbeiten'),
         ),
@@ -246,7 +249,7 @@ class _CreateOrEditAccountScreenState extends State<CreateOrEditAccountScreen> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         AccountTypeInputField(textController: _accountGroupTextController, errorText: _accountGroupErrorText),
-                        TextInputField(input: _accountName, inputCallback: _setAccountNameState, errorText: _accountNameErrorText, hintText: 'Name'),
+                        TextInputField(textEditingController: _accountNameController, input: _accountName, inputCallback: _setAccountNameState, errorText: _accountNameErrorText, hintText: 'Name'),
                         MoneyInputField(
                             textController: _bankBalanceTextController, errorText: _bankBalanceErrorText, hintText: 'Kontostand', bottomSheetTitle: 'Kontostand eingeben:'),
                         PreselectAccountInputField(textController: _preselectedAccountTextController),

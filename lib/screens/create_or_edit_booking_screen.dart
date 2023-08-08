@@ -44,6 +44,7 @@ class CreateOrEditBookingScreen extends StatefulWidget {
 
 class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
   final TextEditingController _amountTextController = TextEditingController();
+  final TextEditingController _bookingNameController = TextEditingController();
   final TextEditingController _bookingDateTextController = TextEditingController();
   final TextEditingController _fromAccountTextController = TextEditingController();
   final TextEditingController _toAccountTextController = TextEditingController();
@@ -82,6 +83,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
     _bookingDateTextController.text = dateFormatterDDMMYYYYEE.format(DateTime.parse(_loadedBooking.date));
     _bookingRepeat = _loadedBooking.bookingRepeats;
     _amountTextController.text = _loadedBooking.amount;
+    _bookingNameController.text = _loadedBooking.title;
     _categorieTextController.text = _loadedBooking.categorie;
     _fromAccountTextController.text = _loadedBooking.fromAccount;
     _toAccountTextController.text = _loadedBooking.toAccount;
@@ -329,6 +331,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
+        resizeToAvoidBottomInset: false,
         appBar: AppBar(
           title: widget.bookingBoxIndex == -1 ? const Text('Buchung erstellen') : const Text('Buchung bearbeiten'),
           actions: [
@@ -373,7 +376,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
                             bookingDateCallback: (bookingDate) => setState(() => _parsedBookingDate = bookingDate),
                             repeat: _bookingRepeat,
                             repeatCallback: (repeat) => setState(() => _bookingRepeat = repeat)),
-                        TextInputField(input: _title, inputCallback: _setTitleState, hintText: 'Titel'),
+                        TextInputField(textEditingController: _bookingNameController, input: _title, inputCallback: _setTitleState, hintText: 'Titel'),
                         MoneyInputField(textController: _amountTextController, errorText: _amountErrorText, hintText: 'Betrag', bottomSheetTitle: 'Betrag eingeben:'),
                         _getAccountInputField(),
                         _currentTransaction == TransactionType.transfer.name
