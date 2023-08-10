@@ -53,7 +53,10 @@ class SeparateBudgetCard extends StatelessWidget {
                         ? Text('${dateFormatterMMM.format(DateTime.parse(budget.budgetDate))}.')
                         : Text(dateFormatterMMM.format(DateTime.parse(budget.budgetDate))),
                   ),
-                  Text(formatToMoneyAmount(budget.budget.toString())),
+                  Padding(
+                    padding: const EdgeInsets.only(right: 6.0),
+                    child: Text(formatToMoneyAmount(budget.budget.toString())),
+                  ),
                 ],
               ),
             ),
