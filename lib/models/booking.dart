@@ -275,7 +275,42 @@ class Booking extends HiveObject {
     }
   }
 
-  void deleteBooking(int bookingBoxIndex) async {
+  static Future<void> updateBookingAccountName(String oldAccountName, String newAccountName) async {
+    var bookingBox = await Hive.openBox(bookingsBox);
+    for (int i = 0; i < bookingBox.length; i++) {
+      Booking booking = await bookingBox.getAt(i);
+      if (booking.fromAccount == oldAccountName) {
+        Booking updatedBookingWithNewAccountName = Booking()
+          ..transactionType = booking.transactionType
+          ..bookingRepeats = booking.bookingRepeats
+          ..title = booking.title
+          ..date = booking.date
+          ..amount = booking.amount
+          ..categorie = booking.categorie
+          ..fromAccount = newAccountName
+          ..toAccount = booking.toAccount
+          ..serieId = booking.serieId
+          ..booked = booking.booked;
+        bookingBox.putAt(booking.boxIndex, updatedBookingWithNewAccountName);
+      }
+      if (booking.toAccount == oldAccountName) {
+        Booking updatedBookingWithNewAccountName = Booking()
+          ..transactionType = booking.transactionType
+          ..bookingRepeats = booking.bookingRepeats
+          ..title = booking.title
+          ..date = booking.date
+          ..amount = booking.amount
+          ..categorie = booking.categorie
+          ..fromAccount = booking.fromAccount
+          ..toAccount = newAccountName
+          ..serieId = booking.serieId
+          ..booked = booking.booked;
+        bookingBox.putAt(booking.boxIndex, updatedBookingWithNewAccountName);
+      }
+    }
+  }
+
+  Future<void> deleteBooking(int bookingBoxIndex) async {
     var bookingBox = await Hive.openBox(bookingsBox);
     Booking booking = await bookingBox.getAt(bookingBoxIndex);
     if (booking.booked) {
