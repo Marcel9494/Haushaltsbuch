@@ -48,6 +48,13 @@ class Booking extends HiveObject {
       ..serieId = serieId
       ..booked = booked;
     bookingBox.add(newBooking);
+    if (booked) {
+      if (transactionType == TransactionType.transfer.name || transactionType == TransactionType.investment.name) {
+        Account.transferMoney(fromAccount, toAccount, amount);
+      } else {
+        Account.calculateNewAccountBalance(fromAccount, amount, transactionType);
+      }
+    }
   }
 
   Future<Booking> updateBookingBookedState(Booking updatedBooking) async {
