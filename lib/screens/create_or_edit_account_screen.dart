@@ -173,7 +173,7 @@ class _CreateOrEditAccountScreenState extends State<CreateOrEditAccountScreen> {
       ..toAccount = _accountName;
     // TODO newBooking.createBooking();
     // TODO entfernen? newBooking.createBooking(newBooking);
-    _account.updateAccount(_account, widget.accountBoxIndex);
+    _account.updateAccount(_account, widget.accountBoxIndex, _loadedAccount.name);
     for (int i = 0; i < 4; i++) {
       Navigator.pop(context);
     }
@@ -181,7 +181,7 @@ class _CreateOrEditAccountScreenState extends State<CreateOrEditAccountScreen> {
   }
 
   void _noPressed() {
-    _account.updateAccount(_account, widget.accountBoxIndex);
+    _account.updateAccount(_account, widget.accountBoxIndex, _loadedAccount.name);
     for (int i = 0; i < 4; i++) {
       Navigator.pop(context);
     }
@@ -189,7 +189,7 @@ class _CreateOrEditAccountScreenState extends State<CreateOrEditAccountScreen> {
   }
 
   void _updateAccount() {
-    _account.updateAccount(_account, widget.accountBoxIndex);
+    _account.updateAccount(_account, widget.accountBoxIndex, _loadedAccount.name);
     _navigateToAccountScreen();
   }
 
