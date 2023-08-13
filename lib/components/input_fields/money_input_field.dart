@@ -27,7 +27,7 @@ class MoneyInputField extends StatelessWidget {
       builder: (BuildContext context) {
         return Material(
           child: SizedBox(
-            height: 430,
+            height: 430+47,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -165,5 +165,22 @@ class MoneyInputField extends StatelessWidget {
         errorText: errorText.isEmpty ? null : errorText,
       ),
     );
+  }
+}
+
+
+class WidgetPosition {
+  getSizes(GlobalKey key) {
+    final RenderBox renderBoxRed = key.currentContext?.findRenderObject() as RenderBox;
+    final sizeRed = renderBoxRed.size;
+    print("SIZE: $sizeRed");
+    return [sizeRed.width, sizeRed.height];
+  }
+
+  getPositions(GlobalKey key) {
+    final RenderBox renderBoxRed = key.currentContext?.findRenderObject() as RenderBox;
+    final positionRed = renderBoxRed.localToGlobal(Offset.zero);
+    print("POSITION: $positionRed ");
+    return [positionRed.dx, positionRed.dy];
   }
 }
