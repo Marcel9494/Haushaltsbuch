@@ -1,6 +1,8 @@
 import 'package:hive/hive.dart';
 
 import '/utils/consts/hive_consts.dart';
+
+import 'booking.dart';
 import 'enums/categorie_types.dart';
 
 @HiveType(typeId: categoryTypeId)
@@ -21,6 +23,7 @@ class Categorie extends HiveObject {
       Categorie categorie = await categorieBox.getAt(i);
       if (oldCategorieName == categorie.name) {
         categorieBox.putAt(i, updatedCategorie);
+        Booking.updateBookingCategorieName(oldCategorieName, updatedCategorie.name);
         break;
       }
     }
