@@ -1,7 +1,8 @@
 import 'package:hive/hive.dart';
 
-import '/utils/consts/hive_consts.dart';
 import 'enums/categorie_types.dart';
+
+import '/utils/consts/hive_consts.dart';
 
 @HiveType(typeId: categoryTypeId)
 class Categorie extends HiveObject {
@@ -154,11 +155,14 @@ class CategorieAdapter extends TypeAdapter<Categorie> {
 
   @override
   Categorie read(BinaryReader reader) {
-    return Categorie()..name = reader.read();
+    return Categorie()
+      ..name = reader.read()
+      ..type = reader.read();
   }
 
   @override
   void write(BinaryWriter writer, Categorie obj) {
     writer.write(obj.name);
+    writer.write(obj.type);
   }
 }

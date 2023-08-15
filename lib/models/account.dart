@@ -23,9 +23,10 @@ class Account extends HiveObject {
     accountBox.add(newAccount);
   }
 
-  void updateAccount(Account updatedAccount, int accountBoxIndex) async {
+  void updateAccount(Account updatedAccount, int accountBoxIndex, String oldAccountName) async {
     var accountBox = await Hive.openBox(accountsBox);
     accountBox.putAt(accountBoxIndex, updatedAccount);
+    Booking.updateBookingAccountName(oldAccountName, updatedAccount.name);
   }
 
   void deleteAccount(Account deleteAccount) async {

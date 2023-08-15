@@ -123,7 +123,7 @@ class _YearlyBookingTabViewState extends State<YearlyBookingTabView> {
                         child: ListView.builder(
                           itemCount: _monthList.length,
                           itemBuilder: (BuildContext context, int index) {
-                            return MonthlyOverviewCard(monthlyStats: _monthList[index]);
+                            return MonthlyOverviewCard(monthlyStats: _monthList[index], selectedYear: widget.selectedDate.year);
                           },
                         ),
                       ),
