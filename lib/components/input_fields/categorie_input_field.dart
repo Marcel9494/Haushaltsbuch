@@ -67,7 +67,9 @@ class _CategorieInputFieldState extends State<CategorieInputField> {
                             child: GridView.count(
                               primary: false,
                               padding: const EdgeInsets.all(20),
-                              crossAxisCount: 3,
+                              crossAxisCount: 4,
+                              mainAxisSpacing: 5,
+                              crossAxisSpacing: 5,
                               shrinkWrap: true,
                               children: <Widget>[
                                 for (int i = 0; i < categorieNames.length; i++)

@@ -39,6 +39,7 @@ class _DateInputFieldState extends State<DateInputField> {
           title: const Text('Wiederholung:'),
           content: SizedBox(
             height: 400.0,
+            width: 200,
             child: ScrollConfiguration(
               behavior: ScrollingBehavior(),
               child: ListView.builder(

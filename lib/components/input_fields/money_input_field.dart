@@ -39,7 +39,9 @@ class MoneyInputField extends StatelessWidget {
                 Center(
                   child: GridView.count(
                     primary: false,
-                    padding: const EdgeInsets.all(20),
+                    padding: const EdgeInsets.all(30),
+                    mainAxisSpacing: 5,
+                    crossAxisSpacing: 5,
                     crossAxisCount: 4,
                     shrinkWrap: true,
                     children: <Widget>[
@@ -165,22 +167,5 @@ class MoneyInputField extends StatelessWidget {
         errorText: errorText.isEmpty ? null : errorText,
       ),
     );
-  }
-}
-
-
-class WidgetPosition {
-  getSizes(GlobalKey key) {
-    final RenderBox renderBoxRed = key.currentContext?.findRenderObject() as RenderBox;
-    final sizeRed = renderBoxRed.size;
-    print("SIZE: $sizeRed");
-    return [sizeRed.width, sizeRed.height];
-  }
-
-  getPositions(GlobalKey key) {
-    final RenderBox renderBoxRed = key.currentContext?.findRenderObject() as RenderBox;
-    final positionRed = renderBoxRed.localToGlobal(Offset.zero);
-    print("POSITION: $positionRed ");
-    return [positionRed.dx, positionRed.dy];
   }
 }
