@@ -88,6 +88,10 @@ class _EditBudgetScreenState extends State<EditBudgetScreen> {
                       child: Column(
                         children: [
                           DefaultBudgetCard(defaultBudget: _defaultBudget),
+                          const Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 12.0),
+                            child: Divider(),
+                          ),
                           RefreshIndicator(
                             onRefresh: () async {
                               _budgetList = await _loadOneBudgetCategorie();
