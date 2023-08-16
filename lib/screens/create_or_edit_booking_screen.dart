@@ -189,12 +189,10 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
   }
 
   set currentTransaction(String transaction) => setState(() => {_currentTransaction = transaction, _categorieTextController.text = ''});
-  set currentBookingDate(DateTime bookingDate) => setState(() => _parsedBookingDate = bookingDate);
+  set currentBookingDate(DateTime bookingDate) => _parsedBookingDate = bookingDate;
 
   void _setTitleState(String title) {
-    setState(() {
-      _title = title;
-    });
+    _title = title;
   }
 
   void _deleteBooking(int index) {
@@ -370,7 +368,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
                         DateInputField(
                             currentDate: _parsedBookingDate,
                             textController: _bookingDateTextController,
-                            bookingDateCallback: (bookingDate) => setState(() => _parsedBookingDate = bookingDate),
+                            bookingDateCallback: (bookingDate) => _parsedBookingDate = bookingDate,
                             repeat: _bookingRepeat,
                             repeatCallback: (repeat) => setState(() => _bookingRepeat = repeat)),
                         TextInputField(input: _title, inputCallback: _setTitleState, hintText: 'Titel'),
