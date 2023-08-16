@@ -282,6 +282,28 @@ class Booking extends HiveObject {
     }
   }
 
+  static Future<void> updateBookingCategorieName(String oldCategorieName, String newCategorieName) async {
+    var bookingBox = await Hive.openBox(bookingsBox);
+    for (int i = 0; i < bookingBox.length; i++) {
+      Booking booking = await bookingBox.getAt(i);
+      if (booking.categorie == oldCategorieName) {
+        Booking updatedBookingWithNewCategorieName = Booking()
+          ..boxIndex = i
+          ..transactionType = booking.transactionType
+          ..bookingRepeats = booking.bookingRepeats
+          ..title = booking.title
+          ..date = booking.date
+          ..amount = booking.amount
+          ..categorie = newCategorieName
+          ..fromAccount = booking.fromAccount
+          ..toAccount = booking.toAccount
+          ..serieId = booking.serieId
+          ..booked = booking.booked;
+        bookingBox.putAt(updatedBookingWithNewCategorieName.boxIndex, updatedBookingWithNewCategorieName);
+      }
+    }
+  }
+
   static Future<void> updateBookingAccountName(String oldAccountName, String newAccountName) async {
     var bookingBox = await Hive.openBox(bookingsBox);
     for (int i = 0; i < bookingBox.length; i++) {
@@ -298,7 +320,7 @@ class Booking extends HiveObject {
           ..toAccount = booking.toAccount
           ..serieId = booking.serieId
           ..booked = booking.booked;
-        bookingBox.putAt(booking.boxIndex, updatedBookingWithNewAccountName);
+        bookingBox.putAt(updatedBookingWithNewAccountName.boxIndex, updatedBookingWithNewAccountName);
       }
       if (booking.toAccount == oldAccountName) {
         Booking updatedBookingWithNewAccountName = Booking()
@@ -312,7 +334,7 @@ class Booking extends HiveObject {
           ..toAccount = newAccountName
           ..serieId = booking.serieId
           ..booked = booking.booked;
-        bookingBox.putAt(booking.boxIndex, updatedBookingWithNewAccountName);
+        bookingBox.putAt(updatedBookingWithNewAccountName.boxIndex, updatedBookingWithNewAccountName);
       }
     }
   }
