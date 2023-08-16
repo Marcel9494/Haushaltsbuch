@@ -27,7 +27,7 @@ class MoneyInputField extends StatelessWidget {
       builder: (BuildContext context) {
         return Material(
           child: SizedBox(
-            height: 430,
+            height: 430+47,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -39,7 +39,9 @@ class MoneyInputField extends StatelessWidget {
                 Center(
                   child: GridView.count(
                     primary: false,
-                    padding: const EdgeInsets.all(20),
+                    padding: const EdgeInsets.all(30),
+                    mainAxisSpacing: 5,
+                    crossAxisSpacing: 5,
                     crossAxisCount: 4,
                     shrinkWrap: true,
                     children: <Widget>[

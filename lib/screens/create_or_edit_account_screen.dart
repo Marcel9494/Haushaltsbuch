@@ -31,18 +31,23 @@ class CreateOrEditAccountScreen extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<CreateOrEditAccountScreen> createState() => _CreateOrEditAccountScreenState();
+  State<CreateOrEditAccountScreen> createState() =>
+      _CreateOrEditAccountScreenState();
 }
 
 class _CreateOrEditAccountScreenState extends State<CreateOrEditAccountScreen> {
-  final TextEditingController _accountGroupTextController = TextEditingController();
-  final TextEditingController _bankBalanceTextController = TextEditingController();
-  final TextEditingController _preselectedAccountTextController = TextEditingController();
-  final RoundedLoadingButtonController _saveButtonController = RoundedLoadingButtonController();
+  final TextEditingController _accountGroupTextController =
+      TextEditingController();
+  final TextEditingController _accountNameController = TextEditingController();
+  final TextEditingController _bankBalanceTextController =
+      TextEditingController();
+  final TextEditingController _preselectedAccountTextController =
+      TextEditingController();
+  final RoundedLoadingButtonController _saveButtonController =
+      RoundedLoadingButtonController();
   bool _isAccountEdited = false;
   bool _primaryAccountsLoaded = false;
   final Account _account = Account();
-  String _accountName = '';
   String _accountNameErrorText = '';
   String _accountGroupErrorText = '';
   String _bankBalanceErrorText = '';
@@ -60,7 +65,7 @@ class _CreateOrEditAccountScreenState extends State<CreateOrEditAccountScreen> {
 
   Future<void> _loadAccount() async {
     _loadedAccount = await Account.loadAccount(widget.accountBoxIndex);
-    _accountName = _loadedAccount.name;
+    _accountNameController.text = _loadedAccount.name;
     _accountGroupTextController.text = _loadedAccount.accountType;
     _bankBalanceTextController.text = _loadedAccount.bankBalance;
     _oldBankBalance = formatMoneyAmountToDouble(_loadedAccount.bankBalance);
@@ -72,22 +77,36 @@ class _CreateOrEditAccountScreenState extends State<CreateOrEditAccountScreen> {
   }
 
   void _createOrUpdateAccount() async {
-    _account.name = _accountName;
-    bool validAccountName = await _validAccountName(_accountName);
-    bool validAccountGroup = _validAccountGroup(_accountGroupTextController.text);
+    _account.name = _accountNameController.text;
+    bool validAccountName =
+        await _validAccountName(_accountNameController.text);
+
+    bool validAccountGroup =
+        _validAccountGroup(_accountGroupTextController.text);
     bool validBankBalance = _validBankBalance(_bankBalanceTextController.text);
-    if (validAccountGroup == false || validAccountName == false || validBankBalance == false) {
+    if (validAccountGroup == false ||
+        validAccountName == false ||
+        validBankBalance == false) {
       _setSaveButtonAnimation(false);
     } else {
       _account.accountType = _accountGroupTextController.text;
       _account.bankBalance = _bankBalanceTextController.text;
-      PrimaryAccount.setPrimaryAccountNames(_preselectedAccountTextController.text, _account.name);
+      PrimaryAccount.setPrimaryAccountNames(
+          _preselectedAccountTextController.text, _account.name);
       if (widget.accountBoxIndex == -1) {
         _account.createAccount(_account);
         _navigateToAccountScreen();
       } else {
-        if (_oldBankBalance != formatMoneyAmountToDouble(_bankBalanceTextController.text)) {
-          showChoiceDialog(context, 'Buchung erfassen?', _recordBooking, _noPressed, 'Buchung wurde erstellt', 'Buchung wurde erfolgreich erstellt.', Icons.info_outline,
+        if (_oldBankBalance !=
+            formatMoneyAmountToDouble(_bankBalanceTextController.text)) {
+          showChoiceDialog(
+              context,
+              'Buchung erfassen?',
+              _recordBooking,
+              _noPressed,
+              'Buchung wurde erstellt',
+              'Buchung wurde erfolgreich erstellt.',
+              Icons.info_outline,
               'Der Betragsunterschied wurde in deinem Account gespeichert. Möchtest du die Differenz als ${_oldBankBalance >= formatMoneyAmountToDouble(_bankBalanceTextController.text) ? TransactionType.outcome.name : TransactionType.income.name} erfassen?');
         } else {
           _updateAccount();
@@ -97,14 +116,15 @@ class _CreateOrEditAccountScreenState extends State<CreateOrEditAccountScreen> {
   }
 
   Future<bool> _validAccountName(String accountNameInput) async {
-    if (_accountName.isEmpty) {
+    if (_accountNameController.text.isEmpty) {
       setState(() {
         _accountNameErrorText = 'Bitte geben Sie einen Kontonamen ein.';
       });
       return false;
     }
     if (widget.accountBoxIndex == -1) {
-      bool accountNameExisting = await _account.existsAccountName(_accountName);
+      bool accountNameExisting =
+          await _account.existsAccountName(_accountNameController.text);
       if (accountNameExisting) {
         setState(() {
           _accountNameErrorText = 'Konto ist bereits angelegt.';
@@ -139,7 +159,9 @@ class _CreateOrEditAccountScreenState extends State<CreateOrEditAccountScreen> {
   }
 
   void _setSaveButtonAnimation(bool successful) {
-    successful ? _saveButtonController.success() : _saveButtonController.error();
+    successful
+        ? _saveButtonController.success()
+        : _saveButtonController.error();
     if (successful == false) {
       Timer(const Duration(seconds: 1), () {
         _saveButtonController.reset();
@@ -147,21 +169,18 @@ class _CreateOrEditAccountScreenState extends State<CreateOrEditAccountScreen> {
     }
   }
 
-  void _setAccountNameState(String accountName) {
-    setState(() {
-      _accountName = accountName;
-    });
-  }
-
   void _recordBooking() {
     String transactionType = '';
     double difference = 0.0;
-    if (_oldBankBalance >= formatMoneyAmountToDouble(_bankBalanceTextController.text)) {
+    if (_oldBankBalance >=
+        formatMoneyAmountToDouble(_bankBalanceTextController.text)) {
       transactionType = TransactionType.outcome.name;
     } else {
       transactionType = TransactionType.income.name;
     }
-    difference = (_oldBankBalance - formatMoneyAmountToDouble(_bankBalanceTextController.text)).abs();
+    difference = (_oldBankBalance -
+            formatMoneyAmountToDouble(_bankBalanceTextController.text))
+        .abs();
     Booking newBooking = Booking()
       ..transactionType = transactionType
       ..bookingRepeats = RepeatType.noRepetition.name
@@ -169,15 +188,16 @@ class _CreateOrEditAccountScreenState extends State<CreateOrEditAccountScreen> {
       ..date = DateTime.now().toString()
       ..amount = formatToMoneyAmount(difference.toString())
       ..categorie = 'Differenz'
-      ..fromAccount = _accountName
-      ..toAccount = _accountName;
+      ..fromAccount = _accountNameController.text
+      ..toAccount = _accountNameController.text;
     // TODO newBooking.createBooking();
     // TODO entfernen? newBooking.createBooking(newBooking);
     _account.updateAccount(_account, widget.accountBoxIndex, _loadedAccount.name);
     for (int i = 0; i < 4; i++) {
       Navigator.pop(context);
     }
-    Navigator.pushNamed(context, bottomNavBarRoute, arguments: BottomNavBarScreenArguments(2));
+    Navigator.pushNamed(context, bottomNavBarRoute,
+        arguments: BottomNavBarScreenArguments(2));
   }
 
   void _noPressed() {
@@ -185,7 +205,8 @@ class _CreateOrEditAccountScreenState extends State<CreateOrEditAccountScreen> {
     for (int i = 0; i < 4; i++) {
       Navigator.pop(context);
     }
-    Navigator.pushNamed(context, bottomNavBarRoute, arguments: BottomNavBarScreenArguments(2));
+    Navigator.pushNamed(context, bottomNavBarRoute,
+        arguments: BottomNavBarScreenArguments(2));
   }
 
   void _updateAccount() {
@@ -200,19 +221,23 @@ class _CreateOrEditAccountScreenState extends State<CreateOrEditAccountScreen> {
         FocusScope.of(context).requestFocus(FocusNode());
         Navigator.pop(context);
         Navigator.pop(context);
-        Navigator.pushNamed(context, bottomNavBarRoute, arguments: BottomNavBarScreenArguments(2));
+        Navigator.pushNamed(context, bottomNavBarRoute,
+            arguments: BottomNavBarScreenArguments(2));
       }
     });
   }
 
   void _getPrimaryAccounts() async {
-    _loadedPrimaryAccounts = await PrimaryAccount.loadFilteredPrimaryAccountList(_accountName);
+    _loadedPrimaryAccounts =
+        await PrimaryAccount.loadFilteredPrimaryAccountList(
+            _accountNameController.text);
     for (int i = 0; i < _loadedPrimaryAccounts.length; i++) {
       if (_loadedPrimaryAccounts[i].accountName != '') {
         if (_preselectedAccountTextController.text.isNotEmpty) {
           _preselectedAccountTextController.text += ', ';
         }
-        _preselectedAccountTextController.text += _loadedPrimaryAccounts[i].transactionType;
+        _preselectedAccountTextController.text +=
+            _loadedPrimaryAccounts[i].transactionType;
       }
     }
   }
@@ -221,8 +246,11 @@ class _CreateOrEditAccountScreenState extends State<CreateOrEditAccountScreen> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
+        resizeToAvoidBottomInset: false,
         appBar: AppBar(
-          title: widget.accountBoxIndex == -1 ? const Text('Konto erstellen') : const Text('Konto bearbeiten'),
+          title: widget.accountBoxIndex == -1
+              ? const Text('Konto erstellen')
+              : const Text('Konto bearbeiten'),
         ),
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 24.0),
@@ -245,12 +273,23 @@ class _CreateOrEditAccountScreenState extends State<CreateOrEditAccountScreen> {
                     return Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        AccountTypeInputField(textController: _accountGroupTextController, errorText: _accountGroupErrorText),
-                        TextInputField(input: _accountName, inputCallback: _setAccountNameState, errorText: _accountNameErrorText, hintText: 'Name'),
+                        AccountTypeInputField(
+                            textController: _accountGroupTextController,
+                            errorText: _accountGroupErrorText),
+                        TextInputField(
+                            textEditingController: _accountNameController,
+                            errorText: _accountNameErrorText,
+                            hintText: 'Name'),
                         MoneyInputField(
-                            textController: _bankBalanceTextController, errorText: _bankBalanceErrorText, hintText: 'Kontostand', bottomSheetTitle: 'Kontostand eingeben:'),
-                        PreselectAccountInputField(textController: _preselectedAccountTextController),
-                        SaveButton(saveFunction: _createOrUpdateAccount, buttonController: _saveButtonController),
+                            textController: _bankBalanceTextController,
+                            errorText: _bankBalanceErrorText,
+                            hintText: 'Kontostand',
+                            bottomSheetTitle: 'Kontostand eingeben:'),
+                        PreselectAccountInputField(
+                            textController: _preselectedAccountTextController),
+                        SaveButton(
+                            saveFunction: _createOrUpdateAccount,
+                            buttonController: _saveButtonController),
                       ],
                     );
                 }
