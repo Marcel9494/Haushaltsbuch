@@ -97,11 +97,6 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
       return;
     }
     if (widget.bookingBoxIndex == -1) {
-      if (_currentTransaction == TransactionType.transfer.name || _currentTransaction == TransactionType.investment.name) {
-        Account.transferMoney(_fromAccountTextController.text, _toAccountTextController.text, _amountTextController.text);
-      } else {
-        Account.calculateNewAccountBalance(_fromAccountTextController.text, _amountTextController.text, _currentTransaction);
-      }
       Booking booking = Booking();
       if (_bookingRepeat == RepeatType.noRepetition.name) {
         booking.createBooking(_title, _currentTransaction, _parsedBookingDate.toString(), _bookingRepeat, _amountTextController.text, _categorieTextController.text,

@@ -1,5 +1,6 @@
-import '/utils/consts/hive_consts.dart';
 import 'package:hive/hive.dart';
+
+import '/utils/consts/hive_consts.dart';
 
 @HiveType(typeId: categoryTypeTypeId)
 enum CategorieType { income, outcome, investment }

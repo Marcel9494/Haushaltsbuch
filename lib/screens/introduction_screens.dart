@@ -20,15 +20,7 @@ class IntroductionScreens extends StatefulWidget {
 class _IntroductionScreensState extends State<IntroductionScreens> {
   @override
   void initState() {
-    _forwardToApp();
     super.initState();
-  }
-
-  void _forwardToApp() async {
-    // TODO funktioniert noch nicht
-    /*if (await Categorie.checkIfCategoriesExists()) {
-      Navigator.popAndPushNamed(context, bottomNavBarRoute, arguments: BottomNavBarScreenArguments(0));
-    }*/
   }
 
   void _createStartCategoriesAndAccounts() {
