@@ -1,8 +1,10 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../../utils/helper_components/scrolling_behavior.dart';
 
-void showListDialog(BuildContext context, String title, List<dynamic> items, TextEditingController textController) {
+void showListDialog(BuildContext context, String title, List<dynamic> items,
+    TextEditingController textController) {
   showDialog(
     context: context,
     builder: (BuildContext context) {
@@ -12,17 +14,21 @@ void showListDialog(BuildContext context, String title, List<dynamic> items, Tex
           height: 400.0,
           child: ScrollConfiguration(
             behavior: ScrollingBehavior(),
-            child: ListView.builder(
-              itemCount: items.length,
-              itemBuilder: (BuildContext context, int index) {
-                return ListTile(
-                  title: Text(items[index]),
-                  onTap: () => {
-                    textController.text = items[index],
-                    Navigator.pop(context),
-                  },
-                );
-              },
+            child: SizedBox(
+              width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.height,
+              child: ListView.builder(
+                itemCount: items.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return ListTile(
+                    title: Text(items[index]),
+                    onTap: () => {
+                      textController.text = items[index],
+                      Navigator.pop(context),
+                    },
+                  );
+                },
+              ),
             ),
           ),
         ),

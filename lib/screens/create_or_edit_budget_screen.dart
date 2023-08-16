@@ -18,7 +18,8 @@ import '/models/enums/transaction_types.dart';
 import '/models/screen_arguments/bottom_nav_bar_screen_arguments.dart';
 
 class CreateOrEditBudgetScreen extends StatefulWidget {
-  final int budgetBoxIndex; // budgetBoxIndex == -1 = Budget bearbeiten / -2 = Standardbudget bearbeiten / >= 0 = Budget erstellen
+  final int
+      budgetBoxIndex; // budgetBoxIndex == -1 = Budget bearbeiten / -2 = Standardbudget bearbeiten / >= 0 = Budget erstellen
   final String? budgetCategorie;
 
   const CreateOrEditBudgetScreen({
@@ -28,13 +29,16 @@ class CreateOrEditBudgetScreen extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<CreateOrEditBudgetScreen> createState() => _CreateOrEditBudgetScreenState();
+  State<CreateOrEditBudgetScreen> createState() =>
+      _CreateOrEditBudgetScreenState();
 }
 
 class _CreateOrEditBudgetScreenState extends State<CreateOrEditBudgetScreen> {
-  final TextEditingController _categorieTextController = TextEditingController();
+  final TextEditingController _categorieTextController =
+      TextEditingController();
   final TextEditingController _budgetTextController = TextEditingController();
-  final RoundedLoadingButtonController _saveButtonController = RoundedLoadingButtonController();
+  final RoundedLoadingButtonController _saveButtonController =
+      RoundedLoadingButtonController();
   late DefaultBudget _loadedDefaultBudget;
   late Budget _loadedBudget;
   String _categorieErrorText = '';
@@ -53,21 +57,26 @@ class _CreateOrEditBudgetScreenState extends State<CreateOrEditBudgetScreen> {
 
   Future<void> _loadBudget() async {
     _loadedBudget = await Budget.loadBudget(widget.budgetBoxIndex);
-    _budgetTextController.text = formatToMoneyAmount(_loadedBudget.budget.toString());
+    _budgetTextController.text =
+        formatToMoneyAmount(_loadedBudget.budget.toString());
   }
 
   Future<void> _loadDefaultBudget() async {
-    _loadedDefaultBudget = await DefaultBudget.loadDefaultBudget(widget.budgetCategorie!);
-    _budgetTextController.text = formatToMoneyAmount(_loadedDefaultBudget.defaultBudget.toString());
+    _loadedDefaultBudget =
+        await DefaultBudget.loadDefaultBudget(widget.budgetCategorie!);
+    _budgetTextController.text =
+        formatToMoneyAmount(_loadedDefaultBudget.defaultBudget.toString());
   }
 
   void _createOrUpdateBudget() async {
-    if (_validCategorie(_categorieTextController.text) == false || _validBudget(_budgetTextController.text) == false) {
+    if (_validCategorie(_categorieTextController.text) == false ||
+        _validBudget(_budgetTextController.text) == false) {
       _setSaveButtonAnimation(false);
       return;
     }
     if (widget.budgetBoxIndex == -1) {
-      _budgetExistsAlready = await Budget.existsBudgetCategorie(_categorieTextController.text);
+      _budgetExistsAlready =
+          await Budget.existsBudgetCategorie(_categorieTextController.text);
       if (_budgetExistsAlready) {
         showChoiceDialog(
             context,
@@ -88,14 +97,16 @@ class _CreateOrEditBudgetScreenState extends State<CreateOrEditBudgetScreen> {
         newBudget.createBudget(newBudget);
         DefaultBudget newDefaultBudget = DefaultBudget()
           ..categorie = _categorieTextController.text
-          ..defaultBudget = formatMoneyAmountToDouble(_budgetTextController.text);
+          ..defaultBudget =
+              formatMoneyAmountToDouble(_budgetTextController.text);
         newDefaultBudget.createDefaultBudget(newDefaultBudget);
       }
     } else if (widget.budgetBoxIndex == -2) {
       DefaultBudget updatedDefaultBudget = DefaultBudget()
         ..categorie = _loadedDefaultBudget.categorie
         ..defaultBudget = formatMoneyAmountToDouble(_budgetTextController.text);
-      updatedDefaultBudget.updateDefaultBudget(updatedDefaultBudget, _loadedDefaultBudget.categorie);
+      updatedDefaultBudget.updateDefaultBudget(
+          updatedDefaultBudget, _loadedDefaultBudget.categorie);
       Budget.updateAllFutureBudgetsFromCategorie(updatedDefaultBudget);
     } else {
       Budget updatedBudget = Budget()
@@ -117,7 +128,8 @@ class _CreateOrEditBudgetScreenState extends State<CreateOrEditBudgetScreen> {
             Navigator.pop(context);
             Navigator.pop(context);
           }
-          Navigator.pushNamed(context, bottomNavBarRoute, arguments: BottomNavBarScreenArguments(1));
+          Navigator.pushNamed(context, bottomNavBarRoute,
+              arguments: BottomNavBarScreenArguments(1));
         }
       });
     }
@@ -146,7 +158,9 @@ class _CreateOrEditBudgetScreenState extends State<CreateOrEditBudgetScreen> {
   }
 
   void _setSaveButtonAnimation(bool successful) {
-    successful ? _saveButtonController.success() : _saveButtonController.error();
+    successful
+        ? _saveButtonController.success()
+        : _saveButtonController.error();
     if (successful == false) {
       Timer(const Duration(seconds: 1), () {
         _saveButtonController.reset();
@@ -159,13 +173,15 @@ class _CreateOrEditBudgetScreenState extends State<CreateOrEditBudgetScreen> {
       DefaultBudget updatedDefaultBudget = DefaultBudget()
         ..categorie = _categorieTextController.text
         ..defaultBudget = formatMoneyAmountToDouble(_budgetTextController.text);
-      updatedDefaultBudget.updateDefaultBudget(updatedDefaultBudget, _categorieTextController.text);
+      updatedDefaultBudget.updateDefaultBudget(
+          updatedDefaultBudget, _categorieTextController.text);
       Budget.updateAllBudgetsFromCategorie(updatedDefaultBudget);
     });
     _setSaveButtonAnimation(true);
     Navigator.pop(context);
     Navigator.pop(context);
-    Navigator.popAndPushNamed(context, bottomNavBarRoute, arguments: BottomNavBarScreenArguments(1));
+    Navigator.popAndPushNamed(context, bottomNavBarRoute,
+        arguments: BottomNavBarScreenArguments(1));
     FocusScope.of(context).unfocus();
   }
 
@@ -180,7 +196,9 @@ class _CreateOrEditBudgetScreenState extends State<CreateOrEditBudgetScreen> {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          title: Text(widget.budgetBoxIndex == -1 ? 'Budget erstellen' : 'Budget bearbeiten'),
+          title: Text(widget.budgetBoxIndex == -1
+              ? 'Budget erstellen'
+              : 'Budget bearbeiten'),
         ),
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 24.0),
@@ -200,8 +218,14 @@ class _CreateOrEditBudgetScreenState extends State<CreateOrEditBudgetScreen> {
                         title: 'Kategorie für Budget auswählen:',
                         autofocus: true)
                     : const SizedBox(),
-                MoneyInputField(textController: _budgetTextController, errorText: _budgetErrorText, hintText: 'Budget', bottomSheetTitle: 'Budget eingeben:'),
-                SaveButton(saveFunction: _createOrUpdateBudget, buttonController: _saveButtonController),
+                MoneyInputField(
+                    textController: _budgetTextController,
+                    errorText: _budgetErrorText,
+                    hintText: 'Budget',
+                    bottomSheetTitle: 'Budget eingeben:'),
+                SaveButton(
+                    saveFunction: _createOrUpdateBudget,
+                    buttonController: _saveButtonController),
               ],
             ),
           ),

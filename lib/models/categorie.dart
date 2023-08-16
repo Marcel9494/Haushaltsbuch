@@ -1,7 +1,9 @@
 import 'package:hive/hive.dart';
 
-import '/utils/consts/hive_consts.dart';
+import 'booking.dart';
 import 'enums/categorie_types.dart';
+
+import '/utils/consts/hive_consts.dart';
 
 @HiveType(typeId: categoryTypeId)
 class Categorie extends HiveObject {
@@ -21,6 +23,7 @@ class Categorie extends HiveObject {
       Categorie categorie = await categorieBox.getAt(i);
       if (oldCategorieName == categorie.name) {
         categorieBox.putAt(i, updatedCategorie);
+        Booking.updateBookingCategorieName(oldCategorieName, updatedCategorie.name);
         break;
       }
     }
@@ -154,11 +157,14 @@ class CategorieAdapter extends TypeAdapter<Categorie> {
 
   @override
   Categorie read(BinaryReader reader) {
-    return Categorie()..name = reader.read();
+    return Categorie()
+      ..name = reader.read()
+      ..type = reader.read();
   }
 
   @override
   void write(BinaryWriter writer, Categorie obj) {
     writer.write(obj.name);
+    writer.write(obj.type);
   }
 }

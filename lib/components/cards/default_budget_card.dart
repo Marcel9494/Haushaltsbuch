@@ -30,17 +30,25 @@ class DefaultBudgetCard extends StatelessWidget {
               Expanded(
                 flex: 5,
                 child: Padding(
-                  padding: const EdgeInsets.only(right: 12.0),
-                  child: Text('${defaultBudget.categorie} Standardbudget', overflow: TextOverflow.ellipsis, maxLines: 2),
-                ),
-              ),
-              Expanded(
-                flex: 2,
-                child: Padding(
-                  padding: const EdgeInsets.only(right: 10.0),
-                  child: Text(
-                    formatToMoneyAmount(defaultBudget.defaultBudget.toString()),
-                    textAlign: TextAlign.right,
+                  padding: const EdgeInsets.only(right: 12.0, left: 12.0),
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text('${defaultBudget.categorie} Standardbudget', overflow: TextOverflow.ellipsis, maxLines: 2),
+                          Text(
+                            formatToMoneyAmount(defaultBudget.defaultBudget.toString()),
+                            textAlign: TextAlign.right,
+                          ),
+                        ],
+                      ),
+                      const Divider(),
+                      const Text(
+                        'Du kannst das Budget für jeden Monat anpassen. Wenn du das Standardbudget veränderst, wird es für den aktuellen und alle zukünftigen Monate angewendet.',
+                        textAlign: TextAlign.justify,
+                      ),
+                    ],
                   ),
                 ),
               ),
