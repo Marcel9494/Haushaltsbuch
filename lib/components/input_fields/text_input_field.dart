@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class TextInputField extends StatelessWidget {
+class TextInputField extends StatefulWidget {
   final TextEditingController textEditingController;
   final String hintText;
   final String errorText;
@@ -17,33 +17,45 @@ class TextInputField extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  State<TextInputField> createState() => _TextInputFieldState();
+}
+
+class _TextInputFieldState extends State<TextInputField> {
+  @override
   Widget build(BuildContext context) {
     return TextFormField(
       textCapitalization: TextCapitalization.words,
-      controller: textEditingController,
-      maxLength: maxLength,
-      autofocus: autofocus,
+      controller: widget.textEditingController,
+      maxLength: widget.maxLength,
+      autofocus: widget.autofocus,
       textAlignVertical: TextAlignVertical.center,
+      onChanged: (_) => setState(() {
+        widget.textEditingController;
+      }),
       decoration: InputDecoration(
-        hintText: hintText,
+        hintText: widget.hintText,
         counterText: '',
         prefixIcon: const Icon(
           Icons.title_rounded,
           color: Colors.grey,
         ),
-        suffixIcon: IconButton(
-          onPressed: () {
-            textEditingController.clear();
-          },
-          icon: const Icon(
-              Icons.clear,
-              color: Colors.grey,
-          ),
-        ),
+        suffixIcon: widget.textEditingController.text.isNotEmpty
+            ? IconButton(
+                onPressed: () {
+                  setState(() {
+                    widget.textEditingController.clear();
+                  });
+                },
+                icon: const Icon(
+                  Icons.clear,
+                  color: Colors.grey,
+                ),
+              )
+            : const SizedBox(),
         focusedBorder: const UnderlineInputBorder(
           borderSide: BorderSide(color: Colors.cyanAccent, width: 1.5),
         ),
-        errorText: errorText.isEmpty ? null : errorText,
+        errorText: widget.errorText.isEmpty ? null : widget.errorText,
       ),
     );
   }

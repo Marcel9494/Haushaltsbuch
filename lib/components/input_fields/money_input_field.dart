@@ -27,7 +27,7 @@ class MoneyInputField extends StatelessWidget {
       builder: (BuildContext context) {
         return Material(
           child: SizedBox(
-            height: 430+47,
+            height: 430.0,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [

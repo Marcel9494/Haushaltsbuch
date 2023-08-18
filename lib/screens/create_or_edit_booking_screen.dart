@@ -197,7 +197,6 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
   }
 
   set currentTransaction(String transaction) => setState(() => {_currentTransaction = transaction, _categorieTextController.text = ''});
-
   set currentBookingDate(DateTime bookingDate) => _parsedBookingDate = bookingDate;
 
   void _deleteBooking(int index) {
