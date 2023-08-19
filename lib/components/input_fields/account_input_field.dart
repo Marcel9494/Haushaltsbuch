@@ -30,7 +30,7 @@ class _AccountInputFieldState extends State<AccountInputField> {
       builder: (BuildContext context) {
         return Material(
           child: SizedBox(
-            height: 400,
+            height: 400.0,
             child: ListView(
               children: [
                 const BottomSheetLine(),
