@@ -12,7 +12,7 @@ class TextInputField extends StatefulWidget {
     required this.textEditingController,
     required this.hintText,
     this.errorText = '',
-    this.maxLength = 40,
+    this.maxLength = 60,
     this.autofocus = false,
   }) : super(key: key);
 
