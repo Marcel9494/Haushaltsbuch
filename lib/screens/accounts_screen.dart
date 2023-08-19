@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
-import '../components/tab_views/asset_future_development_statistic_tab_view.dart';
-import '../models/booking.dart';
+import '/components/tab_views/asset_future_development_statistic_tab_view.dart';
 import '/components/tab_views/asset_development_statistic_tab_view.dart';
 import '/components/tab_views/asset_allocation_statistic_tab_view.dart';
 import '/components/tab_views/account_overview_tab_view.dart';
@@ -14,6 +12,7 @@ import '/components/deco/overview_tile.dart';
 import '/utils/consts/route_consts.dart';
 
 import '/models/account.dart';
+import '/models/booking.dart';
 import '/models/screen_arguments/create_or_edit_account_screen_arguments.dart';
 
 class AccountsScreen extends StatefulWidget {

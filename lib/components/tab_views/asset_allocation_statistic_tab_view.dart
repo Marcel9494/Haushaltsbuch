@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:haushaltsbuch/utils/number_formatters/number_formatter.dart';
+
+import '../dialogs/info_dialog.dart';
+
+import '/utils/number_formatters/number_formatter.dart';
 
 import '/components/cards/percentage_card.dart';
 import '/components/deco/loading_indicator.dart';
@@ -133,7 +136,10 @@ class _AssetAllocationStatisticTabViewState extends State<AssetAllocationStatist
                                     style: const TextStyle(color: Colors.cyanAccent),
                                   ),
                                 )
-                              : const SizedBox(),
+                              : IconButton(
+                                  onPressed: () => showInfoDialog(context, 'Kapitalanlagen & risikolose Anlagen', () => Navigator.pop(context),
+                                      'Unter Kapitalanlagen werden alle Konten vom Typ Kapitalanlage verrechnet, diese sind risikobehaftet.\n\nUnter risikolose Anlagen werden Sparguthaben, Girokonten, Tagesgeldkonten, etc. gezählt die risikoarm sind.'),
+                                  icon: const Icon(Icons.help_outline_rounded, color: Colors.grey)),
                         ],
                       ),
                     ),
