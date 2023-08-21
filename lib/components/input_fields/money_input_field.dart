@@ -5,12 +5,12 @@ import '/components/deco/bottom_sheet_line.dart';
 
 import '/utils/number_formatters/number_formatter.dart';
 
-class MoneyInputField extends StatelessWidget {
+class MoneyInputField extends StatefulWidget {
   final TextEditingController textController;
   final String errorText;
   final String hintText;
   final String bottomSheetTitle;
-  bool _clearedInputField = false;
+  final FocusNode focus;
 
   MoneyInputField({
     Key? key,
@@ -18,10 +18,23 @@ class MoneyInputField extends StatelessWidget {
     required this.errorText,
     required this.hintText,
     required this.bottomSheetTitle,
+    required this.focus,
   }) : super(key: key);
 
+  @override
+  State<MoneyInputField> createState() => _MoneyInputFieldState();
+}
+
+class _MoneyInputFieldState extends State<MoneyInputField> {
+  bool _clearedInputField = false;
+
   void _openBottomSheetForNumberInput(BuildContext context) {
-    _clearedInputField = textController.text.isEmpty ? true : false;
+    _clearedInputField = widget.textController.text.isEmpty ? true : false;
+    print('Test');
+    if (widget.focus.hasFocus == false) {
+      return;
+    }
+    print('Test 2');
     showCupertinoModalBottomSheet<void>(
       context: context,
       builder: (BuildContext context) {
@@ -33,8 +46,8 @@ class MoneyInputField extends StatelessWidget {
               children: [
                 const BottomSheetLine(),
                 Padding(
-                  padding: const EdgeInsets.only(top: 16.0, left: 20.0),
-                  child: Text(bottomSheetTitle, style: const TextStyle(fontSize: 18.0)),
+                  padding: const EdgeInsets.only(top: 16.0, left: 30.0),
+                  child: Text(widget.bottomSheetTitle, style: const TextStyle(fontSize: 18.0)),
                 ),
                 Center(
                   child: GridView.count(
@@ -59,7 +72,7 @@ class MoneyInputField extends StatelessWidget {
                       ),
                       OutlinedButton(
                         onPressed: () {
-                          textController.text = '';
+                          widget.textController.text = '';
                         },
                         child: const Icon(Icons.clear_rounded, color: Colors.cyanAccent),
                       ),
@@ -77,8 +90,8 @@ class MoneyInputField extends StatelessWidget {
                       ),
                       OutlinedButton(
                         onPressed: () {
-                          if (textController.text.isNotEmpty) {
-                            textController.text = textController.text.substring(0, textController.text.length - 1);
+                          if (widget.textController.text.isNotEmpty) {
+                            widget.textController.text = widget.textController.text.substring(0, widget.textController.text.length - 1);
                           }
                         },
                         child: const Icon(Icons.backspace_rounded, color: Colors.cyanAccent),
@@ -122,8 +135,10 @@ class MoneyInputField extends StatelessWidget {
         );
       },
     ).whenComplete(() {
-      if (textController.text.isNotEmpty) {
-        textController.text = formatToMoneyAmount(textController.text);
+      if (widget.textController.text.isNotEmpty) {
+        widget.textController.text = formatToMoneyAmount(widget.textController.text);
+        FocusManager.instance.primaryFocus?.unfocus();
+        FocusScope.of(context).unfocus();
       }
     });
   }
@@ -132,30 +147,52 @@ class MoneyInputField extends StatelessWidget {
     // Eingabefeld wird automatisch geleert => Benutzer muss das Eingabefeld nicht mehr mit X löschen, wenn
     // ein neuer Betrag eingegeben wird.
     if (_clearedInputField == false) {
-      textController.text = '';
+      widget.textController.text = '';
       _clearedInputField = true;
     }
-    if (amount == ',' && textController.text.contains(',')) {
-      textController.text;
+    if (amount == ',' && widget.textController.text.contains(',')) {
+      widget.textController.text;
     } else {
       final regex = RegExp(r'^\d+(,\d{0,2})?$');
-      if (regex.hasMatch(textController.text + amount)) {
-        textController.text += amount;
+      if (regex.hasMatch(widget.textController.text + amount)) {
+        widget.textController.text += amount;
       }
     }
+  }
+
+  void _onFocusChange() {
+    // TODO hier weitermachen und nicht benötigter Code aufräumen + Wenn Textfeld nicht leer auch nicht fokusieren und ggf.
+    // nicht gültiges Format Fehler abfangen 100.0 anstatt 100,00 €
+    FocusManager.instance.primaryFocus?.unfocus();
+    FocusScope.of(context).unfocus();
+    Navigator.pop(context);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    widget.focus.addListener(() => widget.focus.hasFocus ? _openBottomSheetForNumberInput(context) : null);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    widget.focus.removeListener(_onFocusChange);
+    widget.focus.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
       maxLength: 9,
-      controller: textController,
+      controller: widget.textController,
       textAlignVertical: TextAlignVertical.center,
       showCursor: false,
       readOnly: true,
+      focusNode: widget.focus,
       onTap: () => _openBottomSheetForNumberInput(context),
       decoration: InputDecoration(
-        hintText: hintText,
+        hintText: widget.hintText,
         counterText: '',
         prefixIcon: const Icon(
           Icons.money_rounded,
@@ -164,7 +201,7 @@ class MoneyInputField extends StatelessWidget {
         focusedBorder: const UnderlineInputBorder(
           borderSide: BorderSide(color: Colors.cyanAccent, width: 1.5),
         ),
-        errorText: errorText.isEmpty ? null : errorText,
+        errorText: widget.errorText.isEmpty ? null : widget.errorText,
       ),
     );
   }

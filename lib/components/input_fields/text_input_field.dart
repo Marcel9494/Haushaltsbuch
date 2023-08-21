@@ -6,11 +6,13 @@ class TextInputField extends StatefulWidget {
   final String errorText;
   final int maxLength;
   final bool autofocus;
+  final FocusNode focus;
 
   const TextInputField({
     Key? key,
     required this.textEditingController,
     required this.hintText,
+    required this.focus,
     this.errorText = '',
     this.maxLength = 60,
     this.autofocus = false,
@@ -25,6 +27,7 @@ class _TextInputFieldState extends State<TextInputField> {
   Widget build(BuildContext context) {
     return TextFormField(
       textCapitalization: TextCapitalization.words,
+      textInputAction: TextInputAction.next,
       controller: widget.textEditingController,
       maxLength: widget.maxLength,
       autofocus: widget.autofocus,
@@ -32,6 +35,9 @@ class _TextInputFieldState extends State<TextInputField> {
       onChanged: (_) => setState(() {
         widget.textEditingController;
       }),
+      onFieldSubmitted: (_) {
+        FocusScope.of(context).requestFocus(widget.focus);
+      },
       decoration: InputDecoration(
         hintText: widget.hintText,
         counterText: '',

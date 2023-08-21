@@ -40,6 +40,7 @@ class _CreateOrEditAccountScreenState extends State<CreateOrEditAccountScreen> {
   final TextEditingController _bankBalanceTextController = TextEditingController();
   final TextEditingController _preselectedAccountTextController = TextEditingController();
   final RoundedLoadingButtonController _saveButtonController = RoundedLoadingButtonController();
+  final FocusNode focus = FocusNode();
   bool _isAccountEdited = false;
   bool _primaryAccountsLoaded = false;
   final Account _account = Account();
@@ -242,9 +243,13 @@ class _CreateOrEditAccountScreenState extends State<CreateOrEditAccountScreen> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         AccountTypeInputField(textController: _accountGroupTextController, errorText: _accountGroupErrorText),
-                        TextInputField(textEditingController: _accountNameController, errorText: _accountNameErrorText, hintText: 'Name'),
+                        TextInputField(textEditingController: _accountNameController, errorText: _accountNameErrorText, hintText: 'Name', focus: focus),
                         MoneyInputField(
-                            textController: _bankBalanceTextController, errorText: _bankBalanceErrorText, hintText: 'Kontostand', bottomSheetTitle: 'Kontostand eingeben:'),
+                            textController: _bankBalanceTextController,
+                            errorText: _bankBalanceErrorText,
+                            hintText: 'Kontostand',
+                            bottomSheetTitle: 'Kontostand eingeben:',
+                            focus: focus),
                         PreselectAccountInputField(textController: _preselectedAccountTextController),
                         SaveButton(saveFunction: _createOrUpdateAccount, buttonController: _saveButtonController),
                       ],

@@ -49,6 +49,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
   final TextEditingController _toAccountTextController = TextEditingController();
   final TextEditingController _categorieTextController = TextEditingController();
   final RoundedLoadingButtonController _saveButtonController = RoundedLoadingButtonController();
+  final FocusNode focus = FocusNode();
   bool _isBookingEdited = false;
   bool _isPreselectedAccountsLoaded = false;
   String _currentTransaction = '';
@@ -376,8 +377,8 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
                             bookingDateCallback: (bookingDate) => _parsedBookingDate = bookingDate,
                             repeat: _bookingRepeat,
                             repeatCallback: (repeat) => setState(() => _bookingRepeat = repeat)),
-                        TextInputField(textEditingController: _bookingNameController, errorText: _bookingNameErrorText, hintText: 'Titel'),
-                        MoneyInputField(textController: _amountTextController, errorText: _amountErrorText, hintText: 'Betrag', bottomSheetTitle: 'Betrag eingeben:'),
+                        TextInputField(textEditingController: _bookingNameController, errorText: _bookingNameErrorText, hintText: 'Titel', focus: focus),
+                        MoneyInputField(textController: _amountTextController, errorText: _amountErrorText, hintText: 'Betrag', bottomSheetTitle: 'Betrag eingeben:', focus: focus),
                         _getAccountInputField(),
                         _currentTransaction == TransactionType.transfer.name
                             ? const SizedBox()
