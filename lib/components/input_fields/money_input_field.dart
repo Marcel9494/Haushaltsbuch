@@ -161,8 +161,6 @@ class _MoneyInputFieldState extends State<MoneyInputField> {
   }
 
   void _onFocusChange() {
-    // TODO hier weitermachen und nicht benötigter Code aufräumen + Wenn Textfeld nicht leer auch nicht fokusieren und ggf.
-    // nicht gültiges Format Fehler abfangen 100.0 anstatt 100,00 €
     FocusManager.instance.primaryFocus?.unfocus();
     FocusScope.of(context).unfocus();
     Navigator.pop(context);
@@ -171,7 +169,10 @@ class _MoneyInputFieldState extends State<MoneyInputField> {
   @override
   void initState() {
     super.initState();
+    // Wenn Textfeld nicht leer auch nicht fokusieren
+    //if (widget.textController.text.isEmpty) {
     widget.focus.addListener(() => widget.focus.hasFocus ? _openBottomSheetForNumberInput(context) : null);
+    //}
   }
 
   @override

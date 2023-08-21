@@ -5,7 +5,7 @@ import 'package:intl/intl.dart';
 // return 8,60 €
 String formatToMoneyAmount(String moneyAmount) {
   var amountFormatter = NumberFormat.simpleCurrency(locale: 'de-DE');
-  moneyAmount = amountFormatter.format(double.parse(moneyAmount.replaceAll(',', '.')));
+  moneyAmount = amountFormatter.format(double.parse(moneyAmount.replaceAll(',', '.').replaceAll('€', '')));
   return moneyAmount;
 }
 
