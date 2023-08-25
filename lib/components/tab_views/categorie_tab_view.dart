@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:another_flushbar/flushbar.dart';
 
 import '/models/categorie.dart';
+import '/models/enums/mode_types.dart';
 import '/models/enums/categorie_types.dart';
 import '/models/screen_arguments/create_or_edit_categorie_screen_arguments.dart';
+import '/models/screen_arguments/create_or_edit_subcategorie_screen_arguments.dart';
 
 import '/utils/consts/route_consts.dart';
 
@@ -122,8 +124,13 @@ class _CategorieTabViewState extends State<CategorieTabView> {
                                         arguments: CreateOrEditCategorieScreenArguments(_categorieList[index].name, _categorieList[index].type!)),
                                   ),
                                   IconButton(
-                                    icon: const Icon(Icons.remove),
+                                    icon: const Icon(Icons.remove_rounded),
                                     onPressed: () => _deleteCategorie(index),
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(Icons.add_rounded),
+                                    onPressed: () => Navigator.pushNamed(context, createOrEditSubcategorieRoute,
+                                        arguments: CreateOrEditSubcategorieScreenArguments(_categorieList[index], ModeType.creationMode)),
                                   ),
                                 ],
                               ),

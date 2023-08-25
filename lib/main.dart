@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:haushaltsbuch/screens/create_or_edit_subcategorie_screen.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
@@ -14,6 +15,7 @@ import 'models/enums/transaction_types.dart';
 import 'models/global_state.dart';
 import 'models/intro_screen_state.dart';
 import 'models/primary_account.dart';
+import 'models/screen_arguments/create_or_edit_subcategorie_screen_arguments.dart';
 import 'models/screen_arguments/edit_budget_screen_arguments.dart';
 import 'models/screen_arguments/bottom_nav_bar_screen_arguments.dart';
 import 'models/screen_arguments/account_details_screen_arguments.dart';
@@ -130,6 +132,15 @@ class BudgetBookApp extends StatelessWidget {
               builder: (BuildContext context) => CreateOrEditCategorieScreen(
                 categorieName: args.categorieName,
                 categorieType: args.categorieType,
+              ),
+              settings: settings,
+            );
+          case createOrEditSubcategorieRoute:
+            final args = settings.arguments as CreateOrEditSubcategorieScreenArguments;
+            return MaterialPageRoute<String>(
+              builder: (BuildContext context) => CreateOrEditSubcategorieScreen(
+                categorie: args.categorie,
+                mode: args.mode,
               ),
               settings: settings,
             );

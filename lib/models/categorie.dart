@@ -11,6 +11,8 @@ class Categorie extends HiveObject {
   String? type;
   @HiveField(1)
   late String name;
+  @HiveField(2)
+  late List<String> subcategorieNames;
 
   void createCategorie(Categorie newCategorie) async {
     var categorieBox = await Hive.openBox(categoriesBox);
@@ -46,6 +48,21 @@ class Categorie extends HiveObject {
       Categorie currentCategorie = await categorieBox.getAt(i);
       if (categorie.name.trim().toLowerCase() == currentCategorie.name.trim().toLowerCase() && categorie.type == currentCategorie.type) {
         return Future.value(true);
+      }
+    }
+    return Future.value(false);
+  }
+
+  Future<bool> existsSubcategorieName(Categorie categorie) async {
+    var categorieBox = await Hive.openBox(categoriesBox);
+    for (int i = 0; i < categorieBox.length; i++) {
+      Categorie currentCategorie = await categorieBox.getAt(i);
+      for (int j = 0; j < currentCategorie.subcategorieNames.length; j++) {
+        for (int k = 0; k < currentCategorie.subcategorieNames.length; k++) {
+          if (categorie.subcategorieNames[j] == currentCategorie.subcategorieNames[k] && categorie.type == currentCategorie.type) {
+            return Future.value(true);
+          }
+        }
       }
     }
     return Future.value(false);
@@ -111,7 +128,8 @@ class Categorie extends HiveObject {
     for (int i = 0; i < categorieNames.length; i++) {
       Categorie categorie = Categorie()
         ..type = CategorieType.outcome.name
-        ..name = categorieNames[i];
+        ..name = categorieNames[i]
+        ..subcategorieNames = [];
       categorie.createCategorie(categorie);
     }
   }
@@ -128,7 +146,8 @@ class Categorie extends HiveObject {
     for (int i = 0; i < categorieNames.length; i++) {
       Categorie categorie = Categorie()
         ..type = CategorieType.income.name
-        ..name = categorieNames[i];
+        ..name = categorieNames[i]
+        ..subcategorieNames = [];
       categorie.createCategorie(categorie);
     }
   }
@@ -145,7 +164,8 @@ class Categorie extends HiveObject {
     for (int i = 0; i < categorieNames.length; i++) {
       Categorie categorie = Categorie()
         ..type = CategorieType.investment.name
-        ..name = categorieNames[i];
+        ..name = categorieNames[i]
+        ..subcategorieNames = [];
       categorie.createCategorie(categorie);
     }
   }
@@ -159,12 +179,14 @@ class CategorieAdapter extends TypeAdapter<Categorie> {
   Categorie read(BinaryReader reader) {
     return Categorie()
       ..name = reader.read()
-      ..type = reader.read();
+      ..type = reader.read()
+      ..subcategorieNames = reader.read();
   }
 
   @override
   void write(BinaryWriter writer, Categorie obj) {
     writer.write(obj.name);
     writer.write(obj.type);
+    writer.write(obj.subcategorieNames);
   }
 }

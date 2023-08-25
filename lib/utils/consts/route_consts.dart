@@ -3,6 +3,7 @@ const bottomNavBarRoute = '/bottomNavBar';
 const createOrEditBookingRoute = '/createOrEditBooking';
 const createOrEditAccountRoute = '/createOrEditAccount';
 const createOrEditCategorieRoute = '/createOrEditCategorie';
+const createOrEditSubcategorieRoute = '/createOrEditSubcategorie';
 const createOrEditBudgetRoute = '/createOrEditBudget';
 const overviewBudgetsRoute = '/overviewBudgets';
 const editBudgetRoute = '/editBudget';
