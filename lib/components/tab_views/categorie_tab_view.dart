@@ -1,13 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:another_flushbar/flushbar.dart';
 
 import '/models/categorie.dart';
-import '/models/enums/mode_types.dart';
 import '/models/enums/categorie_types.dart';
-import '/models/screen_arguments/create_or_edit_categorie_screen_arguments.dart';
-import '/models/screen_arguments/create_or_edit_subcategorie_screen_arguments.dart';
 
-import '/utils/consts/route_consts.dart';
+import '../cards/categorie_card.dart';
 
 import '../deco/loading_indicator.dart';
 
@@ -29,62 +25,6 @@ class _CategorieTabViewState extends State<CategorieTabView> {
   Future<List<Categorie>> _loadCategorieList() async {
     _categorieList = await Categorie.loadCategories(widget.categorieType);
     return _categorieList;
-  }
-
-  void _deleteCategorie(int index) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text('Kategorie ${_categorieList[index].name} löschen?'),
-          actions: <Widget>[
-            TextButton(
-              child: const Text(
-                'Nein',
-                style: TextStyle(
-                  color: Colors.cyanAccent,
-                ),
-              ),
-              onPressed: () => _noPressed(),
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                foregroundColor: Colors.black87,
-                backgroundColor: Colors.cyanAccent,
-              ),
-              onPressed: () => {
-                _yesPressed(index),
-                Flushbar(
-                  title: 'Kategorie wurde gelöscht',
-                  message: 'Kategorie ${_categorieList[index].name} wurde erfolgreich gelöscht.',
-                  icon: const Icon(
-                    Icons.info_outline,
-                    size: 28.0,
-                    color: Colors.cyanAccent,
-                  ),
-                  duration: const Duration(seconds: 3),
-                  leftBarIndicatorColor: Colors.cyanAccent,
-                )..show(context),
-              },
-              child: const Text('Ja'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void _yesPressed(int index) {
-    setState(() {
-      _categorieList[index].deleteCategorie(_categorieList[index]);
-    });
-    Navigator.pop(context);
-    FocusScope.of(context).unfocus();
-  }
-
-  void _noPressed() {
-    Navigator.pop(context);
-    FocusScope.of(context).unfocus();
   }
 
   @override
@@ -113,62 +53,7 @@ class _CategorieTabViewState extends State<CategorieTabView> {
                         child: ListView.builder(
                           itemCount: _categorieList.length,
                           itemBuilder: (BuildContext context, int index) {
-                            return ExpansionTile(
-                              title: Text(_categorieList[index].name),
-                              controlAffinity: ListTileControlAffinity.leading,
-                              trailing: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  IconButton(
-                                    icon: const Icon(Icons.edit),
-                                    onPressed: () => Navigator.pushNamed(context, createOrEditCategorieRoute,
-                                        arguments: CreateOrEditCategorieScreenArguments(_categorieList[index].name, _categorieList[index].type!)),
-                                  ),
-                                  IconButton(
-                                    icon: const Icon(Icons.remove_rounded),
-                                    onPressed: () => _deleteCategorie(index),
-                                  ),
-                                  IconButton(
-                                    icon: const Icon(Icons.add_rounded),
-                                    onPressed: () => Navigator.pushNamed(context, createOrEditSubcategorieRoute,
-                                        arguments: CreateOrEditSubcategorieScreenArguments(_categorieList[index], ModeType.creationMode)),
-                                  ),
-                                ],
-                              ),
-                              children: <Widget>[
-                                SizedBox(
-                                  height: _categorieList[index].subcategorieNames.length * 58.0,
-                                  child: ListView.builder(
-                                    itemCount: _categorieList[index].subcategorieNames.length,
-                                    itemBuilder: (BuildContext context, int subcategorieIndex) {
-                                      return ListTile(title: Text(_categorieList[index].subcategorieNames[subcategorieIndex]));
-                                    },
-                                  ),
-                                ),
-                              ],
-                            );
-                            /*return ListTile(
-                              title: Text(_categorieList[index].name),
-                              trailing: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  IconButton(
-                                    icon: const Icon(Icons.edit),
-                                    onPressed: () => Navigator.pushNamed(context, createOrEditCategorieRoute,
-                                        arguments: CreateOrEditCategorieScreenArguments(_categorieList[index].name, _categorieList[index].type!)),
-                                  ),
-                                  IconButton(
-                                    icon: const Icon(Icons.remove_rounded),
-                                    onPressed: () => _deleteCategorie(index),
-                                  ),
-                                  IconButton(
-                                    icon: const Icon(Icons.add_rounded),
-                                    onPressed: () => Navigator.pushNamed(context, createOrEditSubcategorieRoute,
-                                        arguments: CreateOrEditSubcategorieScreenArguments(_categorieList[index], ModeType.creationMode)),
-                                  ),
-                                ],
-                              ),
-                            );*/
+                            return CategorieCard(categorie: _categorieList[index], categorieIndex: index);
                           },
                         ),
                       ),
