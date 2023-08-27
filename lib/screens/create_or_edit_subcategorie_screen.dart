@@ -15,11 +15,13 @@ import '/utils/consts/global_consts.dart';
 class CreateOrEditSubcategorieScreen extends StatefulWidget {
   final Categorie categorie;
   final ModeType mode;
+  final int subcategorieIndex;
 
   const CreateOrEditSubcategorieScreen({
     Key? key,
     required this.categorie,
     required this.mode,
+    required this.subcategorieIndex,
   }) : super(key: key);
 
   @override
@@ -31,29 +33,28 @@ class CreateOrEditSubcategorieScreen extends StatefulWidget {
 class _CreateOrEditSubcategorieScreenState extends State<CreateOrEditSubcategorieScreen> {
   final TextEditingController _subcategorieNameController = TextEditingController();
   final RoundedLoadingButtonController _saveButtonController = RoundedLoadingButtonController();
-  //final Categorie _categorie = Categorie();
   String _subcategorieNameErrorText = '';
+  String _oldSubcategorie = '';
 
   @override
   void initState() {
     super.initState();
     if (widget.mode == ModeType.editMode) {
-      _subcategorieNameController.text = widget.categorie.subcategorieNames[0];
+      _oldSubcategorie = widget.categorie.subcategorieNames[widget.subcategorieIndex];
+      _subcategorieNameController.text = widget.categorie.subcategorieNames[widget.subcategorieIndex];
     }
   }
 
   void _createOrUpdateSubcategorie() async {
-    //_categorie.name = widget.categorie.name;
-    //_categorie.type = widget.categorie.type;
     bool validSubcategorieName = await _validSubcategorieName(_subcategorieNameController.text.trim());
     if (validSubcategorieName == false) {
       _setSaveButtonAnimation(false);
       return;
     }
     if (widget.mode == ModeType.creationMode) {
-      widget.categorie.updateSubcategories(widget.categorie, _subcategorieNameController.text.trim());
+      widget.categorie.addSubcategorie(widget.categorie, _subcategorieNameController.text.trim());
     } else {
-      // TODO _categorie.updateCategorie(_categorie, ''); // TODO '' ersetzen durch Variable
+      widget.categorie.updateSubcategorie(widget.categorie, _oldSubcategorie, _subcategorieNameController.text.trim());
     }
     _setSaveButtonAnimation(true);
     Timer(const Duration(milliseconds: transitionInMs), () {

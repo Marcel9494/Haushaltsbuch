@@ -141,6 +141,7 @@ class BudgetBookApp extends StatelessWidget {
               builder: (BuildContext context) => CreateOrEditSubcategorieScreen(
                 categorie: args.categorie,
                 mode: args.mode,
+                subcategorieIndex: args.subcategorieIndex,
               ),
               settings: settings,
             );

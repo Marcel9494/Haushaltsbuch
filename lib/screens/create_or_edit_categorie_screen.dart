@@ -10,6 +10,7 @@ import '/components/input_fields/text_input_field.dart';
 import '/models/categorie.dart';
 
 import '/utils/consts/route_consts.dart';
+import '/utils/consts/global_consts.dart';
 
 class CreateOrEditCategorieScreen extends StatefulWidget {
   final String categorieName;
@@ -88,7 +89,7 @@ class _CreateOrEditCategorieScreenState extends State<CreateOrEditCategorieScree
   void _setSaveButtonAnimation(bool successful) {
     successful ? _saveButtonController.success() : _saveButtonController.error();
     if (successful == false) {
-      Timer(const Duration(seconds: 1), () {
+      Timer(const Duration(milliseconds: transitionInMs), () {
         _saveButtonController.reset();
       });
     }

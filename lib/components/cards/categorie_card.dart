@@ -66,9 +66,52 @@ class _CategorieCardState extends State<CategorieCard> {
     );
   }
 
+  void _deleteSubcategorie(int index) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Unterkategorie ${widget.categorie.subcategorieNames[index]} löschen?'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text(
+                'Nein',
+                style: TextStyle(
+                  color: Colors.cyanAccent,
+                ),
+              ),
+              onPressed: () => _noPressed(),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                foregroundColor: Colors.black87,
+                backgroundColor: Colors.cyanAccent,
+              ),
+              onPressed: () => {
+                _yesPressed(index),
+                Flushbar(
+                  title: 'Unterkategorie wurde gelöscht',
+                  message: 'Unterkategorie ${widget.categorie.subcategorieNames[index]} wurde erfolgreich gelöscht.',
+                  icon: const Icon(
+                    Icons.info_outline,
+                    size: 28.0,
+                    color: Colors.cyanAccent,
+                  ),
+                  duration: const Duration(seconds: 3),
+                  leftBarIndicatorColor: Colors.cyanAccent,
+                )..show(context),
+              },
+              child: const Text('Ja'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   void _yesPressed(int index) {
     setState(() {
-      widget.categorie.deleteCategorie(widget.categorie);
+      widget.categorie.deleteSubcategorie(widget.categorie, widget.categorie.subcategorieNames[index]);
     });
     Navigator.pop(context);
     FocusScope.of(context).unfocus();
@@ -90,7 +133,7 @@ class _CategorieCardState extends State<CategorieCard> {
         child: ExpansionTile(
           title: Text(widget.categorie.name),
           controlAffinity: ListTileControlAffinity.leading,
-          tilePadding: const EdgeInsets.fromLTRB(8.0, 0.0, 0.0, 0.0),
+          tilePadding: const EdgeInsets.only(left: 8.0),
           textColor: Colors.cyanAccent,
           iconColor: Colors.white70,
           trailing: Row(
@@ -108,7 +151,7 @@ class _CategorieCardState extends State<CategorieCard> {
               IconButton(
                 icon: const Icon(Icons.add_rounded),
                 onPressed: () =>
-                    Navigator.pushNamed(context, createOrEditSubcategorieRoute, arguments: CreateOrEditSubcategorieScreenArguments(widget.categorie, ModeType.creationMode)),
+                    Navigator.pushNamed(context, createOrEditSubcategorieRoute, arguments: CreateOrEditSubcategorieScreenArguments(widget.categorie, ModeType.creationMode, -1)),
               ),
             ],
           ),
@@ -125,14 +168,15 @@ class _CategorieCardState extends State<CategorieCard> {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
+                          // TODO hier weitermachen und beide IconButtons mit richtiger Funktionalität implementieren
                           IconButton(
                             icon: const Icon(Icons.edit, color: Colors.white70),
-                            onPressed: () =>
-                                Navigator.pushNamed(context, createOrEditCategorieRoute, arguments: CreateOrEditSubcategorieScreenArguments(widget.categorie, ModeType.editMode)),
+                            onPressed: () => Navigator.pushNamed(context, createOrEditSubcategorieRoute,
+                                arguments: CreateOrEditSubcategorieScreenArguments(widget.categorie, ModeType.editMode, subcategorieIndex)),
                           ),
                           IconButton(
                             icon: const Icon(Icons.remove_rounded, color: Colors.white70),
-                            onPressed: () => _deleteCategorie(widget.categorieIndex),
+                            onPressed: () => _deleteSubcategorie(subcategorieIndex),
                           ),
                         ],
                       ),

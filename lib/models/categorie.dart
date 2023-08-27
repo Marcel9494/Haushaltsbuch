@@ -31,7 +31,7 @@ class Categorie extends HiveObject {
     }
   }
 
-  void updateSubcategories(Categorie updatedCategorie, String newSubcategorie) async {
+  void addSubcategorie(Categorie updatedCategorie, String newSubcategorie) async {
     var categorieBox = await Hive.openBox(categoriesBox);
     for (int i = 0; i < categorieBox.length; i++) {
       Categorie categorie = await categorieBox.getAt(i);
@@ -44,12 +44,46 @@ class Categorie extends HiveObject {
     }
   }
 
+  void updateSubcategorie(Categorie updatedCategorie, String oldSubcategorie, String newSubcategorie) async {
+    var categorieBox = await Hive.openBox(categoriesBox);
+    for (int i = 0; i < categorieBox.length; i++) {
+      Categorie categorie = await categorieBox.getAt(i);
+      if (updatedCategorie.name == categorie.name) {
+        for (int j = 0; j < categorie.subcategorieNames.length; j++) {
+          if (categorie.subcategorieNames[j] == oldSubcategorie) {
+            categorie.subcategorieNames[categorie.subcategorieNames.indexWhere((element) => element == oldSubcategorie)] = newSubcategorie;
+            categorieBox.putAt(i, categorie);
+            // TODO Booking.updateBookingCategorieName(oldCategorieName, updatedCategorie.name);
+            break;
+          }
+        }
+      }
+    }
+  }
+
   void deleteCategorie(Categorie deleteCategorie) async {
     var categorieBox = await Hive.openBox(categoriesBox);
     for (int i = 0; i < categorieBox.length; i++) {
       Categorie currentCategorie = await categorieBox.getAt(i);
       if (deleteCategorie.name == currentCategorie.name && deleteCategorie.type == currentCategorie.type) {
         categorieBox.deleteAt(i);
+        break;
+      }
+    }
+  }
+
+  void deleteSubcategorie(Categorie categorie, String deleteSubcategorie) async {
+    var categorieBox = await Hive.openBox(categoriesBox);
+    for (int i = 0; i < categorieBox.length; i++) {
+      Categorie currentCategorie = await categorieBox.getAt(i);
+      if (categorie.name == currentCategorie.name) {
+        for (int j = 0; j < categorie.subcategorieNames.length; j++) {
+          if (categorie.subcategorieNames[j] == deleteSubcategorie) {
+            categorie.subcategorieNames.removeAt(j);
+            categorieBox.putAt(i, categorie);
+            break;
+          }
+        }
         break;
       }
     }
