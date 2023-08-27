@@ -3,13 +3,14 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 
-import '../models/enums/mode_types.dart';
 import '/components/buttons/save_button.dart';
 import '/components/input_fields/text_input_field.dart';
 
 import '/models/categorie.dart';
+import '/models/enums/mode_types.dart';
 
 import '/utils/consts/route_consts.dart';
+import '/utils/consts/global_consts.dart';
 
 class CreateOrEditSubcategorieScreen extends StatefulWidget {
   final Categorie categorie;
@@ -50,17 +51,12 @@ class _CreateOrEditSubcategorieScreenState extends State<CreateOrEditSubcategori
       return;
     }
     if (widget.mode == ModeType.creationMode) {
-      widget.categorie.subcategorieNames.add(_subcategorieNameController.text.trim());
-      Categorie categorieWithNewSubcategorie = Categorie()
-        ..name = widget.categorie.name
-        ..type = widget.categorie.type
-        ..subcategorieNames = widget.categorie.subcategorieNames;
-      categorieWithNewSubcategorie.createCategorie(categorieWithNewSubcategorie);
+      widget.categorie.updateSubcategories(widget.categorie, _subcategorieNameController.text.trim());
     } else {
-      // TODO _categorie.updateCategorie(_categorie, ''); // TODO '' ersetzen durch variable
+      // TODO _categorie.updateCategorie(_categorie, ''); // TODO '' ersetzen durch Variable
     }
     _setSaveButtonAnimation(true);
-    Timer(const Duration(milliseconds: 1000), () {
+    Timer(const Duration(milliseconds: transitionInMs), () {
       if (mounted) {
         FocusScope.of(context).requestFocus(FocusNode());
         Navigator.pop(context);
@@ -70,6 +66,7 @@ class _CreateOrEditSubcategorieScreenState extends State<CreateOrEditSubcategori
     });
   }
 
+  // TODO Validierung in Categorie Model auslagern / implementieren
   Future<bool> _validSubcategorieName(String subcategorieName) async {
     if (subcategorieName.isEmpty) {
       setState(() {

@@ -113,7 +113,41 @@ class _CategorieTabViewState extends State<CategorieTabView> {
                         child: ListView.builder(
                           itemCount: _categorieList.length,
                           itemBuilder: (BuildContext context, int index) {
-                            return ListTile(
+                            return ExpansionTile(
+                              title: Text(_categorieList[index].name),
+                              controlAffinity: ListTileControlAffinity.leading,
+                              trailing: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  IconButton(
+                                    icon: const Icon(Icons.edit),
+                                    onPressed: () => Navigator.pushNamed(context, createOrEditCategorieRoute,
+                                        arguments: CreateOrEditCategorieScreenArguments(_categorieList[index].name, _categorieList[index].type!)),
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(Icons.remove_rounded),
+                                    onPressed: () => _deleteCategorie(index),
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(Icons.add_rounded),
+                                    onPressed: () => Navigator.pushNamed(context, createOrEditSubcategorieRoute,
+                                        arguments: CreateOrEditSubcategorieScreenArguments(_categorieList[index], ModeType.creationMode)),
+                                  ),
+                                ],
+                              ),
+                              children: <Widget>[
+                                SizedBox(
+                                  height: _categorieList[index].subcategorieNames.length * 58.0,
+                                  child: ListView.builder(
+                                    itemCount: _categorieList[index].subcategorieNames.length,
+                                    itemBuilder: (BuildContext context, int subcategorieIndex) {
+                                      return ListTile(title: Text(_categorieList[index].subcategorieNames[subcategorieIndex]));
+                                    },
+                                  ),
+                                ),
+                              ],
+                            );
+                            /*return ListTile(
                               title: Text(_categorieList[index].name),
                               trailing: Row(
                                 mainAxisSize: MainAxisSize.min,
@@ -134,7 +168,7 @@ class _CategorieTabViewState extends State<CategorieTabView> {
                                   ),
                                 ],
                               ),
-                            );
+                            );*/
                           },
                         ),
                       ),
