@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:another_flushbar/flushbar.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 
+import '../components/input_fields/subcategorie_input_field.dart';
 import '/utils/consts/route_consts.dart';
 import '/utils/consts/global_consts.dart';
 import '/utils/date_formatters/date_formatter.dart';
@@ -48,6 +49,9 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
   final TextEditingController _fromAccountTextController = TextEditingController();
   final TextEditingController _toAccountTextController = TextEditingController();
   final TextEditingController _categorieTextController = TextEditingController();
+  // TODO hier weitermachen und _subcategorieTextController.text überall einbauen, dabei an _categorieTextController.text orientieren
+  // müssten die gleichen Stellen sein. Buchung Datenstruktur um Unterkategorie Eintrag erweitern.
+  final TextEditingController _subcategorieTextController = TextEditingController();
   final RoundedLoadingButtonController _saveButtonController = RoundedLoadingButtonController();
   bool _isBookingEdited = false;
   bool _isPreselectedAccountsLoaded = false;
@@ -55,6 +59,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
   String _amountErrorText = '';
   String _bookingNameErrorText = '';
   String _categorieErrorText = '';
+  String _subcategorieErrorText = '';
   String _fromAccountErrorText = '';
   String _toAccountErrorText = '';
   String _bookingRepeat = '';
@@ -381,7 +386,14 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
                         _getAccountInputField(),
                         _currentTransaction == TransactionType.transfer.name
                             ? const SizedBox()
-                            : CategorieInputField(textController: _categorieTextController, errorText: _categorieErrorText, transactionType: _currentTransaction),
+                            : CategorieInputField(
+                                textController: _categorieTextController,
+                                errorText: _categorieErrorText,
+                                transactionType: _currentTransaction,
+                                categorieStringCallback: (categorie) => setState(() => _categorieTextController.text = categorie)),
+                        _currentTransaction == TransactionType.transfer.name
+                            ? const SizedBox()
+                            : SubcategorieInputField(textController: _subcategorieTextController, errorText: _subcategorieErrorText, categorieName: _categorieTextController.text),
                         SaveButton(saveFunction: _createOrUpdateBooking, buttonController: _saveButtonController),
                       ],
                     );

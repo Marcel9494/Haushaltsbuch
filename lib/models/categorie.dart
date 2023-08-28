@@ -140,6 +140,17 @@ class Categorie extends HiveObject {
     return categorieNameList;
   }
 
+  static Future<List<String>> loadSubcategorieNames(String mainCategorie) async {
+    var categorieBox = await Hive.openBox(categoriesBox);
+    for (int i = 0; i < categorieBox.length; i++) {
+      Categorie categorie = await categorieBox.getAt(i);
+      if (mainCategorie.trim() == categorie.name.trim()) {
+        return categorie.subcategorieNames;
+      }
+    }
+    return [];
+  }
+
   static Future<bool> checkIfCategoriesExists() async {
     var categorieBox = await Hive.openBox(categoriesBox);
     if (categorieBox.isEmpty) {
