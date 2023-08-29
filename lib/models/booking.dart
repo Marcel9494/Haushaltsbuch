@@ -25,15 +25,18 @@ class Booking extends HiveObject {
   @HiveField(5)
   late String categorie;
   @HiveField(6)
-  late String fromAccount;
+  late String subcategorie;
   @HiveField(7)
-  late String toAccount;
+  late String fromAccount;
   @HiveField(8)
-  late int serieId;
+  late String toAccount;
   @HiveField(9)
+  late int serieId;
+  @HiveField(10)
   late bool booked;
 
-  void createBooking(String title, String transactionType, String date, String bookingRepeats, String amount, String categorie, String fromAccount, String toAccount,
+  void createBooking(
+      String title, String transactionType, String date, String bookingRepeats, String amount, String categorie, String subcategorie, String fromAccount, String toAccount,
       [int serieId = -1, bool booked = true]) async {
     var bookingBox = await Hive.openBox(bookingsBox);
     Booking newBooking = Booking()
@@ -43,6 +46,7 @@ class Booking extends HiveObject {
       ..date = date
       ..amount = amount
       ..categorie = categorie
+      ..subcategorie = subcategorie
       ..fromAccount = fromAccount
       ..toAccount = toAccount
       ..serieId = serieId
@@ -65,6 +69,7 @@ class Booking extends HiveObject {
       ..date = updatedBooking.date
       ..amount = updatedBooking.amount
       ..categorie = updatedBooking.categorie
+      ..subcategorie = updatedBooking.subcategorie
       ..fromAccount = updatedBooking.fromAccount
       ..toAccount = updatedBooking.toAccount
       ..serieId = updatedBooking.serieId
@@ -83,6 +88,7 @@ class Booking extends HiveObject {
       ..date = oldBooking.date
       ..amount = templateBooking.amount
       ..categorie = templateBooking.categorie
+      ..subcategorie = templateBooking.subcategorie
       ..fromAccount = templateBooking.fromAccount
       ..toAccount = templateBooking.toAccount
       ..serieId = templateBooking.serieId
@@ -90,7 +96,8 @@ class Booking extends HiveObject {
   }
 
   // TODO Serie auf 10 Jahre erhöhen (3 => 120 Monate), für danach muss sich noch etwas überlegt werden
-  void createBookingSerie(String title, String transactionType, String date, String bookingRepeats, String amount, String categorie, String fromAccount, String toAccount,
+  void createBookingSerie(
+      String title, String transactionType, String date, String bookingRepeats, String amount, String categorie, String subcategorie, String fromAccount, String toAccount,
       [int serieId = -1, bool booked = true]) async {
     if (bookingRepeats == RepeatType.everyDay.name) {
       for (int i = 0; i < 3; i++) {
@@ -99,7 +106,8 @@ class Booking extends HiveObject {
         if (bookingDate.isAfter(DateTime.now())) {
           booked = false;
         }
-        createBooking(title, transactionType, bookingDate.toString(), bookingRepeats, amount, categorie, fromAccount, toAccount, await GlobalState.getBookingSerieIndex(), booked);
+        createBooking(title, transactionType, bookingDate.toString(), bookingRepeats, amount, categorie, subcategorie, fromAccount, toAccount,
+            await GlobalState.getBookingSerieIndex(), booked);
       }
     } else if (bookingRepeats == RepeatType.everyWeek.name) {
       for (int i = 0; i < 3; i++) {
@@ -108,7 +116,8 @@ class Booking extends HiveObject {
         if (bookingDate.isAfter(DateTime.now())) {
           booked = false;
         }
-        createBooking(title, transactionType, bookingDate.toString(), bookingRepeats, amount, categorie, fromAccount, toAccount, await GlobalState.getBookingSerieIndex(), booked);
+        createBooking(title, transactionType, bookingDate.toString(), bookingRepeats, amount, categorie, subcategorie, fromAccount, toAccount,
+            await GlobalState.getBookingSerieIndex(), booked);
       }
     } else if (bookingRepeats == RepeatType.everyTwoWeeks.name) {
       for (int i = 0; i < 3; i++) {
@@ -117,7 +126,8 @@ class Booking extends HiveObject {
         if (bookingDate.isAfter(DateTime.now())) {
           booked = false;
         }
-        createBooking(title, transactionType, bookingDate.toString(), bookingRepeats, amount, categorie, fromAccount, toAccount, await GlobalState.getBookingSerieIndex(), booked);
+        createBooking(title, transactionType, bookingDate.toString(), bookingRepeats, amount, categorie, subcategorie, fromAccount, toAccount,
+            await GlobalState.getBookingSerieIndex(), booked);
       }
     } else if (bookingRepeats == RepeatType.beginningOfMonth.name) {
       for (int i = 0; i < 3; i++) {
@@ -126,7 +136,8 @@ class Booking extends HiveObject {
         if (bookingDate.isAfter(DateTime.now())) {
           booked = false;
         }
-        createBooking(title, transactionType, bookingDate.toString(), bookingRepeats, amount, categorie, fromAccount, toAccount, await GlobalState.getBookingSerieIndex(), booked);
+        createBooking(title, transactionType, bookingDate.toString(), bookingRepeats, amount, categorie, subcategorie, fromAccount, toAccount,
+            await GlobalState.getBookingSerieIndex(), booked);
       }
     } else if (bookingRepeats == RepeatType.endOfMonth.name) {
       for (int i = 0; i < 3; i++) {
@@ -135,7 +146,8 @@ class Booking extends HiveObject {
         if (bookingDate.isAfter(DateTime.now())) {
           booked = false;
         }
-        createBooking(title, transactionType, bookingDate.toString(), bookingRepeats, amount, categorie, fromAccount, toAccount, await GlobalState.getBookingSerieIndex(), booked);
+        createBooking(title, transactionType, bookingDate.toString(), bookingRepeats, amount, categorie, subcategorie, fromAccount, toAccount,
+            await GlobalState.getBookingSerieIndex(), booked);
       }
     } else if (bookingRepeats == RepeatType.everyMonth.name) {
       for (int i = 0; i < 3; i++) {
@@ -144,7 +156,8 @@ class Booking extends HiveObject {
         if (bookingDate.isAfter(DateTime.now())) {
           booked = false;
         }
-        createBooking(title, transactionType, bookingDate.toString(), bookingRepeats, amount, categorie, fromAccount, toAccount, await GlobalState.getBookingSerieIndex(), booked);
+        createBooking(title, transactionType, bookingDate.toString(), bookingRepeats, amount, categorie, subcategorie, fromAccount, toAccount,
+            await GlobalState.getBookingSerieIndex(), booked);
       }
     } else if (bookingRepeats == RepeatType.everyThreeMonths.name) {
       for (int i = 0; i < 3; i++) {
@@ -153,7 +166,8 @@ class Booking extends HiveObject {
         if (bookingDate.isAfter(DateTime.now())) {
           booked = false;
         }
-        createBooking(title, transactionType, bookingDate.toString(), bookingRepeats, amount, categorie, fromAccount, toAccount, await GlobalState.getBookingSerieIndex(), booked);
+        createBooking(title, transactionType, bookingDate.toString(), bookingRepeats, amount, categorie, subcategorie, fromAccount, toAccount,
+            await GlobalState.getBookingSerieIndex(), booked);
       }
     } else if (bookingRepeats == RepeatType.everySixMonths.name) {
       for (int i = 0; i < 3; i++) {
@@ -162,7 +176,8 @@ class Booking extends HiveObject {
         if (bookingDate.isAfter(DateTime.now())) {
           booked = false;
         }
-        createBooking(title, transactionType, bookingDate.toString(), bookingRepeats, amount, categorie, fromAccount, toAccount, await GlobalState.getBookingSerieIndex(), booked);
+        createBooking(title, transactionType, bookingDate.toString(), bookingRepeats, amount, categorie, subcategorie, fromAccount, toAccount,
+            await GlobalState.getBookingSerieIndex(), booked);
       }
     } else if (bookingRepeats == RepeatType.everyYear.name) {
       for (int i = 0; i < 3; i++) {
@@ -171,7 +186,8 @@ class Booking extends HiveObject {
         if (bookingDate.isAfter(DateTime.now())) {
           booked = false;
         }
-        createBooking(title, transactionType, bookingDate.toString(), bookingRepeats, amount, categorie, fromAccount, toAccount, await GlobalState.getBookingSerieIndex(), booked);
+        createBooking(title, transactionType, bookingDate.toString(), bookingRepeats, amount, categorie, subcategorie, fromAccount, toAccount,
+            await GlobalState.getBookingSerieIndex(), booked);
       }
     }
     GlobalState.increaseBookingSerieIndex();
@@ -224,6 +240,7 @@ class Booking extends HiveObject {
             ..date = booking.date
             ..amount = templateBooking.amount
             ..categorie = templateBooking.categorie
+            ..subcategorie = templateBooking.subcategorie
             ..fromAccount = templateBooking.fromAccount
             ..toAccount = templateBooking.toAccount
             ..serieId = templateBooking.serieId
@@ -265,6 +282,7 @@ class Booking extends HiveObject {
             ..date = booking.date
             ..amount = templateBooking.amount
             ..categorie = templateBooking.categorie
+            ..subcategorie = templateBooking.subcategorie
             ..fromAccount = templateBooking.fromAccount
             ..toAccount = templateBooking.toAccount
             ..serieId = templateBooking.serieId
@@ -282,6 +300,7 @@ class Booking extends HiveObject {
     }
   }
 
+  // TODO subcategorie mit abhandeln oder eigene Funktion für updateBookingSubcategorie implementieren?
   static Future<void> updateBookingCategorieName(String oldCategorieName, String newCategorieName) async {
     var bookingBox = await Hive.openBox(bookingsBox);
     for (int i = 0; i < bookingBox.length; i++) {
@@ -316,6 +335,7 @@ class Booking extends HiveObject {
           ..date = booking.date
           ..amount = booking.amount
           ..categorie = booking.categorie
+          ..subcategorie = booking.subcategorie
           ..fromAccount = newAccountName
           ..toAccount = booking.toAccount
           ..serieId = booking.serieId
@@ -330,6 +350,7 @@ class Booking extends HiveObject {
           ..date = booking.date
           ..amount = booking.amount
           ..categorie = booking.categorie
+          ..subcategorie = booking.subcategorie
           ..fromAccount = booking.fromAccount
           ..toAccount = newAccountName
           ..serieId = booking.serieId
@@ -466,6 +487,7 @@ class BookingAdapter extends TypeAdapter<Booking> {
       ..bookingRepeats = reader.read()
       ..amount = reader.read()
       ..categorie = reader.read()
+      ..subcategorie = reader.read()
       ..fromAccount = reader.read()
       ..toAccount = reader.read()
       ..serieId = reader.read()
@@ -480,6 +502,7 @@ class BookingAdapter extends TypeAdapter<Booking> {
     writer.write(obj.bookingRepeats);
     writer.write(obj.amount);
     writer.write(obj.categorie);
+    writer.write(obj.subcategorie);
     writer.write(obj.fromAccount);
     writer.write(obj.toAccount);
     writer.write(obj.serieId);

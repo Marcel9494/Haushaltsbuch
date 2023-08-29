@@ -7,14 +7,12 @@ import '../deco/bottom_sheet_line.dart';
 
 class SubcategorieInputField extends StatefulWidget {
   final TextEditingController textController;
-  final String errorText;
   final String categorieName;
   final String title;
 
   const SubcategorieInputField({
     Key? key,
     required this.textController,
-    required this.errorText,
     required this.categorieName,
     this.title = 'Unterkategorie auswählen:',
   }) : super(key: key);
@@ -103,16 +101,15 @@ class _SubcategorieInputFieldState extends State<SubcategorieInputField> {
       showCursor: false,
       readOnly: true,
       onTap: () => _openBottomSheetWithSubcategorieList(context),
-      decoration: InputDecoration(
+      decoration: const InputDecoration(
         hintText: 'Unterkategorie',
-        prefixIcon: const Icon(
+        prefixIcon: Icon(
           Icons.donut_large_rounded,
           color: Colors.grey,
         ),
-        focusedBorder: const UnderlineInputBorder(
+        focusedBorder: UnderlineInputBorder(
           borderSide: BorderSide(color: Colors.cyanAccent, width: 1.5),
         ),
-        errorText: widget.errorText.isEmpty ? null : widget.errorText,
       ),
     );
   }
