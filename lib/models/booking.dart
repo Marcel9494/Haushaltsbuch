@@ -424,6 +424,19 @@ class Booking extends HiveObject {
     return bookingList;
   }
 
+  static Future<List<Booking>> loadSubcategorieBookingList(int selectedMonth, int selectedYear, String subcategorie) async {
+    var bookingBox = await Hive.openBox(bookingsBox);
+    List<Booking> bookingList = [];
+    for (int i = 0; i < bookingBox.length; i++) {
+      Booking booking = await bookingBox.getAt(i);
+      if (DateTime.parse(booking.date).month == selectedMonth && DateTime.parse(booking.date).year == selectedYear && booking.subcategorie == subcategorie) {
+        booking.boxIndex = i;
+        bookingList.add(booking);
+      }
+    }
+    return bookingList;
+  }
+
   static double getRevenues(List<Booking> bookingList) {
     double revenues = 0.0;
     for (int i = 0; i < bookingList.length; i++) {
