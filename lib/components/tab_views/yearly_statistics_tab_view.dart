@@ -174,7 +174,7 @@ class _YearlyStatisticsTabViewState extends State<YearlyStatisticsTabView> {
                       child: ListView.builder(
                         itemCount: _percentageStats.length,
                         itemBuilder: (BuildContext context, int index) {
-                          return CategoriePercentageCard(percentageStats: _percentageStats[index]);
+                          return CategoriePercentageCard(percentageStats: _percentageStats[index], bookingList: _bookingList);
                         },
                       ),
                     ),

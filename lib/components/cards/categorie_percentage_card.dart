@@ -11,10 +11,12 @@ import '/utils/number_formatters/number_formatter.dart';
 class CategoriePercentageCard extends StatefulWidget {
   final PercentageStats percentageStats;
   final DateTime? selectedDate;
+  final List<Booking> bookingList;
 
   const CategoriePercentageCard({
     Key? key,
     required this.percentageStats,
+    required this.bookingList,
     this.selectedDate,
   }) : super(key: key);
 
@@ -25,18 +27,24 @@ class CategoriePercentageCard extends StatefulWidget {
 class _CategoriePercentageCardState extends State<CategoriePercentageCard> {
   List<String> _subcategorieNames = [];
   List<Booking> _subcategorieBookings = [];
-  List<double> _subCategorieAmounts = [];
+  List<double> _subcategorieAmounts = [];
+  List<double> _subcategoriePercentages = [];
 
   // TODO hier weitermachen und Unterkategorie % Werte berechnen und Code verbessern! Nicht sehr performant aktuell
   Future<List<String>> _loadSubcategorieNameList() async {
+    print(widget.percentageStats.amount);
     _subcategorieNames = await Categorie.loadSubcategorieNames(widget.percentageStats.name);
     for (int i = 0; i < _subcategorieNames.length; i++) {
       double totalAmount = 0.0;
-      _subcategorieBookings = await Booking.loadSubcategorieBookingList(widget.selectedDate!.month, widget.selectedDate!.year, _subcategorieNames[i]);
+      _subcategorieBookings = await Booking.loadSubcategorieBookingList(widget.bookingList, widget.selectedDate!.month, widget.selectedDate!.year, _subcategorieNames[i]);
       for (int j = 0; j < _subcategorieBookings.length; j++) {
         totalAmount += formatMoneyAmountToDouble(_subcategorieBookings[j].amount);
       }
-      _subCategorieAmounts.add(totalAmount);
+      _subcategorieAmounts.add(totalAmount);
+    }
+    double totalExpenditures = Booking.getExpenditures(widget.bookingList);
+    for (int i = 0; i < _subcategorieNames.length; i++) {
+      _subcategoriePercentages.add((_subcategorieAmounts[i] * 100) / totalExpenditures);
     }
     return _subcategorieNames;
   }
@@ -114,9 +122,30 @@ class _CategoriePercentageCardState extends State<CategoriePercentageCard> {
                           height: _subcategorieNames.length * 58.0,
                           child: ListView.builder(
                             itemCount: _subcategorieNames.length,
+                            physics: const NeverScrollableScrollPhysics(),
                             itemBuilder: (BuildContext context, int subcategorieIndex) {
                               return ListTile(
-                                title: Text(_subcategorieNames[subcategorieIndex] + ' ' + formatToMoneyAmount(_subCategorieAmounts[subcategorieIndex].toString())),
+                                title: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.only(left: 36.0, right: 8.0),
+                                      child: Text(
+                                        _subcategoriePercentages[subcategorieIndex].toStringAsFixed(1).replaceAll('.', ',') + ' %  ' + _subcategorieNames[subcategorieIndex],
+                                        style: const TextStyle(fontSize: 14.0),
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.only(right: 52.0),
+                                      child: Text(
+                                        formatToMoneyAmount(_subcategorieAmounts[subcategorieIndex].toString()),
+                                        style: const TextStyle(fontSize: 14.0),
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               );
                             },
                           ),
