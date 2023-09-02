@@ -27,16 +27,15 @@ class CategoriePercentageCard extends StatefulWidget {
 class _CategoriePercentageCardState extends State<CategoriePercentageCard> {
   List<String> _subcategorieNames = [];
   List<Booking> _subcategorieBookings = [];
-  List<double> _subcategorieAmounts = [];
-  List<double> _subcategoriePercentages = [];
+  final List<double> _subcategorieAmounts = [];
+  final List<double> _subcategoriePercentages = [];
 
-  // TODO hier weitermachen und Unterkategorie % Werte berechnen und Code verbessern! Nicht sehr performant aktuell
+  // TODO erweitern um getRevenues und getInvestments
   Future<List<String>> _loadSubcategorieNameList() async {
-    print(widget.percentageStats.amount);
     _subcategorieNames = await Categorie.loadSubcategorieNames(widget.percentageStats.name);
     for (int i = 0; i < _subcategorieNames.length; i++) {
       double totalAmount = 0.0;
-      _subcategorieBookings = await Booking.loadSubcategorieBookingList(widget.bookingList, widget.selectedDate!.month, widget.selectedDate!.year, _subcategorieNames[i]);
+      _subcategorieBookings = await Booking.loadSubcategorieBookingList(widget.bookingList, _subcategorieNames[i]);
       for (int j = 0; j < _subcategorieBookings.length; j++) {
         totalAmount += formatMoneyAmountToDouble(_subcategorieBookings[j].amount);
       }
@@ -69,9 +68,6 @@ class _CategoriePercentageCardState extends State<CategoriePercentageCard> {
             minLeadingWidth: 0.0,
             child: ExpansionTile(
               title: const SizedBox.shrink(),
-              // TODO hier weitermachen
-              //trailing: const SizedBox.shrink(),
-              //controlAffinity: ListTileControlAffinity.trailing,
               controlAffinity: ListTileControlAffinity.leading,
               textColor: widget.percentageStats.statColor,
               iconColor: widget.percentageStats.statColor,

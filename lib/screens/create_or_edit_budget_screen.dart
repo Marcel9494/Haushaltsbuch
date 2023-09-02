@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 
+import '../components/input_fields/subcategorie_input_field.dart';
 import '/utils/consts/global_consts.dart';
 import '/utils/consts/route_consts.dart';
 import '/utils/number_formatters/number_formatter.dart';
@@ -33,6 +34,7 @@ class CreateOrEditBudgetScreen extends StatefulWidget {
 
 class _CreateOrEditBudgetScreenState extends State<CreateOrEditBudgetScreen> {
   final TextEditingController _categorieTextController = TextEditingController();
+  final TextEditingController _subcategorieTextController = TextEditingController();
   final TextEditingController _budgetTextController = TextEditingController();
   final RoundedLoadingButtonController _saveButtonController = RoundedLoadingButtonController();
   late DefaultBudget _loadedDefaultBudget;
@@ -201,6 +203,7 @@ class _CreateOrEditBudgetScreenState extends State<CreateOrEditBudgetScreen> {
                         title: 'Kategorie für Budget auswählen:',
                         autofocus: true)
                     : const SizedBox(),
+                SubcategorieInputField(textController: _subcategorieTextController, categorieName: _categorieTextController.text),
                 MoneyInputField(textController: _budgetTextController, errorText: _budgetErrorText, hintText: 'Budget', bottomSheetTitle: 'Budget eingeben:'),
                 SaveButton(saveFunction: _createOrUpdateBudget, buttonController: _saveButtonController),
               ],

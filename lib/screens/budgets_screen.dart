@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:haushaltsbuch/utils/number_formatters/number_formatter.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 
-import '../utils/consts/route_consts.dart';
+import '/utils/consts/route_consts.dart';
+import '/utils/number_formatters/number_formatter.dart';
+
 import '/components/cards/budget_card.dart';
 import '/components/deco/loading_indicator.dart';
 import '/components/buttons/month_picker_buttons.dart';
