@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:haushaltsbuch/screens/create_or_edit_subcategorie_screen.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
@@ -10,6 +9,7 @@ import 'models/booking.dart';
 import 'models/account.dart';
 import 'models/categorie.dart';
 import 'models/budget.dart';
+import 'models/subbudget.dart';
 import 'models/default_budget.dart';
 import 'models/enums/transaction_types.dart';
 import 'models/global_state.dart';
@@ -31,6 +31,7 @@ import '/screens/overview_budgets_screen.dart';
 import '/screens/create_or_edit_booking_screen.dart';
 import '/screens/create_or_edit_account_screen.dart';
 import '/screens/create_or_edit_categorie_screen.dart';
+import '/screens/create_or_edit_subcategorie_screen.dart';
 import '/screens/categories_screen.dart';
 import '/screens/account_details_screen.dart';
 import '/screens/create_or_edit_budget_screen.dart';
@@ -49,6 +50,7 @@ void main() async {
   Hive.registerAdapter(PrimaryAccountAdapter());
   Hive.registerAdapter(CategorieAdapter());
   Hive.registerAdapter(BudgetAdapter());
+  Hive.registerAdapter(SubbudgetAdapter());
   Hive.registerAdapter(DefaultBudgetAdapter());
   Hive.registerAdapter(TransactionTypeAdapter());
   Hive.registerAdapter(GlobalStateAdapter());
@@ -149,6 +151,7 @@ class BudgetBookApp extends StatelessWidget {
             final args = settings.arguments as CreateOrEditBudgetScreenArguments;
             return MaterialPageRoute<String>(
               builder: (BuildContext context) => CreateOrEditBudgetScreen(
+                budgetModeType: args.budgetModeType,
                 budgetBoxIndex: args.budgetBoxIndex,
                 budgetCategorie: args.budgetCategorie,
               ),

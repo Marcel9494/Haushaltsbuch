@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '/models/default_budget.dart';
+import '/models/enums/budget_mode_types.dart';
 import '/models/screen_arguments/create_or_edit_budget_screen_arguments.dart';
 
 import '/utils/consts/route_consts.dart';
@@ -17,7 +18,8 @@ class DefaultBudgetCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => Navigator.pushNamed(context, createOrEditBudgetRoute, arguments: CreateOrEditBudgetScreenArguments(-2, defaultBudget.categorie)),
+      onTap: () =>
+          Navigator.pushNamed(context, createOrEditBudgetRoute, arguments: CreateOrEditBudgetScreenArguments(BudgetModeType.updateDefaultBudgetMode, -1, defaultBudget.categorie)),
       child: Card(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(14.0),

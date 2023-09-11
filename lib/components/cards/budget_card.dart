@@ -30,21 +30,20 @@ class _BudgetCardState extends State<BudgetCard> {
   final List<double> _subcategoriePercentages = [];
 
   Future<List<String>> _loadSubcategorieNameList() async {
-    // TODO hier weitermachen Beispiel an categorie_percentage_card.dart -> _loadSubcategorieNameList nehmen
+    // TODO hier weitermachen Beispiel an categorie_percentage_card.dart -> _loadSubcategorieNameList nehmen + Code verbessern
     _subcategorieNames = await Categorie.loadSubcategorieNames(widget.budget.categorie);
-    for (int i = 0; i < _subcategorieNames.length; i++) {
-      double totalAmount = 0.0;
-      _subcategorieBudgets = await Subbudget.loadSubcategorieBudgetList(widget.budget.categorie, _subcategorieNames, widget.selectedDate);
-      print(_subcategorieBudgets);
-      /*for (int j = 0; j < _subcategorieBudgets.length; j++) {
+    //for (int i = 0; i < _subcategorieNames.length; i++) {
+    double totalAmount = 0.0;
+    _subcategorieBudgets = await Subbudget.loadSubcategorieBudgetList(widget.budget.categorie, _subcategorieNames, widget.selectedDate);
+    /*for (int j = 0; j < _subcategorieBudgets.length; j++) {
         totalAmount += formatMoneyAmountToDouble(_subcategorieBookings[j].amount);
       }*/
-      _subcategorieAmounts.add(totalAmount);
-    }
+    _subcategorieAmounts.add(totalAmount);
+    //}
     //double totalExpenditures = Booking.getExpenditures(widget.bookingList);
-    for (int i = 0; i < _subcategorieNames.length; i++) {
-      _subcategoriePercentages.add((_subcategorieAmounts[i] * 100) / 0.0); //totalExpenditures);
-    }
+    //for (int i = 0; i < _subcategorieNames.length; i++) {
+    //  _subcategoriePercentages.add((_subcategorieAmounts[i] * 100) / 0.0); //totalExpenditures);
+    //}
     return _subcategorieNames;
   }
 
@@ -171,7 +170,7 @@ class _BudgetCardState extends State<BudgetCard> {
                                       Padding(
                                         padding: const EdgeInsets.only(left: 36.0, right: 8.0),
                                         child: Text(
-                                          _subcategorieNames[subcategorieIndex],
+                                          _subcategorieBudgets[subcategorieIndex].subcategorieName,
                                           style: const TextStyle(fontSize: 14.0),
                                           overflow: TextOverflow.ellipsis,
                                         ),
@@ -179,7 +178,7 @@ class _BudgetCardState extends State<BudgetCard> {
                                       Padding(
                                         padding: const EdgeInsets.only(right: 52.0),
                                         child: Text(
-                                          formatToMoneyAmount(_subcategorieAmounts[subcategorieIndex].toString()),
+                                          formatToMoneyAmount(_subcategorieBudgets[subcategorieIndex].subcategorieBudget.toString()),
                                           style: const TextStyle(fontSize: 14.0),
                                           overflow: TextOverflow.ellipsis,
                                         ),

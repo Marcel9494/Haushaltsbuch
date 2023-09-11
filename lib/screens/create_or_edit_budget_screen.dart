@@ -1,29 +1,36 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 
-import '../components/input_fields/subcategorie_input_field.dart';
+import '../models/categorie.dart';
+import '../utils/consts/hive_consts.dart';
 import '/utils/consts/global_consts.dart';
 import '/utils/consts/route_consts.dart';
 import '/utils/number_formatters/number_formatter.dart';
 
 import '/components/dialogs/choice_dialog.dart';
 import '/components/input_fields/categorie_input_field.dart';
+import '/components/input_fields/subcategorie_input_field.dart';
 import '/components/input_fields/money_input_field.dart';
 import '/components/buttons/save_button.dart';
 
 import '/models/budget.dart';
+import '/models/subbudget.dart';
 import '/models/default_budget.dart';
+import '/models/enums/budget_mode_types.dart';
 import '/models/enums/transaction_types.dart';
 import '/models/screen_arguments/bottom_nav_bar_screen_arguments.dart';
 
 class CreateOrEditBudgetScreen extends StatefulWidget {
-  final int budgetBoxIndex; // budgetBoxIndex == -1 = Budget bearbeiten / -2 = Standardbudget bearbeiten / >= 0 = Budget erstellen
+  final BudgetModeType budgetModeType;
+  final int? budgetBoxIndex; // budgetBoxIndex == -1 = Budget bearbeiten / -2 = Standardbudget bearbeiten / >= 0 = Budget erstellen
   final String? budgetCategorie;
 
   const CreateOrEditBudgetScreen({
     Key? key,
+    required this.budgetModeType,
     required this.budgetBoxIndex,
     this.budgetCategorie,
   }) : super(key: key);
@@ -46,15 +53,16 @@ class _CreateOrEditBudgetScreenState extends State<CreateOrEditBudgetScreen> {
   @override
   void initState() {
     super.initState();
-    if (widget.budgetBoxIndex == -2) {
+    if (widget.budgetModeType == BudgetModeType.updateDefaultBudgetMode) {
       _loadDefaultBudget();
     } else if (widget.budgetBoxIndex != -1) {
+      // TODO if mit BudgetModeType ersetzen
       _loadBudget();
     }
   }
 
   Future<void> _loadBudget() async {
-    _loadedBudget = await Budget.loadBudget(widget.budgetBoxIndex);
+    _loadedBudget = await Budget.loadBudget(widget.budgetBoxIndex!);
     _budgetTextController.text = formatToMoneyAmount(_loadedBudget.budget.toString());
   }
 
@@ -63,50 +71,21 @@ class _CreateOrEditBudgetScreenState extends State<CreateOrEditBudgetScreen> {
     _budgetTextController.text = formatToMoneyAmount(_loadedDefaultBudget.defaultBudget.toString());
   }
 
-  void _createOrUpdateBudget() async {
+  void _saveBudget() {
     if (_validCategorie(_categorieTextController.text) == false || _validBudget(_budgetTextController.text) == false) {
       _setSaveButtonAnimation(false);
       return;
     }
-    if (widget.budgetBoxIndex == -1) {
-      _budgetExistsAlready = await Budget.existsBudgetCategorie(_categorieTextController.text);
-      if (_budgetExistsAlready) {
-        showChoiceDialog(
-            context,
-            'Budget aktualisieren?',
-            _yesPressed,
-            _noPressed,
-            'Budget wurde aktualisiert',
-            'Budget ${_categorieTextController.text} wurde erfolgreich aktualisiert.',
-            Icons.info_outline,
-            'Budget für ${_categorieTextController.text} wurde bereits angelegt möchten Sie alle Budgeteinträge aktualisieren?');
+    if (widget.budgetModeType == BudgetModeType.budgetCreationMode) {
+      if (_subcategorieTextController.text.isEmpty) {
+        _createBudget();
       } else {
-        Budget newBudget = Budget()
-          ..categorie = _categorieTextController.text
-          ..budget = formatMoneyAmountToDouble(_budgetTextController.text)
-          ..currentExpenditure = 0.0
-          ..percentage = 0.0
-          ..budgetDate = DateTime.now().toString();
-        newBudget.createBudget(newBudget);
-        DefaultBudget newDefaultBudget = DefaultBudget()
-          ..categorie = _categorieTextController.text
-          ..defaultBudget = formatMoneyAmountToDouble(_budgetTextController.text);
-        newDefaultBudget.createDefaultBudget(newDefaultBudget);
+        _createSubbudget();
       }
-    } else if (widget.budgetBoxIndex == -2) {
-      DefaultBudget updatedDefaultBudget = DefaultBudget()
-        ..categorie = _loadedDefaultBudget.categorie
-        ..defaultBudget = formatMoneyAmountToDouble(_budgetTextController.text);
-      updatedDefaultBudget.updateDefaultBudget(updatedDefaultBudget, _loadedDefaultBudget.categorie);
-      Budget.updateAllFutureBudgetsFromCategorie(updatedDefaultBudget);
+    } else if (widget.budgetModeType == BudgetModeType.updateDefaultBudgetMode) {
+      _updateAllFutureBudgets();
     } else {
-      Budget updatedBudget = Budget()
-        ..categorie = _loadedBudget.categorie
-        ..budget = formatMoneyAmountToDouble(_budgetTextController.text)
-        ..currentExpenditure = 0.0
-        ..percentage = 0.0
-        ..budgetDate = _loadedBudget.budgetDate.toString();
-      updatedBudget.updateBudget(updatedBudget, widget.budgetBoxIndex);
+      _updateBudget();
     }
     if (_budgetExistsAlready == false) {
       _setSaveButtonAnimation(true);
@@ -123,6 +102,102 @@ class _CreateOrEditBudgetScreenState extends State<CreateOrEditBudgetScreen> {
         }
       });
     }
+  }
+
+  void _createBudget() async {
+    _budgetExistsAlready = await Budget.existsBudgetCategorie(_categorieTextController.text);
+    if (_budgetExistsAlready) {
+      showChoiceDialog(
+          context,
+          'Budget aktualisieren?',
+          _yesPressed,
+          _noPressed,
+          'Budget wurde aktualisiert',
+          'Budget ${_categorieTextController.text} wurde erfolgreich aktualisiert.',
+          Icons.info_outline,
+          'Budget für ${_categorieTextController.text} wurde bereits angelegt möchten Sie alle Budgeteinträge aktualisieren?');
+    } else {
+      Budget newBudget = Budget()
+        ..categorie = _categorieTextController.text
+        ..budget = formatMoneyAmountToDouble(_budgetTextController.text)
+        ..currentExpenditure = 0.0
+        ..percentage = 0.0
+        ..budgetDate = DateTime.now().toString();
+      newBudget.createBudget(newBudget);
+      DefaultBudget newDefaultBudget = DefaultBudget()
+        ..categorie = _categorieTextController.text
+        ..defaultBudget = formatMoneyAmountToDouble(_budgetTextController.text);
+      newDefaultBudget.createDefaultBudget(newDefaultBudget);
+    }
+  }
+
+  void _createSubbudget() async {
+    var subbudgetBox = await Hive.openBox(subbudgetsBox);
+    _budgetExistsAlready = await Budget.existsBudgetCategorie(_categorieTextController.text);
+    if (_budgetExistsAlready) {
+      // TODO hier weitermachen und Code testen + auch für else Zweig implementieren + Code verbessern
+      for (int i = 0; i < 3; i++) {
+        DateTime date = DateTime.now();
+        Subbudget subbudget = Subbudget()
+          ..boxIndex = i
+          ..subcategorieBudget = formatMoneyAmountToDouble(_budgetTextController.text)
+          ..subcategorieName = _subcategorieTextController.text
+          ..currentSubcategoriePercentage = 0.0
+          ..currentSubcategorieExpenditure = 0.0
+          ..categorie = _categorieTextController.text
+          ..budgetDate = DateTime(date.year, date.month + i, 1).toString();
+        subbudget.createBudgetInstance(subbudget);
+        subbudgetBox.add(subbudget);
+      }
+      List<String> subcategorieNames = await Categorie.loadSubcategorieNames(_categorieTextController.text);
+      Subbudget.createSubbudgets(_categorieTextController.text, _subcategorieTextController.text, subcategorieNames);
+    } else {
+      Budget newBudget = Budget()
+        ..categorie = _categorieTextController.text
+        ..budget = formatMoneyAmountToDouble(_budgetTextController.text)
+        ..currentExpenditure = 0.0
+        ..percentage = 0.0
+        ..budgetDate = DateTime.now().toString();
+      newBudget.createBudget(newBudget);
+      // TODO hier weitermachen für Subbudgets ebenfalls DefaultBudgets anlegen + bisherigen Code testen
+      for (int i = 0; i < 3; i++) {
+        DateTime date = DateTime.now();
+        Subbudget subbudget = Subbudget()
+          ..boxIndex = i
+          ..subcategorieBudget = formatMoneyAmountToDouble(_budgetTextController.text)
+          ..subcategorieName = _subcategorieTextController.text
+          ..currentSubcategoriePercentage = 0.0
+          ..currentSubcategorieExpenditure = 0.0
+          ..categorie = _categorieTextController.text
+          ..budgetDate = DateTime(date.year, date.month + i, 1).toString();
+        subbudget.createBudgetInstance(subbudget);
+        subbudgetBox.add(subbudget);
+      }
+      List<String> subcategorieNames = await Categorie.loadSubcategorieNames(_categorieTextController.text);
+      Subbudget.createSubbudgets(_categorieTextController.text, _subcategorieTextController.text, subcategorieNames);
+      DefaultBudget newDefaultBudget = DefaultBudget()
+        ..categorie = _categorieTextController.text
+        ..defaultBudget = formatMoneyAmountToDouble(_budgetTextController.text);
+      newDefaultBudget.createDefaultBudget(newDefaultBudget);
+    }
+  }
+
+  void _updateAllFutureBudgets() async {
+    DefaultBudget updatedDefaultBudget = DefaultBudget()
+      ..categorie = _loadedDefaultBudget.categorie
+      ..defaultBudget = formatMoneyAmountToDouble(_budgetTextController.text);
+    updatedDefaultBudget.updateDefaultBudget(updatedDefaultBudget, _loadedDefaultBudget.categorie);
+    Budget.updateAllFutureBudgetsFromCategorie(updatedDefaultBudget);
+  }
+
+  void _updateBudget() {
+    Budget updatedBudget = Budget()
+      ..categorie = _loadedBudget.categorie
+      ..budget = formatMoneyAmountToDouble(_budgetTextController.text)
+      ..currentExpenditure = 0.0
+      ..percentage = 0.0
+      ..budgetDate = _loadedBudget.budgetDate.toString();
+    updatedBudget.updateBudget(updatedBudget, widget.budgetBoxIndex!);
   }
 
   bool _validCategorie(String categorieInput) {
@@ -205,7 +280,7 @@ class _CreateOrEditBudgetScreenState extends State<CreateOrEditBudgetScreen> {
                     : const SizedBox(),
                 SubcategorieInputField(textController: _subcategorieTextController, categorieName: _categorieTextController.text),
                 MoneyInputField(textController: _budgetTextController, errorText: _budgetErrorText, hintText: 'Budget', bottomSheetTitle: 'Budget eingeben:'),
-                SaveButton(saveFunction: _createOrUpdateBudget, buttonController: _saveButtonController),
+                SaveButton(saveFunction: _saveBudget, buttonController: _saveButtonController),
               ],
             ),
           ),
