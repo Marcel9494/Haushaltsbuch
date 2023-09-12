@@ -167,20 +167,56 @@ class _BudgetCardState extends State<BudgetCard> {
                                   title: Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Padding(
-                                        padding: const EdgeInsets.only(left: 36.0, right: 8.0),
-                                        child: Text(
-                                          _subcategorieBudgets[subcategorieIndex].subcategorieName,
-                                          style: const TextStyle(fontSize: 14.0),
-                                          overflow: TextOverflow.ellipsis,
+                                      Expanded(
+                                        flex: 3,
+                                        child: Padding(
+                                          padding: const EdgeInsets.only(left: 36.0),
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                _subcategorieBudgets[subcategorieIndex].subcategorieName,
+                                                style: const TextStyle(fontSize: 14.0),
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                              Text(
+                                                formatToMoneyAmount(_subcategorieBudgets[subcategorieIndex].subcategorieBudget.toString()),
+                                                style: const TextStyle(fontSize: 14.0),
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                      Expanded(
+                                        flex: 3,
+                                        child: Padding(
+                                          padding: const EdgeInsets.only(left: 12.0, right: 16.0),
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                formatToMoneyAmount(_subcategorieBudgets[subcategorieIndex].subcategorieBudget.toString()),
+                                                style: const TextStyle(fontSize: 14.0),
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                              Padding(
+                                                padding: const EdgeInsets.only(top: 2.0),
+                                                child: _subcategorieBudgets[subcategorieIndex].subcategorieBudget -
+                                                            _subcategorieBudgets[subcategorieIndex].currentSubcategorieExpenditure >=
+                                                        0.0
+                                                    ? const Text('noch verfügbar', style: TextStyle(color: Colors.grey, fontSize: 14.0))
+                                                    : const Text('überschritten', style: TextStyle(color: Colors.grey, fontSize: 14.0)),
+                                              ),
+                                            ],
+                                          ),
                                         ),
                                       ),
                                       Padding(
-                                        padding: const EdgeInsets.only(right: 52.0),
+                                        padding: const EdgeInsets.only(right: 28.0),
                                         child: Text(
-                                          formatToMoneyAmount(_subcategorieBudgets[subcategorieIndex].subcategorieBudget.toString()),
-                                          style: const TextStyle(fontSize: 14.0),
-                                          overflow: TextOverflow.ellipsis,
+                                          '${widget.budget.percentage.toStringAsFixed(0)} %',
+                                          style: const TextStyle(fontSize: 12.0),
                                         ),
                                       ),
                                     ],

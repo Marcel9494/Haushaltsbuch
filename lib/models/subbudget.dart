@@ -58,6 +58,8 @@ class Subbudget extends HiveObject {
             DateTime.parse(subbudget.budgetDate).year == selectedDate.year &&
             subbudget.subcategorieName == subcategorie[j]) {
           subbudget.boxIndex = i;
+          subbudget.currentSubcategorieExpenditure = 0.0;
+          subbudget.currentSubcategoriePercentage = 0.0;
           subcategorieBudgetList.add(subbudget);
         }
       }
