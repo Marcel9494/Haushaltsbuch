@@ -1,6 +1,7 @@
 import 'package:hive/hive.dart';
 
 import '/utils/consts/hive_consts.dart';
+import 'booking.dart';
 
 @HiveType(typeId: subbudgetTypeId)
 class Subbudget extends HiveObject {
@@ -58,6 +59,7 @@ class Subbudget extends HiveObject {
             DateTime.parse(subbudget.budgetDate).year == selectedDate.year &&
             subbudget.subcategorieName == subcategorie[j]) {
           subbudget.boxIndex = i;
+          subbudget.categorie = categorie;
           subbudget.currentSubcategorieExpenditure = 0.0;
           subbudget.currentSubcategoriePercentage = 0.0;
           subcategorieBudgetList.add(subbudget);
@@ -65,6 +67,15 @@ class Subbudget extends HiveObject {
       }
     }
     return subcategorieBudgetList;
+  }
+
+  static Future<List<Subbudget>> calculateCurrentExpenditure(List<Subbudget> subbudgetList, DateTime selectedDate) async {
+    List<Booking> bookingList = await Booking.loadMonthlyBookingList(selectedDate.month, selectedDate.year);
+    for (int i = 0; i < subbudgetList.length; i++) {
+      print(subbudgetList[i].subcategorieName);
+      subbudgetList[i].currentSubcategorieExpenditure = Booking.getExpenditures(bookingList, subbudgetList[i].categorie, subbudgetList[i].subcategorieName);
+    }
+    return subbudgetList;
   }
 }
 

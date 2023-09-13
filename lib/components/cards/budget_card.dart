@@ -31,15 +31,12 @@ class _BudgetCardState extends State<BudgetCard> {
 
   Future<List<String>> _loadSubcategorieNameList() async {
     // TODO hier weitermachen Beispiel an categorie_percentage_card.dart -> _loadSubcategorieNameList nehmen + Code verbessern
-    _subcategorieNames = await Categorie.loadSubcategorieNames(widget.budget.categorie);
-    //for (int i = 0; i < _subcategorieNames.length; i++) {
     double totalAmount = 0.0;
+    _subcategorieNames = await Categorie.loadSubcategorieNames(widget.budget.categorie);
     _subcategorieBudgets = await Subbudget.loadSubcategorieBudgetList(widget.budget.categorie, _subcategorieNames, widget.selectedDate);
-    /*for (int j = 0; j < _subcategorieBudgets.length; j++) {
-        totalAmount += formatMoneyAmountToDouble(_subcategorieBookings[j].amount);
-      }*/
+    _subcategorieBudgets = await Subbudget.calculateCurrentExpenditure(_subcategorieBudgets, widget.selectedDate);
+    //for (int i = 0; i < _subcategorieBudgets)
     _subcategorieAmounts.add(totalAmount);
-    //}
     //double totalExpenditures = Booking.getExpenditures(widget.bookingList);
     //for (int i = 0; i < _subcategorieNames.length; i++) {
     //  _subcategoriePercentages.add((_subcategorieAmounts[i] * 100) / 0.0); //totalExpenditures);
@@ -196,7 +193,9 @@ class _BudgetCardState extends State<BudgetCard> {
                                             crossAxisAlignment: CrossAxisAlignment.start,
                                             children: [
                                               Text(
-                                                formatToMoneyAmount(_subcategorieBudgets[subcategorieIndex].subcategorieBudget.toString()),
+                                                formatToMoneyAmount((_subcategorieBudgets[subcategorieIndex].subcategorieBudget -
+                                                        _subcategorieBudgets[subcategorieIndex].currentSubcategorieExpenditure)
+                                                    .toString()),
                                                 style: const TextStyle(fontSize: 14.0),
                                                 overflow: TextOverflow.ellipsis,
                                               ),

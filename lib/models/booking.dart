@@ -444,11 +444,17 @@ class Booking extends HiveObject {
     return revenues;
   }
 
-  static double getExpenditures(List<Booking> bookingList, [String categorie = '']) {
+  // TODO hier weitermachen und Funktion in 2 Funktionen aufteilen in Categorie Ausgaben und Unterkategorie Ausgaben
+  static double getExpenditures(List<Booking> bookingList, [String categorie = '', String subcategorie = '']) {
     double expenditures = 0.0;
     for (int i = 0; i < bookingList.length; i++) {
       if ((bookingList[i].transactionType == TransactionType.outcome.name && categorie == '') ||
-          (bookingList[i].transactionType == TransactionType.outcome.name && bookingList[i].categorie == categorie && categorie != '')) {
+          (bookingList[i].transactionType == TransactionType.outcome.name && bookingList[i].categorie == categorie && categorie != '') ||
+          (bookingList[i].transactionType == TransactionType.outcome.name &&
+              bookingList[i].categorie == categorie &&
+              categorie != '' &&
+              bookingList[i].subcategorie == subcategorie &&
+              subcategorie != '')) {
         expenditures += formatMoneyAmountToDouble(bookingList[i].amount);
       }
     }
