@@ -125,7 +125,7 @@ class _CategoriePercentageCardState extends State<CategoriePercentageCard> {
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
                                     Padding(
-                                      padding: const EdgeInsets.only(left: 36.0, right: 8.0),
+                                      padding: const EdgeInsets.only(left: 34.0, right: 8.0),
                                       child: Text(
                                         _subcategoriePercentages[subcategorieIndex].toStringAsFixed(1).replaceAll('.', ',') + ' %  ' + _subcategorieNames[subcategorieIndex],
                                         style: const TextStyle(fontSize: 14.0),

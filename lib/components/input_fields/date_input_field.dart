@@ -9,30 +9,20 @@ import '/screens/create_or_edit_booking_screen.dart';
 
 import '/utils/date_formatters/date_formatter.dart';
 
-typedef BookingDateCallback = void Function(DateTime bookingDate);
-typedef RepeatCallback = void Function(String repeat);
-
-class DateInputField extends StatefulWidget {
+class DateInputField extends StatelessWidget {
   final DateTime currentDate;
   final TextEditingController textController;
-  final BookingDateCallback bookingDateCallback;
   final String repeat;
-  final RepeatCallback repeatCallback;
+  final Function(String repeat) repeatCallback;
 
   const DateInputField({
     Key? key,
     required this.currentDate,
     required this.textController,
-    required this.bookingDateCallback,
     required this.repeat,
     required this.repeatCallback,
   }) : super(key: key);
 
-  @override
-  State<DateInputField> createState() => _DateInputFieldState();
-}
-
-class _DateInputFieldState extends State<DateInputField> {
   void _openBottomSheetWithRepeatList(BuildContext context) {
     showCupertinoModalBottomSheet<void>(
       context: context,
@@ -59,14 +49,14 @@ class _DateInputFieldState extends State<DateInputField> {
                           child: ListTile(
                             title: Text(RepeatType.values[index].name, textAlign: TextAlign.center),
                             onTap: () => {
-                              widget.repeatCallback(RepeatType.values[index].name),
+                              repeatCallback(RepeatType.values[index].name),
                               if (RepeatType.values[index].name == RepeatType.beginningOfMonth.name)
                                 {
-                                  widget.textController.text = dateFormatterDDMMYYYYEE.format(DateTime(DateTime.now().year, DateTime.now().month + 1, 1)),
+                                  textController.text = dateFormatterDDMMYYYYEE.format(DateTime(DateTime.now().year, DateTime.now().month + 1, 1)),
                                 }
                               else if (RepeatType.values[index].name == RepeatType.endOfMonth.name)
                                 {
-                                  widget.textController.text = dateFormatterDDMMYYYYEE
+                                  textController.text = dateFormatterDDMMYYYYEE
                                       .format(DateTime(DateTime.now().year, DateTime.now().month, DateTime(DateTime.now().year, DateTime.now().month + 1, 0).day)),
                                 },
                               Navigator.pop(context),
@@ -74,8 +64,8 @@ class _DateInputFieldState extends State<DateInputField> {
                             visualDensity: const VisualDensity(vertical: -4.0),
                             shape: RoundedRectangleBorder(
                               side: BorderSide(
-                                  color: widget.repeat == RepeatType.values[index].name ? Colors.cyanAccent.shade400 : Colors.grey,
-                                  width: widget.repeat == RepeatType.values[index].name ? 1.2 : 0.4),
+                                  color: repeat == RepeatType.values[index].name ? Colors.cyanAccent.shade400 : Colors.grey,
+                                  width: repeat == RepeatType.values[index].name ? 1.2 : 0.4),
                               borderRadius: BorderRadius.circular(8.0),
                             ),
                             tileColor: Colors.grey.shade800,
@@ -98,7 +88,7 @@ class _DateInputFieldState extends State<DateInputField> {
     return Column(
       children: [
         TextFormField(
-          controller: widget.textController,
+          controller: textController,
           maxLength: 10,
           readOnly: true,
           textAlignVertical: TextAlignVertical.center,
@@ -112,19 +102,19 @@ class _DateInputFieldState extends State<DateInputField> {
             suffixIcon: Column(
               children: [
                 IconTheme(
-                  data: IconThemeData(color: widget.repeat == RepeatType.noRepetition.name ? Colors.grey : Colors.cyanAccent),
+                  data: IconThemeData(color: repeat == RepeatType.noRepetition.name ? Colors.grey : Colors.cyanAccent),
                   child: IconButton(
                     onPressed: () => _openBottomSheetWithRepeatList(context),
                     icon: const Icon(Icons.repeat_rounded),
-                    padding: widget.repeat == RepeatType.noRepetition.name ? null : const EdgeInsets.only(top: 6.0),
-                    constraints: widget.repeat == RepeatType.noRepetition.name ? null : const BoxConstraints(),
+                    padding: repeat == RepeatType.noRepetition.name ? null : const EdgeInsets.only(top: 6.0),
+                    constraints: repeat == RepeatType.noRepetition.name ? null : const BoxConstraints(),
                   ),
                 ),
-                widget.repeat == RepeatType.noRepetition.name
+                repeat == RepeatType.noRepetition.name
                     ? const SizedBox()
                     : Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 6.0),
-                        child: Text(widget.repeat, style: const TextStyle(fontSize: 10.0)),
+                        child: Text(repeat, style: const TextStyle(fontSize: 10.0)),
                       ),
               ],
             ),
@@ -136,7 +126,7 @@ class _DateInputFieldState extends State<DateInputField> {
             DateTime? parsedDate = await showDatePicker(
               context: context,
               locale: const Locale('de', 'DE'),
-              initialDate: widget.currentDate == DateTime.now() ? DateTime.now() : widget.currentDate,
+              initialDate: currentDate == DateTime.now() ? DateTime.now() : currentDate,
               firstDate: DateTime(1900),
               lastDate: DateTime(2100),
               builder: (context, child) {
@@ -156,7 +146,7 @@ class _DateInputFieldState extends State<DateInputField> {
             );
             if (parsedDate != null) {
               CreateOrEditBookingScreen.of(context)!.currentBookingDate = parsedDate;
-              widget.textController.text = dateFormatterDDMMYYYYEE.format(parsedDate);
+              textController.text = dateFormatterDDMMYYYYEE.format(parsedDate);
             }
           },
         ),

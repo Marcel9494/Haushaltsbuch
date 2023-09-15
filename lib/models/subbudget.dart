@@ -72,8 +72,7 @@ class Subbudget extends HiveObject {
   static Future<List<Subbudget>> calculateCurrentExpenditure(List<Subbudget> subbudgetList, DateTime selectedDate) async {
     List<Booking> bookingList = await Booking.loadMonthlyBookingList(selectedDate.month, selectedDate.year);
     for (int i = 0; i < subbudgetList.length; i++) {
-      print(subbudgetList[i].subcategorieName);
-      subbudgetList[i].currentSubcategorieExpenditure = Booking.getExpenditures(bookingList, subbudgetList[i].categorie, subbudgetList[i].subcategorieName);
+      subbudgetList[i].currentSubcategorieExpenditure = Booking.getSubcategorieExpenditures(bookingList, subbudgetList[i].categorie, subbudgetList[i].subcategorieName);
     }
     return subbudgetList;
   }

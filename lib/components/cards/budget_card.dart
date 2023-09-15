@@ -26,21 +26,11 @@ class BudgetCard extends StatefulWidget {
 class _BudgetCardState extends State<BudgetCard> {
   List<String> _subcategorieNames = [];
   List<Subbudget> _subcategorieBudgets = [];
-  final List<double> _subcategorieAmounts = [];
-  final List<double> _subcategoriePercentages = [];
 
-  Future<List<String>> _loadSubcategorieNameList() async {
-    // TODO hier weitermachen Beispiel an categorie_percentage_card.dart -> _loadSubcategorieNameList nehmen + Code verbessern
-    double totalAmount = 0.0;
+  Future<List<String>> _loadSubcategorieBudgets() async {
     _subcategorieNames = await Categorie.loadSubcategorieNames(widget.budget.categorie);
     _subcategorieBudgets = await Subbudget.loadSubcategorieBudgetList(widget.budget.categorie, _subcategorieNames, widget.selectedDate);
     _subcategorieBudgets = await Subbudget.calculateCurrentExpenditure(_subcategorieBudgets, widget.selectedDate);
-    //for (int i = 0; i < _subcategorieBudgets)
-    _subcategorieAmounts.add(totalAmount);
-    //double totalExpenditures = Booking.getExpenditures(widget.bookingList);
-    //for (int i = 0; i < _subcategorieNames.length; i++) {
-    //  _subcategoriePercentages.add((_subcategorieAmounts[i] * 100) / 0.0); //totalExpenditures);
-    //}
     return _subcategorieNames;
   }
 
@@ -148,7 +138,7 @@ class _BudgetCardState extends State<BudgetCard> {
                 ),
                 children: <Widget>[
                   FutureBuilder(
-                    future: _loadSubcategorieNameList(),
+                    future: _loadSubcategorieBudgets(),
                     builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
                       switch (snapshot.connectionState) {
                         case ConnectionState.waiting:
@@ -165,7 +155,7 @@ class _BudgetCardState extends State<BudgetCard> {
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
                                       Expanded(
-                                        flex: 3,
+                                        flex: 2,
                                         child: Padding(
                                           padding: const EdgeInsets.only(left: 36.0),
                                           child: Column(
@@ -188,7 +178,7 @@ class _BudgetCardState extends State<BudgetCard> {
                                       Expanded(
                                         flex: 3,
                                         child: Padding(
-                                          padding: const EdgeInsets.only(left: 12.0, right: 16.0),
+                                          padding: const EdgeInsets.only(left: 20.0, right: 16.0),
                                           child: Column(
                                             crossAxisAlignment: CrossAxisAlignment.start,
                                             children: [
@@ -209,13 +199,6 @@ class _BudgetCardState extends State<BudgetCard> {
                                               ),
                                             ],
                                           ),
-                                        ),
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.only(right: 28.0),
-                                        child: Text(
-                                          '${widget.budget.percentage.toStringAsFixed(0)} %',
-                                          style: const TextStyle(fontSize: 12.0),
                                         ),
                                       ),
                                     ],

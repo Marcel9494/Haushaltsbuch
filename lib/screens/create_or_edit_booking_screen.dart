@@ -396,7 +396,6 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
                         DateInputField(
                             currentDate: _parsedBookingDate,
                             textController: _bookingDateTextController,
-                            bookingDateCallback: (bookingDate) => _parsedBookingDate = bookingDate,
                             repeat: _bookingRepeat,
                             repeatCallback: (repeat) => setState(() => _bookingRepeat = repeat)),
                         TextInputField(textEditingController: _bookingNameController, errorText: _bookingNameErrorText, hintText: 'Titel'),
