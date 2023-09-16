@@ -80,7 +80,6 @@ class Subbudget extends HiveObject {
             DateTime.parse(subbudget.budgetDate).year == selectedDate.year &&
             subbudget.subcategorieName == subcategorie[j]) {
           subbudget.boxIndex = i;
-          subbudget.categorie = categorie;
           subbudget.currentSubcategorieExpenditure = 0.0;
           subbudget.currentSubcategoriePercentage = 0.0;
           subcategorieBudgetList.add(subbudget);
@@ -106,6 +105,7 @@ class SubbudgetAdapter extends TypeAdapter<Subbudget> {
   @override
   Subbudget read(BinaryReader reader) {
     return Subbudget()
+      ..categorie = reader.read()
       ..subcategorieName = reader.read()
       ..subcategorieBudget = reader.read()
       ..budgetDate = reader.read();
@@ -113,6 +113,7 @@ class SubbudgetAdapter extends TypeAdapter<Subbudget> {
 
   @override
   void write(BinaryWriter writer, Subbudget obj) {
+    writer.write(obj.categorie);
     writer.write(obj.subcategorieName);
     writer.write(obj.subcategorieBudget);
     writer.write(obj.budgetDate);

@@ -17,6 +17,7 @@ import 'models/intro_screen_state.dart';
 import 'models/primary_account.dart';
 import 'models/screen_arguments/create_or_edit_subcategorie_screen_arguments.dart';
 import 'models/screen_arguments/edit_budget_screen_arguments.dart';
+import 'models/screen_arguments/edit_subbudget_screen_arguments.dart';
 import 'models/screen_arguments/bottom_nav_bar_screen_arguments.dart';
 import 'models/screen_arguments/account_details_screen_arguments.dart';
 import 'models/screen_arguments/categorie_amount_list_screen_arguments.dart';
@@ -37,6 +38,7 @@ import '/screens/account_details_screen.dart';
 import '/screens/create_or_edit_budget_screen.dart';
 import '/screens/categorie_amount_list_screen.dart';
 import '/screens/edit_budget_screen.dart';
+import '/screens/edit_subbudget_screen.dart';
 import '/screens/settings_screen.dart';
 import '/screens/splash_screen.dart';
 
@@ -162,6 +164,14 @@ class BudgetBookApp extends StatelessWidget {
             return MaterialPageRoute<String>(
               builder: (BuildContext context) => EditBudgetScreen(
                 budget: args.budget,
+              ),
+              settings: settings,
+            );
+          case editSubbudgetRoute:
+            final args = settings.arguments as EditSubbudgetScreenArguments;
+            return MaterialPageRoute<String>(
+              builder: (BuildContext context) => EditSubbudgetScreen(
+                subbudget: args.subbudget,
               ),
               settings: settings,
             );

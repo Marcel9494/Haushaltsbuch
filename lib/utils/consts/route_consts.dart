@@ -7,6 +7,7 @@ const createOrEditSubcategorieRoute = '/createOrEditSubcategorie';
 const createOrEditBudgetRoute = '/createOrEditBudget';
 const overviewBudgetsRoute = '/overviewBudgets';
 const editBudgetRoute = '/editBudget';
+const editSubbudgetRoute = '/editSubbudget';
 const categoriesRoute = '/categories';
 const accountDetailsRoute = '/accountDetails';
 const categorieAmountListRoute = '/categorieAmountList';
