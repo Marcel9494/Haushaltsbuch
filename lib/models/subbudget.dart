@@ -1,7 +1,8 @@
 import 'package:hive/hive.dart';
 
-import '/utils/consts/hive_consts.dart';
 import 'booking.dart';
+
+import '/utils/consts/hive_consts.dart';
 
 @HiveType(typeId: subbudgetTypeId)
 class Subbudget extends HiveObject {
@@ -47,6 +48,26 @@ class Subbudget extends HiveObject {
         subbudgetBox.add(subbudget);
       }
     }
+  }
+
+  static Future<List<Subbudget>> loadSubcategorieList(String categorie) async {
+    var subbudgetBox = await Hive.openBox(subbudgetsBox);
+    List<Subbudget> subcategorieList = [];
+    for (int i = 0; i < subbudgetBox.length; i++) {
+      Subbudget subbudget = await subbudgetBox.getAt(i);
+      if (subbudget.categorie == categorie) {
+        bool subcategorieIsAlreadyInList = false;
+        for (int j = 0; j < subcategorieList.length; j++) {
+          if (subcategorieList[j].subcategorieName == subbudget.subcategorieName) {
+            subcategorieIsAlreadyInList = true;
+          }
+        }
+        if (subcategorieIsAlreadyInList == false) {
+          subcategorieList.add(subbudget);
+        }
+      }
+    }
+    return subcategorieList;
   }
 
   static Future<List<Subbudget>> loadSubcategorieBudgetList(String categorie, List<String> subcategorie, DateTime selectedDate) async {

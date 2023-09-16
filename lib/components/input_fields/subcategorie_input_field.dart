@@ -102,7 +102,7 @@ class _SubcategorieInputFieldState extends State<SubcategorieInputField> {
       readOnly: true,
       onTap: () => _openBottomSheetWithSubcategorieList(context),
       decoration: const InputDecoration(
-        hintText: 'Unterkategorie',
+        hintText: 'Unterkategorie (optional)',
         prefixIcon: Icon(
           Icons.donut_large_rounded,
           color: Colors.grey,
