@@ -159,7 +159,7 @@ class _CreateOrEditBudgetScreenState extends State<CreateOrEditBudgetScreen> {
         ..percentage = 0.0
         ..budgetDate = DateTime.now().toString();
       newBudget.createBudget(newBudget);
-      // TODO hier weitermachen für Subbudgets ebenfalls DefaultBudgets anlegen + bisherigen Code testen
+      // TODO hier weitermachen für Subbudgets ebenfalls DefaultBudgets anlegen (siehe weiter oben) + bisherigen Code testen
       for (int i = 0; i < 3; i++) {
         DateTime date = DateTime.now();
         Subbudget subbudget = Subbudget()

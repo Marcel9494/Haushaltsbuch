@@ -89,6 +89,19 @@ class Subbudget extends HiveObject {
     return subcategorieBudgetList;
   }
 
+  static Future<List<Subbudget>> loadOneSubbudget(String subcategorieName) async {
+    var subbudgetBox = await Hive.openBox(subbudgetsBox);
+    List<Subbudget> subbudgetList = [];
+    for (int i = 0; i < subbudgetBox.length; i++) {
+      Subbudget subbudget = await subbudgetBox.getAt(i);
+      if (subbudget.subcategorieName == subcategorieName) {
+        subbudget.boxIndex = i;
+        subbudgetList.add(subbudget);
+      }
+    }
+    return subbudgetList;
+  }
+
   static Future<List<Subbudget>> calculateCurrentExpenditure(List<Subbudget> subbudgetList, DateTime selectedDate) async {
     List<Booking> bookingList = await Booking.loadMonthlyBookingList(selectedDate.month, selectedDate.year);
     for (int i = 0; i < subbudgetList.length; i++) {
