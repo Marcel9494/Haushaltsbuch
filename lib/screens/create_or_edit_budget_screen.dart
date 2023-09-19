@@ -49,6 +49,7 @@ class _CreateOrEditBudgetScreenState extends State<CreateOrEditBudgetScreen> {
   String _categorieErrorText = '';
   String _budgetErrorText = '';
   bool _budgetExistsAlready = false;
+  bool _subbudgetExistsAlready = false;
 
   @override
   void initState() {
@@ -105,7 +106,7 @@ class _CreateOrEditBudgetScreenState extends State<CreateOrEditBudgetScreen> {
   }
 
   void _createBudget() async {
-    _budgetExistsAlready = await Budget.existsBudgetCategorie(_categorieTextController.text);
+    _budgetExistsAlready = await Budget.existsBudgetForCategorie(_categorieTextController.text);
     if (_budgetExistsAlready) {
       showChoiceDialog(
           context,
@@ -133,24 +134,35 @@ class _CreateOrEditBudgetScreenState extends State<CreateOrEditBudgetScreen> {
 
   void _createSubbudget() async {
     var subbudgetBox = await Hive.openBox(subbudgetsBox);
-    _budgetExistsAlready = await Budget.existsBudgetCategorie(_categorieTextController.text);
+    _budgetExistsAlready = await Budget.existsBudgetForCategorie(_categorieTextController.text);
+    _subbudgetExistsAlready = await Subbudget.existsSubbudgetForCategorie(_subcategorieTextController.text);
     if (_budgetExistsAlready) {
-      // TODO hier weitermachen und Code testen + auch für else Zweig implementieren + Code verbessern
-      for (int i = 0; i < 3; i++) {
-        DateTime date = DateTime.now();
-        Subbudget subbudget = Subbudget()
-          ..boxIndex = i
-          ..subcategorieBudget = formatMoneyAmountToDouble(_budgetTextController.text)
-          ..subcategorieName = _subcategorieTextController.text
-          ..currentSubcategoriePercentage = 0.0
-          ..currentSubcategorieExpenditure = 0.0
-          ..categorie = _categorieTextController.text
-          ..budgetDate = DateTime(date.year, date.month + i, 1).toString();
-        subbudget.createBudgetInstance(subbudget);
-        subbudgetBox.add(subbudget);
+      // TODO hier weitermachen und Code testen + Code verbessern => 2x ziemlich gleicher Code und teilweise zu kompliziert
+      if (_subbudgetExistsAlready) {
+        // TODO hier weitermachen Subbudgets werden noch nicht geupdatet unten auch beachten! if Bedingungen erfüllt prints einbauen zum testen!
+        DefaultBudget defaultSubbudget = await DefaultBudget.loadDefaultBudget(_subcategorieTextController.text);
+        Subbudget.updateAllSubbudgetsForCategorie(defaultSubbudget);
+      } else {
+        for (int i = 0; i < 3; i++) {
+          DateTime date = DateTime.now();
+          Subbudget subbudget = Subbudget()
+            ..boxIndex = i
+            ..subcategorieBudget = formatMoneyAmountToDouble(_budgetTextController.text)
+            ..subcategorieName = _subcategorieTextController.text
+            ..currentSubcategoriePercentage = 0.0
+            ..currentSubcategorieExpenditure = 0.0
+            ..categorie = _categorieTextController.text
+            ..budgetDate = DateTime(date.year, date.month + i, 1).toString();
+          subbudget.createBudgetInstance(subbudget);
+          subbudgetBox.add(subbudget);
+        }
+        DefaultBudget newDefaultSubcategoriebudget = DefaultBudget()
+          ..categorie = _subcategorieTextController.text
+          ..defaultBudget = formatMoneyAmountToDouble(_budgetTextController.text);
+        newDefaultSubcategoriebudget.createDefaultBudget(newDefaultSubcategoriebudget);
+        List<String> subcategorieNames = await Categorie.loadSubcategorieNames(_categorieTextController.text);
+        Subbudget.createSubbudgets(_categorieTextController.text, _subcategorieTextController.text, subcategorieNames);
       }
-      List<String> subcategorieNames = await Categorie.loadSubcategorieNames(_categorieTextController.text);
-      Subbudget.createSubbudgets(_categorieTextController.text, _subcategorieTextController.text, subcategorieNames);
     } else {
       Budget newBudget = Budget()
         ..categorie = _categorieTextController.text
@@ -159,26 +171,34 @@ class _CreateOrEditBudgetScreenState extends State<CreateOrEditBudgetScreen> {
         ..percentage = 0.0
         ..budgetDate = DateTime.now().toString();
       newBudget.createBudget(newBudget);
-      // TODO hier weitermachen für Subbudgets ebenfalls DefaultBudgets anlegen (siehe weiter oben) + bisherigen Code testen
-      for (int i = 0; i < 3; i++) {
-        DateTime date = DateTime.now();
-        Subbudget subbudget = Subbudget()
-          ..boxIndex = i
-          ..subcategorieBudget = formatMoneyAmountToDouble(_budgetTextController.text)
-          ..subcategorieName = _subcategorieTextController.text
-          ..currentSubcategoriePercentage = 0.0
-          ..currentSubcategorieExpenditure = 0.0
-          ..categorie = _categorieTextController.text
-          ..budgetDate = DateTime(date.year, date.month + i, 1).toString();
-        subbudget.createBudgetInstance(subbudget);
-        subbudgetBox.add(subbudget);
-      }
-      List<String> subcategorieNames = await Categorie.loadSubcategorieNames(_categorieTextController.text);
-      Subbudget.createSubbudgets(_categorieTextController.text, _subcategorieTextController.text, subcategorieNames);
       DefaultBudget newDefaultBudget = DefaultBudget()
         ..categorie = _categorieTextController.text
         ..defaultBudget = formatMoneyAmountToDouble(_budgetTextController.text);
       newDefaultBudget.createDefaultBudget(newDefaultBudget);
+      if (_subbudgetExistsAlready) {
+        DefaultBudget defaultSubbudget = await DefaultBudget.loadDefaultBudget(_subcategorieTextController.text);
+        Subbudget.updateAllSubbudgetsForCategorie(defaultSubbudget);
+      } else {
+        for (int i = 0; i < 3; i++) {
+          DateTime date = DateTime.now();
+          Subbudget subbudget = Subbudget()
+            ..boxIndex = i
+            ..subcategorieBudget = formatMoneyAmountToDouble(_budgetTextController.text)
+            ..subcategorieName = _subcategorieTextController.text
+            ..currentSubcategoriePercentage = 0.0
+            ..currentSubcategorieExpenditure = 0.0
+            ..categorie = _categorieTextController.text
+            ..budgetDate = DateTime(date.year, date.month + i, 1).toString();
+          subbudget.createBudgetInstance(subbudget);
+          subbudgetBox.add(subbudget);
+        }
+        DefaultBudget newDefaultSubcategoriebudget = DefaultBudget()
+          ..categorie = _subcategorieTextController.text
+          ..defaultBudget = formatMoneyAmountToDouble(_budgetTextController.text);
+        newDefaultSubcategoriebudget.createDefaultBudget(newDefaultSubcategoriebudget);
+        List<String> subcategorieNames = await Categorie.loadSubcategorieNames(_categorieTextController.text);
+        Subbudget.createSubbudgets(_categorieTextController.text, _subcategorieTextController.text, subcategorieNames);
+      }
     }
   }
 

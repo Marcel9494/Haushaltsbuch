@@ -1,9 +1,13 @@
 import 'package:hive/hive.dart';
 
 import 'booking.dart';
+import 'default_budget.dart';
 
 import '/utils/consts/hive_consts.dart';
 
+// TODO Code verbessern categorie in maincategorie umbenennen und subcategorieName in subcategorie umbenennen
+// TODO currentSubcategorieExpenditure in subcategorieExpenditure umbenennen
+// TODO currentSubcategoriePercentage in subcategoriePercentage umbenennen
 @HiveType(typeId: subbudgetTypeId)
 class Subbudget extends HiveObject {
   late int boxIndex;
@@ -46,6 +50,21 @@ class Subbudget extends HiveObject {
           ..categorie = mainCategorie
           ..budgetDate = DateTime(date.year, date.month + j, 1).toString();
         subbudgetBox.add(subbudget);
+      }
+      DefaultBudget newDefaultSubcategoriebudget = DefaultBudget()
+        ..categorie = subcategorieNames[i]
+        ..defaultBudget = 0.0;
+      newDefaultSubcategoriebudget.createDefaultBudget(newDefaultSubcategoriebudget);
+    }
+  }
+
+  static void updateAllSubbudgetsForCategorie(DefaultBudget defaultBudget) async {
+    var subbudgetBox = await Hive.openBox(subbudgetsBox);
+    for (int i = 0; i < subbudgetBox.length; i++) {
+      Subbudget subbudget = await subbudgetBox.getAt(i);
+      if (subbudget.subcategorieName == defaultBudget.categorie) {
+        subbudget.subcategorieBudget = defaultBudget.defaultBudget;
+        subbudgetBox.putAt(i, subbudget);
       }
     }
   }
@@ -100,6 +119,17 @@ class Subbudget extends HiveObject {
       }
     }
     return subbudgetList;
+  }
+
+  static Future<bool> existsSubbudgetForCategorie(String subbudgetCategorie) async {
+    var subbudgetBox = await Hive.openBox(subbudgetsBox);
+    for (int i = 0; i < subbudgetBox.length; i++) {
+      Subbudget subbudget = await subbudgetBox.getAt(i);
+      if (subbudget.subcategorieName == subbudgetCategorie) {
+        return Future.value(true);
+      }
+    }
+    return Future.value(false);
   }
 
   static Future<List<Subbudget>> calculateCurrentExpenditure(List<Subbudget> subbudgetList, DateTime selectedDate) async {
