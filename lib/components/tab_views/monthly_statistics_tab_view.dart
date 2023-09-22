@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:percent_indicator/circular_percent_indicator.dart';
 
 import '/models/booking.dart';
 import '/models/percentage_stats.dart';
@@ -11,7 +10,7 @@ import '/utils/number_formatters/number_formatter.dart';
 
 import '../buttons/transaction_stats_toggle_buttons.dart';
 
-import '../cards/percentage_card.dart';
+import '../cards/categorie_percentage_card.dart';
 
 import '../deco/loading_indicator.dart';
 
@@ -169,11 +168,11 @@ class _MonthlyStatisticsTabViewState extends State<MonthlyStatisticsTabView> {
                     },
                     color: Colors.cyanAccent,
                     child: SizedBox(
-                      height: 250.0,
+                      height: 300.0, // TODO dynamisch machen
                       child: ListView.builder(
                         itemCount: _percentageStats.length,
                         itemBuilder: (BuildContext context, int index) {
-                          return PercentageCard(percentageStats: _percentageStats[index], selectedDate: widget.selectedDate);
+                          return CategoriePercentageCard(percentageStats: _percentageStats[index], selectedDate: widget.selectedDate, bookingList: _bookingList);
                         },
                       ),
                     ),

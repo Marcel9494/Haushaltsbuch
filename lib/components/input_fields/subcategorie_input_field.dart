@@ -1,49 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
-import '/components/deco/bottom_sheet_line.dart';
-
 import '/models/categorie.dart';
 
-typedef CategorieStringCallback = void Function(String currentCategorie);
+import '../deco/bottom_sheet_line.dart';
 
-class CategorieInputField extends StatefulWidget {
+class SubcategorieInputField extends StatefulWidget {
   final TextEditingController textController;
-  final String errorText;
-  final String transactionType;
+  final String categorieName;
   final String title;
-  final bool autofocus;
-  final CategorieStringCallback categorieStringCallback;
 
-  const CategorieInputField({
+  const SubcategorieInputField({
     Key? key,
     required this.textController,
-    required this.errorText,
-    required this.transactionType,
-    required this.categorieStringCallback,
-    this.title = 'Kategorie auswählen:',
-    this.autofocus = false,
+    required this.categorieName,
+    this.title = 'Unterkategorie auswählen:',
   }) : super(key: key);
 
   @override
-  State<CategorieInputField> createState() => _CategorieInputFieldState();
+  State<SubcategorieInputField> createState() => _SubcategorieInputFieldState();
 }
 
-class _CategorieInputFieldState extends State<CategorieInputField> {
-  List<String> _categorieNames = [];
+class _SubcategorieInputFieldState extends State<SubcategorieInputField> {
+  List<String> _subcategorieNames = [];
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (widget.autofocus) {
-      // Future.delayed Grund siehe: https://stackoverflow.com/q/58027568/15943768
-      Future.delayed(Duration.zero, () {
-        _openBottomSheetWithCategorieList(context);
-      });
-    }
-  }
-
-  void _openBottomSheetWithCategorieList(BuildContext context) {
+  void _openBottomSheetWithSubcategorieList(BuildContext context) {
     showCupertinoModalBottomSheet<void>(
       context: context,
       builder: (BuildContext context) {
@@ -58,14 +39,14 @@ class _CategorieInputFieldState extends State<CategorieInputField> {
                   child: Text(widget.title, style: const TextStyle(fontSize: 18.0)),
                 ),
                 FutureBuilder(
-                  future: _loadCategorieNameList(),
+                  future: _loadSubcategorieNameList(),
                   builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
                     switch (snapshot.connectionState) {
                       case ConnectionState.waiting:
                         return const SizedBox();
                       case ConnectionState.done:
-                        if (_categorieNames.isEmpty) {
-                          return const Text('Erstelle zuerst eine Kategorie.');
+                        if (_subcategorieNames.isEmpty) {
+                          return const Text('Erstelle zuerst eine Unterkategorie.');
                         } else {
                           return Center(
                             child: GridView.count(
@@ -76,15 +57,14 @@ class _CategorieInputFieldState extends State<CategorieInputField> {
                               crossAxisSpacing: 5,
                               shrinkWrap: true,
                               children: <Widget>[
-                                for (int i = 0; i < _categorieNames.length; i++)
+                                for (int i = 0; i < _subcategorieNames.length; i++)
                                   OutlinedButton(
                                     onPressed: () => {
-                                      widget.textController.text = _categorieNames[i],
-                                      widget.categorieStringCallback(_categorieNames[i]),
+                                      widget.textController.text = _subcategorieNames[i],
                                       Navigator.pop(context),
                                     },
                                     child: Text(
-                                      _categorieNames[i],
+                                      _subcategorieNames[i],
                                       textAlign: TextAlign.center,
                                       style: const TextStyle(
                                         color: Colors.white70,
@@ -108,9 +88,9 @@ class _CategorieInputFieldState extends State<CategorieInputField> {
     );
   }
 
-  Future<List<String>> _loadCategorieNameList() async {
-    _categorieNames = await Categorie.loadCategorieNames(widget.transactionType);
-    return _categorieNames;
+  Future<List<String>> _loadSubcategorieNameList() async {
+    _subcategorieNames = await Categorie.loadSubcategorieNames(widget.categorieName);
+    return _subcategorieNames;
   }
 
   @override
@@ -120,18 +100,16 @@ class _CategorieInputFieldState extends State<CategorieInputField> {
       textAlignVertical: TextAlignVertical.center,
       showCursor: false,
       readOnly: true,
-      autofocus: widget.autofocus,
-      onTap: () => _openBottomSheetWithCategorieList(context),
-      decoration: InputDecoration(
-        hintText: 'Kategorie',
-        prefixIcon: const Icon(
-          Icons.donut_small_rounded,
+      onTap: () => _openBottomSheetWithSubcategorieList(context),
+      decoration: const InputDecoration(
+        hintText: 'Unterkategorie (optional)',
+        prefixIcon: Icon(
+          Icons.donut_large_rounded,
           color: Colors.grey,
         ),
-        focusedBorder: const UnderlineInputBorder(
+        focusedBorder: UnderlineInputBorder(
           borderSide: BorderSide(color: Colors.cyanAccent, width: 1.5),
         ),
-        errorText: widget.errorText.isEmpty ? null : widget.errorText,
       ),
     );
   }

@@ -3,14 +3,13 @@ import 'package:flutter/material.dart';
 
 import '../buttons/transaction_stats_toggle_buttons.dart';
 
+import '../cards/categorie_percentage_card.dart';
 import '/models/booking.dart';
 import '/models/percentage_stats.dart';
 import '/models/enums/categorie_types.dart';
 import '/models/enums/transaction_types.dart';
 
 import '/utils/number_formatters/number_formatter.dart';
-
-import '../cards/percentage_card.dart';
 
 import '../deco/loading_indicator.dart';
 
@@ -171,11 +170,11 @@ class _YearlyStatisticsTabViewState extends State<YearlyStatisticsTabView> {
                     },
                     color: Colors.cyanAccent,
                     child: SizedBox(
-                      height: 250.0,
+                      height: 300.0, // TODO dynamisch machen
                       child: ListView.builder(
                         itemCount: _percentageStats.length,
                         itemBuilder: (BuildContext context, int index) {
-                          return PercentageCard(percentageStats: _percentageStats[index]);
+                          return CategoriePercentageCard(percentageStats: _percentageStats[index], bookingList: _bookingList);
                         },
                       ),
                     ),

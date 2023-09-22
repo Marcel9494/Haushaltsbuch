@@ -12,6 +12,9 @@ class OverviewBudgetsScreen extends StatefulWidget {
   State<OverviewBudgetsScreen> createState() => _OverviewBudgetsScreenState();
 }
 
+// TODO hier weitermachen und Budgets verwalten um Unterkategorien erweitern.
+// TODO Dabei den Benutzer auf dieser Seite auswählen lassen können, ob er eine
+// TODO Hauptkategorie oder Unterkategorie bearbeiten möchte.
 class _OverviewBudgetsScreenState extends State<OverviewBudgetsScreen> {
   List<Budget> _budgetList = [];
 

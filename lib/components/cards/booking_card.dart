@@ -117,7 +117,7 @@ class BookingCard extends StatelessWidget {
                           children: [
                             booking.transactionType == TransactionType.transfer.name || booking.transactionType == TransactionType.investment.name
                                 ? const SizedBox()
-                                : Text(booking.categorie, overflow: TextOverflow.ellipsis),
+                                : Text(booking.subcategorie.isEmpty ? booking.categorie : booking.subcategorie, overflow: TextOverflow.ellipsis),
                             Padding(
                               padding: EdgeInsets.only(
                                   top: booking.transactionType == TransactionType.transfer.name || booking.transactionType == TransactionType.investment.name ? 0.0 : 8.0),

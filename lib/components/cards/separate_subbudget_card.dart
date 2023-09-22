@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '/models/budget.dart';
+import '/models/subbudget.dart';
 import '/models/enums/budget_mode_types.dart';
 import '/models/screen_arguments/create_or_edit_budget_screen_arguments.dart';
 
@@ -8,18 +8,18 @@ import '/utils/consts/route_consts.dart';
 import '/utils/date_formatters/date_formatter.dart';
 import '/utils/number_formatters/number_formatter.dart';
 
-class SeparateBudgetCard extends StatelessWidget {
-  final Budget budget;
+class SeparateSubbudgetCard extends StatelessWidget {
+  final Subbudget subbudget;
 
-  const SeparateBudgetCard({
+  const SeparateSubbudgetCard({
     Key? key,
-    required this.budget,
+    required this.subbudget,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => Navigator.pushNamed(context, createOrEditBudgetRoute, arguments: CreateOrEditBudgetScreenArguments(BudgetModeType.budgetCreationMode, budget.boxIndex)),
+      onTap: () => Navigator.pushNamed(context, createOrEditBudgetRoute, arguments: CreateOrEditBudgetScreenArguments(BudgetModeType.budgetCreationMode, subbudget.boxIndex)),
       child: Card(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(14.0),
@@ -32,7 +32,7 @@ class SeparateBudgetCard extends StatelessWidget {
             decoration: BoxDecoration(
               border: Border(
                   left: BorderSide(
-                      color: DateTime.parse(budget.budgetDate).month == DateTime.now().month && DateTime.parse(budget.budgetDate).year == DateTime.now().year
+                      color: DateTime.parse(subbudget.budgetDate).month == DateTime.now().month && DateTime.parse(subbudget.budgetDate).year == DateTime.now().year
                           ? Colors.cyanAccent
                           : Colors.transparent,
                       width: 3.5)),
@@ -47,16 +47,16 @@ class SeparateBudgetCard extends StatelessWidget {
                     padding: const EdgeInsets.all(8.0),
                     decoration: BoxDecoration(
                         border: Border.all(
-                            color: DateTime.parse(budget.budgetDate).month == DateTime.now().month && DateTime.parse(budget.budgetDate).year == DateTime.now().year
+                            color: DateTime.parse(subbudget.budgetDate).month == DateTime.now().month && DateTime.parse(subbudget.budgetDate).year == DateTime.now().year
                                 ? Colors.cyanAccent
                                 : Colors.blueGrey)),
-                    child: dateFormatterMMMM.format(DateTime.parse(budget.budgetDate)).length > 3
-                        ? Text('${dateFormatterMMM.format(DateTime.parse(budget.budgetDate))}.')
-                        : Text(dateFormatterMMM.format(DateTime.parse(budget.budgetDate))),
+                    child: dateFormatterMMMM.format(DateTime.parse(subbudget.budgetDate)).length > 3
+                        ? Text('${dateFormatterMMM.format(DateTime.parse(subbudget.budgetDate))}.')
+                        : Text(dateFormatterMMM.format(DateTime.parse(subbudget.budgetDate))),
                   ),
                   Padding(
                     padding: const EdgeInsets.only(right: 6.0),
-                    child: Text(formatToMoneyAmount(budget.budget.toString())),
+                    child: Text(formatToMoneyAmount(subbudget.subcategorieBudget.toString())),
                   ),
                 ],
               ),

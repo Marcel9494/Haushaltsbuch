@@ -9,12 +9,15 @@ import 'models/booking.dart';
 import 'models/account.dart';
 import 'models/categorie.dart';
 import 'models/budget.dart';
+import 'models/subbudget.dart';
 import 'models/default_budget.dart';
 import 'models/enums/transaction_types.dart';
 import 'models/global_state.dart';
 import 'models/intro_screen_state.dart';
 import 'models/primary_account.dart';
+import 'models/screen_arguments/create_or_edit_subcategorie_screen_arguments.dart';
 import 'models/screen_arguments/edit_budget_screen_arguments.dart';
+import 'models/screen_arguments/edit_subbudget_screen_arguments.dart';
 import 'models/screen_arguments/bottom_nav_bar_screen_arguments.dart';
 import 'models/screen_arguments/account_details_screen_arguments.dart';
 import 'models/screen_arguments/categorie_amount_list_screen_arguments.dart';
@@ -29,11 +32,13 @@ import '/screens/overview_budgets_screen.dart';
 import '/screens/create_or_edit_booking_screen.dart';
 import '/screens/create_or_edit_account_screen.dart';
 import '/screens/create_or_edit_categorie_screen.dart';
+import '/screens/create_or_edit_subcategorie_screen.dart';
 import '/screens/categories_screen.dart';
 import '/screens/account_details_screen.dart';
 import '/screens/create_or_edit_budget_screen.dart';
 import '/screens/categorie_amount_list_screen.dart';
 import '/screens/edit_budget_screen.dart';
+import '/screens/edit_subbudget_screen.dart';
 import '/screens/settings_screen.dart';
 import '/screens/splash_screen.dart';
 
@@ -47,6 +52,7 @@ void main() async {
   Hive.registerAdapter(PrimaryAccountAdapter());
   Hive.registerAdapter(CategorieAdapter());
   Hive.registerAdapter(BudgetAdapter());
+  Hive.registerAdapter(SubbudgetAdapter());
   Hive.registerAdapter(DefaultBudgetAdapter());
   Hive.registerAdapter(TransactionTypeAdapter());
   Hive.registerAdapter(GlobalStateAdapter());
@@ -133,10 +139,21 @@ class BudgetBookApp extends StatelessWidget {
               ),
               settings: settings,
             );
+          case createOrEditSubcategorieRoute:
+            final args = settings.arguments as CreateOrEditSubcategorieScreenArguments;
+            return MaterialPageRoute<String>(
+              builder: (BuildContext context) => CreateOrEditSubcategorieScreen(
+                categorie: args.categorie,
+                mode: args.mode,
+                subcategorieIndex: args.subcategorieIndex,
+              ),
+              settings: settings,
+            );
           case createOrEditBudgetRoute:
             final args = settings.arguments as CreateOrEditBudgetScreenArguments;
             return MaterialPageRoute<String>(
               builder: (BuildContext context) => CreateOrEditBudgetScreen(
+                budgetModeType: args.budgetModeType,
                 budgetBoxIndex: args.budgetBoxIndex,
                 budgetCategorie: args.budgetCategorie,
               ),
@@ -147,6 +164,14 @@ class BudgetBookApp extends StatelessWidget {
             return MaterialPageRoute<String>(
               builder: (BuildContext context) => EditBudgetScreen(
                 budget: args.budget,
+              ),
+              settings: settings,
+            );
+          case editSubbudgetRoute:
+            final args = settings.arguments as EditSubbudgetScreenArguments;
+            return MaterialPageRoute<String>(
+              builder: (BuildContext context) => EditSubbudgetScreen(
+                subbudget: args.subbudget,
               ),
               settings: settings,
             );

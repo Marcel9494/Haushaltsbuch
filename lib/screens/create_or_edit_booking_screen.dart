@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:another_flushbar/flushbar.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 
+import '../components/input_fields/subcategorie_input_field.dart';
 import '/utils/consts/route_consts.dart';
 import '/utils/consts/global_consts.dart';
 import '/utils/date_formatters/date_formatter.dart';
@@ -48,6 +49,9 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
   final TextEditingController _fromAccountTextController = TextEditingController();
   final TextEditingController _toAccountTextController = TextEditingController();
   final TextEditingController _categorieTextController = TextEditingController();
+  // TODO hier weitermachen und _subcategorieTextController.text überall einbauen, dabei an _categorieTextController.text orientieren
+  // müssten die gleichen Stellen sein. Buchung Datenstruktur um Unterkategorie Eintrag erweitern.
+  final TextEditingController _subcategorieTextController = TextEditingController();
   final RoundedLoadingButtonController _saveButtonController = RoundedLoadingButtonController();
   bool _isBookingEdited = false;
   bool _isPreselectedAccountsLoaded = false;
@@ -84,6 +88,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
     _amountTextController.text = _loadedBooking.amount;
     _bookingNameController.text = _loadedBooking.title;
     _categorieTextController.text = _loadedBooking.categorie;
+    _subcategorieTextController.text = _loadedBooking.subcategorie;
     _fromAccountTextController.text = _loadedBooking.fromAccount;
     _toAccountTextController.text = _loadedBooking.toAccount;
     _isBookingEdited = true;
@@ -101,11 +106,13 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
     if (widget.bookingBoxIndex == -1) {
       Booking booking = Booking();
       if (_bookingRepeat == RepeatType.noRepetition.name) {
+        // TODO Code verbessern und nur komplettes Booking Objekt übergeben
         booking.createBooking(_bookingNameController.text, _currentTransaction, _parsedBookingDate.toString(), _bookingRepeat, _amountTextController.text,
-            _categorieTextController.text, _fromAccountTextController.text, _toAccountTextController.text);
+            _categorieTextController.text, _subcategorieTextController.text, _fromAccountTextController.text, _toAccountTextController.text);
       } else if (_bookingRepeat != RepeatType.noRepetition.name) {
+        // TODO Code verbessern und nur komplettes Booking Objekt übergeben
         booking.createBookingSerie(_bookingNameController.text, _currentTransaction, _parsedBookingDate.toString(), _bookingRepeat, _amountTextController.text,
-            _categorieTextController.text, _fromAccountTextController.text, _toAccountTextController.text);
+            _categorieTextController.text, _subcategorieTextController.text, _fromAccountTextController.text, _toAccountTextController.text);
       }
     } else {
       Booking currentBooking = Booking()
@@ -115,6 +122,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
         ..date = _parsedBookingDate.toString()
         ..amount = _amountTextController.text
         ..categorie = _categorieTextController.text
+        ..subcategorie = _subcategorieTextController.text
         ..fromAccount = _fromAccountTextController.text
         ..toAccount = _toAccountTextController.text
         ..serieId = _loadedBooking.serieId
@@ -196,7 +204,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
     }
   }
 
-  set currentTransaction(String transaction) => setState(() => {_currentTransaction = transaction, _categorieTextController.text = ''});
+  set currentTransaction(String transaction) => setState(() => {_currentTransaction = transaction, _categorieTextController.text = '', _subcategorieTextController.text = ''});
   set currentBookingDate(DateTime bookingDate) => _parsedBookingDate = bookingDate;
 
   void _deleteBooking(int index) {
@@ -259,6 +267,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
           ..date = _parsedBookingDate.toString()
           ..amount = _amountTextController.text
           ..categorie = _categorieTextController.text
+          ..subcategorie = _subcategorieTextController.text
           ..fromAccount = _fromAccountTextController.text
           ..toAccount = _toAccountTextController.text
           ..serieId = _loadedBooking.serieId
@@ -282,8 +291,9 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
     _isPreselectedAccountsLoaded = true;
   }
 
+  // TODO Funktion einfacher und übersichtlicher implementieren
   Widget _getAccountInputField() {
-    if (widget.bookingBoxIndex == -1) {
+    if (widget.bookingBoxIndex == -1 && _fromAccountTextController.text.isEmpty && _toAccountTextController.text.isEmpty) {
       if (_currentTransaction == TransactionType.income.name) {
         _fromAccountTextController.text = _primaryAccounts[PreselectAccountType.income.name] ?? '';
         return AccountInputField(textController: _fromAccountTextController, errorText: _fromAccountErrorText);
@@ -306,6 +316,19 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
           children: [
             AccountInputField(textController: _fromAccountTextController, errorText: _fromAccountErrorText, hintText: 'Von'),
             AccountInputField(textController: _toAccountTextController, errorText: _toAccountErrorText, hintText: 'Nach'),
+          ],
+        );
+      }
+    } else if (_fromAccountTextController.text.isNotEmpty || _toAccountTextController.text.isNotEmpty) {
+      if (_currentTransaction == TransactionType.income.name) {
+        return AccountInputField(textController: _fromAccountTextController, errorText: _fromAccountErrorText);
+      } else if (_currentTransaction == TransactionType.outcome.name) {
+        return AccountInputField(textController: _fromAccountTextController, errorText: _fromAccountErrorText);
+      } else if (_currentTransaction == TransactionType.transfer.name) {
+        return Column(
+          children: [
+            AccountInputField(textController: _fromAccountTextController, errorText: _fromAccountErrorText, hintText: 'Von'),
+            AccountInputField(textController: _toAccountTextController, errorText: _toAccountErrorText, hintText: 'Nach')
           ],
         );
       }
@@ -373,7 +396,6 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
                         DateInputField(
                             currentDate: _parsedBookingDate,
                             textController: _bookingDateTextController,
-                            bookingDateCallback: (bookingDate) => _parsedBookingDate = bookingDate,
                             repeat: _bookingRepeat,
                             repeatCallback: (repeat) => setState(() => _bookingRepeat = repeat)),
                         TextInputField(textEditingController: _bookingNameController, errorText: _bookingNameErrorText, hintText: 'Titel'),
@@ -381,7 +403,14 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
                         _getAccountInputField(),
                         _currentTransaction == TransactionType.transfer.name
                             ? const SizedBox()
-                            : CategorieInputField(textController: _categorieTextController, errorText: _categorieErrorText, transactionType: _currentTransaction),
+                            : CategorieInputField(
+                                textController: _categorieTextController,
+                                errorText: _categorieErrorText,
+                                transactionType: _currentTransaction,
+                                categorieStringCallback: (categorie) => setState(() => {_categorieTextController.text = categorie, _subcategorieTextController.text = ''})),
+                        _currentTransaction == TransactionType.transfer.name
+                            ? const SizedBox()
+                            : SubcategorieInputField(textController: _subcategorieTextController, categorieName: _categorieTextController.text),
                         SaveButton(saveFunction: _createOrUpdateBooking, buttonController: _saveButtonController),
                       ],
                     );

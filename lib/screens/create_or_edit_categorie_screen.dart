@@ -10,6 +10,7 @@ import '/components/input_fields/text_input_field.dart';
 import '/models/categorie.dart';
 
 import '/utils/consts/route_consts.dart';
+import '/utils/consts/global_consts.dart';
 
 class CreateOrEditCategorieScreen extends StatefulWidget {
   final String categorieName;
@@ -22,35 +23,27 @@ class CreateOrEditCategorieScreen extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<CreateOrEditCategorieScreen> createState() =>
-      _CreateOrEditCategorieScreenState();
+  State<CreateOrEditCategorieScreen> createState() => _CreateOrEditCategorieScreenState();
 
-  static _CreateOrEditCategorieScreenState? of(BuildContext context) =>
-      context.findAncestorStateOfType<_CreateOrEditCategorieScreenState>();
+  static _CreateOrEditCategorieScreenState? of(BuildContext context) => context.findAncestorStateOfType<_CreateOrEditCategorieScreenState>();
 }
 
-class _CreateOrEditCategorieScreenState
-    extends State<CreateOrEditCategorieScreen> {
-  final TextEditingController _categorieNameController =
-      TextEditingController();
-  final RoundedLoadingButtonController _saveButtonController =
-      RoundedLoadingButtonController();
+class _CreateOrEditCategorieScreenState extends State<CreateOrEditCategorieScreen> {
+  final TextEditingController _categorieNameController = TextEditingController();
+  final RoundedLoadingButtonController _saveButtonController = RoundedLoadingButtonController();
   final Categorie _categorie = Categorie();
-  String _categorieName = '';
   String _categorieNameErrorText = '';
   String _currentCategorieType = '';
 
   @override
   void initState() {
     super.initState();
-    _categorieName = widget.categorieName;
     _categorieNameController.text = widget.categorieName;
     _currentCategorieType = widget.categorieType;
   }
 
   void _createOrUpdateCategorie() async {
     _categorie.name = _categorieNameController.text.trim();
-
     _categorie.type = _currentCategorieType;
     bool validCategorieName = await _validCategorieName(_categorie);
     if (validCategorieName == false) {
@@ -81,8 +74,7 @@ class _CreateOrEditCategorieScreenState
       return false;
     }
     if (widget.categorieName == '') {
-      bool categorieNameExisting =
-          await _categorie.existsCategorieName(categorie);
+      bool categorieNameExisting = await _categorie.existsCategorieName(categorie);
       if (categorieNameExisting) {
         setState(() {
           _categorieNameErrorText = 'Kategoriename ist bereits vorhanden.';
@@ -95,18 +87,15 @@ class _CreateOrEditCategorieScreenState
   }
 
   void _setSaveButtonAnimation(bool successful) {
-    successful
-        ? _saveButtonController.success()
-        : _saveButtonController.error();
+    successful ? _saveButtonController.success() : _saveButtonController.error();
     if (successful == false) {
-      Timer(const Duration(seconds: 1), () {
+      Timer(const Duration(milliseconds: transitionInMs), () {
         _saveButtonController.reset();
       });
     }
   }
 
-  set currentCategorieType(String categorieType) =>
-      setState(() => _currentCategorieType = categorieType);
+  set currentCategorieType(String categorieType) => setState(() => _currentCategorieType = categorieType);
 
   @override
   Widget build(BuildContext context) {
@@ -114,9 +103,7 @@ class _CreateOrEditCategorieScreenState
       child: Scaffold(
         resizeToAvoidBottomInset: false,
         appBar: AppBar(
-          title: widget.categorieName == ''
-              ? const Text('Kategorie erstellen')
-              : const Text('Kategorie bearbeiten'),
+          title: widget.categorieName == '' ? const Text('Hauptkategorie erstellen') : const Text('Hauptkategorie bearbeiten'),
         ),
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 24.0),
@@ -129,17 +116,9 @@ class _CreateOrEditCategorieScreenState
               mainAxisSize: MainAxisSize.min,
               children: [
                 CategorieTypeToggleButtons(
-                    currentCategorieType: _currentCategorieType,
-                    categorieTypeStringCallback: (categorie) =>
-                        setState(() => _currentCategorieType = categorie)),
-                TextInputField(
-                    textEditingController: _categorieNameController,
-                    errorText: _categorieNameErrorText,
-                    hintText: 'Kategoriename',
-                    autofocus: true),
-                SaveButton(
-                    saveFunction: _createOrUpdateCategorie,
-                    buttonController: _saveButtonController),
+                    currentCategorieType: _currentCategorieType, categorieTypeStringCallback: (categorie) => setState(() => _currentCategorieType = categorie)),
+                TextInputField(textEditingController: _categorieNameController, errorText: _categorieNameErrorText, hintText: 'Kategoriename', autofocus: true),
+                SaveButton(saveFunction: _createOrUpdateCategorie, buttonController: _saveButtonController),
               ],
             ),
           ),

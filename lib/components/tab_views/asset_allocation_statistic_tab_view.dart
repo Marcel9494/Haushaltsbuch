@@ -3,9 +3,8 @@ import 'package:fl_chart/fl_chart.dart';
 
 import '../dialogs/info_dialog.dart';
 
-import '/utils/number_formatters/number_formatter.dart';
+import '../cards/account_percentage_card.dart';
 
-import '/components/cards/percentage_card.dart';
 import '/components/deco/loading_indicator.dart';
 
 import '/models/account.dart';
@@ -13,6 +12,8 @@ import '/models/percentage_stats.dart';
 import '/models/enums/account_types.dart';
 import '/models/enums/statistic_types.dart';
 import '/models/enums/asset_allocation_statistic_types.dart';
+
+import '/utils/number_formatters/number_formatter.dart';
 
 class AssetAllocationStatisticTabView extends StatefulWidget {
   const AssetAllocationStatisticTabView({Key? key}) : super(key: key);
@@ -203,7 +204,7 @@ class _AssetAllocationStatisticTabViewState extends State<AssetAllocationStatist
                         child: ListView.builder(
                           itemCount: _percentageStats.length,
                           itemBuilder: (BuildContext context, int index) {
-                            return PercentageCard(percentageStats: _percentageStats[index]);
+                            return AccountPercentageCard(percentageStats: _percentageStats[index]);
                           },
                         ),
                       ),

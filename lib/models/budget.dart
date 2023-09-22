@@ -62,6 +62,7 @@ class Budget extends HiveObject {
       Budget budget = await budgetBox.getAt(i);
       if (budget.categorie == defaultBudget.categorie) {
         budget.budget = defaultBudget.defaultBudget;
+        // TODO mit putAt updaten?
       }
     }
   }
@@ -131,7 +132,7 @@ class Budget extends HiveObject {
     return budgetList;
   }
 
-  static Future<bool> existsBudgetCategorie(String budgetCategorie) async {
+  static Future<bool> existsBudgetForCategorie(String budgetCategorie) async {
     var budgetBox = await Hive.openBox(budgetsBox);
     for (int i = 0; i < budgetBox.length; i++) {
       Budget budget = await budgetBox.getAt(i);
