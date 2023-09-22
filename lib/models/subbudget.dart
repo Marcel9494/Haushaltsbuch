@@ -58,12 +58,12 @@ class Subbudget extends HiveObject {
     }
   }
 
-  static void updateAllSubbudgetsForCategorie(DefaultBudget defaultBudget) async {
+  static void updateAllSubbudgetsForCategorie(String budgetCategorie, double newBudgetAmount) async {
     var subbudgetBox = await Hive.openBox(subbudgetsBox);
     for (int i = 0; i < subbudgetBox.length; i++) {
       Subbudget subbudget = await subbudgetBox.getAt(i);
-      if (subbudget.subcategorieName == defaultBudget.categorie) {
-        subbudget.subcategorieBudget = defaultBudget.defaultBudget;
+      if (subbudget.subcategorieName == budgetCategorie) {
+        subbudget.subcategorieBudget = newBudgetAmount;
         subbudgetBox.putAt(i, subbudget);
       }
     }

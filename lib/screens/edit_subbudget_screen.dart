@@ -33,7 +33,6 @@ class _EditSubbudgetScreenState extends State<EditSubbudgetScreen> {
   DateTime _selectedYear = DateTime.now();
 
   Future<List<Subbudget>> _loadOneSubbudgetCategorie() async {
-    print(widget.subbudget.subcategorieName);
     _defaultBudget = await DefaultBudget.loadDefaultBudget(widget.subbudget.subcategorieName);
     _subbudgetList = await Subbudget.loadOneSubbudget(widget.subbudget.subcategorieName);
     return _subbudgetList;

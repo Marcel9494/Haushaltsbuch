@@ -137,11 +137,12 @@ class _CreateOrEditBudgetScreenState extends State<CreateOrEditBudgetScreen> {
     _budgetExistsAlready = await Budget.existsBudgetForCategorie(_categorieTextController.text);
     _subbudgetExistsAlready = await Subbudget.existsSubbudgetForCategorie(_subcategorieTextController.text);
     if (_budgetExistsAlready) {
-      // TODO hier weitermachen und Code testen + Code verbessern => 2x ziemlich gleicher Code und teilweise zu kompliziert
       if (_subbudgetExistsAlready) {
-        // TODO hier weitermachen Subbudgets werden noch nicht geupdatet unten auch beachten! if Bedingungen erfüllt prints einbauen zum testen!
-        DefaultBudget defaultSubbudget = await DefaultBudget.loadDefaultBudget(_subcategorieTextController.text);
-        Subbudget.updateAllSubbudgetsForCategorie(defaultSubbudget);
+        DefaultBudget updatedDefaultBudget = DefaultBudget()
+          ..categorie = _subcategorieTextController.text.isEmpty ? _categorieTextController.text : _subcategorieTextController.text
+          ..defaultBudget = formatMoneyAmountToDouble(_budgetTextController.text);
+        updatedDefaultBudget.updateDefaultBudget(updatedDefaultBudget);
+        Subbudget.updateAllSubbudgetsForCategorie(_subcategorieTextController.text, formatMoneyAmountToDouble(_budgetTextController.text));
       } else {
         for (int i = 0; i < 3; i++) {
           DateTime date = DateTime.now();
@@ -176,8 +177,11 @@ class _CreateOrEditBudgetScreenState extends State<CreateOrEditBudgetScreen> {
         ..defaultBudget = formatMoneyAmountToDouble(_budgetTextController.text);
       newDefaultBudget.createDefaultBudget(newDefaultBudget);
       if (_subbudgetExistsAlready) {
-        DefaultBudget defaultSubbudget = await DefaultBudget.loadDefaultBudget(_subcategorieTextController.text);
-        Subbudget.updateAllSubbudgetsForCategorie(defaultSubbudget);
+        DefaultBudget updatedDefaultBudget = DefaultBudget()
+          ..categorie = _subcategorieTextController.text.isEmpty ? _categorieTextController.text : _subcategorieTextController.text
+          ..defaultBudget = formatMoneyAmountToDouble(_budgetTextController.text);
+        updatedDefaultBudget.updateDefaultBudget(updatedDefaultBudget);
+        Subbudget.updateAllSubbudgetsForCategorie(_subcategorieTextController.text, formatMoneyAmountToDouble(_budgetTextController.text));
       } else {
         for (int i = 0; i < 3; i++) {
           DateTime date = DateTime.now();
@@ -206,7 +210,7 @@ class _CreateOrEditBudgetScreenState extends State<CreateOrEditBudgetScreen> {
     DefaultBudget updatedDefaultBudget = DefaultBudget()
       ..categorie = _loadedDefaultBudget.categorie
       ..defaultBudget = formatMoneyAmountToDouble(_budgetTextController.text);
-    updatedDefaultBudget.updateDefaultBudget(updatedDefaultBudget, _loadedDefaultBudget.categorie);
+    updatedDefaultBudget.updateDefaultBudget(updatedDefaultBudget);
     Budget.updateAllFutureBudgetsFromCategorie(updatedDefaultBudget);
   }
 
@@ -254,9 +258,9 @@ class _CreateOrEditBudgetScreenState extends State<CreateOrEditBudgetScreen> {
   void _yesPressed() {
     setState(() {
       DefaultBudget updatedDefaultBudget = DefaultBudget()
-        ..categorie = _categorieTextController.text
+        ..categorie = _subcategorieTextController.text.isEmpty ? _categorieTextController.text : _subcategorieTextController.text
         ..defaultBudget = formatMoneyAmountToDouble(_budgetTextController.text);
-      updatedDefaultBudget.updateDefaultBudget(updatedDefaultBudget, _categorieTextController.text);
+      updatedDefaultBudget.updateDefaultBudget(updatedDefaultBudget);
       Budget.updateAllBudgetsFromCategorie(updatedDefaultBudget);
     });
     _setSaveButtonAnimation(true);

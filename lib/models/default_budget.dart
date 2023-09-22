@@ -15,11 +15,11 @@ class DefaultBudget extends HiveObject {
     defaultBudgetBox.add(newDefaultBudget);
   }
 
-  void updateDefaultBudget(DefaultBudget updatedDefaultBudget, String defaultBudgetCategorie) async {
+  void updateDefaultBudget(DefaultBudget updatedDefaultBudget) async {
     var defaultBudgetBox = await Hive.openBox(defaultBudgetsBox);
     for (int i = 0; i < defaultBudgetBox.length; i++) {
       DefaultBudget defaultBudget = await defaultBudgetBox.getAt(i);
-      if (defaultBudget.categorie == defaultBudgetCategorie) {
+      if (defaultBudget.categorie == updatedDefaultBudget.categorie) {
         defaultBudgetBox.putAt(i, updatedDefaultBudget);
       }
     }
