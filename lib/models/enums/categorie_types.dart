@@ -32,7 +32,7 @@ extension CategorieTypeExtension on CategorieType {
     }
   }
 
-  CategorieType getCategorieType(String categorie) {
+  static CategorieType getCategorieType(String categorie) {
     try {
       if (categorie == CategorieType.income.name) {
         return CategorieType.income;

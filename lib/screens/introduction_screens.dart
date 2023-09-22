@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:haushaltsbuch/models/categorie/categorie_repository.dart';
 
 import 'package:introduction_screen/introduction_screen.dart';
 
-import '../models/global_state.dart';
-import '../models/primary_account.dart';
+import '/models/global_state.dart';
+import '/models/primary_account.dart';
 import '/models/account.dart';
-import '/models/categorie.dart';
 import '/models/screen_arguments/bottom_nav_bar_screen_arguments.dart';
 
 import '/utils/consts/route_consts.dart';
@@ -24,9 +24,10 @@ class _IntroductionScreensState extends State<IntroductionScreens> {
   }
 
   void _createStartCategoriesAndAccounts() {
-    Categorie.createStartExpenditureCategories();
-    Categorie.createStartRevenueCategories();
-    Categorie.createStartInvestmentCategories();
+    CategorieRepository categorieRepository = CategorieRepository();
+    categorieRepository.createStartExpenditureCategories();
+    categorieRepository.createStartRevenueCategories();
+    categorieRepository.createStartInvestmentCategories();
     Account.createStartAccounts();
     PrimaryAccount.createStartPrimaryAccounts();
     GlobalState.createGlobalState();

@@ -3,7 +3,7 @@ import 'package:percent_indicator/percent_indicator.dart';
 
 import '/models/budget.dart';
 import '/models/subbudget.dart';
-import '/models/categorie.dart';
+import '/models/categorie/categorie_repository.dart';
 import '/models/screen_arguments/categorie_amount_list_screen_arguments.dart';
 
 import '/utils/consts/route_consts.dart';
@@ -28,7 +28,8 @@ class _BudgetCardState extends State<BudgetCard> {
   List<Subbudget> _subcategorieBudgets = [];
 
   Future<List<String>> _loadSubcategorieBudgets() async {
-    _subcategorieNames = await Categorie.loadSubcategorieNames(widget.budget.categorie);
+    CategorieRepository categorieRepository = CategorieRepository();
+    _subcategorieNames = await categorieRepository.loadSubcategorieNames(widget.budget.categorie);
     _subcategorieBudgets = await Subbudget.loadSubcategorieBudgetList(widget.budget.categorie, _subcategorieNames, widget.selectedDate);
     _subcategorieBudgets = await Subbudget.calculateCurrentExpenditure(_subcategorieBudgets, widget.selectedDate);
     return _subcategorieNames;

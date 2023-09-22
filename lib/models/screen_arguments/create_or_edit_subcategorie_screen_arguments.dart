@@ -1,4 +1,4 @@
-import '/models/categorie.dart';
+import '../categorie/categorie_model.dart';
 
 import '../enums/mode_types.dart';
 

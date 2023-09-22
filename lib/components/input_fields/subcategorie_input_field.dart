@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
-import '/models/categorie.dart';
+import '/models/categorie/categorie_repository.dart';
 
 import '../deco/bottom_sheet_line.dart';
 
@@ -89,7 +89,8 @@ class _SubcategorieInputFieldState extends State<SubcategorieInputField> {
   }
 
   Future<List<String>> _loadSubcategorieNameList() async {
-    _subcategorieNames = await Categorie.loadSubcategorieNames(widget.categorieName);
+    CategorieRepository categorieRepository = CategorieRepository();
+    _subcategorieNames = await categorieRepository.loadSubcategorieNames(widget.categorieName);
     return _subcategorieNames;
   }
 
