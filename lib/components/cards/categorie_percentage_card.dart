@@ -33,7 +33,7 @@ class _CategoriePercentageCardState extends State<CategoriePercentageCard> {
   // TODO erweitern um getRevenues und getInvestments
   Future<List<String>> _loadSubcategorieNameList() async {
     CategorieRepository categorieRepository = CategorieRepository();
-    _subcategorieNames = await categorieRepository.loadSubcategorieNames(widget.percentageStats.name);
+    _subcategorieNames = await categorieRepository.loadSubcategorieNameList(widget.percentageStats.name);
     for (int i = 0; i < _subcategorieNames.length; i++) {
       double totalAmount = 0.0;
       _subcategorieBookings = await Booking.loadSubcategorieBookingList(widget.bookingList, _subcategorieNames[i]);

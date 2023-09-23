@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:haushaltsbuch/models/enums/categorie_types.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
-import '../../models/categorie/categorie_repository.dart';
-import '/models/categorie/categorie_model.dart';
+import '/models/enums/categorie_types.dart';
+import '/models/categorie/categorie_repository.dart';
 
 import '/components/deco/bottom_sheet_line.dart';
 
@@ -112,7 +111,7 @@ class _CategorieInputFieldState extends State<CategorieInputField> {
 
   Future<List<String>> _loadCategorieNameList() async {
     CategorieRepository categorieRepository = CategorieRepository();
-    _categorieNames = await categorieRepository.loadCategorieNames(widget.categorieType);
+    _categorieNames = await categorieRepository.loadCategorieNameList(widget.categorieType);
     return _categorieNames;
   }
 

@@ -29,7 +29,7 @@ class _BudgetCardState extends State<BudgetCard> {
 
   Future<List<String>> _loadSubcategorieBudgets() async {
     CategorieRepository categorieRepository = CategorieRepository();
-    _subcategorieNames = await categorieRepository.loadSubcategorieNames(widget.budget.categorie);
+    _subcategorieNames = await categorieRepository.loadSubcategorieNameList(widget.budget.categorie);
     _subcategorieBudgets = await Subbudget.loadSubcategorieBudgetList(widget.budget.categorie, _subcategorieNames, widget.selectedDate);
     _subcategorieBudgets = await Subbudget.calculateCurrentExpenditure(_subcategorieBudgets, widget.selectedDate);
     return _subcategorieNames;

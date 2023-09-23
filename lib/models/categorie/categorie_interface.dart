@@ -7,15 +7,14 @@ abstract class CategorieInterface {
   void update(Categorie updatedCategorie, String oldCategorieName);
   void delete(Categorie deleteCategorie);
   Future<bool> existsCategorieName(Categorie categorie);
-  // TODO werden beide Funktionen noch benötigt oder reicht loadCategorieList?
-  Future<List<String>> loadCategorieNames(CategorieType categorieType);
   Future<List<Categorie>> loadCategorieList(CategorieType categorieType);
+  Future<List<String>> loadCategorieNameList(CategorieType categorieType);
 
-  void createSubcategorie(Categorie updatedCategorie, String newSubcategorie);
-  void updateSubcategorie(Categorie updatedCategorie, String oldSubcategorie, String newSubcategorie);
+  void createSubcategorie(String mainCategorie, String newSubcategorie);
+  void updateSubcategorie(String mainCategorie, String oldSubcategorie, String newSubcategorie);
   void deleteSubcategorie(Categorie categorie, String deleteSubcategorie);
   Future<bool> existsSubcategorieName(Categorie categorie);
-  Future<List<String>> loadSubcategorieNames(String mainCategorie);
+  Future<List<String>> loadSubcategorieNameList(String mainCategorie);
 
   void createStartExpenditureCategories();
   void createStartRevenueCategories();

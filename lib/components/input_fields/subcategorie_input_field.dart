@@ -90,7 +90,7 @@ class _SubcategorieInputFieldState extends State<SubcategorieInputField> {
 
   Future<List<String>> _loadSubcategorieNameList() async {
     CategorieRepository categorieRepository = CategorieRepository();
-    _subcategorieNames = await categorieRepository.loadSubcategorieNames(widget.categorieName);
+    _subcategorieNames = await categorieRepository.loadSubcategorieNameList(widget.categorieName);
     return _subcategorieNames;
   }
 

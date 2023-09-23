@@ -163,7 +163,7 @@ class _CreateOrEditBudgetScreenState extends State<CreateOrEditBudgetScreen> {
           ..defaultBudget = formatMoneyAmountToDouble(_budgetTextController.text);
         newDefaultSubcategoriebudget.createDefaultBudget(newDefaultSubcategoriebudget);
         CategorieRepository categorieRepository = CategorieRepository();
-        List<String> subcategorieNames = await categorieRepository.loadSubcategorieNames(_categorieTextController.text);
+        List<String> subcategorieNames = await categorieRepository.loadSubcategorieNameList(_categorieTextController.text);
         Subbudget.createSubbudgets(_categorieTextController.text, _subcategorieTextController.text, subcategorieNames);
       }
     } else {
@@ -203,7 +203,7 @@ class _CreateOrEditBudgetScreenState extends State<CreateOrEditBudgetScreen> {
           ..defaultBudget = formatMoneyAmountToDouble(_budgetTextController.text);
         newDefaultSubcategoriebudget.createDefaultBudget(newDefaultSubcategoriebudget);
         CategorieRepository categorieRepository = CategorieRepository();
-        List<String> subcategorieNames = await categorieRepository.loadSubcategorieNames(_categorieTextController.text);
+        List<String> subcategorieNames = await categorieRepository.loadSubcategorieNameList(_categorieTextController.text);
         Subbudget.createSubbudgets(_categorieTextController.text, _subcategorieTextController.text, subcategorieNames);
       }
     }

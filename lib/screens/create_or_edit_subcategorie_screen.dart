@@ -54,9 +54,9 @@ class _CreateOrEditSubcategorieScreenState extends State<CreateOrEditSubcategori
     }
     CategorieRepository categorieRepository = CategorieRepository();
     if (widget.mode == ModeType.creationMode) {
-      categorieRepository.createSubcategorie(widget.categorie, _subcategorieNameController.text.trim());
+      categorieRepository.createSubcategorie(widget.categorie.name, _subcategorieNameController.text.trim());
     } else {
-      categorieRepository.updateSubcategorie(widget.categorie, _oldSubcategorie, _subcategorieNameController.text.trim());
+      categorieRepository.updateSubcategorie(widget.categorie.name, _oldSubcategorie, _subcategorieNameController.text.trim());
     }
     _setSaveButtonAnimation(true);
     Timer(const Duration(milliseconds: transitionInMs), () {

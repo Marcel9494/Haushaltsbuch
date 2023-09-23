@@ -54,11 +54,38 @@ class CategorieRepository extends CategorieInterface {
   }
 
   @override
-  void createSubcategorie(Categorie updatedCategorie, String newSubcategorie) async {
+  Future<List<Categorie>> loadCategorieList(CategorieType categorieType) async {
+    var categorieBox = await Hive.openBox(categoriesBox);
+    List<Categorie> categorieList = [];
+    for (int i = 0; i < categorieBox.length; i++) {
+      Categorie categorie = await categorieBox.getAt(i);
+      if (categorieType.name == categorie.type) {
+        categorieList.add(categorie);
+      }
+    }
+    categorieList.sort((first, second) => first.name.compareTo(second.name));
+    return categorieList;
+  }
+
+  @override
+  Future<List<String>> loadCategorieNameList(CategorieType categorieType) async {
+    var categorieBox = await Hive.openBox(categoriesBox);
+    List<String> categorieNameList = [];
+    for (int i = 0; i < categorieBox.length; i++) {
+      Categorie categorie = await categorieBox.getAt(i);
+      if (categorieType.name == categorie.type) {
+        categorieNameList.add(categorie.name);
+      }
+    }
+    return categorieNameList;
+  }
+
+  @override
+  void createSubcategorie(String mainCategorie, String newSubcategorie) async {
     var categorieBox = await Hive.openBox(categoriesBox);
     for (int i = 0; i < categorieBox.length; i++) {
       Categorie categorie = await categorieBox.getAt(i);
-      if (updatedCategorie.name == categorie.name) {
+      if (mainCategorie == categorie.name) {
         categorie.subcategorieNames.add(newSubcategorie);
         categorieBox.putAt(i, categorie);
         // TODO Booking.updateBookingCategorieName(oldCategorieName, updatedCategorie.name);
@@ -68,11 +95,11 @@ class CategorieRepository extends CategorieInterface {
   }
 
   @override
-  void updateSubcategorie(Categorie updatedCategorie, String oldSubcategorie, String newSubcategorie) async {
+  void updateSubcategorie(String mainCategorie, String oldSubcategorie, String newSubcategorie) async {
     var categorieBox = await Hive.openBox(categoriesBox);
     for (int i = 0; i < categorieBox.length; i++) {
       Categorie categorie = await categorieBox.getAt(i);
-      if (updatedCategorie.name == categorie.name) {
+      if (mainCategorie == categorie.name) {
         for (int j = 0; j < categorie.subcategorieNames.length; j++) {
           if (categorie.subcategorieNames[j] == oldSubcategorie) {
             categorie.subcategorieNames[categorie.subcategorieNames.indexWhere((element) => element == oldSubcategorie)] = newSubcategorie;
@@ -120,35 +147,7 @@ class CategorieRepository extends CategorieInterface {
   }
 
   @override
-  Future<List<Categorie>> loadCategorieList(CategorieType categorieType) async {
-    var categorieBox = await Hive.openBox(categoriesBox);
-    List<Categorie> categorieList = [];
-    for (int i = 0; i < categorieBox.length; i++) {
-      Categorie categorie = await categorieBox.getAt(i);
-      if (categorie.type == categorieType.name) {
-        categorieList.add(categorie);
-      }
-    }
-    categorieList.sort((first, second) => first.name.compareTo(second.name));
-    return categorieList;
-  }
-
-  /// [transactionType]
-  @override
-  Future<List<String>> loadCategorieNames(CategorieType categorieType) async {
-    var categorieBox = await Hive.openBox(categoriesBox);
-    List<String> categorieNameList = [];
-    for (int i = 0; i < categorieBox.length; i++) {
-      Categorie categorie = await categorieBox.getAt(i);
-      if (categorieType.name == categorie.type) {
-        categorieNameList.add(categorie.name);
-      }
-    }
-    return categorieNameList;
-  }
-
-  @override
-  Future<List<String>> loadSubcategorieNames(String mainCategorie) async {
+  Future<List<String>> loadSubcategorieNameList(String mainCategorie) async {
     var categorieBox = await Hive.openBox(categoriesBox);
     for (int i = 0; i < categorieBox.length; i++) {
       Categorie categorie = await categorieBox.getAt(i);
