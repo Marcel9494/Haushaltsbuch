@@ -1,8 +1,10 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:haushaltsbuch/models/account/account_repository.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 
+import '../models/account/account_model.dart';
 import '/components/dialogs/choice_dialog.dart';
 import '/components/deco/loading_indicator.dart';
 import '/components/input_fields/account_type_input_field.dart';
@@ -11,7 +13,6 @@ import '/components/input_fields/text_input_field.dart';
 import '/components/input_fields/preselect_account_input_field.dart';
 import '/components/buttons/save_button.dart';
 
-import '/models/account.dart';
 import '/models/booking.dart';
 import '/models/primary_account.dart';
 import '/models/enums/repeat_types.dart';
@@ -43,6 +44,7 @@ class _CreateOrEditAccountScreenState extends State<CreateOrEditAccountScreen> {
   bool _isAccountEdited = false;
   bool _primaryAccountsLoaded = false;
   final Account _account = Account();
+  AccountRepository accountRepository = AccountRepository();
   String _accountNameErrorText = '';
   String _accountGroupErrorText = '';
   String _bankBalanceErrorText = '';
@@ -59,7 +61,7 @@ class _CreateOrEditAccountScreenState extends State<CreateOrEditAccountScreen> {
   }
 
   Future<void> _loadAccount() async {
-    _loadedAccount = await Account.loadAccount(widget.accountBoxIndex);
+    _loadedAccount = await accountRepository.load(widget.accountBoxIndex);
     _accountNameController.text = _loadedAccount.name;
     _accountGroupTextController.text = _loadedAccount.accountType;
     _bankBalanceTextController.text = _loadedAccount.bankBalance;
@@ -84,7 +86,7 @@ class _CreateOrEditAccountScreenState extends State<CreateOrEditAccountScreen> {
       _account.bankBalance = _bankBalanceTextController.text;
       PrimaryAccount.setPrimaryAccountNames(_preselectedAccountTextController.text, _account.name);
       if (widget.accountBoxIndex == -1) {
-        _account.createAccount(_account);
+        accountRepository.create(_account);
         _navigateToAccountScreen();
       } else {
         if (_oldBankBalance != formatMoneyAmountToDouble(_bankBalanceTextController.text)) {
@@ -105,7 +107,7 @@ class _CreateOrEditAccountScreenState extends State<CreateOrEditAccountScreen> {
       return false;
     }
     if (widget.accountBoxIndex == -1) {
-      bool accountNameExisting = await _account.existsAccountName(_accountNameController.text);
+      bool accountNameExisting = await accountRepository.existsAccountName(_accountNameController.text);
       if (accountNameExisting) {
         setState(() {
           _accountNameErrorText = 'Konto ist bereits angelegt.';
@@ -168,7 +170,7 @@ class _CreateOrEditAccountScreenState extends State<CreateOrEditAccountScreen> {
       ..toAccount = _accountNameController.text;
     // TODO newBooking.createBooking();
     // TODO entfernen? newBooking.createBooking(newBooking);
-    _account.updateAccount(_account, widget.accountBoxIndex, _loadedAccount.name);
+    accountRepository.update(_account, widget.accountBoxIndex, _loadedAccount.name);
     for (int i = 0; i < 4; i++) {
       Navigator.pop(context);
     }
@@ -176,7 +178,7 @@ class _CreateOrEditAccountScreenState extends State<CreateOrEditAccountScreen> {
   }
 
   void _noPressed() {
-    _account.updateAccount(_account, widget.accountBoxIndex, _loadedAccount.name);
+    accountRepository.update(_account, widget.accountBoxIndex, _loadedAccount.name);
     for (int i = 0; i < 4; i++) {
       Navigator.pop(context);
     }
@@ -184,7 +186,7 @@ class _CreateOrEditAccountScreenState extends State<CreateOrEditAccountScreen> {
   }
 
   void _updateAccount() {
-    _account.updateAccount(_account, widget.accountBoxIndex, _loadedAccount.name);
+    accountRepository.update(_account, widget.accountBoxIndex, _loadedAccount.name);
     _navigateToAccountScreen();
   }
 

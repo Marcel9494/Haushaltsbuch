@@ -5,11 +5,11 @@ import '/screens/introduction_screens.dart';
 import '/components/deco/loading_indicator.dart';
 import '/components/bottom_nav_bar/bottom_nav_bar.dart';
 
-import '/models/account.dart';
 import '/models/categorie.dart';
 import '/models/global_state.dart';
 import '/models/primary_account.dart';
 import '/models/intro_screen_state.dart';
+import '/models/account/account_repository.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({Key? key}) : super(key: key);
@@ -56,10 +56,11 @@ class _SplashScreenState extends State<SplashScreen> {
                     return const IntroductionScreens();
                   } else {
                     // Wenn State auf false => Initialisieren und Anzeigen der Buchungsseite
+                    AccountRepository accountRepository = AccountRepository();
                     Categorie.createStartExpenditureCategories();
                     Categorie.createStartRevenueCategories();
                     Categorie.createStartInvestmentCategories();
-                    Account.createStartAccounts();
+                    accountRepository.createStartAccounts();
                     PrimaryAccount.createStartPrimaryAccounts();
                     GlobalState.createGlobalState();
                     return const BottomNavBar(screenIndex: 0);

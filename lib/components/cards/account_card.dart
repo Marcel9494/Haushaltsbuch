@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '/utils/consts/route_consts.dart';
 
-import '/models/account.dart';
+import '/models/account/account_model.dart';
 import '/models/screen_arguments/account_details_screen_arguments.dart';
 
 class AccountCard extends StatelessWidget {

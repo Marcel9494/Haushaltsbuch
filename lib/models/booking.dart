@@ -3,7 +3,8 @@ import 'package:hive/hive.dart';
 import '/utils/consts/hive_consts.dart';
 import '/utils/number_formatters/number_formatter.dart';
 
-import 'account.dart';
+import 'account/account_model.dart';
+import 'account/account_repository.dart';
 import 'enums/repeat_types.dart';
 import 'enums/serie_edit_modes.dart';
 import 'enums/transaction_types.dart';
@@ -12,6 +13,7 @@ import 'global_state.dart';
 @HiveType(typeId: bookingTypeId)
 class Booking extends HiveObject {
   late int boxIndex;
+  late AccountRepository accountRepository = AccountRepository();
   @HiveField(0)
   late String title;
   @HiveField(1)
@@ -54,9 +56,9 @@ class Booking extends HiveObject {
     bookingBox.add(newBooking);
     if (booked) {
       if (transactionType == TransactionType.transfer.name || transactionType == TransactionType.investment.name) {
-        Account.transferMoney(fromAccount, toAccount, amount);
+        accountRepository.transferMoney(fromAccount, toAccount, amount);
       } else {
-        Account.calculateNewAccountBalance(fromAccount, amount, transactionType);
+        accountRepository.calculateNewAccountBalance(fromAccount, amount, transactionType);
       }
     }
   }
@@ -204,30 +206,30 @@ class Booking extends HiveObject {
       Booking booking = await bookingBox.getAt(i);
       if (serieEditMode == SerieEditModeType.none || serieEditMode == SerieEditModeType.single) {
         if (booking.serieId == templateBooking.serieId && booking.boxIndex == bookingBoxIndex && booking.booked) {
-          Account.undoneAccountBooking(oldBooking);
+          accountRepository.undoneAccountBooking(oldBooking);
           bookingBox.putAt(bookingBoxIndex, templateBooking);
           if (templateBooking.transactionType == TransactionType.transfer.name || templateBooking.transactionType == TransactionType.investment.name) {
-            Account.transferMoney(templateBooking.fromAccount, templateBooking.toAccount, templateBooking.amount);
+            accountRepository.transferMoney(templateBooking.fromAccount, templateBooking.toAccount, templateBooking.amount);
           } else {
-            Account.calculateNewAccountBalance(templateBooking.fromAccount, templateBooking.amount, templateBooking.transactionType);
+            accountRepository.calculateNewAccountBalance(templateBooking.fromAccount, templateBooking.amount, templateBooking.transactionType);
           }
         }
       } else if (serieEditMode == SerieEditModeType.onlyFuture) {
         if (booking.serieId == templateBooking.serieId && booking.boxIndex == bookingBoxIndex) {
           if (booking.booked) {
-            Account.undoneAccountBooking(oldBooking);
+            accountRepository.undoneAccountBooking(oldBooking);
           }
           bookingBox.putAt(bookingBoxIndex, templateBooking);
           if (booking.booked) {
             if (templateBooking.transactionType == TransactionType.transfer.name || templateBooking.transactionType == TransactionType.investment.name) {
-              Account.transferMoney(templateBooking.fromAccount, templateBooking.toAccount, templateBooking.amount);
+              accountRepository.transferMoney(templateBooking.fromAccount, templateBooking.toAccount, templateBooking.amount);
             } else {
-              Account.calculateNewAccountBalance(templateBooking.fromAccount, templateBooking.amount, templateBooking.transactionType);
+              accountRepository.calculateNewAccountBalance(templateBooking.fromAccount, templateBooking.amount, templateBooking.transactionType);
             }
           }
         } else if (booking.serieId == templateBooking.serieId && DateTime.parse(booking.date).isAfter(DateTime.parse(templateBooking.date))) {
           if (booking.booked) {
-            Account.undoneAccountBooking(booking);
+            accountRepository.undoneAccountBooking(booking);
           }
           bool booked = true;
           if (DateTime.parse(booking.date).isAfter(DateTime.now())) {
@@ -248,28 +250,28 @@ class Booking extends HiveObject {
           bookingBox.putAt(booking.boxIndex, newBooking);
           if (newBooking.booked) {
             if (newBooking.transactionType == TransactionType.transfer.name || newBooking.transactionType == TransactionType.investment.name) {
-              Account.transferMoney(newBooking.fromAccount, newBooking.toAccount, newBooking.amount);
+              accountRepository.transferMoney(newBooking.fromAccount, newBooking.toAccount, newBooking.amount);
             } else {
-              Account.calculateNewAccountBalance(newBooking.fromAccount, newBooking.amount, newBooking.transactionType);
+              accountRepository.calculateNewAccountBalance(newBooking.fromAccount, newBooking.amount, newBooking.transactionType);
             }
           }
         }
       } else if (serieEditMode == SerieEditModeType.all) {
         if (booking.serieId == templateBooking.serieId && booking.boxIndex == bookingBoxIndex) {
           if (booking.booked) {
-            Account.undoneAccountBooking(oldBooking);
+            accountRepository.undoneAccountBooking(oldBooking);
           }
           bookingBox.putAt(bookingBoxIndex, templateBooking);
           if (booking.booked) {
             if (templateBooking.transactionType == TransactionType.transfer.name || templateBooking.transactionType == TransactionType.investment.name) {
-              Account.transferMoney(templateBooking.fromAccount, templateBooking.toAccount, templateBooking.amount);
+              accountRepository.transferMoney(templateBooking.fromAccount, templateBooking.toAccount, templateBooking.amount);
             } else {
-              Account.calculateNewAccountBalance(templateBooking.fromAccount, templateBooking.amount, templateBooking.transactionType);
+              accountRepository.calculateNewAccountBalance(templateBooking.fromAccount, templateBooking.amount, templateBooking.transactionType);
             }
           }
         } else if (booking.serieId == templateBooking.serieId) {
           if (booking.booked) {
-            Account.undoneAccountBooking(booking);
+            accountRepository.undoneAccountBooking(booking);
           }
           bool booked = true;
           if (DateTime.parse(booking.date).isAfter(DateTime.now())) {
@@ -290,9 +292,9 @@ class Booking extends HiveObject {
           bookingBox.putAt(booking.boxIndex, newBooking);
           if (newBooking.booked) {
             if (newBooking.transactionType == TransactionType.transfer.name || newBooking.transactionType == TransactionType.investment.name) {
-              Account.transferMoney(newBooking.fromAccount, newBooking.toAccount, newBooking.amount);
+              accountRepository.transferMoney(newBooking.fromAccount, newBooking.toAccount, newBooking.amount);
             } else {
-              Account.calculateNewAccountBalance(newBooking.fromAccount, newBooking.amount, newBooking.transactionType);
+              accountRepository.calculateNewAccountBalance(newBooking.fromAccount, newBooking.amount, newBooking.transactionType);
             }
           }
         }
@@ -364,7 +366,7 @@ class Booking extends HiveObject {
     var bookingBox = await Hive.openBox(bookingsBox);
     Booking booking = await bookingBox.getAt(bookingBoxIndex);
     if (booking.booked) {
-      Account.undoneAccountBooking(booking);
+      accountRepository.undoneAccountBooking(booking);
     }
     bookingBox.deleteAt(bookingBoxIndex);
   }
@@ -381,7 +383,7 @@ class Booking extends HiveObject {
       for (int i = bookingBox.length - 1; i >= 0; i--) {
         Booking booking = await bookingBox.getAt(i);
         if (booking.booked) {
-          Account.undoneAccountBooking(booking);
+          accountRepository.undoneAccountBooking(booking);
         }
         if (booking.boxIndex == bookingBoxIndex) {
           bookingBox.deleteAt(bookingBoxIndex);
@@ -393,7 +395,7 @@ class Booking extends HiveObject {
       for (int i = bookingBox.length - 1; i >= 0; i--) {
         Booking booking = await bookingBox.getAt(i);
         if (booking.booked) {
-          Account.undoneAccountBooking(booking);
+          accountRepository.undoneAccountBooking(booking);
         }
         if (booking.serieId == templateBooking.serieId) {
           bookingBox.deleteAt(i);

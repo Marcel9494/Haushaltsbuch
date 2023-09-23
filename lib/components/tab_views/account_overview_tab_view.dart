@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 
 import '/utils/number_formatters/number_formatter.dart';
 
-import '/models/account.dart';
 import '/models/booking.dart';
+import '/models/account/account_model.dart';
+import '/models/account/account_repository.dart';
 
 import '../cards/account_card.dart';
 
@@ -21,9 +22,10 @@ class _AccountOverviewTabViewState extends State<AccountOverviewTabView> {
   Map<String, double> _accountTypeBalanceMap = {};
 
   Future<List<Account>> _loadAccountList() async {
+    AccountRepository accountRepository = AccountRepository();
     Booking.checkForNewSerieBookings();
-    _accountList = await Account.loadAccounts();
-    _accountTypeBalanceMap = await Account.getAccountTypeBalance(_accountList);
+    _accountList = await accountRepository.loadAccounts();
+    _accountTypeBalanceMap = await accountRepository.getAccountTypeBalance(_accountList);
     return _accountList;
   }
 

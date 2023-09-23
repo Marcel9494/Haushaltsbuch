@@ -4,13 +4,12 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import '../../models/account/account_repository.dart';
 import '../buttons/month_picker_buttons.dart';
 
-import '../charts/future_wealth_development_chart.dart';
 import '/utils/date_formatters/date_formatter.dart';
 import '/utils/number_formatters/number_formatter.dart';
 
-import '/models/account.dart';
 import '/models/booking.dart';
 import '/models/wealth_development_stats.dart';
 
@@ -39,9 +38,10 @@ class _AssetDevelopmentStatisticTabViewState extends State<AssetDevelopmentStati
   double _currentBalance = 0.0;
 
   Future<List<WealthDevelopmentStats>> _calculatePastWealthDevelopment() async {
+    AccountRepository accountRepository = AccountRepository();
     _pastWealthDevelopmentStats = [];
-    _assets = await Account.getAssetValue();
-    _liabilities = await Account.getLiabilityValue();
+    _assets = await accountRepository.getAssetValue();
+    _liabilities = await accountRepository.getLiabilityValue();
     _currentBalance = _assets - _liabilities;
     for (int i = 0; i < 12; i++) {
       int currentYear = _selectedDate.year;

@@ -3,7 +3,7 @@ import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 import '/components/deco/bottom_sheet_line.dart';
 
-import '/models/account.dart';
+import '/models/account/account_repository.dart';
 
 class AccountInputField extends StatefulWidget {
   final TextEditingController textController;
@@ -89,7 +89,8 @@ class _AccountInputFieldState extends State<AccountInputField> {
   }
 
   Future<List<String>> _loadAccountNameList() async {
-    accountNames = await Account.loadAccountNames();
+    AccountRepository accountRepository = AccountRepository();
+    accountNames = await accountRepository.loadAccountNameList();
     return accountNames;
   }
 

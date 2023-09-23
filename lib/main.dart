@@ -5,8 +5,8 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 
 import '/utils/consts/route_consts.dart';
 
+import 'models/account/account_model.dart';
 import 'models/booking.dart';
-import 'models/account.dart';
 import 'models/categorie.dart';
 import 'models/budget.dart';
 import 'models/subbudget.dart';

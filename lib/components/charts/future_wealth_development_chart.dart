@@ -4,9 +4,9 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-import '/models/account.dart';
 import '/models/booking.dart';
 import '/models/wealth_development_stats.dart';
+import '/models/account/account_repository.dart';
 
 import '/utils/date_formatters/date_formatter.dart';
 import '/utils/number_formatters/number_formatter.dart';
@@ -41,7 +41,8 @@ class _FutureWealthDevelopmentChartState extends State<FutureWealthDevelopmentCh
   }
 
   void _calculateCurrentBalance() async {
-    _currentBalance = await Account.getAssetValue() - await Account.getLiabilityValue();
+    AccountRepository accountRepository = AccountRepository();
+    _currentBalance = await accountRepository.getAssetValue() - await accountRepository.getLiabilityValue();
   }
 
   void _loadBookingList() async {
