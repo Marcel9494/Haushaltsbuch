@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 
+import '../models/categorie/categorie_repository.dart';
+import '../models/enums/categorie_types.dart';
 import '/utils/consts/hive_consts.dart';
 import '/utils/consts/global_consts.dart';
 import '/utils/consts/route_consts.dart';
@@ -17,7 +19,6 @@ import '/components/buttons/save_button.dart';
 
 import '/models/budget.dart';
 import '/models/subbudget.dart';
-import '/models/categorie.dart';
 import '/models/default_budget.dart';
 import '/models/enums/budget_mode_types.dart';
 import '/models/enums/transaction_types.dart';
@@ -161,7 +162,8 @@ class _CreateOrEditBudgetScreenState extends State<CreateOrEditBudgetScreen> {
           ..categorie = _subcategorieTextController.text
           ..defaultBudget = formatMoneyAmountToDouble(_budgetTextController.text);
         newDefaultSubcategoriebudget.createDefaultBudget(newDefaultSubcategoriebudget);
-        List<String> subcategorieNames = await Categorie.loadSubcategorieNames(_categorieTextController.text);
+        CategorieRepository categorieRepository = CategorieRepository();
+        List<String> subcategorieNames = await categorieRepository.loadSubcategorieNameList(_categorieTextController.text);
         Subbudget.createSubbudgets(_categorieTextController.text, _subcategorieTextController.text, subcategorieNames);
       }
     } else {
@@ -200,7 +202,8 @@ class _CreateOrEditBudgetScreenState extends State<CreateOrEditBudgetScreen> {
           ..categorie = _subcategorieTextController.text
           ..defaultBudget = formatMoneyAmountToDouble(_budgetTextController.text);
         newDefaultSubcategoriebudget.createDefaultBudget(newDefaultSubcategoriebudget);
-        List<String> subcategorieNames = await Categorie.loadSubcategorieNames(_categorieTextController.text);
+        CategorieRepository categorieRepository = CategorieRepository();
+        List<String> subcategorieNames = await categorieRepository.loadSubcategorieNameList(_categorieTextController.text);
         Subbudget.createSubbudgets(_categorieTextController.text, _subcategorieTextController.text, subcategorieNames);
       }
     }
@@ -297,7 +300,7 @@ class _CreateOrEditBudgetScreenState extends State<CreateOrEditBudgetScreen> {
                     ? CategorieInputField(
                         textController: _categorieTextController,
                         errorText: _categorieErrorText,
-                        transactionType: TransactionType.outcome.name,
+                        categorieType: CategorieTypeExtension.getCategorieType(TransactionType.outcome.name),
                         categorieStringCallback: (categorie) => setState(() => _categorieTextController.text = categorie),
                         title: 'Kategorie für Budget auswählen:',
                         autofocus: true)

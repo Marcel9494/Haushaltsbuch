@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
-import '/components/deco/bottom_sheet_line.dart';
+import '/models/enums/categorie_types.dart';
+import '/models/categorie/categorie_repository.dart';
 
-import '/models/categorie.dart';
+import '/components/deco/bottom_sheet_line.dart';
 
 typedef CategorieStringCallback = void Function(String currentCategorie);
 
 class CategorieInputField extends StatefulWidget {
   final TextEditingController textController;
   final String errorText;
-  final String transactionType;
+  final CategorieType categorieType;
   final String title;
   final bool autofocus;
   final CategorieStringCallback categorieStringCallback;
@@ -19,7 +20,7 @@ class CategorieInputField extends StatefulWidget {
     Key? key,
     required this.textController,
     required this.errorText,
-    required this.transactionType,
+    required this.categorieType,
     required this.categorieStringCallback,
     this.title = 'Kategorie auswählen:',
     this.autofocus = false,
@@ -109,7 +110,8 @@ class _CategorieInputFieldState extends State<CategorieInputField> {
   }
 
   Future<List<String>> _loadCategorieNameList() async {
-    _categorieNames = await Categorie.loadCategorieNames(widget.transactionType);
+    CategorieRepository categorieRepository = CategorieRepository();
+    _categorieNames = await categorieRepository.loadCategorieNameList(widget.categorieType);
     return _categorieNames;
   }
 

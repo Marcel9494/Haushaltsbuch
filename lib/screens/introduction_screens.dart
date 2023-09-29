@@ -4,8 +4,8 @@ import 'package:introduction_screen/introduction_screen.dart';
 
 import '/models/global_state.dart';
 import '/models/primary_account.dart';
-import '/models/categorie.dart';
 import '/models/account/account_repository.dart';
+import '/models/categorie/categorie_repository.dart';
 import '/models/screen_arguments/bottom_nav_bar_screen_arguments.dart';
 
 import '/utils/consts/route_consts.dart';
@@ -25,10 +25,11 @@ class _IntroductionScreensState extends State<IntroductionScreens> {
 
   void _createStartCategoriesAndAccounts() {
     AccountRepository accountRepository = AccountRepository();
-    Categorie.createStartExpenditureCategories();
-    Categorie.createStartRevenueCategories();
-    Categorie.createStartInvestmentCategories();
     accountRepository.createStartAccounts();
+    CategorieRepository categorieRepository = CategorieRepository();
+    categorieRepository.createStartExpenditureCategories();
+    categorieRepository.createStartRevenueCategories();
+    categorieRepository.createStartInvestmentCategories();
     PrimaryAccount.createStartPrimaryAccounts();
     GlobalState.createGlobalState();
     Navigator.popAndPushNamed(context, bottomNavBarRoute, arguments: BottomNavBarScreenArguments(0));

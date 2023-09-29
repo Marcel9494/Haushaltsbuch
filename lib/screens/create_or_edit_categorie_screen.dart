@@ -3,11 +3,12 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 
+import '/models/categorie/categorie_model.dart';
+import '/models/categorie/categorie_repository.dart';
+
 import '/components/buttons/categorie_type_toggle_buttons.dart';
 import '/components/buttons/save_button.dart';
 import '/components/input_fields/text_input_field.dart';
-
-import '/models/categorie.dart';
 
 import '/utils/consts/route_consts.dart';
 import '/utils/consts/global_consts.dart';
@@ -31,7 +32,7 @@ class CreateOrEditCategorieScreen extends StatefulWidget {
 class _CreateOrEditCategorieScreenState extends State<CreateOrEditCategorieScreen> {
   final TextEditingController _categorieNameController = TextEditingController();
   final RoundedLoadingButtonController _saveButtonController = RoundedLoadingButtonController();
-  final Categorie _categorie = Categorie();
+  CategorieRepository categorieRepository = CategorieRepository();
   String _categorieNameErrorText = '';
   String _currentCategorieType = '';
 
@@ -43,17 +44,20 @@ class _CreateOrEditCategorieScreenState extends State<CreateOrEditCategorieScree
   }
 
   void _createOrUpdateCategorie() async {
-    _categorie.name = _categorieNameController.text.trim();
-    _categorie.type = _currentCategorieType;
-    bool validCategorieName = await _validCategorieName(_categorie);
+    final Categorie categorie = Categorie();
+    categorie.name = _categorieNameController.text.trim();
+    categorie.type = _currentCategorieType;
+    // TODO bei Update Kategorie subcategorieNames nicht auf [] zurücksetzen, sondern beibehalten
+    categorie.subcategorieNames = [];
+    bool validCategorieName = await _validCategorieName(categorie);
     if (validCategorieName == false) {
       _setSaveButtonAnimation(false);
       return;
     }
     if (widget.categorieName == '') {
-      _categorie.createCategorie(_categorie);
+      categorieRepository.create(categorie);
     } else {
-      _categorie.updateCategorie(_categorie, widget.categorieName);
+      categorieRepository.update(categorie, widget.categorieName);
     }
     _setSaveButtonAnimation(true);
     Timer(const Duration(milliseconds: 1000), () {
@@ -74,7 +78,7 @@ class _CreateOrEditCategorieScreenState extends State<CreateOrEditCategorieScree
       return false;
     }
     if (widget.categorieName == '') {
-      bool categorieNameExisting = await _categorie.existsCategorieName(categorie);
+      bool categorieNameExisting = await categorieRepository.existsCategorieName(categorie);
       if (categorieNameExisting) {
         setState(() {
           _categorieNameErrorText = 'Kategoriename ist bereits vorhanden.';

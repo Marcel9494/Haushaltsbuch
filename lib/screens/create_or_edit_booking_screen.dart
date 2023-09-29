@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:another_flushbar/flushbar.dart';
+import 'package:haushaltsbuch/models/enums/categorie_types.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 
 import '../components/input_fields/subcategorie_input_field.dart';
@@ -406,7 +407,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
                             : CategorieInputField(
                                 textController: _categorieTextController,
                                 errorText: _categorieErrorText,
-                                transactionType: _currentTransaction,
+                                categorieType: CategorieTypeExtension.getCategorieType(_currentTransaction),
                                 categorieStringCallback: (categorie) => setState(() => {_categorieTextController.text = categorie, _subcategorieTextController.text = ''})),
                         _currentTransaction == TransactionType.transfer.name
                             ? const SizedBox()

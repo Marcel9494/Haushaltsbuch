@@ -7,8 +7,8 @@ import '/utils/consts/route_consts.dart';
 
 import 'models/account/account_model.dart';
 import 'models/booking.dart';
-import 'models/categorie.dart';
 import 'models/budget.dart';
+import 'models/categorie/categorie_model.dart';
 import 'models/subbudget.dart';
 import 'models/default_budget.dart';
 import 'models/enums/transaction_types.dart';

@@ -1,25 +1,23 @@
 import 'package:hive/hive.dart';
 
-import 'booking.dart';
-import 'enums/categorie_types.dart';
+import '../booking.dart';
+import 'categorie_model.dart';
+
+import '../enums/categorie_types.dart';
+
+import '/models/categorie/categorie_interface.dart';
 
 import '/utils/consts/hive_consts.dart';
 
-@HiveType(typeId: categoryTypeId)
-class Categorie extends HiveObject {
-  @HiveField(0)
-  String? type;
-  @HiveField(1)
-  late String name;
-  @HiveField(2)
-  late List<String> subcategorieNames;
-
-  void createCategorie(Categorie newCategorie) async {
+class CategorieRepository extends CategorieInterface {
+  @override
+  void create(Categorie newCategorie) async {
     var categorieBox = await Hive.openBox(categoriesBox);
     categorieBox.add(newCategorie);
   }
 
-  void updateCategorie(Categorie updatedCategorie, String oldCategorieName) async {
+  @override
+  void update(Categorie updatedCategorie, String oldCategorieName) async {
     var categorieBox = await Hive.openBox(categoriesBox);
     for (int i = 0; i < categorieBox.length; i++) {
       Categorie categorie = await categorieBox.getAt(i);
@@ -31,11 +29,63 @@ class Categorie extends HiveObject {
     }
   }
 
-  void addSubcategorie(Categorie updatedCategorie, String newSubcategorie) async {
+  @override
+  void delete(Categorie deleteCategorie) async {
+    var categorieBox = await Hive.openBox(categoriesBox);
+    for (int i = 0; i < categorieBox.length; i++) {
+      Categorie currentCategorie = await categorieBox.getAt(i);
+      if (deleteCategorie.name == currentCategorie.name && deleteCategorie.type == currentCategorie.type) {
+        categorieBox.deleteAt(i);
+        break;
+      }
+    }
+  }
+
+  @override
+  Future<bool> existsCategorieName(Categorie categorie) async {
+    var categorieBox = await Hive.openBox(categoriesBox);
+    for (int i = 0; i < categorieBox.length; i++) {
+      Categorie currentCategorie = await categorieBox.getAt(i);
+      if (categorie.name.trim().toLowerCase() == currentCategorie.name.trim().toLowerCase() && categorie.type == currentCategorie.type) {
+        return Future.value(true);
+      }
+    }
+    return Future.value(false);
+  }
+
+  @override
+  Future<List<Categorie>> loadCategorieList(CategorieType categorieType) async {
+    var categorieBox = await Hive.openBox(categoriesBox);
+    List<Categorie> categorieList = [];
+    for (int i = 0; i < categorieBox.length; i++) {
+      Categorie categorie = await categorieBox.getAt(i);
+      if (categorieType.name == categorie.type) {
+        categorieList.add(categorie);
+      }
+    }
+    categorieList.sort((first, second) => first.name.compareTo(second.name));
+    return categorieList;
+  }
+
+  @override
+  Future<List<String>> loadCategorieNameList(CategorieType categorieType) async {
+    var categorieBox = await Hive.openBox(categoriesBox);
+    List<String> categorieNameList = [];
+    for (int i = 0; i < categorieBox.length; i++) {
+      Categorie categorie = await categorieBox.getAt(i);
+      if (categorieType.name == categorie.type) {
+        categorieNameList.add(categorie.name);
+      }
+    }
+    return categorieNameList;
+  }
+
+  @override
+  void createSubcategorie(String mainCategorie, String newSubcategorie) async {
     var categorieBox = await Hive.openBox(categoriesBox);
     for (int i = 0; i < categorieBox.length; i++) {
       Categorie categorie = await categorieBox.getAt(i);
-      if (updatedCategorie.name == categorie.name) {
+      if (mainCategorie == categorie.name) {
         categorie.subcategorieNames.add(newSubcategorie);
         categorieBox.putAt(i, categorie);
         // TODO Booking.updateBookingCategorieName(oldCategorieName, updatedCategorie.name);
@@ -44,11 +94,12 @@ class Categorie extends HiveObject {
     }
   }
 
-  void updateSubcategorie(Categorie updatedCategorie, String oldSubcategorie, String newSubcategorie) async {
+  @override
+  void updateSubcategorie(String mainCategorie, String oldSubcategorie, String newSubcategorie) async {
     var categorieBox = await Hive.openBox(categoriesBox);
     for (int i = 0; i < categorieBox.length; i++) {
       Categorie categorie = await categorieBox.getAt(i);
-      if (updatedCategorie.name == categorie.name) {
+      if (mainCategorie == categorie.name) {
         for (int j = 0; j < categorie.subcategorieNames.length; j++) {
           if (categorie.subcategorieNames[j] == oldSubcategorie) {
             categorie.subcategorieNames[categorie.subcategorieNames.indexWhere((element) => element == oldSubcategorie)] = newSubcategorie;
@@ -61,17 +112,7 @@ class Categorie extends HiveObject {
     }
   }
 
-  void deleteCategorie(Categorie deleteCategorie) async {
-    var categorieBox = await Hive.openBox(categoriesBox);
-    for (int i = 0; i < categorieBox.length; i++) {
-      Categorie currentCategorie = await categorieBox.getAt(i);
-      if (deleteCategorie.name == currentCategorie.name && deleteCategorie.type == currentCategorie.type) {
-        categorieBox.deleteAt(i);
-        break;
-      }
-    }
-  }
-
+  @override
   void deleteSubcategorie(Categorie categorie, String deleteSubcategorie) async {
     var categorieBox = await Hive.openBox(categoriesBox);
     for (int i = 0; i < categorieBox.length; i++) {
@@ -89,17 +130,7 @@ class Categorie extends HiveObject {
     }
   }
 
-  Future<bool> existsCategorieName(Categorie categorie) async {
-    var categorieBox = await Hive.openBox(categoriesBox);
-    for (int i = 0; i < categorieBox.length; i++) {
-      Categorie currentCategorie = await categorieBox.getAt(i);
-      if (categorie.name.trim().toLowerCase() == currentCategorie.name.trim().toLowerCase() && categorie.type == currentCategorie.type) {
-        return Future.value(true);
-      }
-    }
-    return Future.value(false);
-  }
-
+  @override
   Future<bool> existsSubcategorieName(Categorie categorie) async {
     var categorieBox = await Hive.openBox(categoriesBox);
     for (int i = 0; i < categorieBox.length; i++) {
@@ -115,32 +146,8 @@ class Categorie extends HiveObject {
     return Future.value(false);
   }
 
-  static Future<List<Categorie>> loadCategories(CategorieType categorieType) async {
-    var categorieBox = await Hive.openBox(categoriesBox);
-    List<Categorie> categorieList = [];
-    for (int i = 0; i < categorieBox.length; i++) {
-      Categorie categorie = await categorieBox.getAt(i);
-      if (categorie.type == categorieType.name) {
-        categorieList.add(categorie);
-      }
-    }
-    categorieList.sort((first, second) => first.name.compareTo(second.name));
-    return categorieList;
-  }
-
-  static Future<List<String>> loadCategorieNames(String transactionType) async {
-    var categorieBox = await Hive.openBox(categoriesBox);
-    List<String> categorieNameList = [];
-    for (int i = 0; i < categorieBox.length; i++) {
-      Categorie categorie = await categorieBox.getAt(i);
-      if (transactionType == categorie.type) {
-        categorieNameList.add(categorie.name);
-      }
-    }
-    return categorieNameList;
-  }
-
-  static Future<List<String>> loadSubcategorieNames(String mainCategorie) async {
+  @override
+  Future<List<String>> loadSubcategorieNameList(String mainCategorie) async {
     var categorieBox = await Hive.openBox(categoriesBox);
     for (int i = 0; i < categorieBox.length; i++) {
       Categorie categorie = await categorieBox.getAt(i);
@@ -151,15 +158,8 @@ class Categorie extends HiveObject {
     return [];
   }
 
-  static Future<bool> checkIfCategoriesExists() async {
-    var categorieBox = await Hive.openBox(categoriesBox);
-    if (categorieBox.isEmpty) {
-      return false;
-    }
-    return true;
-  }
-
-  static void createStartExpenditureCategories() async {
+  @override
+  void createStartExpenditureCategories() async {
     var categorieBox = await Hive.openBox(categoriesBox);
     for (int i = 0; i < categorieBox.length; i++) {
       Categorie categorie = await categorieBox.getAt(i);
@@ -188,11 +188,12 @@ class Categorie extends HiveObject {
         ..type = CategorieType.outcome.name
         ..name = categorieNames[i]
         ..subcategorieNames = [];
-      categorie.createCategorie(categorie);
+      categorieBox.add(categorie);
     }
   }
 
-  static void createStartRevenueCategories() async {
+  @override
+  void createStartRevenueCategories() async {
     var categorieBox = await Hive.openBox(categoriesBox);
     for (int i = 0; i < categorieBox.length; i++) {
       Categorie categorie = await categorieBox.getAt(i);
@@ -206,11 +207,12 @@ class Categorie extends HiveObject {
         ..type = CategorieType.income.name
         ..name = categorieNames[i]
         ..subcategorieNames = [];
-      categorie.createCategorie(categorie);
+      categorieBox.add(categorie);
     }
   }
 
-  static void createStartInvestmentCategories() async {
+  @override
+  void createStartInvestmentCategories() async {
     var categorieBox = await Hive.openBox(categoriesBox);
     for (int i = 0; i < categorieBox.length; i++) {
       Categorie categorie = await categorieBox.getAt(i);
@@ -224,27 +226,7 @@ class Categorie extends HiveObject {
         ..type = CategorieType.investment.name
         ..name = categorieNames[i]
         ..subcategorieNames = [];
-      categorie.createCategorie(categorie);
+      categorieBox.add(categorie);
     }
-  }
-}
-
-class CategorieAdapter extends TypeAdapter<Categorie> {
-  @override
-  final typeId = categoryTypeId;
-
-  @override
-  Categorie read(BinaryReader reader) {
-    return Categorie()
-      ..name = reader.read()
-      ..type = reader.read()
-      ..subcategorieNames = reader.read();
-  }
-
-  @override
-  void write(BinaryWriter writer, Categorie obj) {
-    writer.write(obj.name);
-    writer.write(obj.type);
-    writer.write(obj.subcategorieNames);
   }
 }
