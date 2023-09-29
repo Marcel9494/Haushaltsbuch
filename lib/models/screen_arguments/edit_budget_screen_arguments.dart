@@ -1,4 +1,4 @@
-import '../budget.dart';
+import '../budget/budget_model.dart';
 
 class EditBudgetScreenArguments {
   final Budget budget;

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '/models/budget.dart';
+import '/models/budget/budget_model.dart';
+import '/models/budget/budget_repository.dart';
 
 import '/components/cards/edit_budget_card.dart';
 import '/components/deco/loading_indicator.dart';
@@ -19,7 +20,8 @@ class _OverviewBudgetsScreenState extends State<OverviewBudgetsScreen> {
   List<Budget> _budgetList = [];
 
   Future<List<Budget>> _loadAllBudgetCategories() async {
-    _budgetList = await Budget.loadAllBudgetCategories();
+    BudgetRepository budgetRepository = BudgetRepository();
+    _budgetList = await budgetRepository.loadAllBudgetCategories();
     return _budgetList;
   }
 
