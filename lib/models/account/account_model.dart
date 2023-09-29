@@ -1,9 +1,12 @@
 import 'package:hive/hive.dart';
 
+import '../booking/booking_repository.dart';
+
 import '/utils/consts/hive_consts.dart';
 
 @HiveType(typeId: accountTypeId)
 class Account extends HiveObject {
+  late BookingRepository bookingRepository = BookingRepository();
   late int boxIndex;
   @HiveField(0)
   late String name;

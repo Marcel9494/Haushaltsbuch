@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
+import '../models/booking/booking_repository.dart';
 import '/components/tab_views/asset_future_development_statistic_tab_view.dart';
 import '/components/tab_views/asset_development_statistic_tab_view.dart';
 import '/components/tab_views/asset_allocation_statistic_tab_view.dart';
@@ -11,7 +12,6 @@ import '/components/deco/overview_tile.dart';
 
 import '/utils/consts/route_consts.dart';
 
-import '/models/booking.dart';
 import '/models/account/account_repository.dart';
 import '/models/screen_arguments/create_or_edit_account_screen_arguments.dart';
 
@@ -87,7 +87,8 @@ class _AccountsScreenState extends State<AccountsScreen> {
   }
 
   Widget _showSelectedTabView() {
-    Booking.checkForNewSerieBookings();
+    BookingRepository bookingRepository = BookingRepository();
+    bookingRepository.checkForNewSerieBookings();
     if (_selectedTabOption[0]) {
       return const AccountOverviewTabView();
     } else if (_selectedTabOption[1]) {

@@ -1,6 +1,7 @@
+import 'package:haushaltsbuch/models/booking/booking_repository.dart';
 import 'package:hive/hive.dart';
 
-import '../booking.dart';
+import '../booking/booking_model.dart';
 import '/models/enums/account_types.dart';
 import '/models/enums/transaction_types.dart';
 
@@ -20,7 +21,8 @@ class AccountRepository extends AccountInterface {
   void update(Account updatedAccount, int accountBoxIndex, String oldAccountName) async {
     var accountBox = await Hive.openBox(accountsBox);
     accountBox.putAt(accountBoxIndex, updatedAccount);
-    Booking.updateBookingAccountName(oldAccountName, updatedAccount.name);
+    BookingRepository bookingRepository = BookingRepository();
+    bookingRepository.updateBookingAccountName(oldAccountName, updatedAccount.name);
   }
 
   @override

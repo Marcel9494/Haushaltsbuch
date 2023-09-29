@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 
 import '/utils/number_formatters/number_formatter.dart';
 
-import '/models/booking.dart';
 import '/models/account/account_model.dart';
 import '/models/account/account_repository.dart';
+import '/models/booking/booking_repository.dart';
 
 import '../cards/account_card.dart';
 
@@ -23,7 +23,8 @@ class _AccountOverviewTabViewState extends State<AccountOverviewTabView> {
 
   Future<List<Account>> _loadAccountList() async {
     AccountRepository accountRepository = AccountRepository();
-    Booking.checkForNewSerieBookings();
+    BookingRepository bookingRepository = BookingRepository();
+    bookingRepository.checkForNewSerieBookings();
     _accountList = await accountRepository.loadAccounts();
     _accountTypeBalanceMap = await accountRepository.getAccountTypeBalance(_accountList);
     return _accountList;

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:haushaltsbuch/models/booking/booking_repository.dart';
 
-import '/models/booking.dart';
+import '/models/booking/booking_model.dart';
 import '/models/percentage_stats.dart';
 import '/models/enums/categorie_types.dart';
 import '/models/enums/transaction_types.dart';
@@ -36,7 +37,8 @@ class _MonthlyStatisticsTabViewState extends State<MonthlyStatisticsTabView> {
   set currentCategorieType(String categorie) => setState(() => {_currentCategorieType = categorie});
 
   Future<List<PercentageStats>> _loadStatistics() async {
-    _bookingList = await Booking.loadMonthlyBookingList(widget.selectedDate.month, widget.selectedDate.year);
+    BookingRepository bookingRepository = BookingRepository();
+    _bookingList = await bookingRepository.loadMonthlyBookingList(widget.selectedDate.month, widget.selectedDate.year);
     if (_currentCategorieType == CategorieType.outcome.pluralName) {
       return _loadMonthlyStatistic(TransactionType.outcome);
     } else if (_currentCategorieType == CategorieType.income.pluralName) {

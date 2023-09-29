@@ -1,6 +1,6 @@
 import 'package:hive/hive.dart';
 
-import '../booking.dart';
+import '../booking/booking_repository.dart';
 import 'categorie_model.dart';
 
 import '../enums/categorie_types.dart';
@@ -18,12 +18,13 @@ class CategorieRepository extends CategorieInterface {
 
   @override
   void update(Categorie updatedCategorie, String oldCategorieName) async {
+    BookingRepository bookingRepository = BookingRepository();
     var categorieBox = await Hive.openBox(categoriesBox);
     for (int i = 0; i < categorieBox.length; i++) {
       Categorie categorie = await categorieBox.getAt(i);
       if (oldCategorieName == categorie.name) {
         categorieBox.putAt(i, updatedCategorie);
-        Booking.updateBookingCategorieName(oldCategorieName, updatedCategorie.name);
+        bookingRepository.updateBookingCategorieName(oldCategorieName, updatedCategorie.name);
         break;
       }
     }

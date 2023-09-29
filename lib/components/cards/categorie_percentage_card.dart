@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '/models/booking.dart';
+import '/models/booking/booking_model.dart';
+import '/models/booking/booking_repository.dart';
 import '/models/categorie/categorie_repository.dart';
 import '/models/percentage_stats.dart';
 import '/models/screen_arguments/categorie_amount_list_screen_arguments.dart';
@@ -33,16 +34,17 @@ class _CategoriePercentageCardState extends State<CategoriePercentageCard> {
   // TODO erweitern um getRevenues und getInvestments
   Future<List<String>> _loadSubcategorieNameList() async {
     CategorieRepository categorieRepository = CategorieRepository();
+    BookingRepository bookingRepository = BookingRepository();
     _subcategorieNames = await categorieRepository.loadSubcategorieNameList(widget.percentageStats.name);
     for (int i = 0; i < _subcategorieNames.length; i++) {
       double totalAmount = 0.0;
-      _subcategorieBookings = await Booking.loadSubcategorieBookingList(widget.bookingList, _subcategorieNames[i]);
+      _subcategorieBookings = await bookingRepository.loadSubcategorieBookingList(widget.bookingList, _subcategorieNames[i]);
       for (int j = 0; j < _subcategorieBookings.length; j++) {
         totalAmount += formatMoneyAmountToDouble(_subcategorieBookings[j].amount);
       }
       _subcategorieAmounts.add(totalAmount);
     }
-    double totalExpenditures = Booking.getExpenditures(widget.bookingList);
+    double totalExpenditures = bookingRepository.getExpenditures(widget.bookingList);
     for (int i = 0; i < _subcategorieNames.length; i++) {
       _subcategoriePercentages.add((_subcategorieAmounts[i] * 100) / totalExpenditures);
     }
