@@ -2,8 +2,9 @@ import 'dart:math';
 
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:haushaltsbuch/models/booking/booking_repository.dart';
 
-import '/models/booking.dart';
+import '/models/booking/booking_model.dart';
 
 import '/utils/date_formatters/date_formatter.dart';
 import '/utils/number_formatters/number_formatter.dart';
@@ -37,6 +38,7 @@ class MonthlyBarChartState extends State<MonthlyBarChart> {
   }
 
   Future<List<double>> _loadMonthlyBarChartData() async {
+    BookingRepository bookingRepository = BookingRepository();
     _monthlyExpenditures = [];
     _monthlyExpendituresBarGroups = [];
     _reversedMonthlyExpendituresBarGroups = [];
@@ -49,12 +51,12 @@ class MonthlyBarChartState extends State<MonthlyBarChart> {
         currentYear = widget.selectedDate.year - 1;
         currentMonth = widget.selectedDate.month + 12 - i;
       }
-      _bookingList = await Booking.loadMonthlyBookingList(currentMonth, currentYear, widget.categorie);
+      _bookingList = await bookingRepository.loadMonthlyBookingList(currentMonth, currentYear, widget.categorie);
       if (_bookingList.isEmpty) {
         _monthlyExpenditures.insert(i, 0.0);
         _monthlyExpendituresBarGroups.add(makeGroupData(i, _monthlyExpenditures[i]));
       } else {
-        _monthlyExpenditures.insert(i, Booking.getExpenditures(_bookingList, widget.categorie));
+        _monthlyExpenditures.insert(i, bookingRepository.getExpenditures(_bookingList, widget.categorie));
         _monthlyExpendituresBarGroups.add(makeGroupData(i, _monthlyExpenditures[i]));
       }
     }

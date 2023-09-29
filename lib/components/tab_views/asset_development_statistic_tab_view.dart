@@ -2,15 +2,17 @@ import 'dart:math' as math;
 
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:haushaltsbuch/models/booking/booking_repository.dart';
 import 'package:intl/intl.dart';
 
-import '../../models/account/account_repository.dart';
+import '../../models/booking/booking_model.dart';
+import '/models/account/account_repository.dart';
+
 import '../buttons/month_picker_buttons.dart';
 
 import '/utils/date_formatters/date_formatter.dart';
 import '/utils/number_formatters/number_formatter.dart';
 
-import '/models/booking.dart';
 import '/models/wealth_development_stats.dart';
 
 class AssetDevelopmentStatisticTabView extends StatefulWidget {
@@ -38,6 +40,7 @@ class _AssetDevelopmentStatisticTabViewState extends State<AssetDevelopmentStati
   double _currentBalance = 0.0;
 
   Future<List<WealthDevelopmentStats>> _calculatePastWealthDevelopment() async {
+    BookingRepository bookingRepository = BookingRepository();
     AccountRepository accountRepository = AccountRepository();
     _pastWealthDevelopmentStats = [];
     _assets = await accountRepository.getAssetValue();
@@ -51,9 +54,9 @@ class _AssetDevelopmentStatisticTabViewState extends State<AssetDevelopmentStati
         currentYear = _selectedDate.year - 1;
         currentMonth = _selectedDate.month + 12 - i;
       }
-      List<Booking> bookingList = await Booking.loadMonthlyBookingList(currentMonth, currentYear);
-      double revenues = Booking.getRevenues(bookingList);
-      double expenditures = Booking.getExpenditures(bookingList);
+      List<Booking> bookingList = await bookingRepository.loadMonthlyBookingList(currentMonth, currentYear);
+      double revenues = bookingRepository.getRevenues(bookingList);
+      double expenditures = bookingRepository.getExpenditures(bookingList);
       WealthDevelopmentStats pastWealthDevelopmentStat = WealthDevelopmentStats();
       pastWealthDevelopmentStat.month = currentMonth.toString();
       _currentBalance = _currentBalance + revenues - expenditures;

@@ -1,6 +1,7 @@
 import 'dart:math';
 
-import 'booking.dart';
+import 'booking/booking_model.dart';
+import 'booking/booking_repository.dart';
 
 class WealthDevelopmentStats {
   late String month;
@@ -8,10 +9,11 @@ class WealthDevelopmentStats {
 
   // TODO hier weitermachen und Vermögensenticklung für die Vergangenheit pro Monat berechnen.
   static Future<double> calculatePastWealth(DateTime currentDate, double currentBalance) async {
-    List<Booking> _bookingList = await Booking.loadMonthlyBookingList(currentDate.month - 1, currentDate.year);
-    double monthExpenditures = Booking.getExpenditures(_bookingList);
-    double monthRevenues = Booking.getRevenues(_bookingList);
-    double monthInvestments = Booking.getInvestments(_bookingList);
+    BookingRepository bookingRepository = BookingRepository();
+    List<Booking> _bookingList = await bookingRepository.loadMonthlyBookingList(currentDate.month - 1, currentDate.year);
+    double monthExpenditures = bookingRepository.getExpenditures(_bookingList);
+    double monthRevenues = bookingRepository.getRevenues(_bookingList);
+    double monthInvestments = bookingRepository.getInvestments(_bookingList);
     double monthWealth = currentBalance + monthRevenues + monthInvestments - monthExpenditures;
     return monthWealth;
   }

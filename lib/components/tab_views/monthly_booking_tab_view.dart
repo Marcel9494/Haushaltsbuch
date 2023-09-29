@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '/models/booking.dart';
+import '/models/booking/booking_model.dart';
+import '/models/booking/booking_repository.dart';
 import '/models/enums/transaction_types.dart';
 
 import '../buttons/month_picker_buttons.dart';
@@ -40,9 +41,10 @@ class _MonthlyBookingTabViewState extends State<MonthlyBookingTabView> {
   late List<Booking> _bookingList = [];
   late final Map<DateTime, double> _todayExpendituresMap = {};
   late final Map<DateTime, double> _todayRevenuesMap = {};
+  BookingRepository bookingRepository = BookingRepository();
 
   Future<List<Booking>> _loadMonthlyBookingList() async {
-    _bookingList = await Booking.loadMonthlyBookingList(widget.selectedDate.month, widget.selectedDate.year, widget.categorie, widget.account);
+    _bookingList = await bookingRepository.loadMonthlyBookingList(widget.selectedDate.month, widget.selectedDate.year, widget.categorie, widget.account);
     _prepareMaps(_bookingList);
     _getTodayExpenditures(_bookingList);
     _getTodayRevenues(_bookingList);
@@ -141,13 +143,13 @@ class _MonthlyBookingTabViewState extends State<MonthlyBookingTabView> {
                     widget.showOverviewTile
                         ? OverviewTile(
                             shouldText: 'Einnahmen',
-                            should: Booking.getRevenues(_bookingList),
+                            should: bookingRepository.getRevenues(_bookingList),
                             haveText: 'Ausgaben',
-                            have: Booking.getExpenditures(_bookingList),
+                            have: bookingRepository.getExpenditures(_bookingList),
                             balanceText: 'Saldo',
                             showAverageValuesPerDay: true,
                             investmentText: 'Investitionen',
-                            investmentAmount: Booking.getInvestments(_bookingList),
+                            investmentAmount: bookingRepository.getInvestments(_bookingList),
                             availableText: 'Verfügbar',
                             showAvailable: true,
                             showInvestments: true,
@@ -169,7 +171,7 @@ class _MonthlyBookingTabViewState extends State<MonthlyBookingTabView> {
                                       },
                                     ),
                                   ),
-                                  TotalText(total: formatToMoneyAmount(Booking.getExpenditures(_bookingList, _bookingList[0].categorie).toString())),
+                                  TotalText(total: formatToMoneyAmount(bookingRepository.getExpenditures(_bookingList, _bookingList[0].categorie).toString())),
                                 ],
                               ),
                               MonthlyBarChart(selectedDate: widget.selectedDate, categorie: _bookingList[0].categorie),

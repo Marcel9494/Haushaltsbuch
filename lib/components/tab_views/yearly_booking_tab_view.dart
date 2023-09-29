@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '/models/booking.dart';
 import '/models/monthly_stats.dart';
+import '/models/booking/booking_model.dart';
+import '/models/booking/booking_repository.dart';
 
 import '/utils/date_formatters/date_formatter.dart';
 
@@ -29,14 +30,15 @@ class _YearlyBookingTabViewState extends State<YearlyBookingTabView> {
   List<MonthlyStats> _monthList = [];
 
   Future<List<MonthlyStats>> _loadMonthlyStatsList() async {
+    BookingRepository bookingRepository = BookingRepository();
     _monthList.clear();
     for (int i = 0; i < 12; i++) {
-      List<Booking> _bookingList = await Booking.loadMonthlyBookingList(i + 1, widget.selectedDate.year);
+      List<Booking> _bookingList = await bookingRepository.loadMonthlyBookingList(i + 1, widget.selectedDate.year);
       MonthlyStats monthlyStats = MonthlyStats();
       monthlyStats.month = dateFormatterMMMM.format(DateTime(widget.selectedDate.year, i + 1, 1)).toString();
-      monthlyStats.revenues = Booking.getRevenues(_bookingList);
-      monthlyStats.expenditures = Booking.getExpenditures(_bookingList);
-      monthlyStats.investments = Booking.getInvestments(_bookingList);
+      monthlyStats.revenues = bookingRepository.getRevenues(_bookingList);
+      monthlyStats.expenditures = bookingRepository.getExpenditures(_bookingList);
+      monthlyStats.investments = bookingRepository.getInvestments(_bookingList);
       _monthList.add(monthlyStats);
     }
     return _monthList;

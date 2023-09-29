@@ -2,9 +2,10 @@ import 'dart:math' as math;
 
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:haushaltsbuch/models/booking/booking_repository.dart';
 import 'package:intl/intl.dart';
 
-import '/models/booking.dart';
+import '/models/booking/booking_model.dart';
 import '/models/wealth_development_stats.dart';
 import '/models/account/account_repository.dart';
 
@@ -46,6 +47,7 @@ class _FutureWealthDevelopmentChartState extends State<FutureWealthDevelopmentCh
   }
 
   void _loadBookingList() async {
+    BookingRepository bookingRepository = BookingRepository();
     for (int i = 0; i < 12; i++) {
       int currentYear = _selectedDate.year;
       int currentMonth = _selectedDate.month - i;
@@ -54,8 +56,8 @@ class _FutureWealthDevelopmentChartState extends State<FutureWealthDevelopmentCh
         currentYear = _selectedDate.year - 1;
         currentMonth = _selectedDate.month + 12 - i;
       }
-      _bookingList = await Booking.loadMonthlyBookingList(currentMonth, currentYear);
-      _averageWealthGrowth += Booking.getRevenues(_bookingList) - Booking.getExpenditures(_bookingList);
+      _bookingList = await bookingRepository.loadMonthlyBookingList(currentMonth, currentYear);
+      _averageWealthGrowth += bookingRepository.getRevenues(_bookingList) - bookingRepository.getExpenditures(_bookingList);
     }
   }
 

@@ -1,8 +1,8 @@
 import 'package:hive/hive.dart';
 
+import 'booking/booking_model.dart';
+import 'booking/booking_repository.dart';
 import 'default_budget.dart';
-
-import '/models/booking.dart';
 
 import '/utils/consts/hive_consts.dart';
 
@@ -144,9 +144,10 @@ class Budget extends HiveObject {
   }
 
   static Future<List<Budget>> calculateCurrentExpenditure(List<Budget> budgetList, DateTime selectedDate) async {
-    List<Booking> bookingList = await Booking.loadMonthlyBookingList(selectedDate.month, selectedDate.year);
+    BookingRepository bookingRepository = BookingRepository();
+    List<Booking> bookingList = await bookingRepository.loadMonthlyBookingList(selectedDate.month, selectedDate.year);
     for (int i = 0; i < budgetList.length; i++) {
-      budgetList[i].currentExpenditure = Booking.getExpenditures(bookingList, budgetList[i].categorie);
+      budgetList[i].currentExpenditure = bookingRepository.getExpenditures(bookingList, budgetList[i].categorie);
     }
     return budgetList;
   }

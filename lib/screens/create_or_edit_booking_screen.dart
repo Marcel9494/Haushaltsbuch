@@ -2,14 +2,14 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:another_flushbar/flushbar.dart';
-import 'package:haushaltsbuch/models/enums/categorie_types.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 
-import '../components/input_fields/subcategorie_input_field.dart';
+import '../models/booking/booking_repository.dart';
 import '/utils/consts/route_consts.dart';
 import '/utils/consts/global_consts.dart';
 import '/utils/date_formatters/date_formatter.dart';
 
+import '/components/input_fields/subcategorie_input_field.dart';
 import '/components/buttons/transaction_toggle_buttons.dart';
 import '/components/input_fields/text_input_field.dart';
 import '/components/input_fields/date_input_field.dart';
@@ -19,7 +19,8 @@ import '/components/input_fields/account_input_field.dart';
 import '/components/buttons/save_button.dart';
 import '/components/deco/loading_indicator.dart';
 
-import '/models/booking.dart';
+import '/models/booking/booking_model.dart';
+import '/models/enums/categorie_types.dart';
 import '/models/primary_account.dart';
 import '/models/enums/repeat_types.dart';
 import '/models/enums/serie_edit_modes.dart';
@@ -54,6 +55,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
   // müssten die gleichen Stellen sein. Buchung Datenstruktur um Unterkategorie Eintrag erweitern.
   final TextEditingController _subcategorieTextController = TextEditingController();
   final RoundedLoadingButtonController _saveButtonController = RoundedLoadingButtonController();
+  final BookingRepository bookingRepository = BookingRepository();
   bool _isBookingEdited = false;
   bool _isPreselectedAccountsLoaded = false;
   String _currentTransaction = '';
@@ -80,7 +82,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
   }
 
   Future<void> _loadBooking() async {
-    _loadedBooking = await Booking.loadBooking(widget.bookingBoxIndex);
+    _loadedBooking = await bookingRepository.load(widget.bookingBoxIndex);
     _currentTransaction = _loadedBooking.transactionType;
     _bookingNameController.text = _loadedBooking.title;
     _parsedBookingDate = DateTime.parse(_loadedBooking.date);
@@ -108,11 +110,11 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
       Booking booking = Booking();
       if (_bookingRepeat == RepeatType.noRepetition.name) {
         // TODO Code verbessern und nur komplettes Booking Objekt übergeben
-        booking.createBooking(_bookingNameController.text, _currentTransaction, _parsedBookingDate.toString(), _bookingRepeat, _amountTextController.text,
+        bookingRepository.create(_bookingNameController.text, _currentTransaction, _parsedBookingDate.toString(), _bookingRepeat, _amountTextController.text,
             _categorieTextController.text, _subcategorieTextController.text, _fromAccountTextController.text, _toAccountTextController.text);
       } else if (_bookingRepeat != RepeatType.noRepetition.name) {
         // TODO Code verbessern und nur komplettes Booking Objekt übergeben
-        booking.createBookingSerie(_bookingNameController.text, _currentTransaction, _parsedBookingDate.toString(), _bookingRepeat, _amountTextController.text,
+        bookingRepository.createBookingSerie(_bookingNameController.text, _currentTransaction, _parsedBookingDate.toString(), _bookingRepeat, _amountTextController.text,
             _categorieTextController.text, _subcategorieTextController.text, _fromAccountTextController.text, _toAccountTextController.text);
       }
     } else {
@@ -128,7 +130,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
         ..toAccount = _toAccountTextController.text
         ..serieId = _loadedBooking.serieId
         ..booked = _loadedBooking.booked;
-      Booking.updateSerieBookings(currentBooking, _loadedBooking, widget.bookingBoxIndex, widget.serieEditMode);
+      bookingRepository.updateSerieBookings(currentBooking, _loadedBooking, widget.bookingBoxIndex, widget.serieEditMode);
     }
     _setSaveButtonAnimation(true);
     Timer(const Duration(milliseconds: transitionInMs), () {
@@ -257,7 +259,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
   void _yesPressed(int index) {
     if (widget.serieEditMode == SerieEditModeType.none) {
       setState(() {
-        _loadedBooking.deleteBooking(widget.bookingBoxIndex);
+        bookingRepository.delete(widget.bookingBoxIndex);
       });
     } else {
       setState(() {
@@ -273,7 +275,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
           ..toAccount = _toAccountTextController.text
           ..serieId = _loadedBooking.serieId
           ..booked = _loadedBooking.booked;
-        Booking.deleteSerieBookings(currentBooking, widget.bookingBoxIndex, widget.serieEditMode);
+        bookingRepository.deleteSerieBookings(currentBooking, widget.bookingBoxIndex, widget.serieEditMode);
       });
     }
     Navigator.pop(context);

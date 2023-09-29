@@ -1,6 +1,6 @@
 import 'account_model.dart';
 
-import '../booking.dart';
+import '../booking/booking_model.dart';
 
 abstract class AccountInterface {
   void create(Account newAccount);

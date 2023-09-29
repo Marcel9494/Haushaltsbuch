@@ -3,7 +3,7 @@ import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 import '../deco/bottom_sheet_line.dart';
 
-import '/models/booking.dart';
+import '/models/booking/booking_model.dart';
 import '/models/enums/repeat_types.dart';
 import '/models/enums/serie_edit_modes.dart';
 import '/models/enums/transaction_types.dart';
