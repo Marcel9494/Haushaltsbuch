@@ -1,35 +1,30 @@
 import 'package:hive/hive.dart';
 
+import '../booking.dart';
 import '/models/enums/account_types.dart';
 import '/models/enums/transaction_types.dart';
 
 import '/utils/consts/hive_consts.dart';
 import '/utils/number_formatters/number_formatter.dart';
+import 'account_interface.dart';
+import 'account_model.dart';
 
-import 'booking.dart';
-
-@HiveType(typeId: accountTypeId)
-class Account extends HiveObject {
-  late int boxIndex;
-  @HiveField(0)
-  late String name;
-  @HiveField(1)
-  late String accountType;
-  @HiveField(2)
-  late String bankBalance;
-
-  void createAccount(Account newAccount) async {
+class AccountRepository extends AccountInterface {
+  @override
+  void create(Account newAccount) async {
     var accountBox = await Hive.openBox(accountsBox);
     accountBox.add(newAccount);
   }
 
-  void updateAccount(Account updatedAccount, int accountBoxIndex, String oldAccountName) async {
+  @override
+  void update(Account updatedAccount, int accountBoxIndex, String oldAccountName) async {
     var accountBox = await Hive.openBox(accountsBox);
     accountBox.putAt(accountBoxIndex, updatedAccount);
     Booking.updateBookingAccountName(oldAccountName, updatedAccount.name);
   }
 
-  void deleteAccount(Account deleteAccount) async {
+  @override
+  void delete(Account deleteAccount) async {
     var accountBox = await Hive.openBox(accountsBox);
     for (int i = 0; i < accountBox.length; i++) {
       Account account = await accountBox.getAt(i);
@@ -40,6 +35,7 @@ class Account extends HiveObject {
     }
   }
 
+  @override
   Future<bool> existsAccountName(String accountName) async {
     var accountBox = await Hive.openBox(accountsBox);
     for (int i = 0; i < accountBox.length; i++) {
@@ -51,7 +47,8 @@ class Account extends HiveObject {
     return Future.value(false);
   }
 
-  static void calculateNewAccountBalance(String accountName, String amount, String transaction) async {
+  @override
+  void calculateNewAccountBalance(String accountName, String amount, String transaction) async {
     var accountBox = await Hive.openBox(accountsBox);
     for (int i = 0; i < accountBox.length; i++) {
       Account account = await accountBox.getAt(i);
@@ -69,7 +66,8 @@ class Account extends HiveObject {
     }
   }
 
-  static void transferMoney(String fromAccountName, String toAccountName, String amount) async {
+  @override
+  void transferMoney(String fromAccountName, String toAccountName, String amount) async {
     var accountBox = await Hive.openBox(accountsBox);
     for (int i = 0; i < accountBox.length; i++) {
       Account account = await accountBox.getAt(i);
@@ -87,7 +85,8 @@ class Account extends HiveObject {
     }
   }
 
-  static void undoneAccountBooking(Booking loadedBooking) async {
+  @override
+  void undoneAccountBooking(Booking loadedBooking) async {
     var accountBox = await Hive.openBox(accountsBox);
     for (int i = 0; i < accountBox.length; i++) {
       Account fromAccount = await accountBox.getAt(i);
@@ -118,7 +117,8 @@ class Account extends HiveObject {
     }
   }
 
-  static void undoneSerieAccountBooking(Booking oldBooking) async {
+  @override
+  void undoneSerieAccountBooking(Booking oldBooking) async {
     var accountBox = await Hive.openBox(accountsBox);
     for (int i = 0; i < accountBox.length; i++) {
       Account fromAccount = await accountBox.getAt(i);
@@ -133,13 +133,15 @@ class Account extends HiveObject {
     }
   }
 
-  static Future<Account> loadAccount(int accountBoxIndex) async {
+  @override
+  Future<Account> load(int accountBoxIndex) async {
     var accountBox = await Hive.openBox(accountsBox);
     Account account = await accountBox.getAt(accountBoxIndex);
     return account;
   }
 
-  static Future<List<Account>> loadAccounts() async {
+  @override
+  Future<List<Account>> loadAccounts() async {
     var accountBox = await Hive.openBox(accountsBox);
     List<Account> accountList = [];
     for (int i = 0; i < accountBox.length; i++) {
@@ -151,7 +153,8 @@ class Account extends HiveObject {
     return accountList;
   }
 
-  static Future<List<Account>> loadAssetAccounts() async {
+  @override
+  Future<List<Account>> loadAssetAccounts() async {
     var accountBox = await Hive.openBox(accountsBox);
     List<Account> accountList = [];
     for (int i = 0; i < accountBox.length; i++) {
@@ -171,7 +174,8 @@ class Account extends HiveObject {
     return accountList;
   }
 
-  static Future<List<Account>> loadLiabilityAccounts() async {
+  @override
+  Future<List<Account>> loadLiabilityAccounts() async {
     var accountBox = await Hive.openBox(accountsBox);
     List<Account> accountList = [];
     for (int i = 0; i < accountBox.length; i++) {
@@ -185,7 +189,8 @@ class Account extends HiveObject {
     return accountList;
   }
 
-  static Future<List<String>> loadAccountNames() async {
+  @override
+  Future<List<String>> loadAccountNameList() async {
     var accountBox = await Hive.openBox(accountsBox);
     List<String> accountNameList = [];
     for (int i = 0; i < accountBox.length; i++) {
@@ -195,7 +200,8 @@ class Account extends HiveObject {
     return accountNameList;
   }
 
-  static Future<double> getAssetValue() async {
+  @override
+  Future<double> getAssetValue() async {
     var accountBox = await Hive.openBox(accountsBox);
     double assetValue = 0.0;
     for (int i = 0; i < accountBox.length; i++) {
@@ -213,7 +219,8 @@ class Account extends HiveObject {
     return assetValue;
   }
 
-  static Future<double> getLiabilityValue() async {
+  @override
+  Future<double> getLiabilityValue() async {
     var accountBox = await Hive.openBox(accountsBox);
     double liabilityValue = 0.0;
     for (int i = 0; i < accountBox.length; i++) {
@@ -225,7 +232,8 @@ class Account extends HiveObject {
     return liabilityValue.abs();
   }
 
-  static Future<Map<String, double>> getAccountTypeBalance(List<Account> accountList) async {
+  @override
+  Future<Map<String, double>> getAccountTypeBalance(List<Account> accountList) async {
     late final Map<String, double> accountTypeBalanceMap = {};
     for (int i = 0; i < accountList.length; i++) {
       if (accountTypeBalanceMap.containsKey(accountList[i].accountType) == false) {
@@ -239,7 +247,8 @@ class Account extends HiveObject {
     return accountTypeBalanceMap;
   }
 
-  static void createStartAccounts() async {
+  @override
+  void createStartAccounts() async {
     var accountBox = await Hive.openBox(accountsBox);
     if (accountBox.isNotEmpty) {
       return;
@@ -248,41 +257,21 @@ class Account extends HiveObject {
       ..name = 'Geldbeutel'
       ..bankBalance = '0 €'
       ..accountType = AccountType.cash.name;
-    cashAccount.createAccount(cashAccount);
+    create(cashAccount);
     Account giroAccount = Account()
       ..name = 'Girokonto'
       ..bankBalance = '0 €'
       ..accountType = AccountType.account.name;
-    giroAccount.createAccount(giroAccount);
+    create(giroAccount);
     Account billingAccount = Account()
       ..name = 'Verechnungskonto'
       ..bankBalance = '0 €'
       ..accountType = AccountType.account.name;
-    billingAccount.createAccount(billingAccount);
+    create(billingAccount);
     Account capitalInvestmentAccount = Account()
       ..name = 'Aktiendepot'
       ..bankBalance = '0 €'
       ..accountType = AccountType.capitalInvestments.name;
-    capitalInvestmentAccount.createAccount(capitalInvestmentAccount);
-  }
-}
-
-class AccountAdapter extends TypeAdapter<Account> {
-  @override
-  final typeId = accountTypeId;
-
-  @override
-  Account read(BinaryReader reader) {
-    return Account()
-      ..name = reader.read()
-      ..accountType = reader.read()
-      ..bankBalance = reader.read();
-  }
-
-  @override
-  void write(BinaryWriter writer, Account obj) {
-    writer.write(obj.name);
-    writer.write(obj.accountType);
-    writer.write(obj.bankBalance);
+    create(capitalInvestmentAccount);
   }
 }

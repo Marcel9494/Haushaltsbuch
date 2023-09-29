@@ -7,10 +7,11 @@ import '../cards/account_percentage_card.dart';
 
 import '/components/deco/loading_indicator.dart';
 
-import '/models/account.dart';
 import '/models/percentage_stats.dart';
 import '/models/enums/account_types.dart';
 import '/models/enums/statistic_types.dart';
+import '/models/account/account_model.dart';
+import '/models/account/account_repository.dart';
 import '/models/enums/asset_allocation_statistic_types.dart';
 
 import '/utils/number_formatters/number_formatter.dart';
@@ -30,15 +31,16 @@ class _AssetAllocationStatisticTabViewState extends State<AssetAllocationStatist
   bool _emptyCapitalOrRiskFreeInvestments = false;
 
   Future<List<PercentageStats>> _loadAssetAllocationStatistic() async {
+    AccountRepository accountRepository = AccountRepository();
     _emptyCapitalOrRiskFreeInvestments = false;
     _percentageStats = [];
     List<Account> _accountList = [];
     if (_listStatisticType == StatisticType.assets.name || _assetAllocationStatisticType == AssetAllocationStatisticType.capitalOrRiskFreeInvestments.name) {
-      _accountList = await Account.loadAssetAccounts();
-      _totalAmount = await Account.getAssetValue();
+      _accountList = await accountRepository.loadAssetAccounts();
+      _totalAmount = await accountRepository.getAssetValue();
     } else {
-      _accountList = await Account.loadLiabilityAccounts();
-      _totalAmount = await Account.getLiabilityValue();
+      _accountList = await accountRepository.loadLiabilityAccounts();
+      _totalAmount = await accountRepository.getLiabilityValue();
     }
     for (int i = 0; i < _accountList.length; i++) {
       if (_assetAllocationStatisticType == AssetAllocationStatisticType.individualAccounts.name && formatMoneyAmountToDouble(_accountList[i].bankBalance) != 0.0) {

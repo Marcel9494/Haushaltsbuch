@@ -11,8 +11,8 @@ import '/components/deco/overview_tile.dart';
 
 import '/utils/consts/route_consts.dart';
 
-import '/models/account.dart';
 import '/models/booking.dart';
+import '/models/account/account_repository.dart';
 import '/models/screen_arguments/create_or_edit_account_screen_arguments.dart';
 
 class AccountsScreen extends StatefulWidget {
@@ -62,8 +62,9 @@ class _AccountsScreenState extends State<AccountsScreen> {
   }
 
   Future<void> _getAssetAndLiabilityValues() async {
-    _assetValues = await Account.getAssetValue();
-    _liabilityValues = await Account.getLiabilityValue();
+    AccountRepository accountRepository = AccountRepository();
+    _assetValues = await accountRepository.getAssetValue();
+    _liabilityValues = await accountRepository.getLiabilityValue();
   }
 
   void _setSelectedTab(int selectedIndex) {
