@@ -1,13 +1,14 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:haushaltsbuch/models/categorie/categorie_repository.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 
 import '/components/buttons/save_button.dart';
 import '/components/input_fields/text_input_field.dart';
 
-import '/models/categorie.dart';
 import '/models/enums/mode_types.dart';
+import '/models/categorie/categorie_model.dart';
 
 import '/utils/consts/route_consts.dart';
 import '/utils/consts/global_consts.dart';
@@ -51,10 +52,11 @@ class _CreateOrEditSubcategorieScreenState extends State<CreateOrEditSubcategori
       _setSaveButtonAnimation(false);
       return;
     }
+    CategorieRepository categorieRepository = CategorieRepository();
     if (widget.mode == ModeType.creationMode) {
-      widget.categorie.addSubcategorie(widget.categorie, _subcategorieNameController.text.trim());
+      categorieRepository.createSubcategorie(widget.categorie.name, _subcategorieNameController.text.trim());
     } else {
-      widget.categorie.updateSubcategorie(widget.categorie, _oldSubcategorie, _subcategorieNameController.text.trim());
+      categorieRepository.updateSubcategorie(widget.categorie.name, _oldSubcategorie, _subcategorieNameController.text.trim());
     }
     _setSaveButtonAnimation(true);
     Timer(const Duration(milliseconds: transitionInMs), () {

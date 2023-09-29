@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '/models/categorie.dart';
+import '/models/categorie/categorie_repository.dart';
+import '/models/categorie/categorie_model.dart';
 import '/models/enums/categorie_types.dart';
 
 import '../cards/categorie_card.dart';
@@ -23,7 +24,8 @@ class _CategorieTabViewState extends State<CategorieTabView> {
   late List<Categorie> _categorieList = [];
 
   Future<List<Categorie>> _loadCategorieList() async {
-    _categorieList = await Categorie.loadCategories(widget.categorieType);
+    CategorieRepository categorieRepository = CategorieRepository();
+    _categorieList = await categorieRepository.loadCategorieList(widget.categorieType);
     return _categorieList;
   }
 

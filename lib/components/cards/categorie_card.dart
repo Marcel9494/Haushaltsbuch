@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:another_flushbar/flushbar.dart';
+import 'package:haushaltsbuch/models/categorie/categorie_repository.dart';
 
-import '/models/categorie.dart';
 import '/models/enums/mode_types.dart';
+import '/models/categorie/categorie_model.dart';
 import '/models/screen_arguments/create_or_edit_categorie_screen_arguments.dart';
 import '/models/screen_arguments/create_or_edit_subcategorie_screen_arguments.dart';
 
@@ -110,8 +111,9 @@ class _CategorieCardState extends State<CategorieCard> {
   }
 
   void _yesPressed(int index) {
+    CategorieRepository categorieRepository = CategorieRepository();
     setState(() {
-      widget.categorie.deleteSubcategorie(widget.categorie, widget.categorie.subcategorieNames[index]);
+      categorieRepository.deleteSubcategorie(widget.categorie, widget.categorie.subcategorieNames[index]);
     });
     Navigator.pop(context);
     FocusScope.of(context).unfocus();
