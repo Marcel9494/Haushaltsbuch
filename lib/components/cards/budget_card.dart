@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 
-import '/models/budget.dart';
 import '/models/subbudget.dart';
+import '/models/budget/budget_model.dart';
 import '/models/categorie/categorie_repository.dart';
 import '/models/screen_arguments/categorie_amount_list_screen_arguments.dart';
 

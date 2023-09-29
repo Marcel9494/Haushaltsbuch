@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:haushaltsbuch/models/subbudget.dart';
 
-import '../../models/screen_arguments/edit_subbudget_screen_arguments.dart';
 import '/utils/consts/route_consts.dart';
 import '/utils/number_formatters/number_formatter.dart';
 
-import '/models/budget.dart';
+import '/models/subbudget.dart';
+import '/models/budget/budget_model.dart';
 import '/models/screen_arguments/edit_budget_screen_arguments.dart';
+import '/models/screen_arguments/edit_subbudget_screen_arguments.dart';
 
 class EditBudgetCard extends StatefulWidget {
   final Budget budget;

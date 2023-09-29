@@ -1,24 +1,16 @@
 import 'package:hive/hive.dart';
 
-import 'booking/booking_model.dart';
-import 'booking/booking_repository.dart';
-import 'default_budget.dart';
+import '../booking/booking_model.dart';
+import '../booking/booking_repository.dart';
+import '../default_budget.dart';
+import 'budget_interface.dart';
+import 'budget_model.dart';
 
 import '/utils/consts/hive_consts.dart';
 
-@HiveType(typeId: budgetTypeId)
-class Budget extends HiveObject {
-  late int boxIndex;
-  late double currentExpenditure;
-  late double percentage;
-  @HiveField(0)
-  late String categorie;
-  @HiveField(1)
-  late double budget;
-  @HiveField(2)
-  late String budgetDate;
-
-  Budget createBudgetInstance(Budget newBudget) {
+class BudgetRepository extends BudgetInterface {
+  @override
+  Budget createInstance(Budget newBudget) {
     return Budget()
       ..percentage = newBudget.percentage
       ..currentExpenditure = newBudget.currentExpenditure
@@ -27,24 +19,26 @@ class Budget extends HiveObject {
       ..budgetDate = newBudget.budgetDate;
   }
 
-  void createBudget(Budget newBudget) async {
+  @override
+  void create(Budget newBudget) async {
     var budgetBox = await Hive.openBox(budgetsBox);
     budgetBox.add(newBudget);
     // TODO Anzahl der Budgets erhöhen, damit für die nächsten 10 Jahre Budgets erstellt werden. 3 nur als Test.
     for (int i = 0; i < 3; i++) {
-      DateTime date = DateTime.parse(budgetDate);
-      Budget nextBudget = createBudgetInstance(newBudget);
-      nextBudget.budgetDate = DateTime(date.year, date.month + i + 1, 1).toString();
+      Budget nextBudget = createInstance(newBudget);
+      nextBudget.budgetDate = DateTime(DateTime.now().year, DateTime.now().month + i + 1, 1).toString(); // TODO Jahr dynamisch implementieren
       budgetBox.add(nextBudget);
     }
   }
 
-  void updateBudget(Budget updatedBudget, int budgetBoxIndex) async {
+  @override
+  void update(Budget updatedBudget, int budgetBoxIndex) async {
     var budgetBox = await Hive.openBox(budgetsBox);
     budgetBox.putAt(budgetBoxIndex, updatedBudget);
   }
 
-  static void updateAllFutureBudgetsFromCategorie(DefaultBudget defaultBudget) async {
+  @override
+  void updateAllFutureBudgetsFromCategorie(DefaultBudget defaultBudget) async {
     var budgetBox = await Hive.openBox(budgetsBox);
     for (int i = 0; i < budgetBox.length; i++) {
       Budget budget = await budgetBox.getAt(i);
@@ -56,7 +50,8 @@ class Budget extends HiveObject {
     }
   }
 
-  static void updateAllBudgetsFromCategorie(DefaultBudget defaultBudget) async {
+  @override
+  void updateAllBudgetsFromCategorie(DefaultBudget defaultBudget) async {
     var budgetBox = await Hive.openBox(budgetsBox);
     for (int i = 0; i < budgetBox.length; i++) {
       Budget budget = await budgetBox.getAt(i);
@@ -67,6 +62,7 @@ class Budget extends HiveObject {
     }
   }
 
+  @override
   void deleteAllBudgetsFromCategorie(String budgetCategorie) async {
     var budgetBox = await Hive.openBox(budgetsBox);
     for (int i = budgetBox.length - 1; i >= 0; i--) {
@@ -78,13 +74,15 @@ class Budget extends HiveObject {
     DefaultBudget.deleteDefaultBudget(budgetCategorie);
   }
 
-  static Future<Budget> loadBudget(int budgetBoxIndex) async {
+  @override
+  Future<Budget> load(int budgetBoxIndex) async {
     var budgetBox = await Hive.openBox(budgetsBox);
     Budget budget = await budgetBox.getAt(budgetBoxIndex);
     return budget;
   }
 
-  static Future<List<Budget>> loadAllBudgetCategories() async {
+  @override
+  Future<List<Budget>> loadAllBudgetCategories() async {
     var budgetBox = await Hive.openBox(budgetsBox);
     List<Budget> budgetList = [];
     bool categorieAlreadyInBudgetList = false;
@@ -106,7 +104,8 @@ class Budget extends HiveObject {
     return budgetList;
   }
 
-  static Future<List<Budget>> loadOneBudgetCategorie(String budgetCategorie, [int selectedYear = -1]) async {
+  @override
+  Future<List<Budget>> loadOneBudgetCategorie(String budgetCategorie, [int selectedYear = -1]) async {
     var budgetBox = await Hive.openBox(budgetsBox);
     List<Budget> budgetList = [];
     for (int i = 0; i < budgetBox.length; i++) {
@@ -119,7 +118,8 @@ class Budget extends HiveObject {
     return budgetList;
   }
 
-  static Future<List<Budget>> loadMonthlyBudgetList(DateTime selectedDate) async {
+  @override
+  Future<List<Budget>> loadMonthlyBudgetList(DateTime selectedDate) async {
     var budgetBox = await Hive.openBox(budgetsBox);
     List<Budget> budgetList = [];
     for (int i = 0; i < budgetBox.length; i++) {
@@ -132,7 +132,8 @@ class Budget extends HiveObject {
     return budgetList;
   }
 
-  static Future<bool> existsBudgetForCategorie(String budgetCategorie) async {
+  @override
+  Future<bool> existsBudgetForCategorie(String budgetCategorie) async {
     var budgetBox = await Hive.openBox(budgetsBox);
     for (int i = 0; i < budgetBox.length; i++) {
       Budget budget = await budgetBox.getAt(i);
@@ -143,7 +144,8 @@ class Budget extends HiveObject {
     return Future.value(false);
   }
 
-  static Future<List<Budget>> calculateCurrentExpenditure(List<Budget> budgetList, DateTime selectedDate) async {
+  @override
+  Future<List<Budget>> calculateCurrentExpenditure(List<Budget> budgetList, DateTime selectedDate) async {
     BookingRepository bookingRepository = BookingRepository();
     List<Booking> bookingList = await bookingRepository.loadMonthlyBookingList(selectedDate.month, selectedDate.year);
     for (int i = 0; i < budgetList.length; i++) {
@@ -152,7 +154,8 @@ class Budget extends HiveObject {
     return budgetList;
   }
 
-  static Future<double> calculateCompleteBudgetExpenditures(List<Budget> budgetList, DateTime selectedDate) async {
+  @override
+  Future<double> calculateCompleteBudgetExpenditures(List<Budget> budgetList, DateTime selectedDate) async {
     double completeBudgetExpenditures = 0.0;
     List<Budget> categorieBudgetList = await calculateCurrentExpenditure(budgetList, selectedDate);
     for (int j = 0; j < categorieBudgetList.length; j++) {
@@ -161,39 +164,22 @@ class Budget extends HiveObject {
     return completeBudgetExpenditures;
   }
 
-  static List<Budget> calculateBudgetPercentage(List<Budget> budgetList) {
+  @override
+  List<Budget> calculateBudgetPercentage(List<Budget> budgetList) {
     for (int i = 0; i < budgetList.length; i++) {
       budgetList[i].percentage = (budgetList[i].currentExpenditure * 100) / budgetList[i].budget;
     }
     return budgetList;
   }
 
-  static Future<double> calculateCompleteBudgetAmount(List<Budget> budgetList, DateTime selectedDate) async {
+  @override
+  Future<double> calculateCompleteBudgetAmount(List<Budget> budgetList, DateTime selectedDate) async {
+    BudgetRepository budgetRepository = BudgetRepository();
     double completeBudgetAmount = 0.0;
-    List<Budget> budgetList = await Budget.loadMonthlyBudgetList(selectedDate);
+    List<Budget> budgetList = await budgetRepository.loadMonthlyBudgetList(selectedDate);
     for (int i = 0; i < budgetList.length; i++) {
       completeBudgetAmount += budgetList[i].budget;
     }
     return completeBudgetAmount;
-  }
-}
-
-class BudgetAdapter extends TypeAdapter<Budget> {
-  @override
-  final typeId = budgetTypeId;
-
-  @override
-  Budget read(BinaryReader reader) {
-    return Budget()
-      ..categorie = reader.read()
-      ..budget = reader.read()
-      ..budgetDate = reader.read();
-  }
-
-  @override
-  void write(BinaryWriter writer, Budget obj) {
-    writer.write(obj.categorie);
-    writer.write(obj.budget);
-    writer.write(obj.budgetDate);
   }
 }

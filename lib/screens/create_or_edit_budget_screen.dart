@@ -1,11 +1,11 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:haushaltsbuch/models/budget/budget_repository.dart';
 import 'package:hive/hive.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 
-import '../models/categorie/categorie_repository.dart';
-import '../models/enums/categorie_types.dart';
+import '../models/budget/budget_model.dart';
 import '/utils/consts/hive_consts.dart';
 import '/utils/consts/global_consts.dart';
 import '/utils/consts/route_consts.dart';
@@ -17,7 +17,8 @@ import '/components/input_fields/subcategorie_input_field.dart';
 import '/components/input_fields/money_input_field.dart';
 import '/components/buttons/save_button.dart';
 
-import '/models/budget.dart';
+import '/models/categorie/categorie_repository.dart';
+import '/models/enums/categorie_types.dart';
 import '/models/subbudget.dart';
 import '/models/default_budget.dart';
 import '/models/enums/budget_mode_types.dart';
@@ -45,6 +46,7 @@ class _CreateOrEditBudgetScreenState extends State<CreateOrEditBudgetScreen> {
   final TextEditingController _subcategorieTextController = TextEditingController();
   final TextEditingController _budgetTextController = TextEditingController();
   final RoundedLoadingButtonController _saveButtonController = RoundedLoadingButtonController();
+  final BudgetRepository budgetRepository = BudgetRepository();
   late DefaultBudget _loadedDefaultBudget;
   late Budget _loadedBudget;
   String _categorieErrorText = '';
@@ -64,7 +66,7 @@ class _CreateOrEditBudgetScreenState extends State<CreateOrEditBudgetScreen> {
   }
 
   Future<void> _loadBudget() async {
-    _loadedBudget = await Budget.loadBudget(widget.budgetBoxIndex!);
+    _loadedBudget = await budgetRepository.load(widget.budgetBoxIndex!);
     _budgetTextController.text = formatToMoneyAmount(_loadedBudget.budget.toString());
   }
 
@@ -107,7 +109,7 @@ class _CreateOrEditBudgetScreenState extends State<CreateOrEditBudgetScreen> {
   }
 
   void _createBudget() async {
-    _budgetExistsAlready = await Budget.existsBudgetForCategorie(_categorieTextController.text);
+    _budgetExistsAlready = await budgetRepository.existsBudgetForCategorie(_categorieTextController.text);
     if (_budgetExistsAlready) {
       showChoiceDialog(
           context,
@@ -125,7 +127,7 @@ class _CreateOrEditBudgetScreenState extends State<CreateOrEditBudgetScreen> {
         ..currentExpenditure = 0.0
         ..percentage = 0.0
         ..budgetDate = DateTime.now().toString();
-      newBudget.createBudget(newBudget);
+      budgetRepository.create(newBudget);
       DefaultBudget newDefaultBudget = DefaultBudget()
         ..categorie = _categorieTextController.text
         ..defaultBudget = formatMoneyAmountToDouble(_budgetTextController.text);
@@ -135,7 +137,7 @@ class _CreateOrEditBudgetScreenState extends State<CreateOrEditBudgetScreen> {
 
   void _createSubbudget() async {
     var subbudgetBox = await Hive.openBox(subbudgetsBox);
-    _budgetExistsAlready = await Budget.existsBudgetForCategorie(_categorieTextController.text);
+    _budgetExistsAlready = await budgetRepository.existsBudgetForCategorie(_categorieTextController.text);
     _subbudgetExistsAlready = await Subbudget.existsSubbudgetForCategorie(_subcategorieTextController.text);
     if (_budgetExistsAlready) {
       if (_subbudgetExistsAlready) {
@@ -173,7 +175,7 @@ class _CreateOrEditBudgetScreenState extends State<CreateOrEditBudgetScreen> {
         ..currentExpenditure = 0.0
         ..percentage = 0.0
         ..budgetDate = DateTime.now().toString();
-      newBudget.createBudget(newBudget);
+      budgetRepository.create(newBudget);
       DefaultBudget newDefaultBudget = DefaultBudget()
         ..categorie = _categorieTextController.text
         ..defaultBudget = formatMoneyAmountToDouble(_budgetTextController.text);
@@ -214,7 +216,7 @@ class _CreateOrEditBudgetScreenState extends State<CreateOrEditBudgetScreen> {
       ..categorie = _loadedDefaultBudget.categorie
       ..defaultBudget = formatMoneyAmountToDouble(_budgetTextController.text);
     updatedDefaultBudget.updateDefaultBudget(updatedDefaultBudget);
-    Budget.updateAllFutureBudgetsFromCategorie(updatedDefaultBudget);
+    budgetRepository.updateAllFutureBudgetsFromCategorie(updatedDefaultBudget);
   }
 
   void _updateBudget() {
@@ -224,7 +226,7 @@ class _CreateOrEditBudgetScreenState extends State<CreateOrEditBudgetScreen> {
       ..currentExpenditure = 0.0
       ..percentage = 0.0
       ..budgetDate = _loadedBudget.budgetDate.toString();
-    updatedBudget.updateBudget(updatedBudget, widget.budgetBoxIndex!);
+    budgetRepository.update(updatedBudget, widget.budgetBoxIndex!);
   }
 
   bool _validCategorie(String categorieInput) {
@@ -264,7 +266,7 @@ class _CreateOrEditBudgetScreenState extends State<CreateOrEditBudgetScreen> {
         ..categorie = _subcategorieTextController.text.isEmpty ? _categorieTextController.text : _subcategorieTextController.text
         ..defaultBudget = formatMoneyAmountToDouble(_budgetTextController.text);
       updatedDefaultBudget.updateDefaultBudget(updatedDefaultBudget);
-      Budget.updateAllBudgetsFromCategorie(updatedDefaultBudget);
+      budgetRepository.updateAllBudgetsFromCategorie(updatedDefaultBudget);
     });
     _setSaveButtonAnimation(true);
     Navigator.pop(context);

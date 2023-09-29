@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 
+import '/models/budget/budget_model.dart';
+import '/models/budget/budget_repository.dart';
+
 import '/utils/consts/route_consts.dart';
 import '/utils/number_formatters/number_formatter.dart';
 
 import '/components/cards/budget_card.dart';
 import '/components/deco/loading_indicator.dart';
 import '/components/buttons/month_picker_buttons.dart';
-
-import '/models/budget.dart';
 
 class BudgetsScreen extends StatefulWidget {
   const BudgetsScreen({Key? key}) : super(key: key);
@@ -25,11 +26,12 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
   double _completeBudgetPercentage = 0.0;
 
   Future<List<Budget>> _loadBudgetList() async {
-    _budgetList = await Budget.loadMonthlyBudgetList(_selectedDate);
-    _budgetList = await Budget.calculateCurrentExpenditure(_budgetList, _selectedDate);
-    _budgetList = Budget.calculateBudgetPercentage(_budgetList);
-    _completeBudgetAmount = await Budget.calculateCompleteBudgetAmount(_budgetList, _selectedDate);
-    _completeBudgetExpenditures = await Budget.calculateCompleteBudgetExpenditures(_budgetList, _selectedDate);
+    BudgetRepository budgetRepository = BudgetRepository();
+    _budgetList = await budgetRepository.loadMonthlyBudgetList(_selectedDate);
+    _budgetList = await budgetRepository.calculateCurrentExpenditure(_budgetList, _selectedDate);
+    _budgetList = budgetRepository.calculateBudgetPercentage(_budgetList);
+    _completeBudgetAmount = await budgetRepository.calculateCompleteBudgetAmount(_budgetList, _selectedDate);
+    _completeBudgetExpenditures = await budgetRepository.calculateCompleteBudgetExpenditures(_budgetList, _selectedDate);
     _completeBudgetPercentage = (_completeBudgetExpenditures * 100) / _completeBudgetAmount;
     _budgetList.sort((first, second) => second.percentage.compareTo(first.percentage));
     return _budgetList;
