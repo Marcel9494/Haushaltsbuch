@@ -1,11 +1,10 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:haushaltsbuch/models/budget/budget_repository.dart';
+
 import 'package:hive/hive.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 
-import '../models/budget/budget_model.dart';
 import '/utils/consts/hive_consts.dart';
 import '/utils/consts/global_consts.dart';
 import '/utils/consts/route_consts.dart';
@@ -17,9 +16,12 @@ import '/components/input_fields/subcategorie_input_field.dart';
 import '/components/input_fields/money_input_field.dart';
 import '/components/buttons/save_button.dart';
 
+import '/models/budget/budget_model.dart';
+import '/models/subbudget/subbudget_model.dart';
+import '/models/subbudget/subbudget_repository.dart';
+import '/models/budget/budget_repository.dart';
 import '/models/categorie/categorie_repository.dart';
 import '/models/enums/categorie_types.dart';
-import '/models/subbudget.dart';
 import '/models/default_budget.dart';
 import '/models/enums/budget_mode_types.dart';
 import '/models/enums/transaction_types.dart';
@@ -136,16 +138,18 @@ class _CreateOrEditBudgetScreenState extends State<CreateOrEditBudgetScreen> {
   }
 
   void _createSubbudget() async {
+    // TODO muss in Subbudget Klasse ausgelagert werden
+    SubbudgetRepository subbudgetRepository = SubbudgetRepository();
     var subbudgetBox = await Hive.openBox(subbudgetsBox);
     _budgetExistsAlready = await budgetRepository.existsBudgetForCategorie(_categorieTextController.text);
-    _subbudgetExistsAlready = await Subbudget.existsSubbudgetForCategorie(_subcategorieTextController.text);
+    _subbudgetExistsAlready = await subbudgetRepository.existsSubbudgetForCategorie(_subcategorieTextController.text);
     if (_budgetExistsAlready) {
       if (_subbudgetExistsAlready) {
         DefaultBudget updatedDefaultBudget = DefaultBudget()
           ..categorie = _subcategorieTextController.text.isEmpty ? _categorieTextController.text : _subcategorieTextController.text
           ..defaultBudget = formatMoneyAmountToDouble(_budgetTextController.text);
         updatedDefaultBudget.updateDefaultBudget(updatedDefaultBudget);
-        Subbudget.updateAllSubbudgetsForCategorie(_subcategorieTextController.text, formatMoneyAmountToDouble(_budgetTextController.text));
+        subbudgetRepository.updateAllSubbudgetsForCategorie(_subcategorieTextController.text, formatMoneyAmountToDouble(_budgetTextController.text));
       } else {
         for (int i = 0; i < 3; i++) {
           DateTime date = DateTime.now();
@@ -157,7 +161,7 @@ class _CreateOrEditBudgetScreenState extends State<CreateOrEditBudgetScreen> {
             ..currentSubcategorieExpenditure = 0.0
             ..categorie = _categorieTextController.text
             ..budgetDate = DateTime(date.year, date.month + i, 1).toString();
-          subbudget.createBudgetInstance(subbudget);
+          subbudgetRepository.createInstance(subbudget);
           subbudgetBox.add(subbudget);
         }
         DefaultBudget newDefaultSubcategoriebudget = DefaultBudget()
@@ -166,7 +170,7 @@ class _CreateOrEditBudgetScreenState extends State<CreateOrEditBudgetScreen> {
         newDefaultSubcategoriebudget.createDefaultBudget(newDefaultSubcategoriebudget);
         CategorieRepository categorieRepository = CategorieRepository();
         List<String> subcategorieNames = await categorieRepository.loadSubcategorieNameList(_categorieTextController.text);
-        Subbudget.createSubbudgets(_categorieTextController.text, _subcategorieTextController.text, subcategorieNames);
+        subbudgetRepository.createSubbudgets(_categorieTextController.text, _subcategorieTextController.text, subcategorieNames);
       }
     } else {
       Budget newBudget = Budget()
@@ -185,7 +189,7 @@ class _CreateOrEditBudgetScreenState extends State<CreateOrEditBudgetScreen> {
           ..categorie = _subcategorieTextController.text.isEmpty ? _categorieTextController.text : _subcategorieTextController.text
           ..defaultBudget = formatMoneyAmountToDouble(_budgetTextController.text);
         updatedDefaultBudget.updateDefaultBudget(updatedDefaultBudget);
-        Subbudget.updateAllSubbudgetsForCategorie(_subcategorieTextController.text, formatMoneyAmountToDouble(_budgetTextController.text));
+        subbudgetRepository.updateAllSubbudgetsForCategorie(_subcategorieTextController.text, formatMoneyAmountToDouble(_budgetTextController.text));
       } else {
         for (int i = 0; i < 3; i++) {
           DateTime date = DateTime.now();
@@ -197,7 +201,7 @@ class _CreateOrEditBudgetScreenState extends State<CreateOrEditBudgetScreen> {
             ..currentSubcategorieExpenditure = 0.0
             ..categorie = _categorieTextController.text
             ..budgetDate = DateTime(date.year, date.month + i, 1).toString();
-          subbudget.createBudgetInstance(subbudget);
+          subbudgetRepository.createInstance(subbudget);
           subbudgetBox.add(subbudget);
         }
         DefaultBudget newDefaultSubcategoriebudget = DefaultBudget()
@@ -206,7 +210,7 @@ class _CreateOrEditBudgetScreenState extends State<CreateOrEditBudgetScreen> {
         newDefaultSubcategoriebudget.createDefaultBudget(newDefaultSubcategoriebudget);
         CategorieRepository categorieRepository = CategorieRepository();
         List<String> subcategorieNames = await categorieRepository.loadSubcategorieNameList(_categorieTextController.text);
-        Subbudget.createSubbudgets(_categorieTextController.text, _subcategorieTextController.text, subcategorieNames);
+        subbudgetRepository.createSubbudgets(_categorieTextController.text, _subcategorieTextController.text, subcategorieNames);
       }
     }
   }

@@ -1,4 +1,4 @@
-import '../subbudget.dart';
+import '../subbudget/subbudget_model.dart';
 
 class EditSubbudgetScreenArguments {
   final Subbudget subbudget;

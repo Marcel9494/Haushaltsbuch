@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:haushaltsbuch/models/subbudget/subbudget_repository.dart';
 
-import '/models/subbudget.dart';
 import '/models/default_budget.dart';
+import '/models/subbudget/subbudget_model.dart';
 
 import '/utils/consts/route_consts.dart';
 
@@ -33,8 +34,9 @@ class _EditSubbudgetScreenState extends State<EditSubbudgetScreen> {
   DateTime _selectedYear = DateTime.now();
 
   Future<List<Subbudget>> _loadOneSubbudgetCategorie() async {
+    SubbudgetRepository subbudgetRepository = SubbudgetRepository();
     _defaultBudget = await DefaultBudget.loadDefaultBudget(widget.subbudget.subcategorieName);
-    _subbudgetList = await Subbudget.loadOneSubbudget(widget.subbudget.subcategorieName);
+    _subbudgetList = await subbudgetRepository.loadOneSubbudget(widget.subbudget.subcategorieName);
     return _subbudgetList;
   }
 
