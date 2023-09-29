@@ -1,29 +1,17 @@
 import 'package:hive/hive.dart';
 
-import 'booking/booking_model.dart';
-import 'booking/booking_repository.dart';
-import 'default_budget.dart';
-
 import '/utils/consts/hive_consts.dart';
 
-// TODO Code verbessern categorie in maincategorie umbenennen und subcategorieName in subcategorie umbenennen
-// TODO currentSubcategorieExpenditure in subcategorieExpenditure umbenennen
-// TODO currentSubcategoriePercentage in subcategoriePercentage umbenennen
-@HiveType(typeId: subbudgetTypeId)
-class Subbudget extends HiveObject {
-  late int boxIndex;
-  late double currentSubcategorieExpenditure;
-  late double currentSubcategoriePercentage;
-  @HiveField(0)
-  late String categorie;
-  @HiveField(1)
-  late String subcategorieName;
-  @HiveField(2)
-  late double subcategorieBudget;
-  @HiveField(3)
-  late String budgetDate;
+import '/models/subbudget/subbudget_model.dart';
+import '/models/subbudget/subbudget_interface.dart';
 
-  Subbudget createBudgetInstance(Subbudget newSubbudget) {
+import '../booking/booking_model.dart';
+import '../booking/booking_repository.dart';
+import '../default_budget.dart';
+
+class SubbudgetRepository extends SubbudgetInterface {
+  @override
+  Subbudget createInstance(Subbudget newSubbudget) {
     return Subbudget()
       ..currentSubcategoriePercentage = newSubbudget.currentSubcategoriePercentage
       ..currentSubcategorieExpenditure = newSubbudget.currentSubcategorieExpenditure
@@ -33,7 +21,8 @@ class Subbudget extends HiveObject {
       ..budgetDate = newSubbudget.budgetDate;
   }
 
-  static void createSubbudgets(String mainCategorie, String subcategorie, List<String> subcategorieNames) async {
+  @override
+  void createSubbudgets(String mainCategorie, String subcategorie, List<String> subcategorieNames) async {
     var subbudgetBox = await Hive.openBox(subbudgetsBox);
     for (int i = 0; i < subcategorieNames.length; i++) {
       // TODO Anzahl der Budgets erhöhen, damit für die nächsten 10 Jahre Budgets erstellt werden. 3 nur als Test.
@@ -59,7 +48,8 @@ class Subbudget extends HiveObject {
     }
   }
 
-  static void updateAllSubbudgetsForCategorie(String budgetCategorie, double newBudgetAmount) async {
+  @override
+  void updateAllSubbudgetsForCategorie(String budgetCategorie, double newBudgetAmount) async {
     var subbudgetBox = await Hive.openBox(subbudgetsBox);
     for (int i = 0; i < subbudgetBox.length; i++) {
       Subbudget subbudget = await subbudgetBox.getAt(i);
@@ -70,7 +60,8 @@ class Subbudget extends HiveObject {
     }
   }
 
-  static Future<List<Subbudget>> loadSubcategorieList(String categorie) async {
+  @override
+  Future<List<Subbudget>> loadSubcategorieList(String categorie) async {
     var subbudgetBox = await Hive.openBox(subbudgetsBox);
     List<Subbudget> subcategorieList = [];
     for (int i = 0; i < subbudgetBox.length; i++) {
@@ -90,7 +81,8 @@ class Subbudget extends HiveObject {
     return subcategorieList;
   }
 
-  static Future<List<Subbudget>> loadSubcategorieBudgetList(String categorie, List<String> subcategorie, DateTime selectedDate) async {
+  @override
+  Future<List<Subbudget>> loadSubcategorieBudgetList(String categorie, List<String> subcategorie, DateTime selectedDate) async {
     var subbudgetBox = await Hive.openBox(subbudgetsBox);
     List<Subbudget> subcategorieBudgetList = [];
     for (int i = 0; i < subbudgetBox.length; i++) {
@@ -109,7 +101,8 @@ class Subbudget extends HiveObject {
     return subcategorieBudgetList;
   }
 
-  static Future<List<Subbudget>> loadOneSubbudget(String subcategorieName) async {
+  @override
+  Future<List<Subbudget>> loadOneSubbudget(String subcategorieName) async {
     var subbudgetBox = await Hive.openBox(subbudgetsBox);
     List<Subbudget> subbudgetList = [];
     for (int i = 0; i < subbudgetBox.length; i++) {
@@ -122,7 +115,8 @@ class Subbudget extends HiveObject {
     return subbudgetList;
   }
 
-  static Future<bool> existsSubbudgetForCategorie(String subbudgetCategorie) async {
+  @override
+  Future<bool> existsSubbudgetForCategorie(String subbudgetCategorie) async {
     var subbudgetBox = await Hive.openBox(subbudgetsBox);
     for (int i = 0; i < subbudgetBox.length; i++) {
       Subbudget subbudget = await subbudgetBox.getAt(i);
@@ -133,34 +127,13 @@ class Subbudget extends HiveObject {
     return Future.value(false);
   }
 
-  static Future<List<Subbudget>> calculateCurrentExpenditure(List<Subbudget> subbudgetList, DateTime selectedDate) async {
+  @override
+  Future<List<Subbudget>> calculateCurrentExpenditure(List<Subbudget> subbudgetList, DateTime selectedDate) async {
     BookingRepository bookingRepository = BookingRepository();
     List<Booking> bookingList = await bookingRepository.loadMonthlyBookingList(selectedDate.month, selectedDate.year);
     for (int i = 0; i < subbudgetList.length; i++) {
       subbudgetList[i].currentSubcategorieExpenditure = bookingRepository.getSubcategorieExpenditures(bookingList, subbudgetList[i].categorie, subbudgetList[i].subcategorieName);
     }
     return subbudgetList;
-  }
-}
-
-class SubbudgetAdapter extends TypeAdapter<Subbudget> {
-  @override
-  final typeId = subbudgetTypeId;
-
-  @override
-  Subbudget read(BinaryReader reader) {
-    return Subbudget()
-      ..categorie = reader.read()
-      ..subcategorieName = reader.read()
-      ..subcategorieBudget = reader.read()
-      ..budgetDate = reader.read();
-  }
-
-  @override
-  void write(BinaryWriter writer, Subbudget obj) {
-    writer.write(obj.categorie);
-    writer.write(obj.subcategorieName);
-    writer.write(obj.subcategorieBudget);
-    writer.write(obj.budgetDate);
   }
 }
