@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:haushaltsbuch/models/booking/booking_repository.dart';
 
+import '../../models/percentage_stats/percentage_stats_model.dart';
+import '../../models/percentage_stats/percentage_stats_repository.dart';
 import '/models/booking/booking_model.dart';
-import '/models/percentage_stats.dart';
+import '/models/booking/booking_repository.dart';
 import '/models/enums/categorie_types.dart';
 import '/models/enums/transaction_types.dart';
 
@@ -50,15 +51,16 @@ class _MonthlyStatisticsTabViewState extends State<MonthlyStatisticsTabView> {
   }
 
   Future<List<PercentageStats>> _loadMonthlyStatistic(TransactionType transactionType) async {
+    PercentageStatsRepository percentageStatsRepository = PercentageStatsRepository();
     _percentageStats = [];
     double total = 0.0;
     for (int i = 0; i < _bookingList.length; i++) {
       if (_bookingList[i].transactionType == transactionType.name) {
         total += formatMoneyAmountToDouble(_bookingList[i].amount);
-        _percentageStats = PercentageStats.createOrUpdatePercentageStats(i, _bookingList[i].amount, _percentageStats, _bookingList[i].categorie, false);
+        _percentageStats = percentageStatsRepository.createOrUpdate(i, _bookingList[i].amount, _percentageStats, _bookingList[i].categorie, false);
       }
     }
-    _percentageStats = PercentageStats.calculatePercentage(_percentageStats, total);
+    _percentageStats = percentageStatsRepository.calculatePercentage(_percentageStats, total);
     _percentageStats.sort((first, second) => second.percentage.compareTo(first.percentage));
     return _percentageStats;
   }
