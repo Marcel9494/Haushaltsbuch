@@ -1,23 +1,20 @@
 import 'package:hive/hive.dart';
 
+import '../enums/preselect_account_types.dart';
 import '/utils/consts/hive_consts.dart';
 
-import '/models/enums/preselect_account_types.dart';
+import '/models/primary_account/primary_account_model.dart';
+import '/models/primary_account/primary_account_interface.dart';
 
-@HiveType(typeId: primaryAccountTypeId)
-class PrimaryAccount extends HiveObject {
-  late int boxIndex;
-  @HiveField(0)
-  late String accountName;
-  @HiveField(1)
-  late String transactionType;
-
-  void createPrimaryAccount(PrimaryAccount newPrimaryAccount) async {
+class PrimaryAccountRepository extends PrimaryAccountInterface {
+  @override
+  void create(PrimaryAccount newPrimaryAccount) async {
     var primaryAccountBox = await Hive.openBox(primaryAccountsBox);
     primaryAccountBox.add(newPrimaryAccount);
   }
 
-  static Future<List<PrimaryAccount>> loadPrimaryAccountList() async {
+  @override
+  Future<List<PrimaryAccount>> loadPrimaryAccountList() async {
     var primaryAccountBox = await Hive.openBox(primaryAccountsBox);
     List<PrimaryAccount> primaryAccountList = [];
     for (int i = 0; i < primaryAccountBox.length; i++) {
@@ -28,7 +25,8 @@ class PrimaryAccount extends HiveObject {
     return primaryAccountList;
   }
 
-  static Future<List<PrimaryAccount>> loadFilteredPrimaryAccountList(String accountName) async {
+  @override
+  Future<List<PrimaryAccount>> loadFilteredPrimaryAccountList(String accountName) async {
     var primaryAccountBox = await Hive.openBox(primaryAccountsBox);
     List<PrimaryAccount> primaryAccountList = [];
     for (int i = 0; i < primaryAccountBox.length; i++) {
@@ -41,7 +39,8 @@ class PrimaryAccount extends HiveObject {
     return primaryAccountList;
   }
 
-  static Future<Map<String, String>> getCurrentPrimaryAccounts() async {
+  @override
+  Future<Map<String, String>> getCurrentPrimaryAccounts() async {
     var primaryAccountBox = await Hive.openBox(primaryAccountsBox);
     Map<String, String> primaryAccounts = {};
     for (int i = 0; i < primaryAccountBox.length; i++) {
@@ -51,7 +50,8 @@ class PrimaryAccount extends HiveObject {
     return primaryAccounts;
   }
 
-  static void setPrimaryAccountNames(String transactionTypes, String accountName) async {
+  @override
+  void setPrimaryAccountNames(String transactionTypes, String accountName) async {
     var primaryAccountBox = await Hive.openBox(primaryAccountsBox);
     List<String> transactionTypeList = transactionTypes.split(', ');
     for (int i = 0; i < primaryAccountBox.length; i++) {
@@ -99,7 +99,8 @@ class PrimaryAccount extends HiveObject {
     }
   }
 
-  static void createStartPrimaryAccounts() async {
+  @override
+  void createStartPrimaryAccounts() async {
     var primaryAccountBox = await Hive.openBox(primaryAccountsBox);
     if (primaryAccountBox.isNotEmpty) {
       return;
@@ -107,44 +108,26 @@ class PrimaryAccount extends HiveObject {
     PrimaryAccount incomePrimaryAccount = PrimaryAccount()
       ..accountName = ''
       ..transactionType = PreselectAccountType.income.name;
-    incomePrimaryAccount.createPrimaryAccount(incomePrimaryAccount);
+    create(incomePrimaryAccount);
     PrimaryAccount outcomePrimaryAccount = PrimaryAccount()
       ..accountName = ''
       ..transactionType = PreselectAccountType.outcome.name;
-    outcomePrimaryAccount.createPrimaryAccount(outcomePrimaryAccount);
+    create(outcomePrimaryAccount);
     PrimaryAccount transferFromPrimaryAccount = PrimaryAccount()
       ..accountName = ''
       ..transactionType = PreselectAccountType.transferFrom.name;
-    transferFromPrimaryAccount.createPrimaryAccount(transferFromPrimaryAccount);
+    create(transferFromPrimaryAccount);
     PrimaryAccount transferToPrimaryAccount = PrimaryAccount()
       ..accountName = ''
       ..transactionType = PreselectAccountType.transferTo.name;
-    transferToPrimaryAccount.createPrimaryAccount(transferToPrimaryAccount);
+    create(transferToPrimaryAccount);
     PrimaryAccount investmentFromPrimaryAccount = PrimaryAccount()
       ..accountName = ''
       ..transactionType = PreselectAccountType.investmentFrom.name;
-    investmentFromPrimaryAccount.createPrimaryAccount(investmentFromPrimaryAccount);
+    create(investmentFromPrimaryAccount);
     PrimaryAccount investmentToPrimaryAccount = PrimaryAccount()
       ..accountName = ''
       ..transactionType = PreselectAccountType.investmentTo.name;
-    investmentToPrimaryAccount.createPrimaryAccount(investmentToPrimaryAccount);
-  }
-}
-
-class PrimaryAccountAdapter extends TypeAdapter<PrimaryAccount> {
-  @override
-  final typeId = primaryAccountTypeId;
-
-  @override
-  PrimaryAccount read(BinaryReader reader) {
-    return PrimaryAccount()
-      ..accountName = reader.read()
-      ..transactionType = reader.read();
-  }
-
-  @override
-  void write(BinaryWriter writer, PrimaryAccount obj) {
-    writer.write(obj.accountName);
-    writer.write(obj.transactionType);
+    create(investmentToPrimaryAccount);
   }
 }

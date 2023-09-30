@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
+import '../models/primary_account/primary_account_repository.dart';
 import '/screens/introduction_screens.dart';
 
 import '/components/deco/loading_indicator.dart';
 import '/components/bottom_nav_bar/bottom_nav_bar.dart';
 
 import '/models/global_state.dart';
-import '/models/primary_account.dart';
 import '/models/intro_screen_state.dart';
 import '/models/account/account_repository.dart';
 import '/models/categorie/categorie_repository.dart';
@@ -62,7 +62,8 @@ class _SplashScreenState extends State<SplashScreen> {
                     categorieRepository.createStartExpenditureCategories();
                     categorieRepository.createStartRevenueCategories();
                     categorieRepository.createStartInvestmentCategories();
-                    PrimaryAccount.createStartPrimaryAccounts();
+                    PrimaryAccountRepository primaryAccountRepository = PrimaryAccountRepository();
+                    primaryAccountRepository.createStartPrimaryAccounts();
                     GlobalState.createGlobalState();
                     return const BottomNavBar(screenIndex: 0);
                   }

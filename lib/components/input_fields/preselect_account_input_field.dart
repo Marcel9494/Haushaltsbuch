@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
-import '/models/primary_account.dart';
+import '/models/primary_account/primary_account_repository.dart';
+import '/models/primary_account/primary_account_model.dart';
 import '/models/enums/preselect_account_types.dart';
 
 import '../deco/bottom_sheet_line.dart';
@@ -176,7 +177,8 @@ class _PreselectAccountInputFieldState extends State<PreselectAccountInputField>
 
   Future<List<bool>> _loadPreselectedAccountList() async {
     _setPrimaryAccounts();
-    _currentPrimaryAccounts = await PrimaryAccount.loadPrimaryAccountList();
+    PrimaryAccountRepository primaryAccountRepository = PrimaryAccountRepository();
+    _currentPrimaryAccounts = await primaryAccountRepository.loadPrimaryAccountList();
     return preselectedAccount;
   }
 
