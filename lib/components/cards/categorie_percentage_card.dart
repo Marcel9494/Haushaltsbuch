@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '/models/booking/booking_model.dart';
 import '/models/booking/booking_repository.dart';
 import '/models/categorie/categorie_repository.dart';
-import '/models/percentage_stats.dart';
+import '/models/percentage_stats/percentage_stats_model.dart';
 import '/models/screen_arguments/categorie_amount_list_screen_arguments.dart';
 
 import '/utils/consts/route_consts.dart';

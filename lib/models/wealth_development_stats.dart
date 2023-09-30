@@ -3,6 +3,8 @@ import 'dart:math';
 import 'booking/booking_model.dart';
 import 'booking/booking_repository.dart';
 
+// TODO muss noch umgebaut werden vorerst noch kein Repository Pattern implementieren bevor nicht geklärt ist,
+// TODO ob dieses Feature in das Erste Release aufgenommen wird => wahrscheinlich nicht.
 class WealthDevelopmentStats {
   late String month;
   late double wealth;

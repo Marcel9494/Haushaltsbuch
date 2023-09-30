@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '/models/percentage_stats.dart';
+import '/models/percentage_stats/percentage_stats_model.dart';
 
 import '/utils/number_formatters/number_formatter.dart';
 
