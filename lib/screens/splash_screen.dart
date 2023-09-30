@@ -5,11 +5,11 @@ import '/screens/introduction_screens.dart';
 import '/components/deco/loading_indicator.dart';
 import '/components/bottom_nav_bar/bottom_nav_bar.dart';
 
-import '/models/intro_screen_state.dart';
 import '/models/account/account_repository.dart';
 import '/models/categorie/categorie_repository.dart';
 import '/models/global_state/global_state_repository.dart';
 import '/models/primary_account/primary_account_repository.dart';
+import '/models/intro_screen_state/intro_screen_state_repository.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({Key? key}) : super(key: key);
@@ -22,12 +22,13 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen> {
   late Future<bool> _value;
+  final IntroScreenStateRepository introScreenStateRepository = IntroScreenStateRepository();
 
   @override
   initState() {
     super.initState();
     // Abfrage des States für die Anzeige des IntroductionScreens
-    _value = IntroScreenState.getIntroScreenState();
+    _value = introScreenStateRepository.getIntroScreenState();
   }
 
   @override
@@ -52,7 +53,7 @@ class _SplashScreenState extends State<SplashScreen> {
                 } else if (snapshot.hasData) {
                   if (snapshot.data == true) {
                     // Wenn State auf true => Anzeigen des IntroScreens
-                    IntroScreenState.setIntroScreenState();
+                    introScreenStateRepository.setIntroScreenState();
                     return const IntroductionScreens();
                   } else {
                     // Wenn State auf false => Initialisieren und Anzeigen der Buchungsseite

@@ -12,7 +12,8 @@ import 'models/categorie/categorie_model.dart';
 import 'models/default_budget/default_budget_model.dart';
 import 'models/enums/transaction_types.dart';
 import 'models/global_state/global_state_model.dart';
-import 'models/intro_screen_state.dart';
+import 'models/intro_screen_state/intro_screen_state_model.dart';
+import 'models/intro_screen_state/intro_screen_state_repository.dart';
 import 'models/primary_account/primary_account_model.dart';
 import 'models/subbudget/subbudget_model.dart';
 import 'models/screen_arguments/create_or_edit_subcategorie_screen_arguments.dart';
@@ -57,7 +58,8 @@ void main() async {
   Hive.registerAdapter(TransactionTypeAdapter());
   Hive.registerAdapter(GlobalStateAdapter());
   Hive.registerAdapter(IntroScreenStateAdapter());
-  IntroScreenState.init();
+  IntroScreenStateRepository introScreenStateRepository = IntroScreenStateRepository();
+  introScreenStateRepository.init();
   runApp(const BudgetBookApp());
 }
 
