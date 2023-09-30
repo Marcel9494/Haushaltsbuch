@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 
-import '../models/primary_account/primary_account_repository.dart';
 import '/screens/introduction_screens.dart';
 
 import '/components/deco/loading_indicator.dart';
 import '/components/bottom_nav_bar/bottom_nav_bar.dart';
 
-import '/models/global_state.dart';
 import '/models/intro_screen_state.dart';
 import '/models/account/account_repository.dart';
 import '/models/categorie/categorie_repository.dart';
+import '/models/global_state/global_state_repository.dart';
+import '/models/primary_account/primary_account_repository.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({Key? key}) : super(key: key);
@@ -64,7 +64,8 @@ class _SplashScreenState extends State<SplashScreen> {
                     categorieRepository.createStartInvestmentCategories();
                     PrimaryAccountRepository primaryAccountRepository = PrimaryAccountRepository();
                     primaryAccountRepository.createStartPrimaryAccounts();
-                    GlobalState.createGlobalState();
+                    GlobalStateRepository globalStateRepository = GlobalStateRepository();
+                    globalStateRepository.create();
                     return const BottomNavBar(screenIndex: 0);
                   }
                 } else {

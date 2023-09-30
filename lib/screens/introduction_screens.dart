@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 import 'package:introduction_screen/introduction_screen.dart';
 
-import '../models/primary_account/primary_account_repository.dart';
-import '/models/global_state.dart';
+import '/models/global_state/global_state_repository.dart';
+import '/models/primary_account/primary_account_repository.dart';
 import '/models/account/account_repository.dart';
 import '/models/categorie/categorie_repository.dart';
 import '/models/screen_arguments/bottom_nav_bar_screen_arguments.dart';
@@ -32,7 +32,8 @@ class _IntroductionScreensState extends State<IntroductionScreens> {
     categorieRepository.createStartInvestmentCategories();
     PrimaryAccountRepository primaryAccountRepository = PrimaryAccountRepository();
     primaryAccountRepository.createStartPrimaryAccounts();
-    GlobalState.createGlobalState();
+    GlobalStateRepository globalStateRepository = GlobalStateRepository();
+    globalStateRepository.create();
     Navigator.popAndPushNamed(context, bottomNavBarRoute, arguments: BottomNavBarScreenArguments(0));
   }
 
