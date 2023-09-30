@@ -11,7 +11,7 @@ import 'models/budget/budget_model.dart';
 import 'models/categorie/categorie_model.dart';
 import 'models/default_budget/default_budget_model.dart';
 import 'models/enums/transaction_types.dart';
-import 'models/global_state.dart';
+import 'models/global_state/global_state_model.dart';
 import 'models/intro_screen_state.dart';
 import 'models/primary_account/primary_account_model.dart';
 import 'models/subbudget/subbudget_model.dart';
