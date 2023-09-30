@@ -5,6 +5,7 @@ import 'package:another_flushbar/flushbar.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 
 import '../models/booking/booking_repository.dart';
+import '../models/primary_account/primary_account_repository.dart';
 import '/utils/consts/route_consts.dart';
 import '/utils/consts/global_consts.dart';
 import '/utils/date_formatters/date_formatter.dart';
@@ -21,7 +22,6 @@ import '/components/deco/loading_indicator.dart';
 
 import '/models/booking/booking_model.dart';
 import '/models/enums/categorie_types.dart';
-import '/models/primary_account.dart';
 import '/models/enums/repeat_types.dart';
 import '/models/enums/serie_edit_modes.dart';
 import '/models/enums/transaction_types.dart';
@@ -290,7 +290,8 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
   }
 
   Future<void> _loadPreselectedAccounts() async {
-    _primaryAccounts = await PrimaryAccount.getCurrentPrimaryAccounts();
+    PrimaryAccountRepository primaryAccountRepository = PrimaryAccountRepository();
+    _primaryAccounts = await primaryAccountRepository.getCurrentPrimaryAccounts();
     _isPreselectedAccountsLoaded = true;
   }
 

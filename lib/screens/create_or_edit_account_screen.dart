@@ -12,12 +12,13 @@ import '/components/input_fields/text_input_field.dart';
 import '/components/input_fields/preselect_account_input_field.dart';
 import '/components/buttons/save_button.dart';
 
-import '/models/primary_account.dart';
 import '/models/enums/repeat_types.dart';
 import '/models/booking/booking_model.dart';
 import '/models/account/account_model.dart';
 import '/models/enums/transaction_types.dart';
 import '/models/account/account_repository.dart';
+import '/models/primary_account/primary_account_model.dart';
+import '/models/primary_account/primary_account_repository.dart';
 import '/models/screen_arguments/bottom_nav_bar_screen_arguments.dart';
 
 import '/utils/consts/route_consts.dart';
@@ -42,10 +43,12 @@ class _CreateOrEditAccountScreenState extends State<CreateOrEditAccountScreen> {
   final TextEditingController _bankBalanceTextController = TextEditingController();
   final TextEditingController _preselectedAccountTextController = TextEditingController();
   final RoundedLoadingButtonController _saveButtonController = RoundedLoadingButtonController();
+  final AccountRepository accountRepository = AccountRepository();
+  final PrimaryAccountRepository primaryAccountRepository = PrimaryAccountRepository();
   bool _isAccountEdited = false;
   bool _primaryAccountsLoaded = false;
   final Account _account = Account();
-  AccountRepository accountRepository = AccountRepository();
+
   String _accountNameErrorText = '';
   String _accountGroupErrorText = '';
   String _bankBalanceErrorText = '';
@@ -77,7 +80,6 @@ class _CreateOrEditAccountScreenState extends State<CreateOrEditAccountScreen> {
   void _createOrUpdateAccount() async {
     _account.name = _accountNameController.text;
     bool validAccountName = await _validAccountName(_accountNameController.text);
-
     bool validAccountGroup = _validAccountGroup(_accountGroupTextController.text);
     bool validBankBalance = _validBankBalance(_bankBalanceTextController.text);
     if (validAccountGroup == false || validAccountName == false || validBankBalance == false) {
@@ -85,7 +87,7 @@ class _CreateOrEditAccountScreenState extends State<CreateOrEditAccountScreen> {
     } else {
       _account.accountType = _accountGroupTextController.text;
       _account.bankBalance = _bankBalanceTextController.text;
-      PrimaryAccount.setPrimaryAccountNames(_preselectedAccountTextController.text, _account.name);
+      primaryAccountRepository.setPrimaryAccountNames(_preselectedAccountTextController.text, _account.name);
       if (widget.accountBoxIndex == -1) {
         accountRepository.create(_account);
         _navigateToAccountScreen();
@@ -204,7 +206,7 @@ class _CreateOrEditAccountScreenState extends State<CreateOrEditAccountScreen> {
   }
 
   void _getPrimaryAccounts() async {
-    _loadedPrimaryAccounts = await PrimaryAccount.loadFilteredPrimaryAccountList(_accountNameController.text);
+    _loadedPrimaryAccounts = await primaryAccountRepository.loadFilteredPrimaryAccountList(_accountNameController.text);
     for (int i = 0; i < _loadedPrimaryAccounts.length; i++) {
       if (_loadedPrimaryAccounts[i].accountName != '') {
         if (_preselectedAccountTextController.text.isNotEmpty) {
