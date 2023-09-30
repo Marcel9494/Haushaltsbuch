@@ -1,5 +1,5 @@
-import '../default_budget.dart';
 import 'budget_model.dart';
+import '../default_budget/default_budget_model.dart';
 
 abstract class BudgetInterface {
   void create(Budget newBudget);

@@ -9,7 +9,7 @@ import 'models/account/account_model.dart';
 import 'models/booking/booking_model.dart';
 import 'models/budget/budget_model.dart';
 import 'models/categorie/categorie_model.dart';
-import 'models/default_budget.dart';
+import 'models/default_budget/default_budget_model.dart';
 import 'models/enums/transaction_types.dart';
 import 'models/global_state.dart';
 import 'models/intro_screen_state.dart';

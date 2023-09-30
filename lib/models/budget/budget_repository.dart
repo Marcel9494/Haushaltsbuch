@@ -2,7 +2,8 @@ import 'package:hive/hive.dart';
 
 import '../booking/booking_model.dart';
 import '../booking/booking_repository.dart';
-import '../default_budget.dart';
+import '../default_budget/default_budget_model.dart';
+import '../default_budget/default_budget_repository.dart';
 import 'budget_interface.dart';
 import 'budget_model.dart';
 
@@ -71,7 +72,8 @@ class BudgetRepository extends BudgetInterface {
         budgetBox.deleteAt(i);
       }
     }
-    DefaultBudget.deleteDefaultBudget(budgetCategorie);
+    DefaultBudgetRepository defaultBudgetRepository = DefaultBudgetRepository();
+    defaultBudgetRepository.delete(budgetCategorie);
   }
 
   @override

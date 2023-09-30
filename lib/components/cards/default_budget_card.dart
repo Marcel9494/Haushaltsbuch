@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '/models/default_budget.dart';
 import '/models/enums/budget_mode_types.dart';
+import '/models/default_budget/default_budget_model.dart';
 import '/models/screen_arguments/create_or_edit_budget_screen_arguments.dart';
 
 import '/utils/consts/route_consts.dart';
