@@ -1,9 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:haushaltsbuch/models/intro_screen_state.dart';
-import 'package:introduction_screen/introduction_screen.dart';
 import 'package:settings_ui/settings_ui.dart';
 
+import '/models/intro_screen_state/intro_screen_state_repository.dart';
 import '/models/screen_arguments/bottom_nav_bar_screen_arguments.dart';
 
 import '/utils/settings/settings.dart';
@@ -50,11 +49,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       onToggle: (bool value) {
                         setState(() {
                           demoMode = value;
-                          print(demoMode);
                         });
                         Navigator.pop(context);
-                        Navigator.pushNamed(context, bottomNavBarRoute,
-                            arguments: BottomNavBarScreenArguments(0));
+                        Navigator.pushNamed(context, bottomNavBarRoute, arguments: BottomNavBarScreenArguments(0));
                       },
                     ),
                   ],
@@ -70,18 +67,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   context: context,
                   builder: (context) {
                     return CupertinoAlertDialog(
-                      content: const Text(
-                          "Beim nächsten Start wird der Introduction Screen erneut angezeigt."),
+                      content: const Text("Beim nächsten Start wird der Introduction Screen erneut angezeigt."),
                       title: const Text("Info"),
                       actions: [
                         TextButton(
                             onPressed: () {
-                              IntroScreenState.setIntroScreenState();
+                              IntroScreenStateRepository introScreenStateRepository = IntroScreenStateRepository();
+                              introScreenStateRepository.setIntroScreenState();
                               Navigator.pop(context);
-                              Navigator.popAndPushNamed(
-                                  context,
-                                  bottomNavBarRoute,
-                                  arguments: BottomNavBarScreenArguments(0));
+                              Navigator.popAndPushNamed(context, bottomNavBarRoute, arguments: BottomNavBarScreenArguments(0));
                             },
                             child: const Text("OK"))
                       ],
