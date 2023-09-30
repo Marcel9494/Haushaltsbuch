@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 
+import '../models/default_budget/default_budget_repository.dart';
 import '/utils/consts/hive_consts.dart';
 import '/utils/consts/global_consts.dart';
 import '/utils/consts/route_consts.dart';
@@ -17,12 +18,12 @@ import '/components/input_fields/money_input_field.dart';
 import '/components/buttons/save_button.dart';
 
 import '/models/budget/budget_model.dart';
+import '/models/default_budget/default_budget_model.dart';
 import '/models/subbudget/subbudget_model.dart';
 import '/models/subbudget/subbudget_repository.dart';
 import '/models/budget/budget_repository.dart';
 import '/models/categorie/categorie_repository.dart';
 import '/models/enums/categorie_types.dart';
-import '/models/default_budget.dart';
 import '/models/enums/budget_mode_types.dart';
 import '/models/enums/transaction_types.dart';
 import '/models/screen_arguments/bottom_nav_bar_screen_arguments.dart';
@@ -49,6 +50,7 @@ class _CreateOrEditBudgetScreenState extends State<CreateOrEditBudgetScreen> {
   final TextEditingController _budgetTextController = TextEditingController();
   final RoundedLoadingButtonController _saveButtonController = RoundedLoadingButtonController();
   final BudgetRepository budgetRepository = BudgetRepository();
+  final DefaultBudgetRepository defaultBudgetRepository = DefaultBudgetRepository();
   late DefaultBudget _loadedDefaultBudget;
   late Budget _loadedBudget;
   String _categorieErrorText = '';
@@ -73,7 +75,7 @@ class _CreateOrEditBudgetScreenState extends State<CreateOrEditBudgetScreen> {
   }
 
   Future<void> _loadDefaultBudget() async {
-    _loadedDefaultBudget = await DefaultBudget.loadDefaultBudget(widget.budgetCategorie!);
+    _loadedDefaultBudget = await defaultBudgetRepository.load(widget.budgetCategorie!);
     _budgetTextController.text = formatToMoneyAmount(_loadedDefaultBudget.defaultBudget.toString());
   }
 
@@ -133,7 +135,7 @@ class _CreateOrEditBudgetScreenState extends State<CreateOrEditBudgetScreen> {
       DefaultBudget newDefaultBudget = DefaultBudget()
         ..categorie = _categorieTextController.text
         ..defaultBudget = formatMoneyAmountToDouble(_budgetTextController.text);
-      newDefaultBudget.createDefaultBudget(newDefaultBudget);
+      defaultBudgetRepository.create(newDefaultBudget);
     }
   }
 
@@ -148,7 +150,7 @@ class _CreateOrEditBudgetScreenState extends State<CreateOrEditBudgetScreen> {
         DefaultBudget updatedDefaultBudget = DefaultBudget()
           ..categorie = _subcategorieTextController.text.isEmpty ? _categorieTextController.text : _subcategorieTextController.text
           ..defaultBudget = formatMoneyAmountToDouble(_budgetTextController.text);
-        updatedDefaultBudget.updateDefaultBudget(updatedDefaultBudget);
+        defaultBudgetRepository.update(updatedDefaultBudget);
         subbudgetRepository.updateAllSubbudgetsForCategorie(_subcategorieTextController.text, formatMoneyAmountToDouble(_budgetTextController.text));
       } else {
         for (int i = 0; i < 3; i++) {
@@ -167,7 +169,7 @@ class _CreateOrEditBudgetScreenState extends State<CreateOrEditBudgetScreen> {
         DefaultBudget newDefaultSubcategoriebudget = DefaultBudget()
           ..categorie = _subcategorieTextController.text
           ..defaultBudget = formatMoneyAmountToDouble(_budgetTextController.text);
-        newDefaultSubcategoriebudget.createDefaultBudget(newDefaultSubcategoriebudget);
+        defaultBudgetRepository.create(newDefaultSubcategoriebudget);
         CategorieRepository categorieRepository = CategorieRepository();
         List<String> subcategorieNames = await categorieRepository.loadSubcategorieNameList(_categorieTextController.text);
         subbudgetRepository.createSubbudgets(_categorieTextController.text, _subcategorieTextController.text, subcategorieNames);
@@ -183,12 +185,12 @@ class _CreateOrEditBudgetScreenState extends State<CreateOrEditBudgetScreen> {
       DefaultBudget newDefaultBudget = DefaultBudget()
         ..categorie = _categorieTextController.text
         ..defaultBudget = formatMoneyAmountToDouble(_budgetTextController.text);
-      newDefaultBudget.createDefaultBudget(newDefaultBudget);
+      defaultBudgetRepository.create(newDefaultBudget);
       if (_subbudgetExistsAlready) {
         DefaultBudget updatedDefaultBudget = DefaultBudget()
           ..categorie = _subcategorieTextController.text.isEmpty ? _categorieTextController.text : _subcategorieTextController.text
           ..defaultBudget = formatMoneyAmountToDouble(_budgetTextController.text);
-        updatedDefaultBudget.updateDefaultBudget(updatedDefaultBudget);
+        defaultBudgetRepository.update(updatedDefaultBudget);
         subbudgetRepository.updateAllSubbudgetsForCategorie(_subcategorieTextController.text, formatMoneyAmountToDouble(_budgetTextController.text));
       } else {
         for (int i = 0; i < 3; i++) {
@@ -207,7 +209,7 @@ class _CreateOrEditBudgetScreenState extends State<CreateOrEditBudgetScreen> {
         DefaultBudget newDefaultSubcategoriebudget = DefaultBudget()
           ..categorie = _subcategorieTextController.text
           ..defaultBudget = formatMoneyAmountToDouble(_budgetTextController.text);
-        newDefaultSubcategoriebudget.createDefaultBudget(newDefaultSubcategoriebudget);
+        defaultBudgetRepository.create(newDefaultSubcategoriebudget);
         CategorieRepository categorieRepository = CategorieRepository();
         List<String> subcategorieNames = await categorieRepository.loadSubcategorieNameList(_categorieTextController.text);
         subbudgetRepository.createSubbudgets(_categorieTextController.text, _subcategorieTextController.text, subcategorieNames);
@@ -219,7 +221,7 @@ class _CreateOrEditBudgetScreenState extends State<CreateOrEditBudgetScreen> {
     DefaultBudget updatedDefaultBudget = DefaultBudget()
       ..categorie = _loadedDefaultBudget.categorie
       ..defaultBudget = formatMoneyAmountToDouble(_budgetTextController.text);
-    updatedDefaultBudget.updateDefaultBudget(updatedDefaultBudget);
+    defaultBudgetRepository.update(updatedDefaultBudget);
     budgetRepository.updateAllFutureBudgetsFromCategorie(updatedDefaultBudget);
   }
 
@@ -269,7 +271,7 @@ class _CreateOrEditBudgetScreenState extends State<CreateOrEditBudgetScreen> {
       DefaultBudget updatedDefaultBudget = DefaultBudget()
         ..categorie = _subcategorieTextController.text.isEmpty ? _categorieTextController.text : _subcategorieTextController.text
         ..defaultBudget = formatMoneyAmountToDouble(_budgetTextController.text);
-      updatedDefaultBudget.updateDefaultBudget(updatedDefaultBudget);
+      defaultBudgetRepository.update(updatedDefaultBudget);
       budgetRepository.updateAllBudgetsFromCategorie(updatedDefaultBudget);
     });
     _setSaveButtonAnimation(true);

@@ -1,6 +1,5 @@
 import 'package:hive/hive.dart';
 
-import '../booking/booking_repository.dart';
 import '/utils/consts/hive_consts.dart';
 
 @HiveType(typeId: categoryTypeId)

@@ -7,7 +7,8 @@ import '/models/subbudget/subbudget_interface.dart';
 
 import '../booking/booking_model.dart';
 import '../booking/booking_repository.dart';
-import '../default_budget.dart';
+import '../default_budget/default_budget_model.dart';
+import '../default_budget/default_budget_repository.dart';
 
 class SubbudgetRepository extends SubbudgetInterface {
   @override
@@ -41,10 +42,12 @@ class SubbudgetRepository extends SubbudgetInterface {
           ..budgetDate = DateTime(date.year, date.month + j, 1).toString();
         subbudgetBox.add(subbudget);
       }
+
       DefaultBudget newDefaultSubcategoriebudget = DefaultBudget()
         ..categorie = subcategorieNames[i]
         ..defaultBudget = 0.0;
-      newDefaultSubcategoriebudget.createDefaultBudget(newDefaultSubcategoriebudget);
+      DefaultBudgetRepository defaultBudgetRepository = DefaultBudgetRepository();
+      defaultBudgetRepository.create(newDefaultSubcategoriebudget);
     }
   }
 

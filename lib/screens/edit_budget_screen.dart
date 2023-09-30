@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:haushaltsbuch/models/budget/budget_repository.dart';
 
-import '/models/default_budget.dart';
+import '../models/default_budget/default_budget_repository.dart';
 import '/models/budget/budget_model.dart';
+import '/models/budget/budget_repository.dart';
+import '/models/default_budget/default_budget_model.dart';
 
 import '/utils/consts/route_consts.dart';
 
@@ -31,7 +32,8 @@ class _EditBudgetScreenState extends State<EditBudgetScreen> {
   BudgetRepository budgetRepository = BudgetRepository();
 
   Future<List<Budget>> _loadOneBudgetCategorie() async {
-    _defaultBudget = await DefaultBudget.loadDefaultBudget(widget.budget.categorie);
+    DefaultBudgetRepository defaultBudgetRepository = DefaultBudgetRepository();
+    _defaultBudget = await defaultBudgetRepository.load(widget.budget.categorie);
     _budgetList = await budgetRepository.loadOneBudgetCategorie(widget.budget.categorie, _selectedYear.year);
     return _budgetList;
   }
