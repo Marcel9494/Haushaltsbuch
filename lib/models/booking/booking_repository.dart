@@ -31,6 +31,7 @@ class BookingRepository extends BookingInterface {
       ..toAccount = toAccount
       ..serieId = serieId
       ..booked = booked;
+    print(bookingBox.length);
     bookingBox.add(newBooking);
     if (booked) {
       if (transactionType == TransactionType.transfer.name || transactionType == TransactionType.investment.name) {
@@ -405,13 +406,21 @@ class BookingRepository extends BookingInterface {
     List<Booking> bookingList = [];
     for (int i = 0; i < bookingBox.length; i++) {
       Booking booking = await bookingBox.getAt(i);
+      print(booking.categorie);
+      print(booking.fromAccount);
+      print(DateTime.parse(booking.date).month);
+      print(selectedMonth);
+      //print(DateTime.parse(booking.date).year);
+      print(selectedYear);
       if ((DateTime.parse(booking.date).month == selectedMonth && DateTime.parse(booking.date).year == selectedYear && categorie == '' && account == '') ||
           (DateTime.parse(booking.date).month == selectedMonth && DateTime.parse(booking.date).year == selectedYear && categorie != '' && booking.categorie == categorie) ||
           (DateTime.parse(booking.date).month == selectedMonth && DateTime.parse(booking.date).year == selectedYear && account != '' && booking.fromAccount == account)) {
+        print('Hallo 2');
         booking.boxIndex = i;
         bookingList.add(booking);
       }
     }
+
     bookingList.sort((first, second) => second.date.compareTo(first.date));
     return bookingList;
   }

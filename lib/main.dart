@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hive_flutter/adapters.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 import '/utils/consts/route_consts.dart';
@@ -26,6 +27,8 @@ import 'models/screen_arguments/create_or_edit_account_screen_arguments.dart';
 import 'models/screen_arguments/create_or_edit_booking_screen_arguments.dart';
 import 'models/screen_arguments/create_or_edit_budget_screen_arguments.dart';
 import 'models/screen_arguments/create_or_edit_categorie_screen_arguments.dart';
+
+import '/blocs/create_or_edit_booking_screen/create_or_edit_booking_screen_bloc.dart';
 
 import '/components/bottom_nav_bar/bottom_nav_bar.dart';
 
@@ -60,7 +63,12 @@ void main() async {
   Hive.registerAdapter(IntroScreenStateAdapter());
   IntroScreenStateRepository introScreenStateRepository = IntroScreenStateRepository();
   introScreenStateRepository.init();
-  runApp(const BudgetBookApp());
+  runApp(
+    MultiBlocProvider(
+      providers: [BlocProvider<CreateOrEditBookingBloc>(create: (context) => CreateOrEditBookingBloc())],
+      child: const BudgetBookApp(),
+    ),
+  );
 }
 
 class BudgetBookApp extends StatelessWidget {

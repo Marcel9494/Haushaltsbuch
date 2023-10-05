@@ -2,8 +2,10 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:another_flushbar/flushbar.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 
+import '../blocs/create_or_edit_booking_screen/create_or_edit_booking_screen_bloc.dart';
 import '../models/booking/booking_repository.dart';
 import '../models/primary_account/primary_account_repository.dart';
 import '/utils/consts/route_consts.dart';
@@ -55,6 +57,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
   // müssten die gleichen Stellen sein. Buchung Datenstruktur um Unterkategorie Eintrag erweitern.
   final TextEditingController _subcategorieTextController = TextEditingController();
   final RoundedLoadingButtonController _saveButtonController = RoundedLoadingButtonController();
+  late final CreateOrEditBookingBloc createOrEditBookingBloc;
   final BookingRepository bookingRepository = BookingRepository();
   bool _isBookingEdited = false;
   bool _isPreselectedAccountsLoaded = false;
@@ -72,6 +75,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
   @override
   void initState() {
     super.initState();
+    createOrEditBookingBloc = BlocProvider.of<CreateOrEditBookingBloc>(context);
     if (widget.bookingBoxIndex == -1) {
       _currentTransaction = TransactionType.outcome.name;
       _bookingRepeat = RepeatType.noRepetition.name;
@@ -79,6 +83,12 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
     } else {
       _loadBooking();
     }
+  }
+
+  @override
+  void dispose() {
+    //createOrEditBookingBloc.close();
+    super.dispose();
   }
 
   Future<void> _loadBooking() async {
@@ -98,7 +108,10 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
   }
 
   void _createOrUpdateBooking() async {
-    if (_validBookingName(_bookingNameController.text) == false ||
+    print('Test 1');
+    print(_parsedBookingDate.toString());
+    createOrEditBookingBloc.add(CreateBookingEvent(context));
+    /*if (_validBookingName(_bookingNameController.text) == false ||
         _validBookingAmount(_amountTextController.text) == false ||
         _validCategorie(_categorieTextController.text) == false ||
         _validFromAccount(_fromAccountTextController.text) == false ||
@@ -108,6 +121,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
     }
     if (widget.bookingBoxIndex == -1) {
       Booking booking = Booking();
+
       if (_bookingRepeat == RepeatType.noRepetition.name) {
         // TODO Code verbessern und nur komplettes Booking Objekt übergeben
         bookingRepository.create(_bookingNameController.text, _currentTransaction, _parsedBookingDate.toString(), _bookingRepeat, _amountTextController.text,
@@ -131,7 +145,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
         ..serieId = _loadedBooking.serieId
         ..booked = _loadedBooking.booked;
       bookingRepository.updateSerieBookings(currentBooking, _loadedBooking, widget.bookingBoxIndex, widget.serieEditMode);
-    }
+    }*/
     _setSaveButtonAnimation(true);
     Timer(const Duration(milliseconds: transitionInMs), () {
       if (mounted) {
