@@ -1,6 +1,6 @@
 import 'package:hive/hive.dart';
 
-import '../../utils/consts/hive_consts.dart';
+import '/utils/consts/hive_consts.dart';
 
 @HiveType(typeId: bookingTypeId)
 class Booking extends HiveObject {

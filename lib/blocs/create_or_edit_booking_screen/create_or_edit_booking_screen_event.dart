@@ -4,5 +4,6 @@ abstract class CreateOrEditBookingEvents {}
 
 class CreateBookingEvent extends CreateOrEditBookingEvents {
   final BuildContext context;
-  CreateBookingEvent(this.context);
+  final Booking newBooking;
+  CreateBookingEvent(this.context, this.newBooking);
 }

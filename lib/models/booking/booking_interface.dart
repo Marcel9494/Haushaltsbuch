@@ -2,11 +2,11 @@ import '../enums/serie_edit_modes.dart';
 import 'booking_model.dart';
 
 abstract class BookingInterface {
-  void create(String title, String transactionType, String date, String bookingRepeats, String amount, String categorie, String subcategorie, String fromAccount, String toAccount,
-      [int serieId = -1, bool booked = true]);
-  void createBookingSerie(
-      String title, String transactionType, String date, String bookingRepeats, String amount, String categorie, String subcategorie, String fromAccount, String toAccount,
-      [int serieId = -1, bool booked = true]);
+  void create(Booking newBooking);
+  void createInstance(String title, String transactionType, String date, String bookingRepeats, String amount, String categorie, String subcategorie, String fromAccount,
+      String toAccount, bool isSerieBooking);
+  void createSerie(Booking templateBooking);
+  void executeAccountTransaction(Booking booking);
 
   void update(Booking updatedBooking, int bookingBoxIndex);
   void updateSerieBookings(Booking templateBooking, Booking oldBooking, int bookingBoxIndex, SerieEditModeType serieEditMode);

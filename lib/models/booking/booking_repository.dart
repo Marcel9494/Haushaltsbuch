@@ -1,10 +1,10 @@
 import 'package:hive/hive.dart';
 
 import '../account/account_repository.dart';
-import '../global_state/global_state_repository.dart';
 import '../enums/repeat_types.dart';
 import '../enums/serie_edit_modes.dart';
 import '../enums/transaction_types.dart';
+import '../global_state/global_state_repository.dart';
 
 import '/utils/consts/hive_consts.dart';
 import '/utils/number_formatters/number_formatter.dart';
@@ -16,10 +16,18 @@ class BookingRepository extends BookingInterface {
   AccountRepository accountRepository = AccountRepository(); // TODO geht das besser?
 
   @override
-  void create(String title, String transactionType, String date, String bookingRepeats, String amount, String categorie, String subcategorie, String fromAccount, String toAccount,
-      [int serieId = -1, bool booked = true]) async {
+  void create(Booking newBooking) async {
     var bookingBox = await Hive.openBox(bookingsBox);
-    Booking newBooking = Booking()
+    bookingBox.add(newBooking);
+    executeAccountTransaction(newBooking);
+  }
+
+  @override
+  void createInstance(String title, String transactionType, String date, String bookingRepeats, String amount, String categorie, String subcategorie, String fromAccount,
+      String toAccount, bool isSerieBooking) async {
+    var bookingBox = await Hive.openBox(bookingsBox);
+    GlobalStateRepository globalStateRepository = GlobalStateRepository();
+    Booking bookingInstance = Booking()
       ..transactionType = transactionType
       ..bookingRepeats = bookingRepeats
       ..title = title
@@ -29,16 +37,95 @@ class BookingRepository extends BookingInterface {
       ..subcategorie = subcategorie
       ..fromAccount = fromAccount
       ..toAccount = toAccount
-      ..serieId = serieId
-      ..booked = booked;
-    print(bookingBox.length);
-    bookingBox.add(newBooking);
-    if (booked) {
-      if (transactionType == TransactionType.transfer.name || transactionType == TransactionType.investment.name) {
-        accountRepository.transferMoney(fromAccount, toAccount, amount);
-      } else {
-        accountRepository.calculateNewAccountBalance(fromAccount, amount, transactionType);
+      ..serieId = isSerieBooking ? await globalStateRepository.getBookingSerieIndex() : -1
+      ..booked = DateTime.parse(date).isAfter(DateTime.now()) ? false : true;
+    bookingBox.add(bookingInstance);
+    executeAccountTransaction(bookingInstance);
+  }
+
+  // TODO Serie auf 10 Jahre erhöhen (3 => 120 Monate), für danach muss sich noch etwas überlegt werden
+  /* Für die übergebene Start Buchung wird je nach ausgewählter Buchungswiederholung
+  * die gleiche Buchung automatisch wieder erstellt nur mit anderem Buchungsdatum.
+  * Außerdem wird geprüft, ob die Buchung in der Zukunft liegt, wenn ja wird diese
+  * als noch nicht gebucht angezeigt und erst wenn das Buchungsdatum erreicht ist als gebucht
+  * vermerkt und von dem ausgewählten Konto abgezogen.
+  * Beispiel: Buchungswiederholung Am Monatsanfang es werden wiederholt Buchungen erstellt
+  * zum Monatsanfang 01.10.23, 01.11.23, 01.12.23,...
+  */
+  @override
+  void createSerie(Booking templateBooking) async {
+    if (templateBooking.bookingRepeats == RepeatType.everyDay.name) {
+      for (int i = 0; i < 3; i++) {
+        DateTime nextBookingDate = DateTime(DateTime.parse(templateBooking.date).year, DateTime.parse(templateBooking.date).month, DateTime.parse(templateBooking.date).day + i);
+        createInstance(templateBooking.title, templateBooking.transactionType, nextBookingDate.toString(), templateBooking.bookingRepeats, templateBooking.amount,
+            templateBooking.categorie, templateBooking.subcategorie, templateBooking.fromAccount, templateBooking.toAccount, true);
       }
+    } else if (templateBooking.bookingRepeats == RepeatType.everyWeek.name) {
+      for (int i = 0; i < 3; i++) {
+        DateTime nextBookingDate =
+            DateTime(DateTime.parse(templateBooking.date).year, DateTime.parse(templateBooking.date).month, DateTime.parse(templateBooking.date).day + i * 7);
+        createInstance(templateBooking.title, templateBooking.transactionType, nextBookingDate.toString(), templateBooking.bookingRepeats, templateBooking.amount,
+            templateBooking.categorie, templateBooking.subcategorie, templateBooking.fromAccount, templateBooking.toAccount, true);
+      }
+    } else if (templateBooking.bookingRepeats == RepeatType.everyTwoWeeks.name) {
+      for (int i = 0; i < 3; i++) {
+        DateTime nextBookingDate =
+            DateTime(DateTime.parse(templateBooking.date).year, DateTime.parse(templateBooking.date).month, DateTime.parse(templateBooking.date).day + i * 14);
+        createInstance(templateBooking.title, templateBooking.transactionType, nextBookingDate.toString(), templateBooking.bookingRepeats, templateBooking.amount,
+            templateBooking.categorie, templateBooking.subcategorie, templateBooking.fromAccount, templateBooking.toAccount, true);
+      }
+    } else if (templateBooking.bookingRepeats == RepeatType.beginningOfMonth.name) {
+      for (int i = 0; i < 3; i++) {
+        DateTime nextBookingDate = DateTime(DateTime.parse(templateBooking.date).year, DateTime.parse(templateBooking.date).month + i + 1, 1);
+        createInstance(templateBooking.title, templateBooking.transactionType, nextBookingDate.toString(), templateBooking.bookingRepeats, templateBooking.amount,
+            templateBooking.categorie, templateBooking.subcategorie, templateBooking.fromAccount, templateBooking.toAccount, true);
+      }
+    } else if (templateBooking.bookingRepeats == RepeatType.endOfMonth.name) {
+      for (int i = 0; i < 3; i++) {
+        DateTime nextBookingDate = DateTime(DateTime.parse(templateBooking.date).year, DateTime.parse(templateBooking.date).month + i + 1, 0);
+        createInstance(templateBooking.title, templateBooking.transactionType, nextBookingDate.toString(), templateBooking.bookingRepeats, templateBooking.amount,
+            templateBooking.categorie, templateBooking.subcategorie, templateBooking.fromAccount, templateBooking.toAccount, true);
+      }
+    } else if (templateBooking.bookingRepeats == RepeatType.everyMonth.name) {
+      for (int i = 0; i < 3; i++) {
+        DateTime nextBookingDate = DateTime(DateTime.parse(templateBooking.date).year, DateTime.parse(templateBooking.date).month + i, DateTime.parse(templateBooking.date).day);
+        createInstance(templateBooking.title, templateBooking.transactionType, nextBookingDate.toString(), templateBooking.bookingRepeats, templateBooking.amount,
+            templateBooking.categorie, templateBooking.subcategorie, templateBooking.fromAccount, templateBooking.toAccount, true);
+      }
+    } else if (templateBooking.bookingRepeats == RepeatType.everyThreeMonths.name) {
+      for (int i = 0; i < 3; i++) {
+        DateTime nextBookingDate =
+            DateTime(DateTime.parse(templateBooking.date).year, DateTime.parse(templateBooking.date).month + i * 3, DateTime.parse(templateBooking.date).day);
+        createInstance(templateBooking.title, templateBooking.transactionType, nextBookingDate.toString(), templateBooking.bookingRepeats, templateBooking.amount,
+            templateBooking.categorie, templateBooking.subcategorie, templateBooking.fromAccount, templateBooking.toAccount, true);
+      }
+    } else if (templateBooking.bookingRepeats == RepeatType.everySixMonths.name) {
+      for (int i = 0; i < 3; i++) {
+        DateTime nextBookingDate =
+            DateTime(DateTime.parse(templateBooking.date).year, DateTime.parse(templateBooking.date).month + i * 6, DateTime.parse(templateBooking.date).day);
+        createInstance(templateBooking.title, templateBooking.transactionType, nextBookingDate.toString(), templateBooking.bookingRepeats, templateBooking.amount,
+            templateBooking.categorie, templateBooking.subcategorie, templateBooking.fromAccount, templateBooking.toAccount, true);
+      }
+    } else if (templateBooking.bookingRepeats == RepeatType.everyYear.name) {
+      for (int i = 0; i < 3; i++) {
+        DateTime nextBookingDate = DateTime(DateTime.parse(templateBooking.date).year + i, DateTime.parse(templateBooking.date).month, DateTime.parse(templateBooking.date).day);
+        createInstance(templateBooking.title, templateBooking.transactionType, nextBookingDate.toString(), templateBooking.bookingRepeats, templateBooking.amount,
+            templateBooking.categorie, templateBooking.subcategorie, templateBooking.fromAccount, templateBooking.toAccount, true);
+      }
+    }
+  }
+
+  @override
+  void executeAccountTransaction(Booking booking) {
+    if (booking.booked) {
+      if (booking.transactionType == TransactionType.transfer.name || booking.transactionType == TransactionType.investment.name) {
+        accountRepository.transferMoney(booking.fromAccount, booking.toAccount, booking.amount);
+      } else {
+        accountRepository.calculateNewAccountBalance(booking.fromAccount, booking.amount, booking.transactionType);
+      }
+    } else {
+      print('Die Buchung liegt in der Zukunft und wird deshalb nicht auf ein Konto verbucht.');
+      // TODO Logging einbauen
     }
   }
 
@@ -76,106 +163,6 @@ class BookingRepository extends BookingInterface {
       ..toAccount = templateBooking.toAccount
       ..serieId = templateBooking.serieId
       ..booked = booked;
-  }
-
-  // TODO Serie auf 10 Jahre erhöhen (3 => 120 Monate), für danach muss sich noch etwas überlegt werden
-  @override
-  void createBookingSerie(
-      String title, String transactionType, String date, String bookingRepeats, String amount, String categorie, String subcategorie, String fromAccount, String toAccount,
-      [int serieId = -1, bool booked = true]) async {
-    GlobalStateRepository globalStateRepository = GlobalStateRepository();
-    if (bookingRepeats == RepeatType.everyDay.name) {
-      for (int i = 0; i < 3; i++) {
-        DateTime bookingDate = DateTime(DateTime.parse(date).year, DateTime.parse(date).month, DateTime.parse(date).day + i);
-        bool booked = true;
-        if (bookingDate.isAfter(DateTime.now())) {
-          booked = false;
-        }
-        create(title, transactionType, bookingDate.toString(), bookingRepeats, amount, categorie, subcategorie, fromAccount, toAccount,
-            await globalStateRepository.getBookingSerieIndex(), booked);
-      }
-    } else if (bookingRepeats == RepeatType.everyWeek.name) {
-      for (int i = 0; i < 3; i++) {
-        DateTime bookingDate = DateTime(DateTime.parse(date).year, DateTime.parse(date).month, DateTime.parse(date).day + i * 7);
-        bool booked = true;
-        if (bookingDate.isAfter(DateTime.now())) {
-          booked = false;
-        }
-        create(title, transactionType, bookingDate.toString(), bookingRepeats, amount, categorie, subcategorie, fromAccount, toAccount,
-            await globalStateRepository.getBookingSerieIndex(), booked);
-      }
-    } else if (bookingRepeats == RepeatType.everyTwoWeeks.name) {
-      for (int i = 0; i < 3; i++) {
-        DateTime bookingDate = DateTime(DateTime.parse(date).year, DateTime.parse(date).month, DateTime.parse(date).day + i * 14);
-        bool booked = true;
-        if (bookingDate.isAfter(DateTime.now())) {
-          booked = false;
-        }
-        create(title, transactionType, bookingDate.toString(), bookingRepeats, amount, categorie, subcategorie, fromAccount, toAccount,
-            await globalStateRepository.getBookingSerieIndex(), booked);
-      }
-    } else if (bookingRepeats == RepeatType.beginningOfMonth.name) {
-      for (int i = 0; i < 3; i++) {
-        DateTime bookingDate = DateTime(DateTime.parse(date).year, DateTime.parse(date).month + i + 1, 1);
-        bool booked = true;
-        if (bookingDate.isAfter(DateTime.now())) {
-          booked = false;
-        }
-        create(title, transactionType, bookingDate.toString(), bookingRepeats, amount, categorie, subcategorie, fromAccount, toAccount,
-            await globalStateRepository.getBookingSerieIndex(), booked);
-      }
-    } else if (bookingRepeats == RepeatType.endOfMonth.name) {
-      for (int i = 0; i < 3; i++) {
-        DateTime bookingDate = DateTime(DateTime.parse(date).year, DateTime.parse(date).month + i + 1, 0);
-        bool booked = true;
-        if (bookingDate.isAfter(DateTime.now())) {
-          booked = false;
-        }
-        create(title, transactionType, bookingDate.toString(), bookingRepeats, amount, categorie, subcategorie, fromAccount, toAccount,
-            await globalStateRepository.getBookingSerieIndex(), booked);
-      }
-    } else if (bookingRepeats == RepeatType.everyMonth.name) {
-      for (int i = 0; i < 3; i++) {
-        DateTime bookingDate = DateTime(DateTime.parse(date).year, DateTime.parse(date).month + i, DateTime.parse(date).day);
-        bool booked = true;
-        if (bookingDate.isAfter(DateTime.now())) {
-          booked = false;
-        }
-        create(title, transactionType, bookingDate.toString(), bookingRepeats, amount, categorie, subcategorie, fromAccount, toAccount,
-            await globalStateRepository.getBookingSerieIndex(), booked);
-      }
-    } else if (bookingRepeats == RepeatType.everyThreeMonths.name) {
-      for (int i = 0; i < 3; i++) {
-        DateTime bookingDate = DateTime(DateTime.parse(date).year, DateTime.parse(date).month + i * 3, DateTime.parse(date).day);
-        bool booked = true;
-        if (bookingDate.isAfter(DateTime.now())) {
-          booked = false;
-        }
-        create(title, transactionType, bookingDate.toString(), bookingRepeats, amount, categorie, subcategorie, fromAccount, toAccount,
-            await globalStateRepository.getBookingSerieIndex(), booked);
-      }
-    } else if (bookingRepeats == RepeatType.everySixMonths.name) {
-      for (int i = 0; i < 3; i++) {
-        DateTime bookingDate = DateTime(DateTime.parse(date).year, DateTime.parse(date).month + i * 6, DateTime.parse(date).day);
-        bool booked = true;
-        if (bookingDate.isAfter(DateTime.now())) {
-          booked = false;
-        }
-        create(title, transactionType, bookingDate.toString(), bookingRepeats, amount, categorie, subcategorie, fromAccount, toAccount,
-            await globalStateRepository.getBookingSerieIndex(), booked);
-      }
-    } else if (bookingRepeats == RepeatType.everyYear.name) {
-      for (int i = 0; i < 3; i++) {
-        DateTime bookingDate = DateTime(DateTime.parse(date).year + i, DateTime.parse(date).month, DateTime.parse(date).day);
-        bool booked = true;
-        if (bookingDate.isAfter(DateTime.now())) {
-          booked = false;
-        }
-        create(title, transactionType, bookingDate.toString(), bookingRepeats, amount, categorie, subcategorie, fromAccount, toAccount,
-            await globalStateRepository.getBookingSerieIndex(), booked);
-      }
-    }
-    globalStateRepository.increaseBookingSerieIndex();
   }
 
   @override
@@ -406,21 +393,13 @@ class BookingRepository extends BookingInterface {
     List<Booking> bookingList = [];
     for (int i = 0; i < bookingBox.length; i++) {
       Booking booking = await bookingBox.getAt(i);
-      print(booking.categorie);
-      print(booking.fromAccount);
-      print(DateTime.parse(booking.date).month);
-      print(selectedMonth);
-      //print(DateTime.parse(booking.date).year);
-      print(selectedYear);
       if ((DateTime.parse(booking.date).month == selectedMonth && DateTime.parse(booking.date).year == selectedYear && categorie == '' && account == '') ||
           (DateTime.parse(booking.date).month == selectedMonth && DateTime.parse(booking.date).year == selectedYear && categorie != '' && booking.categorie == categorie) ||
           (DateTime.parse(booking.date).month == selectedMonth && DateTime.parse(booking.date).year == selectedYear && account != '' && booking.fromAccount == account)) {
-        print('Hallo 2');
         booking.boxIndex = i;
         bookingList.add(booking);
       }
     }
-
     bookingList.sort((first, second) => second.date.compareTo(first.date));
     return bookingList;
   }

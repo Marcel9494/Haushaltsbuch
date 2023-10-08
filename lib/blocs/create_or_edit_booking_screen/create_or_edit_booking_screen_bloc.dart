@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
-import '../../models/enums/transaction_types.dart';
+import '/models/enums/repeat_types.dart';
 import '/models/booking/booking_model.dart';
 import '/models/booking/booking_repository.dart';
+import '/models/global_state/global_state_repository.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -14,19 +15,20 @@ class CreateOrEditBookingBloc extends Bloc<CreateOrEditBookingEvents, CreateOrEd
   BookingRepository bookingRepository = BookingRepository();
 
   CreateOrEditBookingBloc() : super(CreateOrEditBookingInitialState()) {
-    on<CreateOrEditBookingEvents>((event, emit) async {
-      print('Test 2');
-      print(event);
-      //if (event is CreateBookingEvent) {
+    on<CreateBookingEvent>((event, emit) async {
       emit(CreateOrEditBookingLoadingState());
       try {
-        print('Test 3');
-        bookingRepository.create('Test Bloc', TransactionType.income.name, '2023-10-05 20:25:59.465092', 'None', '8.6', 'Bildung', '', 'Geldbeutel', 'Girokonto');
+        if (event.newBooking.bookingRepeats == RepeatType.noRepetition.name) {
+          bookingRepository.create(event.newBooking);
+        } else {
+          bookingRepository.createSerie(event.newBooking);
+          GlobalStateRepository globalStateRepository = GlobalStateRepository();
+          globalStateRepository.increaseBookingSerieIndex();
+        }
         emit(CreateOrEditBookingSuccessState());
       } catch (error) {
         emit(CreateOrEditBookingFailureState());
       }
-      //}
     });
   }
 }

@@ -53,6 +53,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
   final TextEditingController _fromAccountTextController = TextEditingController();
   final TextEditingController _toAccountTextController = TextEditingController();
   final TextEditingController _categorieTextController = TextEditingController();
+
   // TODO hier weitermachen und _subcategorieTextController.text überall einbauen, dabei an _categorieTextController.text orientieren
   // müssten die gleichen Stellen sein. Buchung Datenstruktur um Unterkategorie Eintrag erweitern.
   final TextEditingController _subcategorieTextController = TextEditingController();
@@ -108,10 +109,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
   }
 
   void _createOrUpdateBooking() async {
-    print('Test 1');
-    print(_parsedBookingDate.toString());
-    createOrEditBookingBloc.add(CreateBookingEvent(context));
-    /*if (_validBookingName(_bookingNameController.text) == false ||
+    if (_validBookingName(_bookingNameController.text) == false ||
         _validBookingAmount(_amountTextController.text) == false ||
         _validCategorie(_categorieTextController.text) == false ||
         _validFromAccount(_fromAccountTextController.text) == false ||
@@ -120,18 +118,21 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
       return;
     }
     if (widget.bookingBoxIndex == -1) {
-      Booking booking = Booking();
-
-      if (_bookingRepeat == RepeatType.noRepetition.name) {
-        // TODO Code verbessern und nur komplettes Booking Objekt übergeben
-        bookingRepository.create(_bookingNameController.text, _currentTransaction, _parsedBookingDate.toString(), _bookingRepeat, _amountTextController.text,
-            _categorieTextController.text, _subcategorieTextController.text, _fromAccountTextController.text, _toAccountTextController.text);
-      } else if (_bookingRepeat != RepeatType.noRepetition.name) {
-        // TODO Code verbessern und nur komplettes Booking Objekt übergeben
-        bookingRepository.createBookingSerie(_bookingNameController.text, _currentTransaction, _parsedBookingDate.toString(), _bookingRepeat, _amountTextController.text,
-            _categorieTextController.text, _subcategorieTextController.text, _fromAccountTextController.text, _toAccountTextController.text);
-      }
+      Booking newBooking = Booking()
+        ..transactionType = _currentTransaction
+        ..bookingRepeats = _bookingRepeat
+        ..title = _bookingNameController.text
+        ..date = _parsedBookingDate.toString()
+        ..amount = _amountTextController.text
+        ..categorie = _categorieTextController.text
+        ..subcategorie = _subcategorieTextController.text
+        ..fromAccount = _fromAccountTextController.text
+        ..toAccount = _toAccountTextController.text
+        ..serieId = -1
+        ..booked = _parsedBookingDate.isAfter(DateTime.now()) ? false : true;
+      createOrEditBookingBloc.add(CreateBookingEvent(context, newBooking));
     } else {
+      // TODO hier weitermachen und Buchung updaten auf Bloc Pattern umstellen
       Booking currentBooking = Booking()
         ..transactionType = _currentTransaction
         ..bookingRepeats = _bookingRepeat
@@ -145,7 +146,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
         ..serieId = _loadedBooking.serieId
         ..booked = _loadedBooking.booked;
       bookingRepository.updateSerieBookings(currentBooking, _loadedBooking, widget.bookingBoxIndex, widget.serieEditMode);
-    }*/
+    }
     _setSaveButtonAnimation(true);
     Timer(const Duration(milliseconds: transitionInMs), () {
       if (mounted) {
