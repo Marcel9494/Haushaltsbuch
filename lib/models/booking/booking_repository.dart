@@ -166,13 +166,7 @@ class BookingRepository extends BookingInterface {
   }
 
   @override
-  void update(Booking updatedBooking, int bookingBoxIndex) async {
-    var bookingBox = await Hive.openBox(bookingsBox);
-    bookingBox.putAt(bookingBoxIndex, updatedBooking);
-  }
-
-  @override
-  void updateSerieBookings(Booking templateBooking, Booking oldBooking, int bookingBoxIndex, SerieEditModeType serieEditMode) async {
+  void update(Booking templateBooking, Booking oldBooking, int bookingBoxIndex, SerieEditModeType serieEditMode) async {
     var bookingBox = await Hive.openBox(bookingsBox);
     for (int i = 0; i < bookingBox.length; i++) {
       Booking booking = await bookingBox.getAt(i);
@@ -180,11 +174,7 @@ class BookingRepository extends BookingInterface {
         if (booking.serieId == templateBooking.serieId && booking.boxIndex == bookingBoxIndex && booking.booked) {
           accountRepository.undoneAccountBooking(oldBooking);
           bookingBox.putAt(bookingBoxIndex, templateBooking);
-          if (templateBooking.transactionType == TransactionType.transfer.name || templateBooking.transactionType == TransactionType.investment.name) {
-            accountRepository.transferMoney(templateBooking.fromAccount, templateBooking.toAccount, templateBooking.amount);
-          } else {
-            accountRepository.calculateNewAccountBalance(templateBooking.fromAccount, templateBooking.amount, templateBooking.transactionType);
-          }
+          executeAccountTransaction(templateBooking);
         }
       } else if (serieEditMode == SerieEditModeType.onlyFuture) {
         if (booking.serieId == templateBooking.serieId && booking.boxIndex == bookingBoxIndex) {
@@ -192,13 +182,7 @@ class BookingRepository extends BookingInterface {
             accountRepository.undoneAccountBooking(oldBooking);
           }
           bookingBox.putAt(bookingBoxIndex, templateBooking);
-          if (booking.booked) {
-            if (templateBooking.transactionType == TransactionType.transfer.name || templateBooking.transactionType == TransactionType.investment.name) {
-              accountRepository.transferMoney(templateBooking.fromAccount, templateBooking.toAccount, templateBooking.amount);
-            } else {
-              accountRepository.calculateNewAccountBalance(templateBooking.fromAccount, templateBooking.amount, templateBooking.transactionType);
-            }
-          }
+          executeAccountTransaction(templateBooking);
         } else if (booking.serieId == templateBooking.serieId && DateTime.parse(booking.date).isAfter(DateTime.parse(templateBooking.date))) {
           if (booking.booked) {
             accountRepository.undoneAccountBooking(booking);
@@ -220,13 +204,7 @@ class BookingRepository extends BookingInterface {
             ..serieId = templateBooking.serieId
             ..booked = booked;
           bookingBox.putAt(booking.boxIndex, newBooking);
-          if (newBooking.booked) {
-            if (newBooking.transactionType == TransactionType.transfer.name || newBooking.transactionType == TransactionType.investment.name) {
-              accountRepository.transferMoney(newBooking.fromAccount, newBooking.toAccount, newBooking.amount);
-            } else {
-              accountRepository.calculateNewAccountBalance(newBooking.fromAccount, newBooking.amount, newBooking.transactionType);
-            }
-          }
+          executeAccountTransaction(newBooking);
         }
       } else if (serieEditMode == SerieEditModeType.all) {
         if (booking.serieId == templateBooking.serieId && booking.boxIndex == bookingBoxIndex) {
@@ -234,13 +212,7 @@ class BookingRepository extends BookingInterface {
             accountRepository.undoneAccountBooking(oldBooking);
           }
           bookingBox.putAt(bookingBoxIndex, templateBooking);
-          if (booking.booked) {
-            if (templateBooking.transactionType == TransactionType.transfer.name || templateBooking.transactionType == TransactionType.investment.name) {
-              accountRepository.transferMoney(templateBooking.fromAccount, templateBooking.toAccount, templateBooking.amount);
-            } else {
-              accountRepository.calculateNewAccountBalance(templateBooking.fromAccount, templateBooking.amount, templateBooking.transactionType);
-            }
-          }
+          executeAccountTransaction(templateBooking);
         } else if (booking.serieId == templateBooking.serieId) {
           if (booking.booked) {
             accountRepository.undoneAccountBooking(booking);
@@ -262,13 +234,7 @@ class BookingRepository extends BookingInterface {
             ..serieId = templateBooking.serieId
             ..booked = booked;
           bookingBox.putAt(booking.boxIndex, newBooking);
-          if (newBooking.booked) {
-            if (newBooking.transactionType == TransactionType.transfer.name || newBooking.transactionType == TransactionType.investment.name) {
-              accountRepository.transferMoney(newBooking.fromAccount, newBooking.toAccount, newBooking.amount);
-            } else {
-              accountRepository.calculateNewAccountBalance(newBooking.fromAccount, newBooking.amount, newBooking.transactionType);
-            }
-          }
+          executeAccountTransaction(newBooking);
         }
       }
     }

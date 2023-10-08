@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:haushaltsbuch/models/enums/serie_edit_modes.dart';
 
 import '/models/enums/repeat_types.dart';
 import '/models/booking/booking_model.dart';
@@ -18,13 +19,23 @@ class CreateOrEditBookingBloc extends Bloc<CreateOrEditBookingEvents, CreateOrEd
     on<CreateBookingEvent>((event, emit) async {
       emit(CreateOrEditBookingLoadingState());
       try {
-        if (event.newBooking.bookingRepeats == RepeatType.noRepetition.name) {
-          bookingRepository.create(event.newBooking);
+        if (event.booking.bookingRepeats == RepeatType.noRepetition.name) {
+          bookingRepository.create(event.booking);
         } else {
-          bookingRepository.createSerie(event.newBooking);
+          bookingRepository.createSerie(event.booking);
           GlobalStateRepository globalStateRepository = GlobalStateRepository();
           globalStateRepository.increaseBookingSerieIndex();
         }
+        emit(CreateOrEditBookingSuccessState());
+      } catch (error) {
+        emit(CreateOrEditBookingFailureState());
+      }
+    });
+
+    on<UpdateBookingEvent>((event, emit) async {
+      emit(CreateOrEditBookingLoadingState());
+      try {
+        bookingRepository.update(event.updatedBooking, event.oldBooking, event.bookingBoxIndex, event.serieEditMode);
         emit(CreateOrEditBookingSuccessState());
       } catch (error) {
         emit(CreateOrEditBookingFailureState());

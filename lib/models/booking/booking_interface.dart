@@ -7,9 +7,8 @@ abstract class BookingInterface {
       String toAccount, bool isSerieBooking);
   void createSerie(Booking templateBooking);
   void executeAccountTransaction(Booking booking);
+  void update(Booking templateBooking, Booking oldBooking, int bookingBoxIndex, SerieEditModeType serieEditMode);
 
-  void update(Booking updatedBooking, int bookingBoxIndex);
-  void updateSerieBookings(Booking templateBooking, Booking oldBooking, int bookingBoxIndex, SerieEditModeType serieEditMode);
   Future<Booking> updateBookingBookedState(Booking updatedBooking);
   Future<Booking> updateBookingInstance(Booking templateBooking, Booking oldBooking);
   Future<void> updateBookingCategorieName(String oldCategorieName, String newCategorieName);

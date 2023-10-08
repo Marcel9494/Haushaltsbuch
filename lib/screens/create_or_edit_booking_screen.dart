@@ -117,36 +117,24 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
       _setSaveButtonAnimation(false);
       return;
     }
+    Booking booking = Booking()
+      ..transactionType = _currentTransaction
+      ..bookingRepeats = _bookingRepeat
+      ..title = _bookingNameController.text
+      ..date = _parsedBookingDate.toString()
+      ..amount = _amountTextController.text
+      ..categorie = _categorieTextController.text
+      ..subcategorie = _subcategorieTextController.text
+      ..fromAccount = _fromAccountTextController.text
+      ..toAccount = _toAccountTextController.text
+      ..serieId = widget.bookingBoxIndex == -1 ? -1 : _loadedBooking.serieId
+      ..booked = _parsedBookingDate.isAfter(DateTime.now()) ? false : true;
     if (widget.bookingBoxIndex == -1) {
-      Booking newBooking = Booking()
-        ..transactionType = _currentTransaction
-        ..bookingRepeats = _bookingRepeat
-        ..title = _bookingNameController.text
-        ..date = _parsedBookingDate.toString()
-        ..amount = _amountTextController.text
-        ..categorie = _categorieTextController.text
-        ..subcategorie = _subcategorieTextController.text
-        ..fromAccount = _fromAccountTextController.text
-        ..toAccount = _toAccountTextController.text
-        ..serieId = -1
-        ..booked = _parsedBookingDate.isAfter(DateTime.now()) ? false : true;
-      createOrEditBookingBloc.add(CreateBookingEvent(context, newBooking));
+      createOrEditBookingBloc.add(CreateBookingEvent(context, booking));
     } else {
-      // TODO hier weitermachen und Buchung updaten auf Bloc Pattern umstellen
-      Booking currentBooking = Booking()
-        ..transactionType = _currentTransaction
-        ..bookingRepeats = _bookingRepeat
-        ..title = _bookingNameController.text
-        ..date = _parsedBookingDate.toString()
-        ..amount = _amountTextController.text
-        ..categorie = _categorieTextController.text
-        ..subcategorie = _subcategorieTextController.text
-        ..fromAccount = _fromAccountTextController.text
-        ..toAccount = _toAccountTextController.text
-        ..serieId = _loadedBooking.serieId
-        ..booked = _loadedBooking.booked;
-      bookingRepository.updateSerieBookings(currentBooking, _loadedBooking, widget.bookingBoxIndex, widget.serieEditMode);
+      createOrEditBookingBloc.add(UpdateBookingEvent(context, _loadedBooking, booking, widget.bookingBoxIndex, widget.serieEditMode));
     }
+    // TODO hier weitermachen und UI Logik in States auslagern?
     _setSaveButtonAnimation(true);
     Timer(const Duration(milliseconds: transitionInMs), () {
       if (mounted) {
