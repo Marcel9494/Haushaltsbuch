@@ -16,3 +16,11 @@ class UpdateBookingEvent extends CreateOrEditBookingEvents {
   final SerieEditModeType serieEditMode;
   UpdateBookingEvent(this.context, this.oldBooking, this.updatedBooking, this.bookingBoxIndex, this.serieEditMode);
 }
+
+class DeleteBookingEvent extends CreateOrEditBookingEvents {
+  final BuildContext context;
+  final Booking booking;
+  final int bookingBoxIndex;
+  final SerieEditModeType serieEditMode;
+  DeleteBookingEvent(this.context, this.booking, this.bookingBoxIndex, this.serieEditMode);
+}

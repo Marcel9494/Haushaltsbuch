@@ -7,7 +7,15 @@ class CreateOrEditBookingInitialState extends CreateOrEditBookingState {}
 class CreateOrEditBookingLoadingState extends CreateOrEditBookingState {}
 
 class CreateOrEditBookingSuccessState extends CreateOrEditBookingState {
-  CreateOrEditBookingSuccessState();
+  final BuildContext context;
+  CreateOrEditBookingSuccessState(this.context) {
+    Timer(const Duration(milliseconds: transitionInMs), () {
+      FocusScope.of(context).requestFocus(FocusNode());
+      Navigator.pop(context);
+      Navigator.pop(context);
+      Navigator.pushNamed(context, bottomNavBarRoute, arguments: BottomNavBarScreenArguments(0));
+    });
+  }
 }
 
 class CreateOrEditBookingFailureState extends CreateOrEditBookingState {}

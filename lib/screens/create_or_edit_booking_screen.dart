@@ -1,15 +1,11 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:another_flushbar/flushbar.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 
-import '../blocs/create_or_edit_booking_screen/create_or_edit_booking_screen_bloc.dart';
-import '../models/booking/booking_repository.dart';
-import '../models/primary_account/primary_account_repository.dart';
-import '/utils/consts/route_consts.dart';
-import '/utils/consts/global_consts.dart';
+import '/blocs/create_or_edit_booking_screen/create_or_edit_booking_screen_bloc.dart';
+
 import '/utils/date_formatters/date_formatter.dart';
 
 import '/components/input_fields/subcategorie_input_field.dart';
@@ -22,13 +18,14 @@ import '/components/input_fields/account_input_field.dart';
 import '/components/buttons/save_button.dart';
 import '/components/deco/loading_indicator.dart';
 
+import '/models/booking/booking_repository.dart';
 import '/models/booking/booking_model.dart';
 import '/models/enums/categorie_types.dart';
 import '/models/enums/repeat_types.dart';
 import '/models/enums/serie_edit_modes.dart';
 import '/models/enums/transaction_types.dart';
 import '/models/enums/preselect_account_types.dart';
-import '/models/screen_arguments/bottom_nav_bar_screen_arguments.dart';
+import '/models/primary_account/primary_account_repository.dart';
 
 class CreateOrEditBookingScreen extends StatefulWidget {
   final int bookingBoxIndex;
@@ -53,9 +50,6 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
   final TextEditingController _fromAccountTextController = TextEditingController();
   final TextEditingController _toAccountTextController = TextEditingController();
   final TextEditingController _categorieTextController = TextEditingController();
-
-  // TODO hier weitermachen und _subcategorieTextController.text überall einbauen, dabei an _categorieTextController.text orientieren
-  // müssten die gleichen Stellen sein. Buchung Datenstruktur um Unterkategorie Eintrag erweitern.
   final TextEditingController _subcategorieTextController = TextEditingController();
   final RoundedLoadingButtonController _saveButtonController = RoundedLoadingButtonController();
   late final CreateOrEditBookingBloc createOrEditBookingBloc;
@@ -84,12 +78,6 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
     } else {
       _loadBooking();
     }
-  }
-
-  @override
-  void dispose() {
-    //createOrEditBookingBloc.close();
-    super.dispose();
   }
 
   Future<void> _loadBooking() async {
@@ -134,16 +122,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
     } else {
       createOrEditBookingBloc.add(UpdateBookingEvent(context, _loadedBooking, booking, widget.bookingBoxIndex, widget.serieEditMode));
     }
-    // TODO hier weitermachen und UI Logik in States auslagern?
     _setSaveButtonAnimation(true);
-    Timer(const Duration(milliseconds: transitionInMs), () {
-      if (mounted) {
-        FocusScope.of(context).requestFocus(FocusNode());
-        Navigator.pop(context);
-        Navigator.pop(context);
-        Navigator.pushNamed(context, bottomNavBarRoute, arguments: BottomNavBarScreenArguments(0));
-      }
-    });
   }
 
   bool _validBookingName(String bookingName) {
@@ -212,85 +191,6 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
 
   set currentTransaction(String transaction) => setState(() => {_currentTransaction = transaction, _categorieTextController.text = '', _subcategorieTextController.text = ''});
   set currentBookingDate(DateTime bookingDate) => _parsedBookingDate = bookingDate;
-
-  void _deleteBooking(int index) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text(widget.serieEditMode == SerieEditModeType.none || widget.serieEditMode == SerieEditModeType.single ? 'Buchung löschen?' : 'Buchungen löschen?'),
-          actions: <Widget>[
-            TextButton(
-              child: const Text(
-                'Nein',
-                style: TextStyle(
-                  color: Colors.cyanAccent,
-                ),
-              ),
-              onPressed: () => _noPressed(),
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                foregroundColor: Colors.black87,
-                backgroundColor: Colors.cyanAccent,
-              ),
-              onPressed: () => {
-                _yesPressed(index),
-                Flushbar(
-                  title:
-                      widget.serieEditMode == SerieEditModeType.none || widget.serieEditMode == SerieEditModeType.single ? 'Buchung wurde gelöscht' : 'Buchungen wurden gelöscht',
-                  message: widget.serieEditMode == SerieEditModeType.none || widget.serieEditMode == SerieEditModeType.single
-                      ? 'Buchung wurde erfolgreich gelöscht.'
-                      : 'Buchungen wurden erfolgreich gelöscht',
-                  icon: const Icon(
-                    Icons.info_outline,
-                    size: 28.0,
-                    color: Colors.cyanAccent,
-                  ),
-                  duration: const Duration(seconds: 3),
-                  leftBarIndicatorColor: Colors.cyanAccent,
-                )..show(context),
-              },
-              child: const Text('Ja'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void _yesPressed(int index) {
-    if (widget.serieEditMode == SerieEditModeType.none) {
-      setState(() {
-        bookingRepository.delete(widget.bookingBoxIndex);
-      });
-    } else {
-      setState(() {
-        Booking currentBooking = Booking()
-          ..transactionType = _currentTransaction
-          ..bookingRepeats = _bookingRepeat
-          ..title = _bookingNameController.text
-          ..date = _parsedBookingDate.toString()
-          ..amount = _amountTextController.text
-          ..categorie = _categorieTextController.text
-          ..subcategorie = _subcategorieTextController.text
-          ..fromAccount = _fromAccountTextController.text
-          ..toAccount = _toAccountTextController.text
-          ..serieId = _loadedBooking.serieId
-          ..booked = _loadedBooking.booked;
-        bookingRepository.deleteSerieBookings(currentBooking, widget.bookingBoxIndex, widget.serieEditMode);
-      });
-    }
-    Navigator.pop(context);
-    Navigator.pop(context);
-    Navigator.popAndPushNamed(context, bottomNavBarRoute, arguments: BottomNavBarScreenArguments(0));
-    FocusScope.of(context).unfocus();
-  }
-
-  void _noPressed() {
-    Navigator.pop(context);
-    FocusScope.of(context).unfocus();
-  }
 
   Future<void> _loadPreselectedAccounts() async {
     PrimaryAccountRepository primaryAccountRepository = PrimaryAccountRepository();
@@ -370,7 +270,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
                 : IconButton(
                     icon: const Icon(Icons.delete_forever_rounded),
                     onPressed: () {
-                      _deleteBooking(widget.bookingBoxIndex);
+                      createOrEditBookingBloc.add(DeleteBookingEvent(context, _loadedBooking, widget.bookingBoxIndex, widget.serieEditMode));
                     },
                   ),
           ],
