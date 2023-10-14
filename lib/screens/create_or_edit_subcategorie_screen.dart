@@ -118,7 +118,7 @@ class _CreateOrEditSubcategorieScreenState extends State<CreateOrEditSubcategori
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                TextInputField(textEditingController: _subcategorieNameController, errorText: _subcategorieNameErrorText, hintText: 'Unterkategoriename', autofocus: true),
+                // TODO TextInputField(textEditingController: _subcategorieNameController, errorText: _subcategorieNameErrorText, hintText: 'Unterkategoriename', autofocus: true),
                 SaveButton(saveFunction: _createOrUpdateSubcategorie, buttonController: _saveButtonController),
               ],
             ),

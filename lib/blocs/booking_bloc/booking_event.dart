@@ -1,14 +1,14 @@
-part of 'create_or_edit_booking_screen_bloc.dart';
+part of 'booking_bloc.dart';
 
-abstract class CreateOrEditBookingEvents {}
+abstract class BookingEvents {}
 
-class CreateBookingEvent extends CreateOrEditBookingEvents {
+class CreateBookingEvent extends BookingEvents {
   final BuildContext context;
   final Booking booking;
   CreateBookingEvent(this.context, this.booking);
 }
 
-class UpdateBookingEvent extends CreateOrEditBookingEvents {
+class UpdateBookingEvent extends BookingEvents {
   final BuildContext context;
   final Booking oldBooking;
   final Booking updatedBooking;
@@ -17,7 +17,13 @@ class UpdateBookingEvent extends CreateOrEditBookingEvents {
   UpdateBookingEvent(this.context, this.oldBooking, this.updatedBooking, this.bookingBoxIndex, this.serieEditMode);
 }
 
-class DeleteBookingEvent extends CreateOrEditBookingEvents {
+class LoadBookingEvent extends BookingEvents {
+  final BuildContext context;
+  final int bookingBoxIndex;
+  LoadBookingEvent(this.context, this.bookingBoxIndex);
+}
+
+class DeleteBookingEvent extends BookingEvents {
   final BuildContext context;
   final Booking booking;
   final int bookingBoxIndex;

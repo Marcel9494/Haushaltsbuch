@@ -2,9 +2,11 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:haushaltsbuch/blocs/input_fields_bloc/text_input_field_cubit.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 
-import '/blocs/create_or_edit_booking_screen/create_or_edit_booking_screen_bloc.dart';
+import '/blocs/booking_bloc/booking_cubit.dart';
+import '/blocs/booking_bloc/booking_bloc.dart';
 
 import '/utils/date_formatters/date_formatter.dart';
 
@@ -28,13 +30,13 @@ import '/models/enums/preselect_account_types.dart';
 import '/models/primary_account/primary_account_repository.dart';
 
 class CreateOrEditBookingScreen extends StatefulWidget {
-  final int bookingBoxIndex;
-  final SerieEditModeType serieEditMode;
+  //final int bookingBoxIndex;
+  //final SerieEditModeType serieEditMode;
 
   const CreateOrEditBookingScreen({
     Key? key,
-    required this.bookingBoxIndex,
-    required this.serieEditMode,
+    //required this.bookingBoxIndex,
+    //required this.serieEditMode,
   }) : super(key: key);
 
   @override
@@ -45,14 +47,16 @@ class CreateOrEditBookingScreen extends StatefulWidget {
 
 class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
   final TextEditingController _amountTextController = TextEditingController();
-  final TextEditingController _bookingNameController = TextEditingController();
+  //final TextEditingController _bookingNameController = TextEditingController();
   final TextEditingController _bookingDateTextController = TextEditingController();
   final TextEditingController _fromAccountTextController = TextEditingController();
   final TextEditingController _toAccountTextController = TextEditingController();
   final TextEditingController _categorieTextController = TextEditingController();
   final TextEditingController _subcategorieTextController = TextEditingController();
   final RoundedLoadingButtonController _saveButtonController = RoundedLoadingButtonController();
-  late final CreateOrEditBookingBloc createOrEditBookingBloc;
+  late final BookingBloc bookingBloc;
+  late final BookingCubit bookingCubit;
+  late final TextInputFieldCubit textInputFieldCubit;
   final BookingRepository bookingRepository = BookingRepository();
   bool _isBookingEdited = false;
   bool _isPreselectedAccountsLoaded = false;
@@ -66,29 +70,40 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
   DateTime _parsedBookingDate = DateTime.now();
   Map<String, String> _primaryAccounts = {};
   late Booking _loadedBooking;
+  int boxIndex = 0;
+
+  final UniqueKey textFieldUniqueKey = UniqueKey();
 
   @override
   void initState() {
     super.initState();
-    createOrEditBookingBloc = BlocProvider.of<CreateOrEditBookingBloc>(context);
-    if (widget.bookingBoxIndex == -1) {
+    textInputFieldCubit = BlocProvider.of<TextInputFieldCubit>(context);
+    bookingBloc = BlocProvider.of<BookingBloc>(context);
+    bookingCubit = BlocProvider.of<BookingCubit>(context);
+
+    Map<Booking, int> map = bookingCubit.state;
+    final Booking booking = map.keys.first;
+    boxIndex = map.values.first;
+
+    if (boxIndex == -1) {
       _currentTransaction = TransactionType.outcome.name;
       _bookingRepeat = RepeatType.noRepetition.name;
       _bookingDateTextController.text = dateFormatterDDMMYYYYEE.format(DateTime.now());
     } else {
-      _loadBooking();
+      textInputFieldCubit.updateValue(booking.title);
+      //_loadBooking();
     }
   }
 
   Future<void> _loadBooking() async {
-    _loadedBooking = await bookingRepository.load(widget.bookingBoxIndex);
+    _loadedBooking = await bookingRepository.load(boxIndex);
     _currentTransaction = _loadedBooking.transactionType;
-    _bookingNameController.text = _loadedBooking.title;
+    //_bookingNameController.text = _loadedBooking.title;
     _parsedBookingDate = DateTime.parse(_loadedBooking.date);
     _bookingDateTextController.text = dateFormatterDDMMYYYYEE.format(DateTime.parse(_loadedBooking.date));
     _bookingRepeat = _loadedBooking.bookingRepeats;
     _amountTextController.text = _loadedBooking.amount;
-    _bookingNameController.text = _loadedBooking.title;
+    //_bookingNameController.text = _loadedBooking.title;
     _categorieTextController.text = _loadedBooking.categorie;
     _subcategorieTextController.text = _loadedBooking.subcategorie;
     _fromAccountTextController.text = _loadedBooking.fromAccount;
@@ -97,41 +112,42 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
   }
 
   void _createOrUpdateBooking() async {
-    if (_validBookingName(_bookingNameController.text) == false ||
+    if (/*_validBookingName(_bookingNameController.text) == false ||*/
         _validBookingAmount(_amountTextController.text) == false ||
-        _validCategorie(_categorieTextController.text) == false ||
-        _validFromAccount(_fromAccountTextController.text) == false ||
-        _validToAccount(_toAccountTextController.text) == false) {
+            _validCategorie(_categorieTextController.text) == false ||
+            _validFromAccount(_fromAccountTextController.text) == false ||
+            _validToAccount(_toAccountTextController.text) == false) {
       _setSaveButtonAnimation(false);
       return;
     }
     Booking booking = Booking()
       ..transactionType = _currentTransaction
       ..bookingRepeats = _bookingRepeat
-      ..title = _bookingNameController.text
+      //..title = _bookingNameController.text
       ..date = _parsedBookingDate.toString()
       ..amount = _amountTextController.text
       ..categorie = _categorieTextController.text
       ..subcategorie = _subcategorieTextController.text
       ..fromAccount = _fromAccountTextController.text
       ..toAccount = _toAccountTextController.text
-      ..serieId = widget.bookingBoxIndex == -1 ? -1 : _loadedBooking.serieId
+      ..serieId = boxIndex == -1 ? -1 : _loadedBooking.serieId
       ..booked = _parsedBookingDate.isAfter(DateTime.now()) ? false : true;
-    if (widget.bookingBoxIndex == -1) {
-      createOrEditBookingBloc.add(CreateBookingEvent(context, booking));
+    if (boxIndex == -1) {
+      bookingBloc.add(CreateBookingEvent(context, booking));
     } else {
-      createOrEditBookingBloc.add(UpdateBookingEvent(context, _loadedBooking, booking, widget.bookingBoxIndex, widget.serieEditMode));
+      // TODO SerieEditModeType.single dynamisch machen
+      bookingBloc.add(UpdateBookingEvent(context, _loadedBooking, booking, boxIndex, SerieEditModeType.single));
     }
     _setSaveButtonAnimation(true);
   }
 
   bool _validBookingName(String bookingName) {
-    if (_bookingNameController.text.isEmpty) {
-      setState(() {
-        _bookingNameErrorText = "Bitte geben Sie eine Beschreibung für die Buchung ein.";
-      });
-      return false;
-    }
+    //if (_bookingNameController.text.isEmpty) {
+    setState(() {
+      _bookingNameErrorText = "Bitte geben Sie eine Beschreibung für die Buchung ein.";
+    });
+    return false;
+    //}
     _bookingNameErrorText = '';
     return true;
   }
@@ -190,6 +206,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
   }
 
   set currentTransaction(String transaction) => setState(() => {_currentTransaction = transaction, _categorieTextController.text = '', _subcategorieTextController.text = ''});
+
   set currentBookingDate(DateTime bookingDate) => _parsedBookingDate = bookingDate;
 
   Future<void> _loadPreselectedAccounts() async {
@@ -200,7 +217,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
 
   // TODO Funktion einfacher und übersichtlicher implementieren
   Widget _getAccountInputField() {
-    if (widget.bookingBoxIndex == -1 && _fromAccountTextController.text.isEmpty && _toAccountTextController.text.isEmpty) {
+    if (boxIndex == -1 && _fromAccountTextController.text.isEmpty && _toAccountTextController.text.isEmpty) {
       if (_currentTransaction == TransactionType.income.name) {
         _fromAccountTextController.text = _primaryAccounts[PreselectAccountType.income.name] ?? '';
         return AccountInputField(textController: _fromAccountTextController, errorText: _fromAccountErrorText);
@@ -263,14 +280,15 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
       child: Scaffold(
         resizeToAvoidBottomInset: false,
         appBar: AppBar(
-          title: widget.bookingBoxIndex == -1 ? const Text('Buchung erstellen') : const Text('Buchung bearbeiten'),
+          title: boxIndex == -1 ? const Text('Buchung erstellen') : const Text('Buchung bearbeiten'),
           actions: [
-            widget.bookingBoxIndex == -1
+            boxIndex == -1
                 ? const SizedBox()
                 : IconButton(
                     icon: const Icon(Icons.delete_forever_rounded),
                     onPressed: () {
-                      createOrEditBookingBloc.add(DeleteBookingEvent(context, _loadedBooking, widget.bookingBoxIndex, widget.serieEditMode));
+                      // TODO SerieEditModeType.single dynamisch machen
+                      bookingBloc.add(DeleteBookingEvent(context, _loadedBooking, boxIndex, SerieEditModeType.single));
                     },
                   ),
           ],
@@ -283,7 +301,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
               borderRadius: BorderRadius.circular(18.0),
             ),
             child: FutureBuilder(
-              future: widget.bookingBoxIndex == -1
+              future: boxIndex == -1
                   ? _isPreselectedAccountsLoaded
                       ? null
                       : _loadPreselectedAccounts()
@@ -305,7 +323,16 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
                             textController: _bookingDateTextController,
                             repeat: _bookingRepeat,
                             repeatCallback: (repeat) => setState(() => _bookingRepeat = repeat)),
-                        TextInputField(textEditingController: _bookingNameController, errorText: _bookingNameErrorText, hintText: 'Titel'),
+                        BlocBuilder<TextInputFieldCubit, String>(
+                          builder: (context, state) {
+                            return TextInputField(
+                                fieldKey: textFieldUniqueKey,
+                                textCubit: textInputFieldCubit,
+                                /*textEditingController: _bookingNameController,*/
+                                errorText: _bookingNameErrorText,
+                                hintText: 'Titel');
+                          },
+                        ),
                         MoneyInputField(textController: _amountTextController, errorText: _amountErrorText, hintText: 'Betrag', bottomSheetTitle: 'Betrag eingeben:'),
                         _getAccountInputField(),
                         _currentTransaction == TransactionType.transfer.name

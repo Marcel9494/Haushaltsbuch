@@ -3,8 +3,8 @@ import 'dart:async';
 import 'package:another_flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 
-import '/utils/consts/global_consts.dart';
 import '/utils/consts/route_consts.dart';
+import '/utils/consts/global_consts.dart';
 
 import '/models/enums/repeat_types.dart';
 import '/models/booking/booking_model.dart';
@@ -15,15 +15,17 @@ import '/models/screen_arguments/bottom_nav_bar_screen_arguments.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-part 'create_or_edit_booking_screen_event.dart';
-part 'create_or_edit_booking_screen_state.dart';
+import 'booking_cubit.dart';
 
-class CreateOrEditBookingBloc extends Bloc<CreateOrEditBookingEvents, CreateOrEditBookingState> {
+part 'booking_event.dart';
+part 'booking_state.dart';
+
+class BookingBloc extends Bloc<BookingEvents, BookingState> {
   BookingRepository bookingRepository = BookingRepository();
 
-  CreateOrEditBookingBloc() : super(CreateOrEditBookingInitialState()) {
+  BookingBloc() : super(BookingInitialState()) {
     on<CreateBookingEvent>((event, emit) async {
-      emit(CreateOrEditBookingLoadingState());
+      emit(BookingLoadingState());
       try {
         if (event.booking.bookingRepeats == RepeatType.noRepetition.name) {
           bookingRepository.create(event.booking);
@@ -32,20 +34,25 @@ class CreateOrEditBookingBloc extends Bloc<CreateOrEditBookingEvents, CreateOrEd
           GlobalStateRepository globalStateRepository = GlobalStateRepository();
           globalStateRepository.increaseBookingSerieIndex();
         }
-        emit(CreateOrEditBookingSuccessState(event.context));
+        emit(BookingSuccessState(event.context));
       } catch (error) {
-        emit(CreateOrEditBookingFailureState());
+        emit(BookingFailureState());
       }
     });
 
     on<UpdateBookingEvent>((event, emit) async {
-      emit(CreateOrEditBookingLoadingState());
+      emit(BookingLoadingState());
       try {
         bookingRepository.update(event.updatedBooking, event.oldBooking, event.bookingBoxIndex, event.serieEditMode);
-        emit(CreateOrEditBookingSuccessState(event.context));
+        emit(BookingSuccessState(event.context));
       } catch (error) {
-        emit(CreateOrEditBookingFailureState());
+        emit(BookingFailureState());
       }
+    });
+
+    on<LoadBookingEvent>((event, emit) async {
+      BlocProvider.of<BookingCubit>(event.context).loadExistingBooking(event.bookingBoxIndex);
+      Navigator.pushNamed(event.context, createOrEditBookingRoute);
     });
 
     on<DeleteBookingEvent>((event, emit) async {
@@ -73,7 +80,7 @@ class CreateOrEditBookingBloc extends Bloc<CreateOrEditBookingEvents, CreateOrEd
         FocusScope.of(event.context).unfocus();
       }
 
-      emit(CreateOrEditBookingLoadingState());
+      emit(BookingLoadingState());
       try {
         showDialog(
           context: event.context,
@@ -122,7 +129,7 @@ class CreateOrEditBookingBloc extends Bloc<CreateOrEditBookingEvents, CreateOrEd
           },
         );
       } catch (error) {
-        emit(CreateOrEditBookingFailureState());
+        emit(BookingFailureState());
       }
     });
   }

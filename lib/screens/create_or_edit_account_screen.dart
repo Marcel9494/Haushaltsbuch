@@ -247,7 +247,7 @@ class _CreateOrEditAccountScreenState extends State<CreateOrEditAccountScreen> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         AccountTypeInputField(textController: _accountGroupTextController, errorText: _accountGroupErrorText),
-                        TextInputField(textEditingController: _accountNameController, errorText: _accountNameErrorText, hintText: 'Name'),
+                        // TODO TextInputField(textEditingController: _accountNameController, errorText: _accountNameErrorText, hintText: 'Name'),
                         MoneyInputField(
                             textController: _bankBalanceTextController, errorText: _bankBalanceErrorText, hintText: 'Kontostand', bottomSheetTitle: 'Kontostand eingeben:'),
                         PreselectAccountInputField(textController: _preselectedAccountTextController),

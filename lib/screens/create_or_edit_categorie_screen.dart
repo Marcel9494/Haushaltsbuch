@@ -121,7 +121,7 @@ class _CreateOrEditCategorieScreenState extends State<CreateOrEditCategorieScree
               children: [
                 CategorieTypeToggleButtons(
                     currentCategorieType: _currentCategorieType, categorieTypeStringCallback: (categorie) => setState(() => _currentCategorieType = categorie)),
-                TextInputField(textEditingController: _categorieNameController, errorText: _categorieNameErrorText, hintText: 'Kategoriename', autofocus: true),
+                // TODO TextInputField(textEditingController: _categorieNameController, errorText: _categorieNameErrorText, hintText: 'Kategoriename', autofocus: true),
                 SaveButton(saveFunction: _createOrUpdateCategorie, buttonController: _saveButtonController),
               ],
             ),

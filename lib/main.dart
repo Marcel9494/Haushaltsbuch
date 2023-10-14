@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:haushaltsbuch/blocs/input_fields_bloc/text_input_field_cubit.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -28,7 +29,8 @@ import 'models/screen_arguments/create_or_edit_booking_screen_arguments.dart';
 import 'models/screen_arguments/create_or_edit_budget_screen_arguments.dart';
 import 'models/screen_arguments/create_or_edit_categorie_screen_arguments.dart';
 
-import '/blocs/create_or_edit_booking_screen/create_or_edit_booking_screen_bloc.dart';
+import '/blocs/booking_bloc/booking_bloc.dart';
+import '/blocs/booking_bloc/booking_cubit.dart';
 
 import '/components/bottom_nav_bar/bottom_nav_bar.dart';
 
@@ -65,7 +67,17 @@ void main() async {
   introScreenStateRepository.init();
   runApp(
     MultiBlocProvider(
-      providers: [BlocProvider<CreateOrEditBookingBloc>(create: (context) => CreateOrEditBookingBloc())],
+      providers: [
+        BlocProvider<BookingBloc>(
+          create: (context) => BookingBloc(),
+        ),
+        BlocProvider<BookingCubit>(
+          create: (context) => BookingCubit(),
+        ),
+        BlocProvider<TextInputFieldCubit>(
+          create: (context) => TextInputFieldCubit(),
+        ),
+      ],
       child: const BudgetBookApp(),
     ),
   );
@@ -101,6 +113,7 @@ class BudgetBookApp extends StatelessWidget {
       ],
       home: const SplashScreen(),
       routes: {
+        createOrEditBookingRoute: (context) => const CreateOrEditBookingScreen(),
         categoriesRoute: (context) => const CategoriesScreen(),
         overviewBudgetsRoute: (context) => const OverviewBudgetsScreen(),
         settingsRoute: (context) => const SettingsScreen(),
@@ -123,7 +136,7 @@ class BudgetBookApp extends StatelessWidget {
               ),
               settings: settings,
             );
-          case createOrEditBookingRoute:
+          /*case createOrEditBookingRoute:
             final args = settings.arguments as CreateOrEditBookingScreenArguments;
             return MaterialPageRoute<String>(
               builder: (BuildContext context) => CreateOrEditBookingScreen(
@@ -131,7 +144,7 @@ class BudgetBookApp extends StatelessWidget {
                 serieEditMode: args.serieEditMode,
               ),
               settings: settings,
-            );
+            );*/
           case createOrEditAccountRoute:
             final args = settings.arguments as CreateOrEditAccountScreenArguments;
             return MaterialPageRoute<String>(
