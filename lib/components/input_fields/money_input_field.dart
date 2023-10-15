@@ -6,7 +6,7 @@ import '/components/deco/bottom_sheet_line.dart';
 import '/utils/number_formatters/number_formatter.dart';
 
 class MoneyInputField extends StatelessWidget {
-  final TextEditingController textController;
+  final dynamic cubit;
   final String errorText;
   final String hintText;
   final String bottomSheetTitle;
@@ -14,14 +14,14 @@ class MoneyInputField extends StatelessWidget {
 
   MoneyInputField({
     Key? key,
-    required this.textController,
+    required this.cubit,
     required this.errorText,
     required this.hintText,
     required this.bottomSheetTitle,
   }) : super(key: key);
 
   void _openBottomSheetForNumberInput(BuildContext context) {
-    _clearedInputField = textController.text.isEmpty ? true : false;
+    _clearedInputField = cubit.state.isEmpty ? true : false;
     showCupertinoModalBottomSheet<void>(
       context: context,
       builder: (BuildContext context) {
@@ -59,7 +59,7 @@ class MoneyInputField extends StatelessWidget {
                       ),
                       OutlinedButton(
                         onPressed: () {
-                          textController.text = '';
+                          cubit.resetValue();
                         },
                         child: const Icon(Icons.clear_rounded, color: Colors.cyanAccent),
                       ),
@@ -77,8 +77,8 @@ class MoneyInputField extends StatelessWidget {
                       ),
                       OutlinedButton(
                         onPressed: () {
-                          if (textController.text.isNotEmpty) {
-                            textController.text = textController.text.substring(0, textController.text.length - 1);
+                          if (cubit.state.isNotEmpty) {
+                            cubit.statet = cubit.state.substring(0, cubit.state.length - 1);
                           }
                         },
                         child: const Icon(Icons.backspace_rounded, color: Colors.cyanAccent),
@@ -122,8 +122,8 @@ class MoneyInputField extends StatelessWidget {
         );
       },
     ).whenComplete(() {
-      if (textController.text.isNotEmpty) {
-        textController.text = formatToMoneyAmount(textController.text);
+      if (cubit.state.isNotEmpty) {
+        cubit.updateValue(formatToMoneyAmount(cubit.state));
       }
     });
   }
@@ -132,15 +132,15 @@ class MoneyInputField extends StatelessWidget {
     // Eingabefeld wird automatisch geleert => Benutzer muss das Eingabefeld nicht mehr mit X löschen, wenn
     // ein neuer Betrag eingegeben wird.
     if (_clearedInputField == false) {
-      textController.text = '';
+      cubit.resetValue();
       _clearedInputField = true;
     }
-    if (amount == ',' && textController.text.contains(',')) {
-      textController.text;
+    if (amount == ',' && cubit.state.contains(',')) {
+      cubit.updateValue(amount);
     } else {
       final regex = RegExp(r'^\d+(,\d{0,2})?$');
-      if (regex.hasMatch(textController.text + amount)) {
-        textController.text += amount;
+      if (regex.hasMatch(cubit.state + amount)) {
+        cubit.updateValue(cubit.state + amount);
       }
     }
   }
@@ -148,8 +148,9 @@ class MoneyInputField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      key: UniqueKey(),
       maxLength: 9,
-      controller: textController,
+      initialValue: cubit.state,
       textAlignVertical: TextAlignVertical.center,
       showCursor: false,
       readOnly: true,

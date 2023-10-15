@@ -248,8 +248,8 @@ class _CreateOrEditAccountScreenState extends State<CreateOrEditAccountScreen> {
                       children: [
                         AccountTypeInputField(textController: _accountGroupTextController, errorText: _accountGroupErrorText),
                         // TODO TextInputField(textEditingController: _accountNameController, errorText: _accountNameErrorText, hintText: 'Name'),
-                        MoneyInputField(
-                            textController: _bankBalanceTextController, errorText: _bankBalanceErrorText, hintText: 'Kontostand', bottomSheetTitle: 'Kontostand eingeben:'),
+                        // TODO MoneyInputField(
+                        //    textController: _bankBalanceTextController, errorText: _bankBalanceErrorText, hintText: 'Kontostand', bottomSheetTitle: 'Kontostand eingeben:'),
                         PreselectAccountInputField(textController: _preselectedAccountTextController),
                         SaveButton(saveFunction: _createOrUpdateAccount, buttonController: _saveButtonController),
                       ],

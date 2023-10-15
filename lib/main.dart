@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:haushaltsbuch/blocs/input_fields_bloc/text_input_field_cubit.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -25,12 +24,13 @@ import 'models/screen_arguments/bottom_nav_bar_screen_arguments.dart';
 import 'models/screen_arguments/account_details_screen_arguments.dart';
 import 'models/screen_arguments/categorie_amount_list_screen_arguments.dart';
 import 'models/screen_arguments/create_or_edit_account_screen_arguments.dart';
-import 'models/screen_arguments/create_or_edit_booking_screen_arguments.dart';
 import 'models/screen_arguments/create_or_edit_budget_screen_arguments.dart';
 import 'models/screen_arguments/create_or_edit_categorie_screen_arguments.dart';
 
 import '/blocs/booking_bloc/booking_bloc.dart';
 import '/blocs/booking_bloc/booking_cubit.dart';
+import '/blocs/input_fields_bloc/text_input_field_cubit.dart';
+import 'blocs/input_fields_bloc/money_input_field_cubit.dart';
 
 import '/components/bottom_nav_bar/bottom_nav_bar.dart';
 
@@ -76,6 +76,9 @@ void main() async {
         ),
         BlocProvider<TextInputFieldCubit>(
           create: (context) => TextInputFieldCubit(),
+        ),
+        BlocProvider<MoneyInputFieldCubit>(
+          create: (context) => MoneyInputFieldCubit(),
         ),
       ],
       child: const BudgetBookApp(),
