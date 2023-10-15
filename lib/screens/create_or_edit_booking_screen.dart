@@ -8,6 +8,8 @@ import '/blocs/booking_bloc/booking_bloc.dart';
 import '/blocs/booking_bloc/booking_cubit.dart';
 import '/blocs/input_fields_bloc/text_input_field_cubit.dart';
 import '/blocs/input_fields_bloc/money_input_field_cubit.dart';
+import '/blocs/input_fields_bloc/categorie_input_field_cubit.dart';
+import '/blocs/input_fields_bloc/subcategorie_input_field_cubit.dart';
 
 import '/utils/date_formatters/date_formatter.dart';
 
@@ -40,17 +42,19 @@ class CreateOrEditBookingScreen extends StatefulWidget {
 }
 
 class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
-  //final TextEditingController _amountTextController = TextEditingController();
   final TextEditingController _bookingDateTextController = TextEditingController();
   final TextEditingController _fromAccountTextController = TextEditingController();
   final TextEditingController _toAccountTextController = TextEditingController();
-  final TextEditingController _categorieTextController = TextEditingController();
-  final TextEditingController _subcategorieTextController = TextEditingController();
+
+  //final TextEditingController _categorieTextController = TextEditingController();
+  //final TextEditingController _subcategorieTextController = TextEditingController();
   final RoundedLoadingButtonController _saveButtonController = RoundedLoadingButtonController();
   late final BookingBloc bookingBloc;
   late final BookingCubit bookingCubit;
   late final TextInputFieldCubit titleInputFieldCubit;
   late final MoneyInputFieldCubit moneyInputFieldCubit;
+  late final CategorieInputFieldCubit categorieInputFieldCubit;
+  late final SubcategorieInputFieldCubit subcategorieInputFieldCubit;
   final BookingRepository bookingRepository = BookingRepository();
   bool _isBookingEdited = false;
   bool _isPreselectedAccountsLoaded = false;
@@ -73,6 +77,8 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
     super.initState();
     titleInputFieldCubit = BlocProvider.of<TextInputFieldCubit>(context);
     moneyInputFieldCubit = BlocProvider.of<MoneyInputFieldCubit>(context);
+    categorieInputFieldCubit = BlocProvider.of<CategorieInputFieldCubit>(context);
+    subcategorieInputFieldCubit = BlocProvider.of<SubcategorieInputFieldCubit>(context);
     bookingBloc = BlocProvider.of<BookingBloc>(context);
     bookingCubit = BlocProvider.of<BookingCubit>(context);
 
@@ -87,6 +93,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
     } else {
       titleInputFieldCubit.updateValue(booking.title);
       moneyInputFieldCubit.updateValue(booking.amount);
+      categorieInputFieldCubit.updateValue(booking.categorie);
       //_loadBooking();
     }
   }
@@ -100,8 +107,8 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
     _bookingRepeat = _loadedBooking.bookingRepeats;
     //_amountTextController.text = _loadedBooking.amount;
     //_bookingNameController.text = _loadedBooking.title;
-    _categorieTextController.text = _loadedBooking.categorie;
-    _subcategorieTextController.text = _loadedBooking.subcategorie;
+    //_categorieTextController.text = _loadedBooking.categorie;
+    //_subcategorieTextController.text = _loadedBooking.subcategorie;
     _fromAccountTextController.text = _loadedBooking.fromAccount;
     _toAccountTextController.text = _loadedBooking.toAccount;
     _isBookingEdited = true;
@@ -110,7 +117,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
   void _createOrUpdateBooking() async {
     if (_validBookingTitle() == false ||
         _validBookingAmount() == false ||
-        _validCategorie(_categorieTextController.text) == false ||
+        _validCategorie() == false ||
         _validFromAccount(_fromAccountTextController.text) == false ||
         _validToAccount(_toAccountTextController.text) == false) {
       _setSaveButtonAnimation(false);
@@ -122,8 +129,8 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
       ..title = titleInputFieldCubit.state
       ..date = _parsedBookingDate.toString()
       ..amount = moneyInputFieldCubit.state
-      ..categorie = _categorieTextController.text
-      ..subcategorie = _subcategorieTextController.text
+      ..categorie = categorieInputFieldCubit.state
+      ..subcategorie = subcategorieInputFieldCubit.state
       ..fromAccount = _fromAccountTextController.text
       ..toAccount = _toAccountTextController.text
       ..serieId = boxIndex == -1 ? -1 : _loadedBooking.serieId
@@ -159,8 +166,8 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
     return true;
   }
 
-  bool _validCategorie(String categorieInput) {
-    if ((_currentTransaction != TransactionType.transfer.name && _currentTransaction != TransactionType.investment.name) && _categorieTextController.text.isEmpty) {
+  bool _validCategorie() {
+    if ((_currentTransaction != TransactionType.transfer.name && _currentTransaction != TransactionType.investment.name) && categorieInputFieldCubit.state.isEmpty) {
       setState(() {
         _categorieErrorText = 'Bitte wählen Sie eine Kategorie aus.';
       });
@@ -201,7 +208,8 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
     }
   }
 
-  set currentTransaction(String transaction) => setState(() => {_currentTransaction = transaction, _categorieTextController.text = '', _subcategorieTextController.text = ''});
+  set currentTransaction(String transaction) =>
+      setState(() => {_currentTransaction = transaction, categorieInputFieldCubit.resetValue(), subcategorieInputFieldCubit.resetValue()});
 
   set currentBookingDate(DateTime bookingDate) => _parsedBookingDate = bookingDate;
 
@@ -332,14 +340,19 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
                         _getAccountInputField(),
                         _currentTransaction == TransactionType.transfer.name
                             ? const SizedBox()
-                            : CategorieInputField(
-                                textController: _categorieTextController,
-                                errorText: _categorieErrorText,
-                                categorieType: CategorieTypeExtension.getCategorieType(_currentTransaction),
-                                categorieStringCallback: (categorie) => setState(() => {_categorieTextController.text = categorie, _subcategorieTextController.text = ''})),
+                            : BlocBuilder<CategorieInputFieldCubit, String>(
+                                builder: (context, state) {
+                                  return CategorieInputField(
+                                      cubit: categorieInputFieldCubit, errorText: _categorieErrorText, categorieType: CategorieTypeExtension.getCategorieType(_currentTransaction));
+                                },
+                              ),
                         _currentTransaction == TransactionType.transfer.name
                             ? const SizedBox()
-                            : SubcategorieInputField(textController: _subcategorieTextController, categorieName: _categorieTextController.text),
+                            : BlocBuilder<SubcategorieInputFieldCubit, String>(
+                                builder: (context, state) {
+                                  return SubcategorieInputField(cubit: subcategorieInputFieldCubit);
+                                },
+                              ),
                         SaveButton(saveFunction: _createOrUpdateBooking, buttonController: _saveButtonController),
                       ],
                     );

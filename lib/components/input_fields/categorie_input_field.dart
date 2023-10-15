@@ -1,27 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
+import '../../blocs/input_fields_bloc/subcategorie_input_field_cubit.dart';
 import '/models/enums/categorie_types.dart';
 import '/models/categorie/categorie_repository.dart';
 
 import '/components/deco/bottom_sheet_line.dart';
 
-typedef CategorieStringCallback = void Function(String currentCategorie);
-
 class CategorieInputField extends StatefulWidget {
-  final TextEditingController textController;
+  final dynamic cubit;
   final String errorText;
   final CategorieType categorieType;
   final String title;
   final bool autofocus;
-  final CategorieStringCallback categorieStringCallback;
 
   const CategorieInputField({
     Key? key,
-    required this.textController,
+    required this.cubit,
     required this.errorText,
     required this.categorieType,
-    required this.categorieStringCallback,
     this.title = 'Kategorie auswählen:',
     this.autofocus = false,
   }) : super(key: key);
@@ -80,8 +78,8 @@ class _CategorieInputFieldState extends State<CategorieInputField> {
                                 for (int i = 0; i < _categorieNames.length; i++)
                                   OutlinedButton(
                                     onPressed: () => {
-                                      widget.textController.text = _categorieNames[i],
-                                      widget.categorieStringCallback(_categorieNames[i]),
+                                      widget.cubit.updateValue(_categorieNames[i]),
+                                      BlocProvider.of<SubcategorieInputFieldCubit>(context).resetValue(),
                                       Navigator.pop(context),
                                     },
                                     child: Text(
@@ -118,7 +116,8 @@ class _CategorieInputFieldState extends State<CategorieInputField> {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
-      controller: widget.textController,
+      key: UniqueKey(),
+      initialValue: widget.cubit.state,
       textAlignVertical: TextAlignVertical.center,
       showCursor: false,
       readOnly: true,

@@ -30,7 +30,9 @@ import 'models/screen_arguments/create_or_edit_categorie_screen_arguments.dart';
 import '/blocs/booking_bloc/booking_bloc.dart';
 import '/blocs/booking_bloc/booking_cubit.dart';
 import '/blocs/input_fields_bloc/text_input_field_cubit.dart';
-import 'blocs/input_fields_bloc/money_input_field_cubit.dart';
+import '/blocs/input_fields_bloc/money_input_field_cubit.dart';
+import '/blocs/input_fields_bloc/categorie_input_field_cubit.dart';
+import '/blocs/input_fields_bloc/subcategorie_input_field_cubit.dart';
 
 import '/components/bottom_nav_bar/bottom_nav_bar.dart';
 
@@ -79,6 +81,12 @@ void main() async {
         ),
         BlocProvider<MoneyInputFieldCubit>(
           create: (context) => MoneyInputFieldCubit(),
+        ),
+        BlocProvider<CategorieInputFieldCubit>(
+          create: (context) => CategorieInputFieldCubit(),
+        ),
+        BlocProvider<SubcategorieInputFieldCubit>(
+          create: (context) => SubcategorieInputFieldCubit(),
         ),
       ],
       child: const BudgetBookApp(),

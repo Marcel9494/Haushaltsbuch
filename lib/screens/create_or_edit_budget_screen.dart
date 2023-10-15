@@ -304,16 +304,16 @@ class _CreateOrEditBudgetScreenState extends State<CreateOrEditBudgetScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                widget.budgetBoxIndex == -1
-                    ? CategorieInputField(
+                /*widget.budgetBoxIndex == -1
+                    ?  TODO CategorieInputField(
                         textController: _categorieTextController,
                         errorText: _categorieErrorText,
                         categorieType: CategorieTypeExtension.getCategorieType(TransactionType.outcome.name),
                         categorieStringCallback: (categorie) => setState(() => _categorieTextController.text = categorie),
                         title: 'Kategorie für Budget auswählen:',
                         autofocus: true)
-                    : const SizedBox(),
-                SubcategorieInputField(textController: _subcategorieTextController, categorieName: _categorieTextController.text),
+                    : const SizedBox(),*/
+                // TODO SubcategorieInputField(textController: _subcategorieTextController, categorieName: _categorieTextController.text),
                 // TODO MoneyInputField(textController: _budgetTextController, errorText: _budgetErrorText, hintText: 'Budget', bottomSheetTitle: 'Budget eingeben:'),
                 SaveButton(saveFunction: _saveBudget, buttonController: _saveButtonController),
               ],

@@ -78,7 +78,7 @@ class MoneyInputField extends StatelessWidget {
                       OutlinedButton(
                         onPressed: () {
                           if (cubit.state.isNotEmpty) {
-                            cubit.statet = cubit.state.substring(0, cubit.state.length - 1);
+                            cubit.updateValue(cubit.state.substring(0, cubit.state.length - 1));
                           }
                         },
                         child: const Icon(Icons.backspace_rounded, color: Colors.cyanAccent),
@@ -122,7 +122,7 @@ class MoneyInputField extends StatelessWidget {
         );
       },
     ).whenComplete(() {
-      if (cubit.state.isNotEmpty) {
+      if (cubit.state.isNotEmpty && !cubit.state.contains('€')) {
         cubit.updateValue(formatToMoneyAmount(cubit.state));
       }
     });
