@@ -6,13 +6,13 @@ import '/components/deco/bottom_sheet_line.dart';
 import '/models/account/account_repository.dart';
 
 class AccountInputField extends StatefulWidget {
-  final TextEditingController textController;
+  final dynamic cubit;
   final String errorText;
   final String hintText;
 
   const AccountInputField({
     Key? key,
-    required this.textController,
+    required this.cubit,
     required this.errorText,
     this.hintText = 'Konto',
   }) : super(key: key);
@@ -60,7 +60,7 @@ class _AccountInputFieldState extends State<AccountInputField> {
                                 for (int i = 0; i < accountNames.length; i++)
                                   OutlinedButton(
                                     onPressed: () => {
-                                      widget.textController.text = accountNames[i],
+                                      widget.cubit.updateValue(accountNames[i]),
                                       Navigator.pop(context),
                                     },
                                     child: Text(
@@ -97,7 +97,8 @@ class _AccountInputFieldState extends State<AccountInputField> {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
-      controller: widget.textController,
+      key: UniqueKey(),
+      initialValue: widget.cubit.state,
       textAlignVertical: TextAlignVertical.center,
       showCursor: false,
       readOnly: true,

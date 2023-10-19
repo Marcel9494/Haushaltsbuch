@@ -3,6 +3,11 @@ import 'dart:async';
 import 'package:another_flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 
+import '../input_fields_bloc/account_input_field_cubit.dart';
+import '../input_fields_bloc/categorie_input_field_cubit.dart';
+import '../input_fields_bloc/money_input_field_cubit.dart';
+import '../input_fields_bloc/subcategorie_input_field_cubit.dart';
+import '../input_fields_bloc/text_input_field_cubit.dart';
 import '/utils/consts/route_consts.dart';
 import '/utils/consts/global_consts.dart';
 
@@ -24,9 +29,52 @@ class BookingBloc extends Bloc<BookingEvents, BookingState> {
   BookingRepository bookingRepository = BookingRepository();
 
   BookingBloc() : super(BookingInitialState()) {
-    on<CreateBookingEvent>((event, emit) async {
+    on<CreateOrEditBookingEvent>((event, emit) async {
       emit(BookingLoadingState());
-      try {
+      TextInputFieldCubit titleInputFieldCubit = BlocProvider.of<TextInputFieldCubit>(event.context);
+      MoneyInputFieldCubit moneyInputFieldCubit = BlocProvider.of<MoneyInputFieldCubit>(event.context);
+      CategorieInputFieldCubit categorieInputFieldCubit = BlocProvider.of<CategorieInputFieldCubit>(event.context);
+      AccountInputFieldCubit fromAccountInputFieldCubit = BlocProvider.of<AccountInputFieldCubit>(event.context);
+      AccountInputFieldCubit toAccountInputFieldCubit = BlocProvider.of<AccountInputFieldCubit>(event.context);
+      SubcategorieInputFieldCubit subcategorieInputFieldCubit = BlocProvider.of<SubcategorieInputFieldCubit>(event.context);
+      //bookingBloc = BlocProvider.of<BookingBloc>(context);
+      //bookingCubit = BlocProvider.of<BookingCubit>(context);
+
+      //Map<Booking, int> map = bookingCubit.state;
+      //final Booking booking = map.keys.first;
+      //boxIndex = map.values.first;
+
+      titleInputFieldCubit.resetValue();
+      moneyInputFieldCubit.resetValue();
+      categorieInputFieldCubit.resetValue();
+      fromAccountInputFieldCubit.resetValue();
+      toAccountInputFieldCubit.resetValue();
+      subcategorieInputFieldCubit.resetValue();
+
+      if (event.bookingBoxIndex == -1) {
+        Booking booking = Booking();
+        emit(BookingSuccessState(event.context, event.bookingBoxIndex, booking));
+        Navigator.pushNamed(event.context, createOrEditBookingRoute);
+        /*_currentTransaction = TransactionType.outcome.name;
+        _bookingRepeat = RepeatType.noRepetition.name;
+        _bookingDateTextController.text = dateFormatterDDMMYYYYEE.format(DateTime.now());*/
+      } else {
+        try {
+          Booking booking = await bookingRepository.load(event.bookingBoxIndex);
+          titleInputFieldCubit.updateValue(booking.title);
+          moneyInputFieldCubit.updateValue(booking.amount);
+          categorieInputFieldCubit.updateValue(booking.categorie);
+          fromAccountInputFieldCubit.updateValue(booking.fromAccount);
+          toAccountInputFieldCubit.updateValue(booking.toAccount);
+          subcategorieInputFieldCubit.updateValue(booking.subcategorie);
+          emit(BookingSuccessState(event.context, event.bookingBoxIndex, booking));
+        } catch (error) {
+          emit(BookingFailureState());
+        } finally {
+          Navigator.pushNamed(event.context, createOrEditBookingRoute);
+        }
+      }
+      /*try {
         if (event.booking.bookingRepeats == RepeatType.noRepetition.name) {
           bookingRepository.create(event.booking);
         } else {
@@ -37,14 +85,14 @@ class BookingBloc extends Bloc<BookingEvents, BookingState> {
         emit(BookingSuccessState(event.context));
       } catch (error) {
         emit(BookingFailureState());
-      }
+      }*/
     });
 
     on<UpdateBookingEvent>((event, emit) async {
       emit(BookingLoadingState());
       try {
         bookingRepository.update(event.updatedBooking, event.oldBooking, event.bookingBoxIndex, event.serieEditMode);
-        emit(BookingSuccessState(event.context));
+        // TODO emit(BookingSuccessState(event.context));
       } catch (error) {
         emit(BookingFailureState());
       }

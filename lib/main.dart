@@ -31,6 +31,7 @@ import '/blocs/booking_bloc/booking_bloc.dart';
 import '/blocs/booking_bloc/booking_cubit.dart';
 import '/blocs/input_fields_bloc/text_input_field_cubit.dart';
 import '/blocs/input_fields_bloc/money_input_field_cubit.dart';
+import 'blocs/input_fields_bloc/account_input_field_cubit.dart';
 import '/blocs/input_fields_bloc/categorie_input_field_cubit.dart';
 import '/blocs/input_fields_bloc/subcategorie_input_field_cubit.dart';
 
@@ -88,6 +89,9 @@ void main() async {
         BlocProvider<SubcategorieInputFieldCubit>(
           create: (context) => SubcategorieInputFieldCubit(),
         ),
+        BlocProvider<AccountInputFieldCubit>(
+          create: (context) => AccountInputFieldCubit(),
+        )
       ],
       child: const BudgetBookApp(),
     ),

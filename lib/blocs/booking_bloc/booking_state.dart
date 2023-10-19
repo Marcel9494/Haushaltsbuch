@@ -8,15 +8,10 @@ class BookingInitialState extends BookingState {}
 class BookingLoadingState extends BookingState {}
 
 class BookingSuccessState extends BookingState {
-  final BuildContext context;
-  BookingSuccessState(this.context) {
-    Timer(const Duration(milliseconds: transitionInMs), () {
-      FocusScope.of(context).requestFocus(FocusNode());
-      Navigator.pop(context);
-      Navigator.pop(context);
-      Navigator.pushNamed(context, bottomNavBarRoute, arguments: BottomNavBarScreenArguments(0));
-    });
-  }
+  BuildContext context;
+  int boxIndex;
+  Booking booking;
+  BookingSuccessState(this.context, this.boxIndex, this.booking);
 }
 
 class BookingFailureState extends BookingState {}
