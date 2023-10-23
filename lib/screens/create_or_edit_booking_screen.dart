@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 
+import '/blocs/button_bloc/transaction_stats_toggle_buttons_cubit.dart';
 import '/blocs/booking_bloc/booking_bloc.dart';
 import '/blocs/booking_bloc/booking_cubit.dart';
 import '/blocs/input_fields_bloc/text_input_field_cubit.dart';
@@ -52,6 +53,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
   final RoundedLoadingButtonController _saveButtonController = RoundedLoadingButtonController();
   late final BookingBloc bookingBloc;
   late final BookingCubit bookingCubit;
+  late final TransactionStatsToggleButtonsCubit transactionStatsToggleButtonCubit;
   late final TextInputFieldCubit titleInputFieldCubit;
   late final MoneyInputFieldCubit moneyInputFieldCubit;
   late final CategorieInputFieldCubit categorieInputFieldCubit;
@@ -61,7 +63,8 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
   final BookingRepository bookingRepository = BookingRepository();
   bool _isBookingEdited = false;
   bool _isPreselectedAccountsLoaded = false;
-  String _currentTransaction = '';
+
+  //String _currentTransaction = '';
   String _amountErrorText = '';
   String _bookingNameErrorText = '';
   String _categorieErrorText = '';
@@ -78,7 +81,8 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
   @override
   void initState() {
     super.initState();
-
+    bookingBloc = BlocProvider.of<BookingBloc>(context);
+    transactionStatsToggleButtonCubit = BlocProvider.of<TransactionStatsToggleButtonsCubit>(context);
     titleInputFieldCubit = BlocProvider.of<TextInputFieldCubit>(context);
     moneyInputFieldCubit = BlocProvider.of<MoneyInputFieldCubit>(context);
     categorieInputFieldCubit = BlocProvider.of<CategorieInputFieldCubit>(context);
@@ -89,7 +93,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
 
   Future<void> _loadBooking() async {
     _loadedBooking = await bookingRepository.load(boxIndex);
-    _currentTransaction = _loadedBooking.transactionType;
+    //_currentTransaction = _loadedBooking.transactionType;
     //_bookingNameController.text = _loadedBooking.title;
     _parsedBookingDate = DateTime.parse(_loadedBooking.date);
     _bookingDateTextController.text = dateFormatterDDMMYYYYEE.format(DateTime.parse(_loadedBooking.date));
@@ -109,7 +113,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
       return;
     }
     Booking booking = Booking()
-      ..transactionType = _currentTransaction
+      ..transactionType = transactionStatsToggleButtonsCubit.state
       ..bookingRepeats = _bookingRepeat
       ..title = titleInputFieldCubit.state
       ..date = _parsedBookingDate.toString()
@@ -152,7 +156,8 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
   }
 
   bool _validCategorie() {
-    if ((_currentTransaction != TransactionType.transfer.name && _currentTransaction != TransactionType.investment.name) && categorieInputFieldCubit.state.isEmpty) {
+    if ((transactionStatsToggleButtonCubit.state != TransactionType.transfer.name && transactionStatsToggleButtonCubit.state != TransactionType.investment.name) &&
+        categorieInputFieldCubit.state.isEmpty) {
       setState(() {
         _categorieErrorText = 'Bitte wählen Sie eine Kategorie aus.';
       });
@@ -174,7 +179,8 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
   }
 
   bool _validToAccount() {
-    if ((_currentTransaction == TransactionType.transfer.name && _currentTransaction != TransactionType.investment.name) && toAccountInputFieldCubit.state.isEmpty) {
+    if ((transactionStatsToggleButtonCubit.state == TransactionType.transfer.name && transactionStatsToggleButtonCubit.state != TransactionType.investment.name) &&
+        toAccountInputFieldCubit.state.isEmpty) {
       setState(() {
         _toAccountErrorText = 'Bitte wählen Sie ein Konto aus.';
       });
@@ -193,8 +199,8 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
     }
   }
 
-  set currentTransaction(String transaction) =>
-      setState(() => {_currentTransaction = transaction, categorieInputFieldCubit.resetValue(), subcategorieInputFieldCubit.resetValue()});
+  /* TODO entfernen? set currentTransaction(String transaction) =>
+      setState(() => {_currentTransaction = transaction, categorieInputFieldCubit.resetValue(), subcategorieInputFieldCubit.resetValue()});*/
 
   set currentBookingDate(DateTime bookingDate) => _parsedBookingDate = bookingDate;
 
@@ -285,12 +291,80 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 24.0),
           child: Card(
-            color: const Color(0xff1c2b30),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(18.0),
-            ),
-            // TODO hier weitermachen und FutureBuilder zu BlocBuilder umwandeln siehe journal_entry_screen.dart
-            child: FutureBuilder(
+              color: const Color(0xff1c2b30),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(18.0),
+              ),
+              // TODO hier weitermachen und FutureBuilder zu BlocBuilder umwandeln siehe journal_entry_screen.dart
+              child: BlocBuilder<BookingBloc, BookingState>(builder: (context, state) {
+                if (state is BookingLoadingState) {
+                  return const LoadingIndicator();
+                } else if (state is BookingSuccessState) {
+                  return Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      BlocBuilder<TransactionStatsToggleButtonsCubit, TransactionStatsToggleButtonsState>(
+                        builder: (context, state) {
+                          return TransactionToggleButtons(
+                              currentTransaction:
+                                  transactionStatsToggleButtonCubit.state /*, transactionStringCallback: (transaction) => setState(() => _currentTransaction = transaction)*/);
+                        },
+                      ),
+                      DateInputField(
+                          currentDate: _parsedBookingDate,
+                          textController: _bookingDateTextController,
+                          repeat: _bookingRepeat,
+                          repeatCallback: (repeat) => setState(() => _bookingRepeat = repeat)),
+                      BlocBuilder<TextInputFieldCubit, String>(
+                        builder: (context, state) {
+                          return TextInputField(fieldKey: titleFieldUniqueKey, textCubit: titleInputFieldCubit, errorText: _bookingNameErrorText, hintText: 'Titel');
+                        },
+                      ),
+                      BlocBuilder<MoneyInputFieldCubit, String>(
+                        builder: (context, state) {
+                          return MoneyInputField(cubit: moneyInputFieldCubit, errorText: _amountErrorText, hintText: 'Betrag', bottomSheetTitle: 'Betrag eingeben:');
+                        },
+                      ),
+                      BlocBuilder<AccountInputFieldCubit, String>(
+                        builder: (context, state) {
+                          if (transactionStatsToggleButtonCubit.state == TransactionType.income.name || transactionStatsToggleButtonCubit.state == TransactionType.outcome.name) {
+                            return AccountInputField(cubit: fromAccountInputFieldCubit, errorText: _fromAccountErrorText);
+                          } else {
+                            return Column(
+                              children: [
+                                AccountInputField(cubit: fromAccountInputFieldCubit, errorText: _fromAccountErrorText, hintText: 'Von'),
+                                AccountInputField(cubit: toAccountInputFieldCubit, errorText: _toAccountErrorText, hintText: 'Nach'),
+                              ],
+                            );
+                          }
+                          // return _getAccountInputField();
+                        },
+                      ),
+                      transactionStatsToggleButtonCubit.state == TransactionType.transfer.name
+                          ? const SizedBox()
+                          : BlocBuilder<CategorieInputFieldCubit, String>(
+                              builder: (context, state) {
+                                return CategorieInputField(
+                                    cubit: categorieInputFieldCubit,
+                                    errorText: _categorieErrorText,
+                                    categorieType: CategorieTypeExtension.getCategorieType(transactionStatsToggleButtonCubit.state));
+                              },
+                            ),
+                      transactionStatsToggleButtonCubit.state == TransactionType.transfer.name
+                          ? const SizedBox()
+                          : BlocBuilder<SubcategorieInputFieldCubit, String>(
+                              builder: (context, state) {
+                                return SubcategorieInputField(cubit: subcategorieInputFieldCubit);
+                              },
+                            ),
+                      SaveButton(saveFunction: _createOrUpdateBooking, buttonController: _saveButtonController),
+                    ],
+                  );
+                } else {
+                  return const Text('Fehler');
+                }
+              })
+              /*child: FutureBuilder(
               future: boxIndex == -1
                   ? _isPreselectedAccountsLoaded
                       ? null
@@ -358,8 +432,8 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
                     );
                 }
               },
-            ),
-          ),
+            ),*/
+              ),
         ),
       ),
     );

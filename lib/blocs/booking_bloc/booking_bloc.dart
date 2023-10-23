@@ -1,21 +1,17 @@
-import 'dart:async';
-
 import 'package:another_flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 
+import '../button_bloc/transaction_stats_toggle_buttons_cubit.dart';
 import '../input_fields_bloc/account_input_field_cubit.dart';
 import '../input_fields_bloc/categorie_input_field_cubit.dart';
 import '../input_fields_bloc/money_input_field_cubit.dart';
 import '../input_fields_bloc/subcategorie_input_field_cubit.dart';
 import '../input_fields_bloc/text_input_field_cubit.dart';
 import '/utils/consts/route_consts.dart';
-import '/utils/consts/global_consts.dart';
 
-import '/models/enums/repeat_types.dart';
 import '/models/booking/booking_model.dart';
 import '/models/enums/serie_edit_modes.dart';
 import '/models/booking/booking_repository.dart';
-import '/models/global_state/global_state_repository.dart';
 import '/models/screen_arguments/bottom_nav_bar_screen_arguments.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -31,6 +27,7 @@ class BookingBloc extends Bloc<BookingEvents, BookingState> {
   BookingBloc() : super(BookingInitialState()) {
     on<CreateOrEditBookingEvent>((event, emit) async {
       emit(BookingLoadingState());
+      TransactionStatsToggleButtonsCubit transactionStatsToggleButtonsCubit = BlocProvider.of<TransactionStatsToggleButtonsCubit>(event.context);
       TextInputFieldCubit titleInputFieldCubit = BlocProvider.of<TextInputFieldCubit>(event.context);
       MoneyInputFieldCubit moneyInputFieldCubit = BlocProvider.of<MoneyInputFieldCubit>(event.context);
       CategorieInputFieldCubit categorieInputFieldCubit = BlocProvider.of<CategorieInputFieldCubit>(event.context);
@@ -44,6 +41,7 @@ class BookingBloc extends Bloc<BookingEvents, BookingState> {
       //final Booking booking = map.keys.first;
       //boxIndex = map.values.first;
 
+      //transactionStatsToggleButtonsCubit.resetValue();
       titleInputFieldCubit.resetValue();
       moneyInputFieldCubit.resetValue();
       categorieInputFieldCubit.resetValue();
@@ -51,6 +49,7 @@ class BookingBloc extends Bloc<BookingEvents, BookingState> {
       toAccountInputFieldCubit.resetValue();
       subcategorieInputFieldCubit.resetValue();
 
+      print(event.bookingBoxIndex);
       if (event.bookingBoxIndex == -1) {
         Booking booking = Booking();
         emit(BookingSuccessState(event.context, event.bookingBoxIndex, booking));
@@ -61,6 +60,7 @@ class BookingBloc extends Bloc<BookingEvents, BookingState> {
       } else {
         try {
           Booking booking = await bookingRepository.load(event.bookingBoxIndex);
+          transactionStatsToggleButtonsCubit.updateValue(booking.transactionType);
           titleInputFieldCubit.updateValue(booking.title);
           moneyInputFieldCubit.updateValue(booking.amount);
           categorieInputFieldCubit.updateValue(booking.categorie);

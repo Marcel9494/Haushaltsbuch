@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:haushaltsbuch/blocs/button_bloc/transaction_stats_toggle_button_cubit.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -91,7 +92,10 @@ void main() async {
         ),
         BlocProvider<AccountInputFieldCubit>(
           create: (context) => AccountInputFieldCubit(),
-        )
+        ),
+        BlocProvider<TransactionStatsToggleButtonCubit>(
+          create: (context) => TransactionStatsToggleButtonCubit(),
+        ),
       ],
       child: const BudgetBookApp(),
     ),
