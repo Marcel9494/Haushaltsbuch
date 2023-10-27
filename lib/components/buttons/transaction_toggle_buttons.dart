@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:haushaltsbuch/blocs/button_bloc/transaction_stats_toggle_button_cubit.dart';
 
+import '/blocs/button_bloc/transaction_stats_toggle_buttons_cubit.dart';
 import '/screens/create_or_edit_booking_screen.dart';
 
 import '/models/enums/transaction_types.dart';
@@ -9,13 +9,13 @@ import '/models/enums/transaction_types.dart';
 //typedef TransactionStringCallback = void Function(String currentTransaction);
 
 class TransactionToggleButtons extends StatefulWidget {
-  final String currentTransaction;
+  dynamic cubit;
 
   //final TransactionStringCallback transactionStringCallback;
 
-  const TransactionToggleButtons({
+  TransactionToggleButtons({
     Key? key,
-    required this.currentTransaction,
+    required this.cubit,
     //required this.transactionStringCallback,
   }) : super(key: key);
 
@@ -33,35 +33,16 @@ class _TransactionToggleButtonsState extends State<TransactionToggleButtons> {
   }
 
   void _getSelectedTransaction() {
-    print(widget.currentTransaction);
-    if (widget.currentTransaction == TransactionType.income.name) {
+    print(widget.cubit.state);
+    if (widget.cubit.state == TransactionType.income.name) {
       _selectedTransaction = <bool>[true, false, false, false];
-    } else if (widget.currentTransaction == TransactionType.outcome.name) {
+    } else if (widget.cubit.state == TransactionType.outcome.name) {
       _selectedTransaction = <bool>[false, true, false, false];
-    } else if (widget.currentTransaction == TransactionType.transfer.name) {
+    } else if (widget.cubit.state == TransactionType.transfer.name) {
       _selectedTransaction = <bool>[false, false, true, false];
-    } else if (widget.currentTransaction == TransactionType.investment.name) {
+    } else if (widget.cubit.state == TransactionType.investment.name) {
       _selectedTransaction = <bool>[false, false, false, true];
     }
-  }
-
-  void _setSelectedTransaction(int selectedIndex) {
-    setState(() {
-      for (int i = 0; i < _selectedTransaction.length; i++) {
-        _selectedTransaction[i] = i == selectedIndex;
-      }
-      /*if (_selectedTransaction[0]) {
-        CreateOrEditBookingScreen.of(context)!.currentTransaction = TransactionType.income.name;
-      } else if (_selectedTransaction[1]) {
-        CreateOrEditBookingScreen.of(context)!.currentTransaction = TransactionType.outcome.name;
-      } else if (_selectedTransaction[2]) {
-        CreateOrEditBookingScreen.of(context)!.currentTransaction = TransactionType.transfer.name;
-      } else if (_selectedTransaction[3]) {
-        CreateOrEditBookingScreen.of(context)!.currentTransaction = TransactionType.investment.name;
-      } else {
-        CreateOrEditBookingScreen.of(context)!.currentTransaction = '';
-      }*/
-    });
   }
 
   Color _getSelectedBorderColor() {
@@ -92,10 +73,10 @@ class _TransactionToggleButtonsState extends State<TransactionToggleButtons> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<TransactionStatsToggleButtonCubit, String>(
+    return BlocBuilder<TransactionStatsToggleButtonsCubit, String>(
       builder: (context, state) {
         return ToggleButtons(
-          onPressed: (selectedIndex) => _setSelectedTransaction(selectedIndex),
+          onPressed: (selectedIndex) => widget.cubit.setSelectedTransaction(selectedIndex, _selectedTransaction),
           borderRadius: const BorderRadius.only(
             topRight: Radius.circular(18.0),
             topLeft: Radius.circular(18.0),

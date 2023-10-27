@@ -7,6 +7,7 @@ import '../input_fields_bloc/categorie_input_field_cubit.dart';
 import '../input_fields_bloc/money_input_field_cubit.dart';
 import '../input_fields_bloc/subcategorie_input_field_cubit.dart';
 import '../input_fields_bloc/text_input_field_cubit.dart';
+
 import '/utils/consts/route_consts.dart';
 
 import '/models/booking/booking_model.dart';
@@ -41,7 +42,7 @@ class BookingBloc extends Bloc<BookingEvents, BookingState> {
       //final Booking booking = map.keys.first;
       //boxIndex = map.values.first;
 
-      //transactionStatsToggleButtonsCubit.resetValue();
+      transactionStatsToggleButtonsCubit.resetValue();
       titleInputFieldCubit.resetValue();
       moneyInputFieldCubit.resetValue();
       categorieInputFieldCubit.resetValue();

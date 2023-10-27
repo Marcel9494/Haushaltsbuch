@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 
-import '/blocs/button_bloc/transaction_stats_toggle_buttons_cubit.dart';
 import '/blocs/booking_bloc/booking_bloc.dart';
 import '/blocs/booking_bloc/booking_cubit.dart';
 import '/blocs/input_fields_bloc/text_input_field_cubit.dart';
@@ -12,6 +11,7 @@ import '/blocs/input_fields_bloc/money_input_field_cubit.dart';
 import '/blocs/input_fields_bloc/account_input_field_cubit.dart';
 import '/blocs/input_fields_bloc/categorie_input_field_cubit.dart';
 import '/blocs/input_fields_bloc/subcategorie_input_field_cubit.dart';
+import '/blocs/button_bloc/transaction_stats_toggle_buttons_cubit.dart';
 
 import '/utils/date_formatters/date_formatter.dart';
 
@@ -53,7 +53,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
   final RoundedLoadingButtonController _saveButtonController = RoundedLoadingButtonController();
   late final BookingBloc bookingBloc;
   late final BookingCubit bookingCubit;
-  late final TransactionStatsToggleButtonsCubit transactionStatsToggleButtonCubit;
+  late final TransactionStatsToggleButtonsCubit transactionStatsToggleButtonsCubit;
   late final TextInputFieldCubit titleInputFieldCubit;
   late final MoneyInputFieldCubit moneyInputFieldCubit;
   late final CategorieInputFieldCubit categorieInputFieldCubit;
@@ -82,7 +82,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
   void initState() {
     super.initState();
     bookingBloc = BlocProvider.of<BookingBloc>(context);
-    transactionStatsToggleButtonCubit = BlocProvider.of<TransactionStatsToggleButtonsCubit>(context);
+    transactionStatsToggleButtonsCubit = BlocProvider.of<TransactionStatsToggleButtonsCubit>(context);
     titleInputFieldCubit = BlocProvider.of<TextInputFieldCubit>(context);
     moneyInputFieldCubit = BlocProvider.of<MoneyInputFieldCubit>(context);
     categorieInputFieldCubit = BlocProvider.of<CategorieInputFieldCubit>(context);
@@ -156,7 +156,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
   }
 
   bool _validCategorie() {
-    if ((transactionStatsToggleButtonCubit.state != TransactionType.transfer.name && transactionStatsToggleButtonCubit.state != TransactionType.investment.name) &&
+    if ((transactionStatsToggleButtonsCubit.state != TransactionType.transfer.name && transactionStatsToggleButtonsCubit.state != TransactionType.investment.name) &&
         categorieInputFieldCubit.state.isEmpty) {
       setState(() {
         _categorieErrorText = 'Bitte wählen Sie eine Kategorie aus.';
@@ -179,7 +179,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
   }
 
   bool _validToAccount() {
-    if ((transactionStatsToggleButtonCubit.state == TransactionType.transfer.name && transactionStatsToggleButtonCubit.state != TransactionType.investment.name) &&
+    if ((transactionStatsToggleButtonsCubit.state == TransactionType.transfer.name && transactionStatsToggleButtonsCubit.state != TransactionType.investment.name) &&
         toAccountInputFieldCubit.state.isEmpty) {
       setState(() {
         _toAccountErrorText = 'Bitte wählen Sie ein Konto aus.';
@@ -303,11 +303,10 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
                   return Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      BlocBuilder<TransactionStatsToggleButtonsCubit, TransactionStatsToggleButtonsState>(
+                      BlocBuilder<TransactionStatsToggleButtonsCubit, String>(
                         builder: (context, state) {
                           return TransactionToggleButtons(
-                              currentTransaction:
-                                  transactionStatsToggleButtonCubit.state /*, transactionStringCallback: (transaction) => setState(() => _currentTransaction = transaction)*/);
+                              cubit: transactionStatsToggleButtonsCubit /*, transactionStringCallback: (transaction) => setState(() => _currentTransaction = transaction)*/);
                         },
                       ),
                       DateInputField(
@@ -327,7 +326,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
                       ),
                       BlocBuilder<AccountInputFieldCubit, String>(
                         builder: (context, state) {
-                          if (transactionStatsToggleButtonCubit.state == TransactionType.income.name || transactionStatsToggleButtonCubit.state == TransactionType.outcome.name) {
+                          if (transactionStatsToggleButtonsCubit.state == TransactionType.income.name || transactionStatsToggleButtonsCubit.state == TransactionType.outcome.name) {
                             return AccountInputField(cubit: fromAccountInputFieldCubit, errorText: _fromAccountErrorText);
                           } else {
                             return Column(
@@ -340,17 +339,17 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
                           // return _getAccountInputField();
                         },
                       ),
-                      transactionStatsToggleButtonCubit.state == TransactionType.transfer.name
+                      transactionStatsToggleButtonsCubit.state == TransactionType.transfer.name
                           ? const SizedBox()
                           : BlocBuilder<CategorieInputFieldCubit, String>(
                               builder: (context, state) {
                                 return CategorieInputField(
                                     cubit: categorieInputFieldCubit,
                                     errorText: _categorieErrorText,
-                                    categorieType: CategorieTypeExtension.getCategorieType(transactionStatsToggleButtonCubit.state));
+                                    categorieType: CategorieTypeExtension.getCategorieType(transactionStatsToggleButtonsCubit.state));
                               },
                             ),
-                      transactionStatsToggleButtonCubit.state == TransactionType.transfer.name
+                      transactionStatsToggleButtonsCubit.state == TransactionType.transfer.name
                           ? const SizedBox()
                           : BlocBuilder<SubcategorieInputFieldCubit, String>(
                               builder: (context, state) {
