@@ -113,7 +113,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
       return;
     }
     Booking booking = Booking()
-      ..transactionType = transactionStatsToggleButtonsCubit.state
+      ..transactionType = transactionStatsToggleButtonsCubit.state.transactionName
       ..bookingRepeats = _bookingRepeat
       ..title = titleInputFieldCubit.state
       ..date = _parsedBookingDate.toString()
@@ -156,7 +156,8 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
   }
 
   bool _validCategorie() {
-    if ((transactionStatsToggleButtonsCubit.state != TransactionType.transfer.name && transactionStatsToggleButtonsCubit.state != TransactionType.investment.name) &&
+    if ((transactionStatsToggleButtonsCubit.state.transactionName != TransactionType.transfer.name &&
+            transactionStatsToggleButtonsCubit.state.transactionName != TransactionType.investment.name) &&
         categorieInputFieldCubit.state.isEmpty) {
       setState(() {
         _categorieErrorText = 'Bitte wählen Sie eine Kategorie aus.';
@@ -179,7 +180,8 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
   }
 
   bool _validToAccount() {
-    if ((transactionStatsToggleButtonsCubit.state == TransactionType.transfer.name && transactionStatsToggleButtonsCubit.state != TransactionType.investment.name) &&
+    if ((transactionStatsToggleButtonsCubit.state.transactionName == TransactionType.transfer.name &&
+            transactionStatsToggleButtonsCubit.state.transactionName != TransactionType.investment.name) &&
         toAccountInputFieldCubit.state.isEmpty) {
       setState(() {
         _toAccountErrorText = 'Bitte wählen Sie ein Konto aus.';
@@ -295,69 +297,68 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(18.0),
               ),
-              // TODO hier weitermachen und FutureBuilder zu BlocBuilder umwandeln siehe journal_entry_screen.dart
               child: BlocBuilder<BookingBloc, BookingState>(builder: (context, state) {
                 if (state is BookingLoadingState) {
                   return const LoadingIndicator();
                 } else if (state is BookingSuccessState) {
-                  return Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      BlocBuilder<TransactionStatsToggleButtonsCubit, String>(
-                        builder: (context, state) {
-                          return TransactionToggleButtons(
-                              cubit: transactionStatsToggleButtonsCubit /*, transactionStringCallback: (transaction) => setState(() => _currentTransaction = transaction)*/);
-                        },
-                      ),
-                      DateInputField(
-                          currentDate: _parsedBookingDate,
-                          textController: _bookingDateTextController,
-                          repeat: _bookingRepeat,
-                          repeatCallback: (repeat) => setState(() => _bookingRepeat = repeat)),
-                      BlocBuilder<TextInputFieldCubit, String>(
-                        builder: (context, state) {
-                          return TextInputField(fieldKey: titleFieldUniqueKey, textCubit: titleInputFieldCubit, errorText: _bookingNameErrorText, hintText: 'Titel');
-                        },
-                      ),
-                      BlocBuilder<MoneyInputFieldCubit, String>(
-                        builder: (context, state) {
-                          return MoneyInputField(cubit: moneyInputFieldCubit, errorText: _amountErrorText, hintText: 'Betrag', bottomSheetTitle: 'Betrag eingeben:');
-                        },
-                      ),
-                      BlocBuilder<AccountInputFieldCubit, String>(
-                        builder: (context, state) {
-                          if (transactionStatsToggleButtonsCubit.state == TransactionType.income.name || transactionStatsToggleButtonsCubit.state == TransactionType.outcome.name) {
-                            return AccountInputField(cubit: fromAccountInputFieldCubit, errorText: _fromAccountErrorText);
-                          } else {
-                            return Column(
-                              children: [
-                                AccountInputField(cubit: fromAccountInputFieldCubit, errorText: _fromAccountErrorText, hintText: 'Von'),
-                                AccountInputField(cubit: toAccountInputFieldCubit, errorText: _toAccountErrorText, hintText: 'Nach'),
-                              ],
-                            );
-                          }
-                          // return _getAccountInputField();
-                        },
-                      ),
-                      transactionStatsToggleButtonsCubit.state == TransactionType.transfer.name
-                          ? const SizedBox()
-                          : BlocBuilder<CategorieInputFieldCubit, String>(
-                              builder: (context, state) {
-                                return CategorieInputField(
-                                    cubit: categorieInputFieldCubit,
-                                    errorText: _categorieErrorText,
-                                    categorieType: CategorieTypeExtension.getCategorieType(transactionStatsToggleButtonsCubit.state));
-                              },
-                            ),
-                      transactionStatsToggleButtonsCubit.state == TransactionType.transfer.name
-                          ? const SizedBox()
-                          : BlocBuilder<SubcategorieInputFieldCubit, String>(
-                              builder: (context, state) {
-                                return SubcategorieInputField(cubit: subcategorieInputFieldCubit);
-                              },
-                            ),
-                      SaveButton(saveFunction: _createOrUpdateBooking, buttonController: _saveButtonController),
-                    ],
+                  return BlocBuilder<TransactionStatsToggleButtonsCubit, TransactionStatsToggleButtonsState>(
+                    builder: (context, state) {
+                      return Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          TransactionToggleButtons(cubit: transactionStatsToggleButtonsCubit),
+                          DateInputField(
+                              currentDate: _parsedBookingDate,
+                              textController: _bookingDateTextController,
+                              repeat: _bookingRepeat,
+                              repeatCallback: (repeat) => setState(() => _bookingRepeat = repeat)),
+                          BlocBuilder<TextInputFieldCubit, String>(
+                            builder: (context, state) {
+                              return TextInputField(fieldKey: titleFieldUniqueKey, textCubit: titleInputFieldCubit, errorText: _bookingNameErrorText, hintText: 'Titel');
+                            },
+                          ),
+                          BlocBuilder<MoneyInputFieldCubit, String>(
+                            builder: (context, state) {
+                              return MoneyInputField(cubit: moneyInputFieldCubit, errorText: _amountErrorText, hintText: 'Betrag', bottomSheetTitle: 'Betrag eingeben:');
+                            },
+                          ),
+                          BlocBuilder<AccountInputFieldCubit, String>(
+                            builder: (context, state) {
+                              if (transactionStatsToggleButtonsCubit.state.transactionName == TransactionType.income.name ||
+                                  transactionStatsToggleButtonsCubit.state.transactionName == TransactionType.outcome.name) {
+                                return AccountInputField(cubit: fromAccountInputFieldCubit, errorText: _fromAccountErrorText);
+                              } else {
+                                return Column(
+                                  children: [
+                                    AccountInputField(cubit: fromAccountInputFieldCubit, errorText: _fromAccountErrorText, hintText: 'Von'),
+                                    AccountInputField(cubit: toAccountInputFieldCubit, errorText: _toAccountErrorText, hintText: 'Nach'),
+                                  ],
+                                );
+                              }
+                              // return _getAccountInputField();
+                            },
+                          ),
+                          transactionStatsToggleButtonsCubit.state.transactionName == TransactionType.transfer.name
+                              ? const SizedBox()
+                              : BlocBuilder<CategorieInputFieldCubit, String>(
+                                  builder: (context, state) {
+                                    return CategorieInputField(
+                                        cubit: categorieInputFieldCubit,
+                                        errorText: _categorieErrorText,
+                                        categorieType: CategorieTypeExtension.getCategorieType(transactionStatsToggleButtonsCubit.state.transactionName));
+                                  },
+                                ),
+                          transactionStatsToggleButtonsCubit.state.transactionName == TransactionType.transfer.name
+                              ? const SizedBox()
+                              : BlocBuilder<SubcategorieInputFieldCubit, String>(
+                                  builder: (context, state) {
+                                    return SubcategorieInputField(cubit: subcategorieInputFieldCubit);
+                                  },
+                                ),
+                          SaveButton(saveFunction: _createOrUpdateBooking, buttonController: _saveButtonController),
+                        ],
+                      );
+                    },
                   );
                 } else {
                   return const Text('Fehler');

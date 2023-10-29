@@ -1,13 +1,10 @@
 part of 'transaction_stats_toggle_buttons_cubit.dart';
 
-abstract class TransactionStatsToggleButtonsState {}
+class TransactionStatsToggleButtonsState {
+  late String transactionName;
+  late List<bool> selectedTransaction;
+  late Color borderColor;
+  late Color fillColor;
 
-class TransactionStatsToggleButtonsInitialState extends TransactionStatsToggleButtonsState {
-  List<bool> selectedTransaction;
-  TransactionStatsToggleButtonsInitialState(this.selectedTransaction);
-}
-
-class TransactionStatsToggleButtonsSuccessState extends TransactionStatsToggleButtonsState {
-  List<bool> selectedTransaction;
-  TransactionStatsToggleButtonsSuccessState(this.selectedTransaction);
+  TransactionStatsToggleButtonsState(this.transactionName, this.selectedTransaction, this.borderColor, this.fillColor);
 }

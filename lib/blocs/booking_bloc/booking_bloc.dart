@@ -42,7 +42,6 @@ class BookingBloc extends Bloc<BookingEvents, BookingState> {
       //final Booking booking = map.keys.first;
       //boxIndex = map.values.first;
 
-      transactionStatsToggleButtonsCubit.resetValue();
       titleInputFieldCubit.resetValue();
       moneyInputFieldCubit.resetValue();
       categorieInputFieldCubit.resetValue();
@@ -61,7 +60,7 @@ class BookingBloc extends Bloc<BookingEvents, BookingState> {
       } else {
         try {
           Booking booking = await bookingRepository.load(event.bookingBoxIndex);
-          transactionStatsToggleButtonsCubit.updateValue(booking.transactionType);
+          transactionStatsToggleButtonsCubit.initTransaction();
           titleInputFieldCubit.updateValue(booking.title);
           moneyInputFieldCubit.updateValue(booking.amount);
           categorieInputFieldCubit.updateValue(booking.categorie);
