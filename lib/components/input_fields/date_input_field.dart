@@ -10,15 +10,13 @@ import '/screens/create_or_edit_booking_screen.dart';
 import '/utils/date_formatters/date_formatter.dart';
 
 class DateInputField extends StatelessWidget {
-  final DateTime currentDate;
-  final TextEditingController textController;
+  final dynamic cubit;
   final String repeat;
   final Function(String repeat) repeatCallback;
 
   const DateInputField({
     Key? key,
-    required this.currentDate,
-    required this.textController,
+    required this.cubit,
     required this.repeat,
     required this.repeatCallback,
   }) : super(key: key);
@@ -52,12 +50,12 @@ class DateInputField extends StatelessWidget {
                               repeatCallback(RepeatType.values[index].name),
                               if (RepeatType.values[index].name == RepeatType.beginningOfMonth.name)
                                 {
-                                  textController.text = dateFormatterDDMMYYYYEE.format(DateTime(DateTime.now().year, DateTime.now().month + 1, 1)),
+                                  cubit.updateValue(dateFormatterDDMMYYYY.format(DateTime(DateTime.now().year, DateTime.now().month + 1, 1))),
                                 }
                               else if (RepeatType.values[index].name == RepeatType.endOfMonth.name)
                                 {
-                                  textController.text = dateFormatterDDMMYYYYEE
-                                      .format(DateTime(DateTime.now().year, DateTime.now().month, DateTime(DateTime.now().year, DateTime.now().month + 1, 0).day)),
+                                  cubit.updateValue(dateFormatterDDMMYYYY
+                                      .format(DateTime(DateTime.now().year, DateTime.now().month, DateTime(DateTime.now().year, DateTime.now().month + 1, 0).day))),
                                 },
                               Navigator.pop(context),
                             },
@@ -88,7 +86,7 @@ class DateInputField extends StatelessWidget {
     return Column(
       children: [
         TextFormField(
-          controller: textController,
+          initialValue: cubit.state.toString(),
           maxLength: 10,
           readOnly: true,
           textAlignVertical: TextAlignVertical.center,
@@ -126,7 +124,7 @@ class DateInputField extends StatelessWidget {
             DateTime? parsedDate = await showDatePicker(
               context: context,
               locale: const Locale('de', 'DE'),
-              initialDate: currentDate == DateTime.now() ? DateTime.now() : currentDate,
+              initialDate: DateTime.now(), //dateFormatterEEDDMMYYYY.format(cubit.state), // == DateTime.now() ? DateTime.now() : DateTime.parse(cubit.state),
               firstDate: DateTime(1900),
               lastDate: DateTime(2100),
               builder: (context, child) {
@@ -145,8 +143,9 @@ class DateInputField extends StatelessWidget {
               },
             );
             if (parsedDate != null) {
-              CreateOrEditBookingScreen.of(context)!.currentBookingDate = parsedDate;
-              textController.text = dateFormatterDDMMYYYYEE.format(parsedDate);
+              //CreateOrEditBookingScreen.of(context)!.currentBookingDate = parsedDate;
+              cubit.updateValue(dateFormatterDDMMYYYY.format(parsedDate));
+              //textController.text = ;
             }
           },
         ),

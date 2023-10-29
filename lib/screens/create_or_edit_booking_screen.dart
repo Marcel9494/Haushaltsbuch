@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 
+import '/blocs/input_fields_bloc/date_input_field_cubit.dart';
 import '/blocs/booking_bloc/booking_bloc.dart';
 import '/blocs/booking_bloc/booking_cubit.dart';
 import '/blocs/input_fields_bloc/text_input_field_cubit.dart';
@@ -44,16 +45,12 @@ class CreateOrEditBookingScreen extends StatefulWidget {
 }
 
 class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
-  final TextEditingController _bookingDateTextController = TextEditingController();
-
-  //final TextEditingController _fromAccountTextController = TextEditingController();
-  //final TextEditingController _toAccountTextController = TextEditingController();
-  //final TextEditingController _categorieTextController = TextEditingController();
-  //final TextEditingController _subcategorieTextController = TextEditingController();
+  //final TextEditingController _bookingDateTextController = TextEditingController();
   final RoundedLoadingButtonController _saveButtonController = RoundedLoadingButtonController();
   late final BookingBloc bookingBloc;
   late final BookingCubit bookingCubit;
   late final TransactionStatsToggleButtonsCubit transactionStatsToggleButtonsCubit;
+  late final DateInputFieldCubit dateInputFieldCubit;
   late final TextInputFieldCubit titleInputFieldCubit;
   late final MoneyInputFieldCubit moneyInputFieldCubit;
   late final CategorieInputFieldCubit categorieInputFieldCubit;
@@ -71,7 +68,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
   String _fromAccountErrorText = '';
   String _toAccountErrorText = '';
   String _bookingRepeat = '';
-  DateTime _parsedBookingDate = DateTime.now();
+  //DateTime _parsedBookingDate = DateTime.now();
   Map<String, String> _primaryAccounts = {};
   late Booking _loadedBooking;
   int boxIndex = 0;
@@ -83,6 +80,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
     super.initState();
     bookingBloc = BlocProvider.of<BookingBloc>(context);
     transactionStatsToggleButtonsCubit = BlocProvider.of<TransactionStatsToggleButtonsCubit>(context);
+    dateInputFieldCubit = BlocProvider.of<DateInputFieldCubit>(context);
     titleInputFieldCubit = BlocProvider.of<TextInputFieldCubit>(context);
     moneyInputFieldCubit = BlocProvider.of<MoneyInputFieldCubit>(context);
     categorieInputFieldCubit = BlocProvider.of<CategorieInputFieldCubit>(context);
@@ -95,8 +93,8 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
     _loadedBooking = await bookingRepository.load(boxIndex);
     //_currentTransaction = _loadedBooking.transactionType;
     //_bookingNameController.text = _loadedBooking.title;
-    _parsedBookingDate = DateTime.parse(_loadedBooking.date);
-    _bookingDateTextController.text = dateFormatterDDMMYYYYEE.format(DateTime.parse(_loadedBooking.date));
+    //_parsedBookingDate = DateTime.parse(_loadedBooking.date);
+    //_bookingDateTextController.text = dateFormatterDDMMYYYYEE.format(DateTime.parse(_loadedBooking.date));
     _bookingRepeat = _loadedBooking.bookingRepeats;
     //_amountTextController.text = _loadedBooking.amount;
     //_bookingNameController.text = _loadedBooking.title;
@@ -116,14 +114,14 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
       ..transactionType = transactionStatsToggleButtonsCubit.state.transactionName
       ..bookingRepeats = _bookingRepeat
       ..title = titleInputFieldCubit.state
-      ..date = _parsedBookingDate.toString()
+      ..date = dateInputFieldCubit.state // _parsedBookingDate.toString()
       ..amount = moneyInputFieldCubit.state
       ..categorie = categorieInputFieldCubit.state
       ..subcategorie = subcategorieInputFieldCubit.state
       ..fromAccount = fromAccountInputFieldCubit.state
       ..toAccount = toAccountInputFieldCubit.state
       ..serieId = boxIndex == -1 ? -1 : _loadedBooking.serieId
-      ..booked = _parsedBookingDate.isAfter(DateTime.now()) ? false : true;
+      ..booked = DateTime.parse(dateInputFieldCubit.state).isAfter(DateTime.now()) ? false : true;
     if (boxIndex == -1) {
       // TODO bookingBloc.add(CreateOrEditBookingEvent(context, booking));
     } else {
@@ -204,7 +202,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
   /* TODO entfernen? set currentTransaction(String transaction) =>
       setState(() => {_currentTransaction = transaction, categorieInputFieldCubit.resetValue(), subcategorieInputFieldCubit.resetValue()});*/
 
-  set currentBookingDate(DateTime bookingDate) => _parsedBookingDate = bookingDate;
+  // TODO entfernen? set currentBookingDate(DateTime bookingDate) => _parsedBookingDate = bookingDate;
 
   Future<void> _loadPreselectedAccounts() async {
     PrimaryAccountRepository primaryAccountRepository = PrimaryAccountRepository();
@@ -307,11 +305,15 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           TransactionToggleButtons(cubit: transactionStatsToggleButtonsCubit),
-                          DateInputField(
-                              currentDate: _parsedBookingDate,
-                              textController: _bookingDateTextController,
-                              repeat: _bookingRepeat,
-                              repeatCallback: (repeat) => setState(() => _bookingRepeat = repeat)),
+                          BlocBuilder<DateInputFieldCubit, String>(
+                            builder: (context, state) {
+                              return DateInputField(
+                                  cubit: dateInputFieldCubit,
+                                  //currentDate: _parsedBookingDate,
+                                  repeat: _bookingRepeat,
+                                  repeatCallback: (repeat) => setState(() => _bookingRepeat = repeat));
+                            },
+                          ),
                           BlocBuilder<TextInputFieldCubit, String>(
                             builder: (context, state) {
                               return TextInputField(fieldKey: titleFieldUniqueKey, textCubit: titleInputFieldCubit, errorText: _bookingNameErrorText, hintText: 'Titel');
