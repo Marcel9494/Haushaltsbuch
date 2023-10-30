@@ -64,7 +64,8 @@ class BookingBloc extends Bloc<BookingEvents, BookingState> {
         try {
           Booking booking = await bookingRepository.load(event.bookingBoxIndex);
           transactionStatsToggleButtonsCubit.initTransaction();
-          dateInputFieldCubit.updateValue(booking.date);
+          dateInputFieldCubit.updateBookingDate(booking.date);
+          dateInputFieldCubit.updateBookingRepeat(booking.bookingRepeats);
           titleInputFieldCubit.updateValue(booking.title);
           moneyInputFieldCubit.updateValue(booking.amount);
           categorieInputFieldCubit.updateValue(booking.categorie);

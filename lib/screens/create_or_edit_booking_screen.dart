@@ -112,16 +112,16 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
     Booking booking = Booking()
       ..transactionType = transactionStatsToggleButtonsCubit.state.transactionName
       // TODO hier weitermachen und bookingRepeat in dateInputFieldCubit mitaufnehmen siehe transactionStatsToggle als Beispiel
-      ..bookingRepeats = _bookingRepeat
+      ..bookingRepeats = dateInputFieldCubit.state.bookingRepeat
       ..title = titleInputFieldCubit.state
-      ..date = dateInputFieldCubit.state
+      ..date = dateInputFieldCubit.state.bookingDate
       ..amount = moneyInputFieldCubit.state
       ..categorie = categorieInputFieldCubit.state
       ..subcategorie = subcategorieInputFieldCubit.state
       ..fromAccount = fromAccountInputFieldCubit.state
       ..toAccount = toAccountInputFieldCubit.state
       ..serieId = boxIndex == -1 ? -1 : _loadedBooking.serieId
-      ..booked = DateTime.parse(dateInputFieldCubit.state).isAfter(DateTime.now()) ? false : true;
+      ..booked = DateTime.parse(dateInputFieldCubit.state.bookingDate).isAfter(DateTime.now()) ? false : true;
     if (boxIndex == -1) {
       // TODO bookingBloc.add(CreateOrEditBookingEvent(context, booking));
     } else {
@@ -300,9 +300,9 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           TransactionToggleButtons(cubit: transactionStatsToggleButtonsCubit),
-                          BlocBuilder<DateInputFieldCubit, String>(
+                          BlocBuilder<DateInputFieldCubit, DateInputFieldState>(
                             builder: (context, state) {
-                              return DateInputField(cubit: dateInputFieldCubit, repeat: _bookingRepeat, repeatCallback: (repeat) => setState(() => _bookingRepeat = repeat));
+                              return DateInputField(cubit: dateInputFieldCubit /*, repeat: _bookingRepeat, repeatCallback: (repeat) => setState(() => _bookingRepeat = repeat)*/);
                             },
                           ),
                           BlocBuilder<TextInputFieldCubit, String>(

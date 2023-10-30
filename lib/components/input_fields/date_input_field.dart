@@ -9,14 +9,10 @@ import '/utils/date_formatters/date_formatter.dart';
 
 class DateInputField extends StatelessWidget {
   final dynamic cubit;
-  final String repeat;
-  final Function(String repeat) repeatCallback;
 
   const DateInputField({
     Key? key,
     required this.cubit,
-    required this.repeat,
-    required this.repeatCallback,
   }) : super(key: key);
 
   void _openBottomSheetWithRepeatList(BuildContext context) {
@@ -44,23 +40,24 @@ class DateInputField extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(horizontal: 30.0, vertical: 4.0),
                           child: ListTile(
                             title: Text(RepeatType.values[index].name, textAlign: TextAlign.center),
+                            // TODO hier weitermachen und Funktionalität in Cubit auslagern
                             onTap: () => {
-                              repeatCallback(RepeatType.values[index].name),
+                              cubit.updateBookingRepeat(RepeatType.values[index].name),
                               if (RepeatType.values[index].name == RepeatType.beginningOfMonth.name)
                                 {
-                                  cubit.updateValue(DateTime(DateTime.now().year, DateTime.now().month + 1, 1)),
+                                  cubit.updateBookingDate(DateTime(DateTime.now().year, DateTime.now().month + 1, 1)),
                                 }
                               else if (RepeatType.values[index].name == RepeatType.endOfMonth.name)
                                 {
-                                  cubit.updateValue(DateTime(DateTime.now().year, DateTime.now().month, DateTime(DateTime.now().year, DateTime.now().month + 1, 0).day)),
+                                  cubit.updateBookingDate(DateTime(DateTime.now().year, DateTime.now().month, DateTime(DateTime.now().year, DateTime.now().month + 1, 0).day)),
                                 },
                               Navigator.pop(context),
                             },
                             visualDensity: const VisualDensity(vertical: -4.0),
                             shape: RoundedRectangleBorder(
                               side: BorderSide(
-                                  color: repeat == RepeatType.values[index].name ? Colors.cyanAccent.shade400 : Colors.grey,
-                                  width: repeat == RepeatType.values[index].name ? 1.2 : 0.4),
+                                  color: cubit.state.bookingRepeat == RepeatType.values[index].name ? Colors.cyanAccent.shade400 : Colors.grey,
+                                  width: cubit.state.bookingRepeat == RepeatType.values[index].name ? 1.2 : 0.4),
                               borderRadius: BorderRadius.circular(8.0),
                             ),
                             tileColor: Colors.grey.shade800,
@@ -84,7 +81,7 @@ class DateInputField extends StatelessWidget {
       children: [
         TextFormField(
           key: UniqueKey(),
-          initialValue: dateFormatterDDMMYYYYEE.format(DateTime.parse(cubit.state)),
+          initialValue: dateFormatterDDMMYYYYEE.format(DateTime.parse(cubit.state.bookingDate)),
           maxLength: 10,
           readOnly: true,
           textAlignVertical: TextAlignVertical.center,
@@ -98,19 +95,19 @@ class DateInputField extends StatelessWidget {
             suffixIcon: Column(
               children: [
                 IconTheme(
-                  data: IconThemeData(color: repeat == RepeatType.noRepetition.name ? Colors.grey : Colors.cyanAccent),
+                  data: IconThemeData(color: cubit.state.bookingRepeat == RepeatType.noRepetition.name ? Colors.grey : Colors.cyanAccent),
                   child: IconButton(
                     onPressed: () => _openBottomSheetWithRepeatList(context),
                     icon: const Icon(Icons.repeat_rounded),
-                    padding: repeat == RepeatType.noRepetition.name ? null : const EdgeInsets.only(top: 6.0),
-                    constraints: repeat == RepeatType.noRepetition.name ? null : const BoxConstraints(),
+                    padding: cubit.state.bookingRepeat == RepeatType.noRepetition.name ? null : const EdgeInsets.only(top: 6.0),
+                    constraints: cubit.state.bookingRepeat == RepeatType.noRepetition.name ? null : const BoxConstraints(),
                   ),
                 ),
-                repeat == RepeatType.noRepetition.name
+                cubit.state.bookingRepeat == RepeatType.noRepetition.name
                     ? const SizedBox()
                     : Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 6.0),
-                        child: Text(repeat, style: const TextStyle(fontSize: 10.0)),
+                        child: Text(cubit.state.bookingRepeat, style: const TextStyle(fontSize: 10.0)),
                       ),
               ],
             ),
@@ -122,7 +119,7 @@ class DateInputField extends StatelessWidget {
             DateTime? parsedDate = await showDatePicker(
               context: context,
               locale: const Locale('de', 'DE'),
-              initialDate: DateTime.parse(cubit.state),
+              initialDate: DateTime.parse(cubit.state.bookingDate),
               firstDate: DateTime(1900),
               lastDate: DateTime(2100),
               builder: (context, child) {
@@ -141,7 +138,7 @@ class DateInputField extends StatelessWidget {
               },
             );
             if (parsedDate != null) {
-              cubit.updateValue(parsedDate.toString());
+              cubit.updateBookingDate(parsedDate.toString());
             }
           },
         ),

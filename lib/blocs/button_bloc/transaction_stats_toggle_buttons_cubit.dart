@@ -1,5 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
+
 import '/models/enums/transaction_types.dart';
 
 part 'transaction_stats_toggle_buttons_state.dart';
@@ -12,7 +13,6 @@ class TransactionStatsToggleButtonsCubit extends Cubit<TransactionStatsToggleBut
     emit(TransactionStatsToggleButtonsState(TransactionType.outcome.name, [false, true, false, false], Colors.redAccent, Colors.redAccent.withOpacity(0.2)));
   }
 
-  // TODO Werte die in Cubit abgespeichert wurden in create_or_edit_boking_screen auslesen und verwenden.
   void setSelectedTransaction(int selectedIndex, List<bool> selectedTransaction) {
     for (int i = 0; i < selectedTransaction.length; i++) {
       selectedTransaction[i] = i == selectedIndex;
