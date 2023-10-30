@@ -1,5 +1,6 @@
 import 'package:another_flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
+import 'package:haushaltsbuch/blocs/input_fields_bloc/date_input_field_cubit.dart';
 
 import '../button_bloc/transaction_stats_toggle_buttons_cubit.dart';
 import '../input_fields_bloc/account_input_field_cubit.dart';
@@ -29,6 +30,7 @@ class BookingBloc extends Bloc<BookingEvents, BookingState> {
     on<CreateOrEditBookingEvent>((event, emit) async {
       emit(BookingLoadingState());
       TransactionStatsToggleButtonsCubit transactionStatsToggleButtonsCubit = BlocProvider.of<TransactionStatsToggleButtonsCubit>(event.context);
+      DateInputFieldCubit dateInputFieldCubit = BlocProvider.of<DateInputFieldCubit>(event.context);
       TextInputFieldCubit titleInputFieldCubit = BlocProvider.of<TextInputFieldCubit>(event.context);
       MoneyInputFieldCubit moneyInputFieldCubit = BlocProvider.of<MoneyInputFieldCubit>(event.context);
       CategorieInputFieldCubit categorieInputFieldCubit = BlocProvider.of<CategorieInputFieldCubit>(event.context);
@@ -42,6 +44,7 @@ class BookingBloc extends Bloc<BookingEvents, BookingState> {
       //final Booking booking = map.keys.first;
       //boxIndex = map.values.first;
 
+      dateInputFieldCubit.resetValue();
       titleInputFieldCubit.resetValue();
       moneyInputFieldCubit.resetValue();
       categorieInputFieldCubit.resetValue();
@@ -61,6 +64,7 @@ class BookingBloc extends Bloc<BookingEvents, BookingState> {
         try {
           Booking booking = await bookingRepository.load(event.bookingBoxIndex);
           transactionStatsToggleButtonsCubit.initTransaction();
+          dateInputFieldCubit.updateValue(booking.date);
           titleInputFieldCubit.updateValue(booking.title);
           moneyInputFieldCubit.updateValue(booking.amount);
           categorieInputFieldCubit.updateValue(booking.categorie);

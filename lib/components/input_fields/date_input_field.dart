@@ -5,8 +5,6 @@ import '../deco/bottom_sheet_line.dart';
 
 import '/models/enums/repeat_types.dart';
 
-import '/screens/create_or_edit_booking_screen.dart';
-
 import '/utils/date_formatters/date_formatter.dart';
 
 class DateInputField extends StatelessWidget {
@@ -50,12 +48,11 @@ class DateInputField extends StatelessWidget {
                               repeatCallback(RepeatType.values[index].name),
                               if (RepeatType.values[index].name == RepeatType.beginningOfMonth.name)
                                 {
-                                  cubit.updateValue(dateFormatterDDMMYYYY.format(DateTime(DateTime.now().year, DateTime.now().month + 1, 1))),
+                                  cubit.updateValue(DateTime(DateTime.now().year, DateTime.now().month + 1, 1)),
                                 }
                               else if (RepeatType.values[index].name == RepeatType.endOfMonth.name)
                                 {
-                                  cubit.updateValue(dateFormatterDDMMYYYY
-                                      .format(DateTime(DateTime.now().year, DateTime.now().month, DateTime(DateTime.now().year, DateTime.now().month + 1, 0).day))),
+                                  cubit.updateValue(DateTime(DateTime.now().year, DateTime.now().month, DateTime(DateTime.now().year, DateTime.now().month + 1, 0).day)),
                                 },
                               Navigator.pop(context),
                             },
@@ -86,7 +83,8 @@ class DateInputField extends StatelessWidget {
     return Column(
       children: [
         TextFormField(
-          initialValue: cubit.state.toString(),
+          key: UniqueKey(),
+          initialValue: dateFormatterDDMMYYYYEE.format(DateTime.parse(cubit.state)),
           maxLength: 10,
           readOnly: true,
           textAlignVertical: TextAlignVertical.center,
@@ -124,7 +122,7 @@ class DateInputField extends StatelessWidget {
             DateTime? parsedDate = await showDatePicker(
               context: context,
               locale: const Locale('de', 'DE'),
-              initialDate: DateTime.now(), //dateFormatterEEDDMMYYYY.format(cubit.state), // == DateTime.now() ? DateTime.now() : DateTime.parse(cubit.state),
+              initialDate: DateTime.parse(cubit.state),
               firstDate: DateTime(1900),
               lastDate: DateTime(2100),
               builder: (context, child) {
@@ -143,9 +141,7 @@ class DateInputField extends StatelessWidget {
               },
             );
             if (parsedDate != null) {
-              //CreateOrEditBookingScreen.of(context)!.currentBookingDate = parsedDate;
-              cubit.updateValue(dateFormatterDDMMYYYY.format(parsedDate));
-              //textController.text = ;
+              cubit.updateValue(parsedDate.toString());
             }
           },
         ),

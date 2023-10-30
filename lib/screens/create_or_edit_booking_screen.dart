@@ -67,8 +67,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
   String _categorieErrorText = '';
   String _fromAccountErrorText = '';
   String _toAccountErrorText = '';
-  String _bookingRepeat = '';
-  //DateTime _parsedBookingDate = DateTime.now();
+  //String _bookingRepeat = '';
   Map<String, String> _primaryAccounts = {};
   late Booking _loadedBooking;
   int boxIndex = 0;
@@ -95,7 +94,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
     //_bookingNameController.text = _loadedBooking.title;
     //_parsedBookingDate = DateTime.parse(_loadedBooking.date);
     //_bookingDateTextController.text = dateFormatterDDMMYYYYEE.format(DateTime.parse(_loadedBooking.date));
-    _bookingRepeat = _loadedBooking.bookingRepeats;
+    //_bookingRepeat = _loadedBooking.bookingRepeats;
     //_amountTextController.text = _loadedBooking.amount;
     //_bookingNameController.text = _loadedBooking.title;
     //_categorieTextController.text = _loadedBooking.categorie;
@@ -112,9 +111,10 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
     }
     Booking booking = Booking()
       ..transactionType = transactionStatsToggleButtonsCubit.state.transactionName
+      // TODO hier weitermachen und bookingRepeat in dateInputFieldCubit mitaufnehmen siehe transactionStatsToggle als Beispiel
       ..bookingRepeats = _bookingRepeat
       ..title = titleInputFieldCubit.state
-      ..date = dateInputFieldCubit.state // _parsedBookingDate.toString()
+      ..date = dateInputFieldCubit.state
       ..amount = moneyInputFieldCubit.state
       ..categorie = categorieInputFieldCubit.state
       ..subcategorie = subcategorieInputFieldCubit.state
@@ -198,11 +198,6 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
       });
     }
   }
-
-  /* TODO entfernen? set currentTransaction(String transaction) =>
-      setState(() => {_currentTransaction = transaction, categorieInputFieldCubit.resetValue(), subcategorieInputFieldCubit.resetValue()});*/
-
-  // TODO entfernen? set currentBookingDate(DateTime bookingDate) => _parsedBookingDate = bookingDate;
 
   Future<void> _loadPreselectedAccounts() async {
     PrimaryAccountRepository primaryAccountRepository = PrimaryAccountRepository();
@@ -307,11 +302,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
                           TransactionToggleButtons(cubit: transactionStatsToggleButtonsCubit),
                           BlocBuilder<DateInputFieldCubit, String>(
                             builder: (context, state) {
-                              return DateInputField(
-                                  cubit: dateInputFieldCubit,
-                                  //currentDate: _parsedBookingDate,
-                                  repeat: _bookingRepeat,
-                                  repeatCallback: (repeat) => setState(() => _bookingRepeat = repeat));
+                              return DateInputField(cubit: dateInputFieldCubit, repeat: _bookingRepeat, repeatCallback: (repeat) => setState(() => _bookingRepeat = repeat));
                             },
                           ),
                           BlocBuilder<TextInputFieldCubit, String>(
