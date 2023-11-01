@@ -8,13 +8,16 @@ class CreateOrEditBookingEvent extends BookingEvents {
   CreateOrEditBookingEvent(this.context, this.bookingBoxIndex);
 }
 
+class CreateBookingEvent extends BookingEvents {
+  final BuildContext context;
+  CreateBookingEvent(this.context);
+}
+
 class UpdateBookingEvent extends BookingEvents {
   final BuildContext context;
-  final Booking oldBooking;
-  final Booking updatedBooking;
   final int bookingBoxIndex;
   final SerieEditModeType serieEditMode;
-  UpdateBookingEvent(this.context, this.oldBooking, this.updatedBooking, this.bookingBoxIndex, this.serieEditMode);
+  UpdateBookingEvent(this.context, this.bookingBoxIndex, this.serieEditMode);
 }
 
 class LoadBookingEvent extends BookingEvents {

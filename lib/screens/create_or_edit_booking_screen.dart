@@ -46,7 +46,6 @@ class CreateOrEditBookingScreen extends StatefulWidget {
 
 class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
   //final TextEditingController _bookingDateTextController = TextEditingController();
-  final RoundedLoadingButtonController _saveButtonController = RoundedLoadingButtonController();
   late final BookingBloc bookingBloc;
   late final BookingCubit bookingCubit;
   late final TransactionStatsToggleButtonsCubit transactionStatsToggleButtonsCubit;
@@ -57,6 +56,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
   late final AccountInputFieldCubit fromAccountInputFieldCubit;
   late final AccountInputFieldCubit toAccountInputFieldCubit;
   late final SubcategorieInputFieldCubit subcategorieInputFieldCubit;
+  final RoundedLoadingButtonController _saveButtonController = RoundedLoadingButtonController();
   final BookingRepository bookingRepository = BookingRepository();
   bool _isBookingEdited = false;
   bool _isPreselectedAccountsLoaded = false;
@@ -109,25 +109,12 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
       _setSaveButtonAnimation(false);
       return;
     }
-    Booking booking = Booking()
-      ..transactionType = transactionStatsToggleButtonsCubit.state.transactionName
-      // TODO hier weitermachen und bookingRepeat in dateInputFieldCubit mitaufnehmen siehe transactionStatsToggle als Beispiel
-      ..bookingRepeats = dateInputFieldCubit.state.bookingRepeat
-      ..title = titleInputFieldCubit.state
-      ..date = dateInputFieldCubit.state.bookingDate
-      ..amount = moneyInputFieldCubit.state
-      ..categorie = categorieInputFieldCubit.state
-      ..subcategorie = subcategorieInputFieldCubit.state
-      ..fromAccount = fromAccountInputFieldCubit.state
-      ..toAccount = toAccountInputFieldCubit.state
-      ..serieId = boxIndex == -1 ? -1 : _loadedBooking.serieId
-      ..booked = DateTime.parse(dateInputFieldCubit.state.bookingDate).isAfter(DateTime.now()) ? false : true;
-    if (boxIndex == -1) {
-      // TODO bookingBloc.add(CreateOrEditBookingEvent(context, booking));
-    } else {
+    //if (boxIndex == -1) {
+    bookingBloc.add(CreateBookingEvent(context));
+    /*} else {
       // TODO SerieEditModeType.single dynamisch machen
-      bookingBloc.add(UpdateBookingEvent(context, _loadedBooking, booking, boxIndex, SerieEditModeType.single));
-    }
+      bookingBloc.add(UpdateBookingEvent(context, boxIndex, SerieEditModeType.single));
+    }*/
     _setSaveButtonAnimation(true);
   }
 

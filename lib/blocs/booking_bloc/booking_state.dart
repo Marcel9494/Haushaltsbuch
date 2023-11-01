@@ -9,9 +9,9 @@ class BookingLoadingState extends BookingState {}
 
 class BookingSuccessState extends BookingState {
   BuildContext context;
-  int boxIndex;
-  Booking booking;
-  BookingSuccessState(this.context, this.boxIndex, this.booking);
+  // int boxIndex;
+  // Booking booking;
+  BookingSuccessState(this.context /*, this.boxIndex, this.booking*/);
 }
 
 class BookingFailureState extends BookingState {}

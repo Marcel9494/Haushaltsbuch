@@ -171,6 +171,8 @@ class BookingRepository extends BookingInterface {
     for (int i = 0; i < bookingBox.length; i++) {
       Booking booking = await bookingBox.getAt(i);
       if (serieEditMode == SerieEditModeType.none || serieEditMode == SerieEditModeType.single) {
+        print(bookingBoxIndex);
+        print("booking.boxIndex: " + booking.boxIndex.toString());
         if (booking.serieId == templateBooking.serieId && booking.boxIndex == bookingBoxIndex && booking.booked) {
           accountRepository.undoneAccountBooking(oldBooking);
           bookingBox.putAt(bookingBoxIndex, templateBooking);
