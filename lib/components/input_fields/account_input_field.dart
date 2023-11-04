@@ -7,12 +7,14 @@ import '/models/account/account_repository.dart';
 
 class AccountInputField extends StatefulWidget {
   final dynamic cubit;
+  final FocusNode focusNode;
   final String errorText;
   final String hintText;
 
   const AccountInputField({
     Key? key,
     required this.cubit,
+    required this.focusNode,
     required this.errorText,
     this.hintText = 'Konto',
   }) : super(key: key);
@@ -98,6 +100,7 @@ class _AccountInputFieldState extends State<AccountInputField> {
   Widget build(BuildContext context) {
     return TextFormField(
       key: UniqueKey(),
+      focusNode: widget.focusNode,
       initialValue: widget.cubit.state,
       textAlignVertical: TextAlignVertical.center,
       showCursor: false,

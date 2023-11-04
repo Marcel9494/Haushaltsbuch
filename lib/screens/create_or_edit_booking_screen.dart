@@ -4,12 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 
+import '../blocs/input_fields_bloc/to_account_input_field_cubit.dart';
 import '/blocs/input_fields_bloc/date_input_field_cubit.dart';
 import '/blocs/booking_bloc/booking_bloc.dart';
 import '/blocs/booking_bloc/booking_cubit.dart';
 import '/blocs/input_fields_bloc/text_input_field_cubit.dart';
 import '/blocs/input_fields_bloc/money_input_field_cubit.dart';
-import '/blocs/input_fields_bloc/account_input_field_cubit.dart';
+import '/blocs/input_fields_bloc/from_account_input_field_cubit.dart';
 import '/blocs/input_fields_bloc/categorie_input_field_cubit.dart';
 import '/blocs/input_fields_bloc/subcategorie_input_field_cubit.dart';
 import '/blocs/button_bloc/transaction_stats_toggle_buttons_cubit.dart';
@@ -53,8 +54,8 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
   late final TextInputFieldCubit titleInputFieldCubit;
   late final MoneyInputFieldCubit moneyInputFieldCubit;
   late final CategorieInputFieldCubit categorieInputFieldCubit;
-  late final AccountInputFieldCubit fromAccountInputFieldCubit;
-  late final AccountInputFieldCubit toAccountInputFieldCubit;
+  late final FromAccountInputFieldCubit fromAccountInputFieldCubit;
+  late final ToAccountInputFieldCubit toAccountInputFieldCubit;
   late final SubcategorieInputFieldCubit subcategorieInputFieldCubit;
   final RoundedLoadingButtonController _saveButtonController = RoundedLoadingButtonController();
   final BookingRepository bookingRepository = BookingRepository();
@@ -72,7 +73,14 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
   late Booking _loadedBooking;
   int boxIndex = 0;
 
-  final UniqueKey titleFieldUniqueKey = UniqueKey();
+  UniqueKey titleFieldUniqueKey = UniqueKey();
+
+  FocusNode titleFocusNode = FocusNode();
+  FocusNode amountFocusNode = FocusNode();
+  FocusNode fromAccountFocusNode = FocusNode();
+  FocusNode toAccountFocusNode = FocusNode();
+  FocusNode categorieFocusNode = FocusNode();
+  FocusNode subcategorieFocusNode = FocusNode();
 
   @override
   void initState() {
@@ -83,8 +91,8 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
     titleInputFieldCubit = BlocProvider.of<TextInputFieldCubit>(context);
     moneyInputFieldCubit = BlocProvider.of<MoneyInputFieldCubit>(context);
     categorieInputFieldCubit = BlocProvider.of<CategorieInputFieldCubit>(context);
-    fromAccountInputFieldCubit = BlocProvider.of<AccountInputFieldCubit>(context);
-    toAccountInputFieldCubit = BlocProvider.of<AccountInputFieldCubit>(context);
+    fromAccountInputFieldCubit = BlocProvider.of<FromAccountInputFieldCubit>(context);
+    toAccountInputFieldCubit = BlocProvider.of<ToAccountInputFieldCubit>(context);
     subcategorieInputFieldCubit = BlocProvider.of<SubcategorieInputFieldCubit>(context);
   }
 
@@ -294,36 +302,44 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
                           ),
                           BlocBuilder<TextInputFieldCubit, String>(
                             builder: (context, state) {
-                              return TextInputField(fieldKey: titleFieldUniqueKey, textCubit: titleInputFieldCubit, errorText: _bookingNameErrorText, hintText: 'Titel');
+                              return TextInputField(
+                                  fieldKey: titleFieldUniqueKey, focusNode: titleFocusNode, textCubit: titleInputFieldCubit, errorText: _bookingNameErrorText, hintText: 'Titel');
                             },
                           ),
                           BlocBuilder<MoneyInputFieldCubit, String>(
                             builder: (context, state) {
-                              return MoneyInputField(cubit: moneyInputFieldCubit, errorText: _amountErrorText, hintText: 'Betrag', bottomSheetTitle: 'Betrag eingeben:');
+                              return MoneyInputField(
+                                  cubit: moneyInputFieldCubit, focusNode: amountFocusNode, errorText: _amountErrorText, hintText: 'Betrag', bottomSheetTitle: 'Betrag eingeben:');
                             },
                           ),
-                          BlocBuilder<AccountInputFieldCubit, String>(
-                            builder: (context, state) {
-                              if (transactionStatsToggleButtonsCubit.state.transactionName == TransactionType.income.name ||
-                                  transactionStatsToggleButtonsCubit.state.transactionName == TransactionType.outcome.name) {
-                                return AccountInputField(cubit: fromAccountInputFieldCubit, errorText: _fromAccountErrorText);
-                              } else {
-                                return Column(
-                                  children: [
-                                    AccountInputField(cubit: fromAccountInputFieldCubit, errorText: _fromAccountErrorText, hintText: 'Von'),
-                                    AccountInputField(cubit: toAccountInputFieldCubit, errorText: _toAccountErrorText, hintText: 'Nach'),
-                                  ],
-                                );
-                              }
-                              // return _getAccountInputField();
-                            },
+
+                          Column(
+                            children: [
+                              BlocBuilder<FromAccountInputFieldCubit, String>(
+                                builder: (context, state) {
+                                  return AccountInputField(cubit: fromAccountInputFieldCubit, focusNode: fromAccountFocusNode, errorText: _fromAccountErrorText, hintText: 'Von');
+                                },
+                              ),
+                              BlocBuilder<ToAccountInputFieldCubit, String>(
+                                builder: (context, state) {
+                                  if (transactionStatsToggleButtonsCubit.state.transactionName == TransactionType.transfer.name ||
+                                      transactionStatsToggleButtonsCubit.state.transactionName == TransactionType.investment.name) {
+                                    return AccountInputField(cubit: toAccountInputFieldCubit, focusNode: toAccountFocusNode, errorText: _toAccountErrorText, hintText: 'Nach');
+                                  } else {
+                                    return const SizedBox();
+                                  }
+                                },
+                              ),
+                            ],
                           ),
+                          // return _getAccountInputField();
                           transactionStatsToggleButtonsCubit.state.transactionName == TransactionType.transfer.name
                               ? const SizedBox()
                               : BlocBuilder<CategorieInputFieldCubit, String>(
                                   builder: (context, state) {
                                     return CategorieInputField(
                                         cubit: categorieInputFieldCubit,
+                                        focusNode: categorieFocusNode,
                                         errorText: _categorieErrorText,
                                         categorieType: CategorieTypeExtension.getCategorieType(transactionStatsToggleButtonsCubit.state.transactionName));
                                   },
@@ -332,7 +348,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
                               ? const SizedBox()
                               : BlocBuilder<SubcategorieInputFieldCubit, String>(
                                   builder: (context, state) {
-                                    return SubcategorieInputField(cubit: subcategorieInputFieldCubit);
+                                    return SubcategorieInputField(cubit: subcategorieInputFieldCubit, focusNode: subcategorieFocusNode);
                                   },
                                 ),
                           SaveButton(saveFunction: _createOrUpdateBooking, buttonController: _saveButtonController),

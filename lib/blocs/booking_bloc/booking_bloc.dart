@@ -3,12 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:haushaltsbuch/blocs/input_fields_bloc/date_input_field_cubit.dart';
 
 import '../button_bloc/transaction_stats_toggle_buttons_cubit.dart';
-import '../input_fields_bloc/account_input_field_cubit.dart';
+import '../input_fields_bloc/from_account_input_field_cubit.dart';
 import '../input_fields_bloc/categorie_input_field_cubit.dart';
 import '../input_fields_bloc/money_input_field_cubit.dart';
 import '../input_fields_bloc/subcategorie_input_field_cubit.dart';
 import '../input_fields_bloc/text_input_field_cubit.dart';
 
+import '../input_fields_bloc/to_account_input_field_cubit.dart';
 import '/utils/consts/route_consts.dart';
 
 import '/models/booking/booking_model.dart';
@@ -35,8 +36,8 @@ class BookingBloc extends Bloc<BookingEvents, BookingState> {
       TextInputFieldCubit titleInputFieldCubit = BlocProvider.of<TextInputFieldCubit>(event.context);
       MoneyInputFieldCubit moneyInputFieldCubit = BlocProvider.of<MoneyInputFieldCubit>(event.context);
       CategorieInputFieldCubit categorieInputFieldCubit = BlocProvider.of<CategorieInputFieldCubit>(event.context);
-      AccountInputFieldCubit fromAccountInputFieldCubit = BlocProvider.of<AccountInputFieldCubit>(event.context);
-      AccountInputFieldCubit toAccountInputFieldCubit = BlocProvider.of<AccountInputFieldCubit>(event.context);
+      FromAccountInputFieldCubit fromAccountInputFieldCubit = BlocProvider.of<FromAccountInputFieldCubit>(event.context);
+      ToAccountInputFieldCubit toAccountInputFieldCubit = BlocProvider.of<ToAccountInputFieldCubit>(event.context);
       SubcategorieInputFieldCubit subcategorieInputFieldCubit = BlocProvider.of<SubcategorieInputFieldCubit>(event.context);
       //bookingBloc = BlocProvider.of<BookingBloc>(context);
       //bookingCubit = BlocProvider.of<BookingCubit>(context);
@@ -63,6 +64,7 @@ class BookingBloc extends Bloc<BookingEvents, BookingState> {
         _bookingDateTextController.text = dateFormatterDDMMYYYYEE.format(DateTime.now());*/
       } else {
         try {
+          // TODO hier weitermachen und Transaction Type richtig laden beim Bearbeiten einer Buchung
           Booking booking = await bookingRepository.load(event.bookingBoxIndex);
           transactionStatsToggleButtonsCubit.initTransaction();
           dateInputFieldCubit.updateBookingDate(booking.date);
@@ -115,8 +117,8 @@ class BookingBloc extends Bloc<BookingEvents, BookingState> {
         TextInputFieldCubit titleInputFieldCubit = BlocProvider.of<TextInputFieldCubit>(event.context);
         MoneyInputFieldCubit moneyInputFieldCubit = BlocProvider.of<MoneyInputFieldCubit>(event.context);
         CategorieInputFieldCubit categorieInputFieldCubit = BlocProvider.of<CategorieInputFieldCubit>(event.context);
-        AccountInputFieldCubit fromAccountInputFieldCubit = BlocProvider.of<AccountInputFieldCubit>(event.context);
-        AccountInputFieldCubit toAccountInputFieldCubit = BlocProvider.of<AccountInputFieldCubit>(event.context);
+        FromAccountInputFieldCubit fromAccountInputFieldCubit = BlocProvider.of<FromAccountInputFieldCubit>(event.context);
+        ToAccountInputFieldCubit toAccountInputFieldCubit = BlocProvider.of<ToAccountInputFieldCubit>(event.context);
         SubcategorieInputFieldCubit subcategorieInputFieldCubit = BlocProvider.of<SubcategorieInputFieldCubit>(event.context);
         Booking newBooking = Booking()
           ..transactionType = transactionStatsToggleButtonsCubit.state.transactionName
@@ -148,8 +150,8 @@ class BookingBloc extends Bloc<BookingEvents, BookingState> {
         TextInputFieldCubit titleInputFieldCubit = BlocProvider.of<TextInputFieldCubit>(event.context);
         MoneyInputFieldCubit moneyInputFieldCubit = BlocProvider.of<MoneyInputFieldCubit>(event.context);
         CategorieInputFieldCubit categorieInputFieldCubit = BlocProvider.of<CategorieInputFieldCubit>(event.context);
-        AccountInputFieldCubit fromAccountInputFieldCubit = BlocProvider.of<AccountInputFieldCubit>(event.context);
-        AccountInputFieldCubit toAccountInputFieldCubit = BlocProvider.of<AccountInputFieldCubit>(event.context);
+        FromAccountInputFieldCubit fromAccountInputFieldCubit = BlocProvider.of<FromAccountInputFieldCubit>(event.context);
+        ToAccountInputFieldCubit toAccountInputFieldCubit = BlocProvider.of<ToAccountInputFieldCubit>(event.context);
         SubcategorieInputFieldCubit subcategorieInputFieldCubit = BlocProvider.of<SubcategorieInputFieldCubit>(event.context);
         Booking oldBooking = Booking()
           ..boxIndex = savedBooking.boxIndex

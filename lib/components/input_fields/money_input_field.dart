@@ -6,6 +6,7 @@ import '/components/deco/bottom_sheet_line.dart';
 import '/utils/number_formatters/number_formatter.dart';
 
 class MoneyInputField extends StatelessWidget {
+  final FocusNode focusNode;
   final dynamic cubit;
   final String errorText;
   final String hintText;
@@ -14,6 +15,7 @@ class MoneyInputField extends StatelessWidget {
 
   MoneyInputField({
     Key? key,
+    required this.focusNode,
     required this.cubit,
     required this.errorText,
     required this.hintText,
@@ -149,11 +151,12 @@ class MoneyInputField extends StatelessWidget {
   Widget build(BuildContext context) {
     return TextFormField(
       key: UniqueKey(),
-      maxLength: 9,
+      focusNode: focusNode,
       initialValue: cubit.state,
       textAlignVertical: TextAlignVertical.center,
       showCursor: false,
       readOnly: true,
+      maxLength: 9,
       onTap: () => _openBottomSheetForNumberInput(context),
       decoration: InputDecoration(
         hintText: hintText,

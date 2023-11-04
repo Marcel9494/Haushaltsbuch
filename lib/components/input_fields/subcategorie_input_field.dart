@@ -10,11 +10,13 @@ import '../deco/bottom_sheet_line.dart';
 
 class SubcategorieInputField extends StatefulWidget {
   final dynamic cubit;
+  final FocusNode focusNode;
   final String title;
 
   const SubcategorieInputField({
     Key? key,
     required this.cubit,
+    required this.focusNode,
     this.title = 'Unterkategorie auswählen:',
   }) : super(key: key);
 
@@ -99,6 +101,7 @@ class _SubcategorieInputFieldState extends State<SubcategorieInputField> {
   Widget build(BuildContext context) {
     return TextFormField(
       key: UniqueKey(),
+      focusNode: widget.focusNode,
       initialValue: widget.cubit.state,
       textAlignVertical: TextAlignVertical.center,
       showCursor: false,

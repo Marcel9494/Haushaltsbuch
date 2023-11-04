@@ -11,6 +11,7 @@ import '/components/deco/bottom_sheet_line.dart';
 
 class CategorieInputField extends StatefulWidget {
   final dynamic cubit;
+  final FocusNode focusNode;
   final String errorText;
   final CategorieType categorieType;
   final String title;
@@ -19,6 +20,7 @@ class CategorieInputField extends StatefulWidget {
   const CategorieInputField({
     Key? key,
     required this.cubit,
+    required this.focusNode,
     required this.errorText,
     required this.categorieType,
     this.title = 'Kategorie auswählen:',
@@ -118,6 +120,7 @@ class _CategorieInputFieldState extends State<CategorieInputField> {
   Widget build(BuildContext context) {
     return TextFormField(
       key: UniqueKey(),
+      focusNode: widget.focusNode,
       initialValue: widget.cubit.state,
       textAlignVertical: TextAlignVertical.center,
       showCursor: false,

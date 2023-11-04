@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:haushaltsbuch/blocs/input_fields_bloc/date_input_field_cubit.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -32,10 +31,12 @@ import '/blocs/booking_bloc/booking_bloc.dart';
 import '/blocs/booking_bloc/booking_cubit.dart';
 import '/blocs/input_fields_bloc/text_input_field_cubit.dart';
 import '/blocs/input_fields_bloc/money_input_field_cubit.dart';
-import '/blocs/input_fields_bloc/account_input_field_cubit.dart';
+import '/blocs/input_fields_bloc/from_account_input_field_cubit.dart';
 import '/blocs/input_fields_bloc/categorie_input_field_cubit.dart';
 import '/blocs/input_fields_bloc/subcategorie_input_field_cubit.dart';
 import '/blocs/button_bloc/transaction_stats_toggle_buttons_cubit.dart';
+import '/blocs/input_fields_bloc/date_input_field_cubit.dart';
+import '/blocs/input_fields_bloc/to_account_input_field_cubit.dart';
 
 import '/components/bottom_nav_bar/bottom_nav_bar.dart';
 
@@ -91,8 +92,11 @@ void main() async {
         BlocProvider<SubcategorieInputFieldCubit>(
           create: (context) => SubcategorieInputFieldCubit(),
         ),
-        BlocProvider<AccountInputFieldCubit>(
-          create: (context) => AccountInputFieldCubit(),
+        BlocProvider<FromAccountInputFieldCubit>(
+          create: (context) => FromAccountInputFieldCubit(),
+        ),
+        BlocProvider<ToAccountInputFieldCubit>(
+          create: (context) => ToAccountInputFieldCubit(),
         ),
         BlocProvider<TransactionStatsToggleButtonsCubit>(
           create: (context) => TransactionStatsToggleButtonsCubit(),
