@@ -1,6 +1,7 @@
 import 'package:another_flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
-import 'package:haushaltsbuch/blocs/input_fields_bloc/date_input_field_cubit.dart';
+
+import '/blocs/input_fields_bloc/date_input_field_cubit.dart';
 
 import '../button_bloc/transaction_stats_toggle_buttons_cubit.dart';
 import '../input_fields_bloc/from_account_input_field_cubit.dart';
@@ -8,8 +9,8 @@ import '../input_fields_bloc/categorie_input_field_cubit.dart';
 import '../input_fields_bloc/money_input_field_cubit.dart';
 import '../input_fields_bloc/subcategorie_input_field_cubit.dart';
 import '../input_fields_bloc/text_input_field_cubit.dart';
-
 import '../input_fields_bloc/to_account_input_field_cubit.dart';
+
 import '/utils/consts/route_consts.dart';
 
 import '/models/booking/booking_model.dart';
@@ -29,8 +30,8 @@ class BookingBloc extends Bloc<BookingEvents, BookingState> {
   late Booking savedBooking = Booking();
 
   BookingBloc() : super(BookingInitialState()) {
-    on<CreateOrEditBookingEvent>((event, emit) async {
-      emit(BookingLoadingState());
+    on<CreateOrLoadBookingEvent>((event, emit) async {
+      emit(BookingLoadingState(event.bookingBoxIndex));
       TransactionStatsToggleButtonsCubit transactionStatsToggleButtonsCubit = BlocProvider.of<TransactionStatsToggleButtonsCubit>(event.context);
       DateInputFieldCubit dateInputFieldCubit = BlocProvider.of<DateInputFieldCubit>(event.context);
       TextInputFieldCubit titleInputFieldCubit = BlocProvider.of<TextInputFieldCubit>(event.context);
@@ -39,13 +40,8 @@ class BookingBloc extends Bloc<BookingEvents, BookingState> {
       FromAccountInputFieldCubit fromAccountInputFieldCubit = BlocProvider.of<FromAccountInputFieldCubit>(event.context);
       ToAccountInputFieldCubit toAccountInputFieldCubit = BlocProvider.of<ToAccountInputFieldCubit>(event.context);
       SubcategorieInputFieldCubit subcategorieInputFieldCubit = BlocProvider.of<SubcategorieInputFieldCubit>(event.context);
-      //bookingBloc = BlocProvider.of<BookingBloc>(context);
-      //bookingCubit = BlocProvider.of<BookingCubit>(context);
 
-      //Map<Booking, int> map = bookingCubit.state;
-      //final Booking booking = map.keys.first;
-      //boxIndex = map.values.first;
-
+      transactionStatsToggleButtonsCubit.initTransaction();
       dateInputFieldCubit.resetValue();
       titleInputFieldCubit.resetValue();
       moneyInputFieldCubit.resetValue();
@@ -56,17 +52,12 @@ class BookingBloc extends Bloc<BookingEvents, BookingState> {
 
       print(event.bookingBoxIndex);
       if (event.bookingBoxIndex == -1) {
-        Booking booking = Booking();
-        emit(BookingSuccessState(event.context /*, event.bookingBoxIndex, booking*/));
         Navigator.pushNamed(event.context, createOrEditBookingRoute);
-        /*_currentTransaction = TransactionType.outcome.name;
-        _bookingRepeat = RepeatType.noRepetition.name;
-        _bookingDateTextController.text = dateFormatterDDMMYYYYEE.format(DateTime.now());*/
+        emit(BookingSuccessState(event.context, event.bookingBoxIndex));
       } else {
         try {
-          // TODO hier weitermachen und Transaction Type richtig laden beim Bearbeiten einer Buchung
           Booking booking = await bookingRepository.load(event.bookingBoxIndex);
-          transactionStatsToggleButtonsCubit.initTransaction();
+          transactionStatsToggleButtonsCubit.updateTransactionType(booking.transactionType);
           dateInputFieldCubit.updateBookingDate(booking.date);
           dateInputFieldCubit.updateBookingRepeat(booking.bookingRepeats);
           titleInputFieldCubit.updateValue(booking.title);
@@ -88,7 +79,7 @@ class BookingBloc extends Bloc<BookingEvents, BookingState> {
           savedBooking.amount = booking.amount;
           savedBooking.booked = booking.booked;
           savedBooking.serieId = booking.serieId;
-          emit(BookingSuccessState(event.context /*, event.bookingBoxIndex, booking*/));
+          emit(BookingSuccessState(event.context, event.bookingBoxIndex));
         } catch (error) {
           emit(BookingFailureState());
         } finally {
@@ -110,7 +101,6 @@ class BookingBloc extends Bloc<BookingEvents, BookingState> {
     });
 
     on<CreateBookingEvent>((event, emit) async {
-      emit(BookingLoadingState());
       try {
         TransactionStatsToggleButtonsCubit transactionStatsToggleButtonsCubit = BlocProvider.of<TransactionStatsToggleButtonsCubit>(event.context);
         DateInputFieldCubit dateInputFieldCubit = BlocProvider.of<DateInputFieldCubit>(event.context);
@@ -134,7 +124,7 @@ class BookingBloc extends Bloc<BookingEvents, BookingState> {
           ..booked = DateTime.parse(dateInputFieldCubit.state.bookingDate).isAfter(DateTime.now()) ? false : true;
         print(newBooking.title);
         bookingRepository.create(newBooking);
-        emit(BookingSuccessState(event.context /*, event.bookingBoxIndex, booking*/));
+        //emit(BookingSuccessState(event.context, event.bookingBoxIndex));
         Navigator.popAndPushNamed(event.context, bottomNavBarRoute, arguments: BottomNavBarScreenArguments(0));
       } catch (error) {
         print(error);
@@ -143,7 +133,6 @@ class BookingBloc extends Bloc<BookingEvents, BookingState> {
     });
 
     on<UpdateBookingEvent>((event, emit) async {
-      emit(BookingLoadingState());
       try {
         TransactionStatsToggleButtonsCubit transactionStatsToggleButtonsCubit = BlocProvider.of<TransactionStatsToggleButtonsCubit>(event.context);
         DateInputFieldCubit dateInputFieldCubit = BlocProvider.of<DateInputFieldCubit>(event.context);
@@ -179,7 +168,7 @@ class BookingBloc extends Bloc<BookingEvents, BookingState> {
           ..serieId = -1 // TODO -1 dynamisch machen. Alter Code: boxIndex == -1 ? -1 : _loadedBooking.serieId
           ..booked = DateTime.parse(dateInputFieldCubit.state.bookingDate).isAfter(DateTime.now()) ? false : true;
         bookingRepository.update(booking, oldBooking, event.bookingBoxIndex, event.serieEditMode);
-        emit(BookingSuccessState(event.context /*, event.bookingBoxIndex, booking*/));
+        emit(BookingSuccessState(event.context, event.bookingBoxIndex));
         Navigator.popAndPushNamed(event.context, bottomNavBarRoute, arguments: BottomNavBarScreenArguments(0));
       } catch (error) {
         emit(BookingFailureState());
@@ -216,7 +205,7 @@ class BookingBloc extends Bloc<BookingEvents, BookingState> {
         FocusScope.of(event.context).unfocus();
       }
 
-      emit(BookingLoadingState());
+      // TODO entfernen? emit(BookingLoadingState());
       try {
         showDialog(
           context: event.context,

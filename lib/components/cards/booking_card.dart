@@ -39,8 +39,7 @@ class BookingCard extends StatelessWidget {
 
   void _editBooking(BuildContext context) {
     if (booking.bookingRepeats == RepeatType.noRepetition.name) {
-      BlocProvider.of<BookingBloc>(context).add(CreateOrEditBookingEvent(context, booking.boxIndex));
-      //Navigator.pushNamed(context, createOrEditBookingRoute, arguments: CreateOrEditBookingScreenArguments(booking.boxIndex, SerieEditModeType.none));
+      BlocProvider.of<BookingBloc>(context).add(CreateOrLoadBookingEvent(context, booking.boxIndex));
     } else {
       showCupertinoModalBottomSheet<void>(
         context: context,

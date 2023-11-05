@@ -2,10 +2,10 @@ part of 'booking_bloc.dart';
 
 abstract class BookingEvents {}
 
-class CreateOrEditBookingEvent extends BookingEvents {
+class CreateOrLoadBookingEvent extends BookingEvents {
   final BuildContext context;
   final int bookingBoxIndex;
-  CreateOrEditBookingEvent(this.context, this.bookingBoxIndex);
+  CreateOrLoadBookingEvent(this.context, this.bookingBoxIndex);
 }
 
 class CreateBookingEvent extends BookingEvents {

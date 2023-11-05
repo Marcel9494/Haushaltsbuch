@@ -29,4 +29,18 @@ class TransactionStatsToggleButtonsCubit extends Cubit<TransactionStatsToggleBut
       emit(TransactionStatsToggleButtonsState(TransactionType.outcome.name, [false, true, false, false], Colors.redAccent, Colors.redAccent.withOpacity(0.2)));
     }
   }
+
+  void updateTransactionType(String transactionType) {
+    if (transactionType == TransactionType.income.name) {
+      emit(TransactionStatsToggleButtonsState(TransactionType.income.name, [true, false, false, false], Colors.greenAccent, Colors.greenAccent.withOpacity(0.2)));
+    } else if (transactionType == TransactionType.outcome.name) {
+      emit(TransactionStatsToggleButtonsState(TransactionType.outcome.name, [false, true, false, false], Colors.redAccent, Colors.redAccent.withOpacity(0.2)));
+    } else if (transactionType == TransactionType.transfer.name) {
+      emit(TransactionStatsToggleButtonsState(TransactionType.transfer.name, [false, false, true, false], Colors.cyanAccent, Colors.cyanAccent.withOpacity(0.2)));
+    } else if (transactionType == TransactionType.investment.name) {
+      emit(TransactionStatsToggleButtonsState(TransactionType.investment.name, [false, false, false, true], Colors.cyanAccent, Colors.cyanAccent.withOpacity(0.2)));
+    } else {
+      emit(TransactionStatsToggleButtonsState(TransactionType.outcome.name, [false, true, false, false], Colors.redAccent, Colors.redAccent.withOpacity(0.2)));
+    }
+  }
 }
