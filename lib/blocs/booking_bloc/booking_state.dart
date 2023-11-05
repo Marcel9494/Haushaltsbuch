@@ -11,11 +11,14 @@ class BookingLoadingState extends BookingState {
 }
 
 class BookingSuccessState extends BookingState {
-  BuildContext context;
-  int bookingBoxIndex;
+  final BuildContext context;
+  final int bookingBoxIndex;
   BookingSuccessState(this.context, this.bookingBoxIndex);
 }
 
-class BookingFailureState extends BookingState {}
+class BookingFailureState extends BookingState {
+  final String errorText;
+  BookingFailureState(this.errorText);
+}
 
 class BookingInitial extends BookingState {}

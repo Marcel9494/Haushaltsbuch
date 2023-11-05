@@ -81,7 +81,7 @@ class BookingBloc extends Bloc<BookingEvents, BookingState> {
           savedBooking.serieId = booking.serieId;
           emit(BookingSuccessState(event.context, event.bookingBoxIndex));
         } catch (error) {
-          emit(BookingFailureState());
+          //emit(BookingFailureState());
         } finally {
           Navigator.pushNamed(event.context, createOrEditBookingRoute);
         }
@@ -100,7 +100,7 @@ class BookingBloc extends Bloc<BookingEvents, BookingState> {
       }*/
     });
 
-    on<CreateBookingEvent>((event, emit) async {
+    on<CreateOrUpdateBookingEvent>((event, emit) async {
       try {
         TransactionStatsToggleButtonsCubit transactionStatsToggleButtonsCubit = BlocProvider.of<TransactionStatsToggleButtonsCubit>(event.context);
         DateInputFieldCubit dateInputFieldCubit = BlocProvider.of<DateInputFieldCubit>(event.context);
@@ -110,68 +110,59 @@ class BookingBloc extends Bloc<BookingEvents, BookingState> {
         FromAccountInputFieldCubit fromAccountInputFieldCubit = BlocProvider.of<FromAccountInputFieldCubit>(event.context);
         ToAccountInputFieldCubit toAccountInputFieldCubit = BlocProvider.of<ToAccountInputFieldCubit>(event.context);
         SubcategorieInputFieldCubit subcategorieInputFieldCubit = BlocProvider.of<SubcategorieInputFieldCubit>(event.context);
-        Booking newBooking = Booking()
-          ..transactionType = transactionStatsToggleButtonsCubit.state.transactionName
-          ..bookingRepeats = dateInputFieldCubit.state.bookingRepeat
-          ..title = titleInputFieldCubit.state
-          ..date = dateInputFieldCubit.state.bookingDate
-          ..amount = moneyInputFieldCubit.state
-          ..categorie = categorieInputFieldCubit.state
-          ..subcategorie = subcategorieInputFieldCubit.state
-          ..fromAccount = fromAccountInputFieldCubit.state
-          ..toAccount = toAccountInputFieldCubit.state
-          ..serieId = -1 // TODO -1 dynamisch machen. Alter Code: boxIndex == -1 ? -1 : _loadedBooking.serieId
-          ..booked = DateTime.parse(dateInputFieldCubit.state.bookingDate).isAfter(DateTime.now()) ? false : true;
-        print(newBooking.title);
-        bookingRepository.create(newBooking);
-        //emit(BookingSuccessState(event.context, event.bookingBoxIndex));
+        if (dateInputFieldCubit.state.bookingDate.isEmpty) {
+          emit(BookingFailureState("Fehler beim Erstellen einer Buchung"));
+        }
+        if (event.bookingBoxIndex == -1) {
+          Booking newBooking = Booking()
+            ..transactionType = transactionStatsToggleButtonsCubit.state.transactionName
+            ..bookingRepeats = dateInputFieldCubit.state.bookingRepeat
+            ..title = titleInputFieldCubit.state
+            ..date = dateInputFieldCubit.state.bookingDate
+            ..amount = moneyInputFieldCubit.state
+            ..categorie = categorieInputFieldCubit.state
+            ..subcategorie = subcategorieInputFieldCubit.state
+            ..fromAccount = fromAccountInputFieldCubit.state
+            ..toAccount = toAccountInputFieldCubit.state
+            ..serieId = -1 // TODO -1 dynamisch machen. Alter Code: boxIndex == -1 ? -1 : _loadedBooking.serieId
+            ..booked = DateTime.parse(dateInputFieldCubit.state.bookingDate).isAfter(DateTime.now()) ? false : true;
+          print(newBooking.title);
+          bookingRepository.create(newBooking);
+          //emit(BookingSuccessState(event.context, event.bookingBoxIndex));
+        } else {
+          Booking oldBooking = Booking()
+            ..boxIndex = savedBooking.boxIndex
+            ..transactionType = savedBooking.transactionType
+            ..bookingRepeats = savedBooking.bookingRepeats
+            ..title = savedBooking.title
+            ..date = savedBooking.date
+            ..amount = savedBooking.amount
+            ..categorie = savedBooking.categorie
+            ..subcategorie = savedBooking.subcategorie
+            ..fromAccount = savedBooking.fromAccount
+            ..toAccount = savedBooking.toAccount
+            ..serieId = savedBooking.serieId // TODO -1 dynamisch machen. Alter Code: boxIndex == -1 ? -1 : _loadedBooking.serieId
+            ..booked = savedBooking.booked; // DateTime.parse(dateInputFieldCubit.state.bookingDate).isAfter(DateTime.now()) ? false : true;
+          Booking booking = Booking()
+            ..transactionType = transactionStatsToggleButtonsCubit.state.transactionName
+            ..bookingRepeats = dateInputFieldCubit.state.bookingRepeat
+            ..title = titleInputFieldCubit.state
+            ..date = dateInputFieldCubit.state.bookingDate
+            ..amount = moneyInputFieldCubit.state
+            ..categorie = categorieInputFieldCubit.state
+            ..subcategorie = subcategorieInputFieldCubit.state
+            ..fromAccount = fromAccountInputFieldCubit.state
+            ..toAccount = toAccountInputFieldCubit.state
+            ..serieId = -1 // TODO -1 dynamisch machen. Alter Code: boxIndex == -1 ? -1 : _loadedBooking.serieId
+            ..booked = DateTime.parse(dateInputFieldCubit.state.bookingDate).isAfter(DateTime.now()) ? false : true;
+          bookingRepository.update(booking, oldBooking, event.bookingBoxIndex, SerieEditModeType.single); // TODO SerieEditModeType dynamisch machen
+          emit(BookingSuccessState(event.context, event.bookingBoxIndex));
+        }
+        // TODO hier weitermachen und nur auf BottomNavBar weiterleiten, wenn Buchung erstellen oder bearbeiten erfolgreich war
         Navigator.popAndPushNamed(event.context, bottomNavBarRoute, arguments: BottomNavBarScreenArguments(0));
       } catch (error) {
         print(error);
-        emit(BookingFailureState());
-      }
-    });
-
-    on<UpdateBookingEvent>((event, emit) async {
-      try {
-        TransactionStatsToggleButtonsCubit transactionStatsToggleButtonsCubit = BlocProvider.of<TransactionStatsToggleButtonsCubit>(event.context);
-        DateInputFieldCubit dateInputFieldCubit = BlocProvider.of<DateInputFieldCubit>(event.context);
-        TextInputFieldCubit titleInputFieldCubit = BlocProvider.of<TextInputFieldCubit>(event.context);
-        MoneyInputFieldCubit moneyInputFieldCubit = BlocProvider.of<MoneyInputFieldCubit>(event.context);
-        CategorieInputFieldCubit categorieInputFieldCubit = BlocProvider.of<CategorieInputFieldCubit>(event.context);
-        FromAccountInputFieldCubit fromAccountInputFieldCubit = BlocProvider.of<FromAccountInputFieldCubit>(event.context);
-        ToAccountInputFieldCubit toAccountInputFieldCubit = BlocProvider.of<ToAccountInputFieldCubit>(event.context);
-        SubcategorieInputFieldCubit subcategorieInputFieldCubit = BlocProvider.of<SubcategorieInputFieldCubit>(event.context);
-        Booking oldBooking = Booking()
-          ..boxIndex = savedBooking.boxIndex
-          ..transactionType = savedBooking.transactionType
-          ..bookingRepeats = savedBooking.bookingRepeats
-          ..title = savedBooking.title
-          ..date = savedBooking.date
-          ..amount = savedBooking.amount
-          ..categorie = savedBooking.categorie
-          ..subcategorie = savedBooking.subcategorie
-          ..fromAccount = savedBooking.fromAccount
-          ..toAccount = savedBooking.toAccount
-          ..serieId = savedBooking.serieId // TODO -1 dynamisch machen. Alter Code: boxIndex == -1 ? -1 : _loadedBooking.serieId
-          ..booked = savedBooking.booked; // DateTime.parse(dateInputFieldCubit.state.bookingDate).isAfter(DateTime.now()) ? false : true;
-        Booking booking = Booking()
-          ..transactionType = transactionStatsToggleButtonsCubit.state.transactionName
-          ..bookingRepeats = dateInputFieldCubit.state.bookingRepeat
-          ..title = titleInputFieldCubit.state
-          ..date = dateInputFieldCubit.state.bookingDate
-          ..amount = moneyInputFieldCubit.state
-          ..categorie = categorieInputFieldCubit.state
-          ..subcategorie = subcategorieInputFieldCubit.state
-          ..fromAccount = fromAccountInputFieldCubit.state
-          ..toAccount = toAccountInputFieldCubit.state
-          ..serieId = -1 // TODO -1 dynamisch machen. Alter Code: boxIndex == -1 ? -1 : _loadedBooking.serieId
-          ..booked = DateTime.parse(dateInputFieldCubit.state.bookingDate).isAfter(DateTime.now()) ? false : true;
-        bookingRepository.update(booking, oldBooking, event.bookingBoxIndex, event.serieEditMode);
-        emit(BookingSuccessState(event.context, event.bookingBoxIndex));
-        Navigator.popAndPushNamed(event.context, bottomNavBarRoute, arguments: BottomNavBarScreenArguments(0));
-      } catch (error) {
-        emit(BookingFailureState());
+        // TODO emit(BookingFailureState());
       }
     });
 
@@ -254,7 +245,7 @@ class BookingBloc extends Bloc<BookingEvents, BookingState> {
           },
         );
       } catch (error) {
-        emit(BookingFailureState());
+        // TODO emit(BookingFailureState());
       }
     });
   }

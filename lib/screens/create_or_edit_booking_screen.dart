@@ -85,11 +85,12 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
     subcategorieInputFieldCubit = BlocProvider.of<SubcategorieInputFieldCubit>(context);
   }
 
-  void _createOrUpdateBooking() async {
+  /*void _createOrUpdateBooking() async {
     if (_validBookingTitle() == false || _validBookingAmount() == false || _validCategorie() == false || _validFromAccount() == false || _validToAccount() == false) {
       _setSaveButtonAnimation(false);
       return;
     }
+    // TODO hier weitermachen und schauen das auch Buchungen wieder bearbeitet werden können!
     //if (boxIndex == -1) {
     bookingBloc.add(CreateBookingEvent(context));
     /*} else {
@@ -97,7 +98,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
       bookingBloc.add(UpdateBookingEvent(context, boxIndex, SerieEditModeType.single));
     }*/
     _setSaveButtonAnimation(true);
-  }
+  }*/
 
   bool _validBookingTitle() {
     if (titleInputFieldCubit.state.isEmpty) {
@@ -171,16 +172,16 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: BlocBuilder<BookingBloc, BookingState>(
-        builder: (context, state) {
-          if (state is BookingLoadingState) {
+        builder: (context, bookingState) {
+          if (bookingState is BookingLoadingState) {
             return const LoadingIndicator();
-          } else if (state is BookingSuccessState) {
+          } else if (bookingState is BookingSuccessState) {
             return Scaffold(
               resizeToAvoidBottomInset: false,
               appBar: AppBar(
-                title: state.bookingBoxIndex == -1 ? const Text('Buchung erstellen') : const Text('Buchung bearbeiten'),
+                title: bookingState.bookingBoxIndex == -1 ? const Text('Buchung erstellen') : const Text('Buchung bearbeiten'),
                 actions: [
-                  state.bookingBoxIndex == -1
+                  bookingState.bookingBoxIndex == -1
                       ? const SizedBox()
                       : IconButton(
                           icon: const Icon(Icons.delete_forever_rounded),
@@ -258,7 +259,8 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
                                     return SubcategorieInputField(cubit: subcategorieInputFieldCubit, focusNode: subcategorieFocusNode);
                                   },
                                 ),
-                          SaveButton(saveFunction: _createOrUpdateBooking, buttonController: _saveButtonController),
+                          SaveButton(
+                              saveFunction: () => bookingBloc.add(CreateOrUpdateBookingEvent(context, bookingState.bookingBoxIndex)), buttonController: _saveButtonController),
                         ],
                       );
                     },
@@ -266,8 +268,10 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
                 ),
               ),
             );
+          } else if (bookingState is BookingFailureState) {
+            return Text(bookingState.errorText);
           } else {
-            return const Text('Fehler');
+            return const Text("Unbekannter Fehler");
           }
         },
       ),
