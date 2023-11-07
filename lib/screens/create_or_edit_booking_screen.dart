@@ -213,7 +213,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
                           BlocBuilder<TextInputFieldCubit, String>(
                             builder: (context, state) {
                               return TextInputField(
-                                  fieldKey: titleFieldUniqueKey, focusNode: titleFocusNode, textCubit: titleInputFieldCubit, errorText: _bookingNameErrorText, hintText: 'Titel');
+                                  fieldKey: titleFieldUniqueKey, focusNode: titleFocusNode, textCubit: titleInputFieldCubit, errorText: bookingState.errorText, hintText: 'Titel');
                             },
                           ),
                           BlocBuilder<MoneyInputFieldCubit, String>(
@@ -260,7 +260,8 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
                                   },
                                 ),
                           SaveButton(
-                              saveFunction: () => bookingBloc.add(CreateOrUpdateBookingEvent(context, bookingState.bookingBoxIndex)), buttonController: _saveButtonController),
+                              saveFunction: () => bookingBloc.add(CreateOrUpdateBookingEvent(context, bookingState.bookingBoxIndex, _saveButtonController)),
+                              buttonController: _saveButtonController),
                         ],
                       );
                     },

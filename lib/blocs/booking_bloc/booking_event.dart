@@ -11,7 +11,8 @@ class CreateOrLoadBookingEvent extends BookingEvents {
 class CreateOrUpdateBookingEvent extends BookingEvents {
   final BuildContext context;
   final int bookingBoxIndex;
-  CreateOrUpdateBookingEvent(this.context, this.bookingBoxIndex);
+  final RoundedLoadingButtonController saveButtonController;
+  CreateOrUpdateBookingEvent(this.context, this.bookingBoxIndex, this.saveButtonController);
 }
 
 class LoadBookingEvent extends BookingEvents {

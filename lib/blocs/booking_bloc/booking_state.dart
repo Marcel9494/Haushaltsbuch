@@ -13,7 +13,9 @@ class BookingLoadingState extends BookingState {
 class BookingSuccessState extends BookingState {
   final BuildContext context;
   final int bookingBoxIndex;
-  BookingSuccessState(this.context, this.bookingBoxIndex);
+  final String errorText;
+  final Function saveButtonController;
+  BookingSuccessState(this.context, this.bookingBoxIndex, this.errorText, this.saveButtonController);
 }
 
 class BookingFailureState extends BookingState {
