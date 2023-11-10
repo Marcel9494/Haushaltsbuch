@@ -100,7 +100,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
     _setSaveButtonAnimation(true);
   }*/
 
-  bool _validBookingTitle() {
+  /*bool _validBookingTitle() {
     if (titleInputFieldCubit.state.isEmpty) {
       setState(() {
         _bookingNameErrorText = "Bitte geben Sie eine Beschreibung für die Buchung ein.";
@@ -109,7 +109,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
     }
     _bookingNameErrorText = '';
     return true;
-  }
+  }*/
 
   bool _validBookingAmount() {
     if (moneyInputFieldCubit.state.isEmpty) {
@@ -199,7 +199,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(18.0),
                   ),
-                  child: BlocBuilder<TransactionStatsToggleButtonsCubit, TransactionStatsToggleButtonsState>(
+                  child: BlocBuilder<TransactionStatsToggleButtonsCubit, TransactionStatsToggleButtonsModel>(
                     builder: (context, state) {
                       return Column(
                         mainAxisSize: MainAxisSize.min,
@@ -210,10 +210,9 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
                               return DateInputField(cubit: dateInputFieldCubit);
                             },
                           ),
-                          BlocBuilder<TextInputFieldCubit, String>(
+                          BlocBuilder<TextInputFieldCubit, TextInputFieldModel>(
                             builder: (context, state) {
-                              return TextInputField(
-                                  fieldKey: titleFieldUniqueKey, focusNode: titleFocusNode, textCubit: titleInputFieldCubit, errorText: bookingState.errorText, hintText: 'Titel');
+                              return TextInputField(fieldKey: titleFieldUniqueKey, focusNode: titleFocusNode, textCubit: titleInputFieldCubit, hintText: 'Titel');
                             },
                           ),
                           BlocBuilder<MoneyInputFieldCubit, String>(

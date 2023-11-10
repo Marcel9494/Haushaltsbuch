@@ -5,7 +5,6 @@ class TextInputField extends StatelessWidget {
   final UniqueKey fieldKey;
   final dynamic textCubit;
   final String hintText;
-  final String errorText;
   final int maxLength;
   final bool autofocus;
 
@@ -15,7 +14,6 @@ class TextInputField extends StatelessWidget {
     required this.fieldKey,
     required this.textCubit,
     required this.hintText,
-    this.errorText = '',
     this.maxLength = 60,
     this.autofocus = false,
   }) : super(key: key);
@@ -25,7 +23,7 @@ class TextInputField extends StatelessWidget {
     return TextFormField(
       key: fieldKey,
       focusNode: focusNode,
-      initialValue: textCubit.state,
+      initialValue: textCubit.state.text,
       textCapitalization: TextCapitalization.words,
       maxLength: maxLength,
       autofocus: autofocus,
@@ -52,7 +50,7 @@ class TextInputField extends StatelessWidget {
         focusedBorder: const UnderlineInputBorder(
           borderSide: BorderSide(color: Colors.cyanAccent, width: 1.5),
         ),
-        errorText: errorText.isEmpty ? null : errorText,
+        errorText: textCubit.state.errorText.isEmpty ? null : textCubit.state.errorText,
       ),
     );
   }

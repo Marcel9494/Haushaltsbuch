@@ -113,19 +113,18 @@ class BookingBloc extends Bloc<BookingEvents, BookingState> {
         FromAccountInputFieldCubit fromAccountInputFieldCubit = BlocProvider.of<FromAccountInputFieldCubit>(event.context);
         ToAccountInputFieldCubit toAccountInputFieldCubit = BlocProvider.of<ToAccountInputFieldCubit>(event.context);
         SubcategorieInputFieldCubit subcategorieInputFieldCubit = BlocProvider.of<SubcategorieInputFieldCubit>(event.context);
-        if (titleInputFieldCubit.state.isEmpty) {
+        // TODO hier weitermachen und weitere Fehler behandeln und nicht benötigten Code entfernen und Code verbessern. Siehe Beispiel titleInputFieldCubit.checkValue(...)
+        if (titleInputFieldCubit.checkValue(titleInputFieldCubit.state.text, "Test")) {
           event.saveButtonController.error();
           Timer(const Duration(seconds: 1), () {
             event.saveButtonController.reset();
           });
-          // TODO hier weitermachen und weitere Fehler behandeln und nicht benötigten Code entfernen und Code verbessern.
-          emit(BookingSuccessState(event.context, event.bookingBoxIndex, "Test", () => event.saveButtonController.error()));
         } else {
           if (event.bookingBoxIndex == -1) {
             Booking newBooking = Booking()
               ..transactionType = transactionStatsToggleButtonsCubit.state.transactionName
               ..bookingRepeats = dateInputFieldCubit.state.bookingRepeat
-              ..title = titleInputFieldCubit.state
+              ..title = titleInputFieldCubit.state.text
               ..date = dateInputFieldCubit.state.bookingDate
               ..amount = moneyInputFieldCubit.state
               ..categorie = categorieInputFieldCubit.state
@@ -155,7 +154,7 @@ class BookingBloc extends Bloc<BookingEvents, BookingState> {
             Booking booking = Booking()
               ..transactionType = transactionStatsToggleButtonsCubit.state.transactionName
               ..bookingRepeats = dateInputFieldCubit.state.bookingRepeat
-              ..title = titleInputFieldCubit.state
+              ..title = titleInputFieldCubit.state.text
               ..date = dateInputFieldCubit.state.bookingDate
               ..amount = moneyInputFieldCubit.state
               ..categorie = categorieInputFieldCubit.state

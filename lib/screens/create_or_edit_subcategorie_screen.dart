@@ -59,9 +59,9 @@ class _CreateOrEditSubcategorieScreenState extends State<CreateOrEditSubcategori
     }
     CategorieRepository categorieRepository = CategorieRepository();
     if (widget.mode == ModeType.creationMode) {
-      categorieRepository.createSubcategorie(widget.categorie.name, textInputFieldCubit.state.trim());
+      // TODO categorieRepository.createSubcategorie(widget.categorie.name, textInputFieldCubit.state.trim());
     } else {
-      categorieRepository.updateSubcategorie(widget.categorie.name, _oldSubcategorie, textInputFieldCubit.state.trim());
+      // TODO categorieRepository.updateSubcategorie(widget.categorie.name, _oldSubcategorie, textInputFieldCubit.state.trim());
     }
     _setSaveButtonAnimation(true);
     Timer(const Duration(milliseconds: transitionInMs), () {
@@ -76,12 +76,13 @@ class _CreateOrEditSubcategorieScreenState extends State<CreateOrEditSubcategori
 
   // TODO Validierung in Categorie Model auslagern / implementieren
   Future<bool> _validSubcategorieName(String subcategorieName) async {
-    if (textInputFieldCubit.state.isEmpty) {
+    // TODO implementieren
+    /*if (textInputFieldCubit.state.isEmpty) {
       setState(() {
         _subcategorieNameErrorText = 'Bitte geben Sie einen Unterkategorienamen ein.';
       });
       return false;
-    }
+    }*/
     // TODO muss noch implementiert werden
     /*if (widget.mode == ModeType.creationMode) {
       bool categorieNameExisting = await categorie.existsSubcategorieName(categorie);

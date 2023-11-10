@@ -18,6 +18,10 @@ class BookingSuccessState extends BookingState {
   BookingSuccessState(this.context, this.bookingBoxIndex, this.errorText, this.saveButtonController);
 }
 
+class CreateOrUpdateFailureState extends BookingState {
+  CreateOrUpdateFailureState();
+}
+
 class BookingFailureState extends BookingState {
   final String errorText;
   BookingFailureState(this.errorText);
