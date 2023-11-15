@@ -23,7 +23,7 @@ class MoneyInputField extends StatelessWidget {
   }) : super(key: key);
 
   void _openBottomSheetForNumberInput(BuildContext context) {
-    _clearedInputField = cubit.state.isEmpty ? true : false;
+    _clearedInputField = cubit.state.amount.isEmpty ? true : false;
     showCupertinoModalBottomSheet<void>(
       context: context,
       builder: (BuildContext context) {
@@ -79,8 +79,8 @@ class MoneyInputField extends StatelessWidget {
                       ),
                       OutlinedButton(
                         onPressed: () {
-                          if (cubit.state.isNotEmpty) {
-                            cubit.updateValue(cubit.state.substring(0, cubit.state.length - 1));
+                          if (cubit.state.amount.isNotEmpty) {
+                            cubit.updateValue(cubit.state.amount.substring(0, cubit.state.amount.length - 1));
                           }
                         },
                         child: const Icon(Icons.backspace_rounded, color: Colors.cyanAccent),
@@ -124,8 +124,8 @@ class MoneyInputField extends StatelessWidget {
         );
       },
     ).whenComplete(() {
-      if (cubit.state.isNotEmpty && !cubit.state.contains('€')) {
-        cubit.updateValue(formatToMoneyAmount(cubit.state));
+      if (cubit.state.amount.isNotEmpty && !cubit.state.amount.contains('€')) {
+        cubit.updateValue(formatToMoneyAmount(cubit.state.amount));
       }
     });
   }
@@ -141,8 +141,8 @@ class MoneyInputField extends StatelessWidget {
       cubit.updateValue(amount);
     } else {
       final regex = RegExp(r'^\d+(,\d{0,2})?$');
-      if (regex.hasMatch(cubit.state + amount)) {
-        cubit.updateValue(cubit.state + amount);
+      if (regex.hasMatch(cubit.state.amount + amount)) {
+        cubit.updateValue(cubit.state.amount + amount);
       }
     }
   }
@@ -152,7 +152,7 @@ class MoneyInputField extends StatelessWidget {
     return TextFormField(
       key: UniqueKey(),
       focusNode: focusNode,
-      initialValue: cubit.state,
+      initialValue: cubit.state.amount,
       textAlignVertical: TextAlignVertical.center,
       showCursor: false,
       readOnly: true,
@@ -168,7 +168,7 @@ class MoneyInputField extends StatelessWidget {
         focusedBorder: const UnderlineInputBorder(
           borderSide: BorderSide(color: Colors.cyanAccent, width: 1.5),
         ),
-        errorText: errorText.isEmpty ? null : errorText,
+        errorText: cubit.state.errorText.isEmpty ? null : cubit.state.errorText,
       ),
     );
   }

@@ -101,7 +101,7 @@ class _AccountInputFieldState extends State<AccountInputField> {
     return TextFormField(
       key: UniqueKey(),
       focusNode: widget.focusNode,
-      initialValue: widget.cubit.state,
+      initialValue: widget.cubit.state.account,
       textAlignVertical: TextAlignVertical.center,
       showCursor: false,
       readOnly: true,
@@ -115,7 +115,7 @@ class _AccountInputFieldState extends State<AccountInputField> {
         focusedBorder: const UnderlineInputBorder(
           borderSide: BorderSide(color: Colors.cyanAccent, width: 1.5),
         ),
-        errorText: widget.errorText.isEmpty ? null : widget.errorText,
+        errorText: widget.cubit.state.errorText.isEmpty ? null : widget.cubit.state.errorText,
       ),
     );
   }

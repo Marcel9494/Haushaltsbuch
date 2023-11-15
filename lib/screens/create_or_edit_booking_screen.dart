@@ -111,7 +111,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
     return true;
   }*/
 
-  bool _validBookingAmount() {
+  /*bool _validBookingAmount() {
     if (moneyInputFieldCubit.state.isEmpty) {
       setState(() {
         _amountErrorText = 'Bitte geben Sie einen Betrag ein.';
@@ -120,9 +120,9 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
     }
     _amountErrorText = '';
     return true;
-  }
+  }*/
 
-  bool _validCategorie() {
+  /*bool _validCategorie() {
     if ((transactionStatsToggleButtonsCubit.state.transactionName != TransactionType.transfer.name &&
             transactionStatsToggleButtonsCubit.state.transactionName != TransactionType.investment.name) &&
         categorieInputFieldCubit.state.isEmpty) {
@@ -133,9 +133,9 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
     }
     _categorieErrorText = '';
     return true;
-  }
+  }*/
 
-  bool _validFromAccount() {
+  /*bool _validFromAccount() {
     if (fromAccountInputFieldCubit.state.isEmpty) {
       setState(() {
         _fromAccountErrorText = 'Bitte wählen Sie ein Konto aus.';
@@ -144,9 +144,9 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
     }
     _fromAccountErrorText = '';
     return true;
-  }
+  }*/
 
-  bool _validToAccount() {
+  /*bool _validToAccount() {
     if ((transactionStatsToggleButtonsCubit.state.transactionName == TransactionType.transfer.name &&
             transactionStatsToggleButtonsCubit.state.transactionName != TransactionType.investment.name) &&
         toAccountInputFieldCubit.state.isEmpty) {
@@ -157,7 +157,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
     }
     _toAccountErrorText = '';
     return true;
-  }
+  }*/
 
   void _setSaveButtonAnimation(bool successful) {
     successful ? _saveButtonController.success() : _saveButtonController.error();
@@ -215,7 +215,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
                               return TextInputField(fieldKey: titleFieldUniqueKey, focusNode: titleFocusNode, textCubit: titleInputFieldCubit, hintText: 'Titel');
                             },
                           ),
-                          BlocBuilder<MoneyInputFieldCubit, String>(
+                          BlocBuilder<MoneyInputFieldCubit, MoneyInputFieldModel>(
                             builder: (context, state) {
                               return MoneyInputField(
                                   cubit: moneyInputFieldCubit, focusNode: amountFocusNode, errorText: _amountErrorText, hintText: 'Betrag', bottomSheetTitle: 'Betrag eingeben:');
@@ -223,12 +223,12 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
                           ),
                           Column(
                             children: [
-                              BlocBuilder<FromAccountInputFieldCubit, String>(
+                              BlocBuilder<FromAccountInputFieldCubit, FromAccountInputFieldModel>(
                                 builder: (context, state) {
                                   return AccountInputField(cubit: fromAccountInputFieldCubit, focusNode: fromAccountFocusNode, errorText: _fromAccountErrorText, hintText: 'Von');
                                 },
                               ),
-                              BlocBuilder<ToAccountInputFieldCubit, String>(
+                              BlocBuilder<ToAccountInputFieldCubit, ToAccountInputFieldModel>(
                                 builder: (context, state) {
                                   if (transactionStatsToggleButtonsCubit.state.transactionName == TransactionType.transfer.name ||
                                       transactionStatsToggleButtonsCubit.state.transactionName == TransactionType.investment.name) {
@@ -242,12 +242,11 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
                           ),
                           transactionStatsToggleButtonsCubit.state.transactionName == TransactionType.transfer.name
                               ? const SizedBox()
-                              : BlocBuilder<CategorieInputFieldCubit, String>(
+                              : BlocBuilder<CategorieInputFieldCubit, CategorieInputFieldModel>(
                                   builder: (context, state) {
                                     return CategorieInputField(
                                         cubit: categorieInputFieldCubit,
                                         focusNode: categorieFocusNode,
-                                        errorText: _categorieErrorText,
                                         categorieType: CategorieTypeExtension.getCategorieType(transactionStatsToggleButtonsCubit.state.transactionName));
                                   },
                                 ),

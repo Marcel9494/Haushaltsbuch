@@ -6,11 +6,11 @@ class TextInputFieldCubit extends Cubit<TextInputFieldModel> {
   TextInputFieldCubit() : super(TextInputFieldModel("", ""));
   void updateValue(String newValue) => emit(TextInputFieldModel(newValue, ""));
   void resetValue() => emit(TextInputFieldModel("", ""));
-  bool checkValue(String value, String errorText) {
+  bool validateValue(String value) {
     if (value.isEmpty) {
-      emit(TextInputFieldModel(value, errorText));
-      return true;
+      emit(TextInputFieldModel(value, "Bitte geben Sie einen Titel für die Buchung ein."));
+      return false;
     }
-    return false;
+    return true;
   }
 }
