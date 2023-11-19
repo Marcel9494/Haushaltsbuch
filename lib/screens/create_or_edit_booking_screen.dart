@@ -23,7 +23,6 @@ import '/components/input_fields/from_account_input_field.dart';
 import '/components/buttons/save_button.dart';
 import '/components/deco/loading_indicator.dart';
 
-import '/models/booking/booking_model.dart';
 import '/models/enums/categorie_types.dart';
 import '/models/enums/serie_edit_modes.dart';
 import '/models/enums/transaction_types.dart';
@@ -48,9 +47,6 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
   late final ToAccountInputFieldCubit toAccountInputFieldCubit;
   late final SubcategorieInputFieldCubit subcategorieInputFieldCubit;
   final RoundedLoadingButtonController _saveButtonController = RoundedLoadingButtonController();
-
-  late Booking _loadedBooking;
-  int boxIndex = 0;
 
   UniqueKey titleFieldUniqueKey = UniqueKey();
 
@@ -93,8 +89,8 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
                       : IconButton(
                           icon: const Icon(Icons.delete_forever_rounded),
                           onPressed: () {
-                            // TODO SerieEditModeType.single dynamisch machen
-                            bookingBloc.add(DeleteBookingEvent(context, _loadedBooking, boxIndex, SerieEditModeType.single));
+                            // TODO hier weitermachen und Buchung löschen mit Bloc implementieren SerieEditModeType.single dynamisch machen
+                            bookingBloc.add(DeleteBookingEvent(context, bookingState.bookingBoxIndex, SerieEditModeType.none));
                           },
                         ),
                 ],

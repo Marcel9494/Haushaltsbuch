@@ -41,6 +41,8 @@ class BookingCard extends StatelessWidget {
     if (booking.bookingRepeats == RepeatType.noRepetition.name) {
       BlocProvider.of<BookingBloc>(context).add(CreateOrLoadBookingEvent(context, booking.boxIndex));
     } else {
+      // TODO hier weitermachen und else Block in booking_bloc.dart ziehen in CreateOrLoadBookingEvent? Oder wird dann die Funktion zu groß
+      // in kleinere Funktionen aufteilen?
       showCupertinoModalBottomSheet<void>(
         context: context,
         builder: (BuildContext context) {

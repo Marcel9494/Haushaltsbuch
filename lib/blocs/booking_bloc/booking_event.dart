@@ -23,8 +23,7 @@ class LoadBookingEvent extends BookingEvents {
 
 class DeleteBookingEvent extends BookingEvents {
   final BuildContext context;
-  final Booking booking;
   final int bookingBoxIndex;
   final SerieEditModeType serieEditMode;
-  DeleteBookingEvent(this.context, this.booking, this.bookingBoxIndex, this.serieEditMode);
+  DeleteBookingEvent(this.context, this.bookingBoxIndex, this.serieEditMode);
 }

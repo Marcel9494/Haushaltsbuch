@@ -44,9 +44,7 @@ class _MonthlyBookingTabViewState extends State<MonthlyBookingTabView> {
   BookingRepository bookingRepository = BookingRepository();
 
   Future<List<Booking>> _loadMonthlyBookingList() async {
-    print(widget.selectedDate.month);
     _bookingList = await bookingRepository.loadMonthlyBookingList(widget.selectedDate.month, widget.selectedDate.year, widget.categorie, widget.account);
-    print(_bookingList.length);
     _prepareMaps(_bookingList);
     _getTodayExpenditures(_bookingList);
     _getTodayRevenues(_bookingList);
