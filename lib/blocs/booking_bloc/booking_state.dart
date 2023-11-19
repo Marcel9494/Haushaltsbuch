@@ -23,8 +23,7 @@ class CreateOrUpdateFailureState extends BookingState {
 }
 
 class BookingFailureState extends BookingState {
-  final String errorText;
-  BookingFailureState(this.errorText);
+  BookingFailureState();
 }
 
 class BookingInitial extends BookingState {}

@@ -8,7 +8,6 @@ import '/utils/number_formatters/number_formatter.dart';
 class MoneyInputField extends StatelessWidget {
   final FocusNode focusNode;
   final dynamic cubit;
-  final String errorText;
   final String hintText;
   final String bottomSheetTitle;
   bool _clearedInputField = false;
@@ -17,7 +16,6 @@ class MoneyInputField extends StatelessWidget {
     Key? key,
     required this.focusNode,
     required this.cubit,
-    required this.errorText,
     required this.hintText,
     required this.bottomSheetTitle,
   }) : super(key: key);
@@ -137,7 +135,7 @@ class MoneyInputField extends StatelessWidget {
       cubit.resetValue();
       _clearedInputField = true;
     }
-    if (amount == ',' && cubit.state.contains(',')) {
+    if (amount == ',' && cubit.state.amount.contains(',')) {
       cubit.updateValue(amount);
     } else {
       final regex = RegExp(r'^\d+(,\d{0,2})?$');

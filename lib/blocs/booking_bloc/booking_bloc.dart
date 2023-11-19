@@ -1,10 +1,9 @@
 import 'dart:async';
 
-import 'package:another_flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
+import 'package:another_flushbar/flushbar.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 
-import '../../models/enums/transaction_types.dart';
 import '/blocs/input_fields_bloc/date_input_field_cubit.dart';
 
 import '../button_bloc/transaction_stats_toggle_buttons_cubit.dart';
@@ -16,9 +15,11 @@ import '../input_fields_bloc/text_input_field_cubit.dart';
 import '../input_fields_bloc/to_account_input_field_cubit.dart';
 
 import '/utils/consts/route_consts.dart';
+import '/utils/consts/global_consts.dart';
 
 import '/models/booking/booking_model.dart';
 import '/models/enums/serie_edit_modes.dart';
+import '/models/enums/transaction_types.dart';
 import '/models/booking/booking_repository.dart';
 import '/models/screen_arguments/bottom_nav_bar_screen_arguments.dart';
 
@@ -54,7 +55,6 @@ class BookingBloc extends Bloc<BookingEvents, BookingState> {
       toAccountInputFieldCubit.resetValue();
       subcategorieInputFieldCubit.resetValue();
 
-      print(event.bookingBoxIndex);
       if (event.bookingBoxIndex == -1) {
         Navigator.pushNamed(event.context, createOrEditBookingRoute);
         emit(BookingSuccessState(event.context, event.bookingBoxIndex, '', () => {}));
@@ -114,77 +114,92 @@ class BookingBloc extends Bloc<BookingEvents, BookingState> {
         FromAccountInputFieldCubit fromAccountInputFieldCubit = BlocProvider.of<FromAccountInputFieldCubit>(event.context);
         ToAccountInputFieldCubit toAccountInputFieldCubit = BlocProvider.of<ToAccountInputFieldCubit>(event.context);
         SubcategorieInputFieldCubit subcategorieInputFieldCubit = BlocProvider.of<SubcategorieInputFieldCubit>(event.context);
-        // TODO hier weitermachen und weitere Fehler behandeln. Bei Fehler dreht sich Button noch weiter und geht nicht in den
-        if (titleInputFieldCubit.validateValue(titleInputFieldCubit.state.text) == false ||
-            moneyInputFieldCubit.validateValue(moneyInputFieldCubit.state.amount) == false ||
-            categorieInputFieldCubit.validateValue(categorieInputFieldCubit.state.categorie) == false ||
-            fromAccountInputFieldCubit.validateValue(fromAccountInputFieldCubit.state.account) == false) {
-          if ((transactionStatsToggleButtonsCubit.state.transactionName == TransactionType.transfer.name ||
-              transactionStatsToggleButtonsCubit.state.transactionName == TransactionType.investment.name)) {
-            if (toAccountInputFieldCubit.validateValue(toAccountInputFieldCubit.state.account) == false) {
-              event.saveButtonController.error();
-              Timer(const Duration(seconds: 1), () {
-                event.saveButtonController.reset();
-              });
-            }
-          } else {
+        if ((transactionStatsToggleButtonsCubit.state.transactionName == TransactionType.income.name ||
+            transactionStatsToggleButtonsCubit.state.transactionName == TransactionType.outcome.name)) {
+          if (titleInputFieldCubit.validateValue(titleInputFieldCubit.state.text) == false ||
+              moneyInputFieldCubit.validateValue(moneyInputFieldCubit.state.amount) == false ||
+              fromAccountInputFieldCubit.validateValue(fromAccountInputFieldCubit.state.fromAccount) == false ||
+              categorieInputFieldCubit.validateValue(categorieInputFieldCubit.state.categorie) == false) {
             event.saveButtonController.error();
-            Timer(const Duration(seconds: 1), () {
+            Timer(const Duration(milliseconds: transitionInMs), () {
               event.saveButtonController.reset();
             });
+            return;
+          }
+        } else if (transactionStatsToggleButtonsCubit.state.transactionName == TransactionType.transfer.name) {
+          if (titleInputFieldCubit.validateValue(titleInputFieldCubit.state.text) == false ||
+              moneyInputFieldCubit.validateValue(moneyInputFieldCubit.state.amount) == false ||
+              fromAccountInputFieldCubit.validateValue(fromAccountInputFieldCubit.state.fromAccount) == false ||
+              toAccountInputFieldCubit.validateValue(toAccountInputFieldCubit.state.toAccount) == false) {
+            event.saveButtonController.error();
+            Timer(const Duration(milliseconds: transitionInMs), () {
+              event.saveButtonController.reset();
+            });
+            return;
           }
         } else {
-          if (event.bookingBoxIndex == -1) {
-            Booking newBooking = Booking()
-              ..transactionType = transactionStatsToggleButtonsCubit.state.transactionName
-              ..bookingRepeats = dateInputFieldCubit.state.bookingRepeat
-              ..title = titleInputFieldCubit.state.text
-              ..date = dateInputFieldCubit.state.bookingDate
-              ..amount = moneyInputFieldCubit.state.amount
-              ..categorie = categorieInputFieldCubit.state.categorie
-              ..subcategorie = subcategorieInputFieldCubit.state
-              ..fromAccount = fromAccountInputFieldCubit.state.account
-              ..toAccount = toAccountInputFieldCubit.state.account
-              ..serieId = -1 // TODO -1 dynamisch machen. Alter Code: boxIndex == -1 ? -1 : _loadedBooking.serieId
-              ..booked = DateTime.parse(dateInputFieldCubit.state.bookingDate).isAfter(DateTime.now()) ? false : true;
-            print(newBooking.title);
-            bookingRepository.create(newBooking);
-            Navigator.popAndPushNamed(event.context, bottomNavBarRoute, arguments: BottomNavBarScreenArguments(0));
-            emit(BookingSuccessState(event.context, event.bookingBoxIndex, '', () => event.saveButtonController.success()));
-          } else {
-            Booking oldBooking = Booking()
-              ..boxIndex = savedBooking.boxIndex
-              ..transactionType = savedBooking.transactionType
-              ..bookingRepeats = savedBooking.bookingRepeats
-              ..title = savedBooking.title
-              ..date = savedBooking.date
-              ..amount = savedBooking.amount
-              ..categorie = savedBooking.categorie
-              ..subcategorie = savedBooking.subcategorie
-              ..fromAccount = savedBooking.fromAccount
-              ..toAccount = savedBooking.toAccount
-              ..serieId = savedBooking.serieId // TODO -1 dynamisch machen. Alter Code: boxIndex == -1 ? -1 : _loadedBooking.serieId
-              ..booked = savedBooking.booked; // DateTime.parse(dateInputFieldCubit.state.bookingDate).isAfter(DateTime.now()) ? false : true;
-            Booking booking = Booking()
-              ..transactionType = transactionStatsToggleButtonsCubit.state.transactionName
-              ..bookingRepeats = dateInputFieldCubit.state.bookingRepeat
-              ..title = titleInputFieldCubit.state.text
-              ..date = dateInputFieldCubit.state.bookingDate
-              ..amount = moneyInputFieldCubit.state.amount
-              ..categorie = categorieInputFieldCubit.state.categorie
-              ..subcategorie = subcategorieInputFieldCubit.state
-              ..fromAccount = fromAccountInputFieldCubit.state.account
-              ..toAccount = toAccountInputFieldCubit.state.account
-              ..serieId = -1 // TODO -1 dynamisch machen. Alter Code: boxIndex == -1 ? -1 : _loadedBooking.serieId
-              ..booked = DateTime.parse(dateInputFieldCubit.state.bookingDate).isAfter(DateTime.now()) ? false : true;
-            bookingRepository.update(booking, oldBooking, event.bookingBoxIndex, SerieEditModeType.single); // TODO SerieEditModeType dynamisch machen
-            Navigator.popAndPushNamed(event.context, bottomNavBarRoute, arguments: BottomNavBarScreenArguments(0));
-            emit(BookingSuccessState(event.context, event.bookingBoxIndex, '', () => event.saveButtonController.success()));
+          if (titleInputFieldCubit.validateValue(titleInputFieldCubit.state.text) == false ||
+              moneyInputFieldCubit.validateValue(moneyInputFieldCubit.state.amount) == false ||
+              fromAccountInputFieldCubit.validateValue(fromAccountInputFieldCubit.state.fromAccount) == false ||
+              toAccountInputFieldCubit.validateValue(toAccountInputFieldCubit.state.toAccount) == false ||
+              categorieInputFieldCubit.validateValue(categorieInputFieldCubit.state.categorie) == false) {
+            event.saveButtonController.error();
+            Timer(const Duration(milliseconds: transitionInMs), () {
+              event.saveButtonController.reset();
+            });
+            return;
           }
+        }
+        if (event.bookingBoxIndex == -1) {
+          Booking newBooking = Booking()
+            ..transactionType = transactionStatsToggleButtonsCubit.state.transactionName
+            ..bookingRepeats = dateInputFieldCubit.state.bookingRepeat
+            ..title = titleInputFieldCubit.state.text
+            ..date = dateInputFieldCubit.state.bookingDate
+            ..amount = moneyInputFieldCubit.state.amount
+            ..categorie = categorieInputFieldCubit.state.categorie
+            ..subcategorie = subcategorieInputFieldCubit.state
+            ..fromAccount = fromAccountInputFieldCubit.state.fromAccount
+            ..toAccount = toAccountInputFieldCubit.state.toAccount
+            ..serieId = -1 // TODO -1 dynamisch machen. Alter Code: boxIndex == -1 ? -1 : _loadedBooking.serieId
+            ..booked = DateTime.parse(dateInputFieldCubit.state.bookingDate).isAfter(DateTime.now()) ? false : true;
+          bookingRepository.create(newBooking);
+          event.saveButtonController.success();
+          await Future.delayed(const Duration(milliseconds: transitionInMs));
+          Navigator.popAndPushNamed(event.context, bottomNavBarRoute, arguments: BottomNavBarScreenArguments(0));
+        } else {
+          Booking oldBooking = Booking()
+            ..boxIndex = savedBooking.boxIndex
+            ..transactionType = savedBooking.transactionType
+            ..bookingRepeats = savedBooking.bookingRepeats
+            ..title = savedBooking.title
+            ..date = savedBooking.date
+            ..amount = savedBooking.amount
+            ..categorie = savedBooking.categorie
+            ..subcategorie = savedBooking.subcategorie
+            ..fromAccount = savedBooking.fromAccount
+            ..toAccount = savedBooking.toAccount
+            ..serieId = savedBooking.serieId // TODO -1 dynamisch machen. Alter Code: boxIndex == -1 ? -1 : _loadedBooking.serieId
+            ..booked = savedBooking.booked; // DateTime.parse(dateInputFieldCubit.state.bookingDate).isAfter(DateTime.now()) ? false : true;
+          Booking booking = Booking()
+            ..transactionType = transactionStatsToggleButtonsCubit.state.transactionName
+            ..bookingRepeats = dateInputFieldCubit.state.bookingRepeat
+            ..title = titleInputFieldCubit.state.text
+            ..date = dateInputFieldCubit.state.bookingDate
+            ..amount = moneyInputFieldCubit.state.amount
+            ..categorie = categorieInputFieldCubit.state.categorie
+            ..subcategorie = subcategorieInputFieldCubit.state
+            ..fromAccount = fromAccountInputFieldCubit.state.fromAccount
+            ..toAccount = toAccountInputFieldCubit.state.toAccount
+            ..serieId = -1 // TODO -1 dynamisch machen. Alter Code: boxIndex == -1 ? -1 : _loadedBooking.serieId
+            ..booked = DateTime.parse(dateInputFieldCubit.state.bookingDate).isAfter(DateTime.now()) ? false : true;
+          bookingRepository.update(booking, oldBooking, event.bookingBoxIndex, SerieEditModeType.single); // TODO SerieEditModeType dynamisch machen
+          event.saveButtonController.success();
+          await Future.delayed(const Duration(milliseconds: transitionInMs));
+          Navigator.popAndPushNamed(event.context, bottomNavBarRoute, arguments: BottomNavBarScreenArguments(0));
         }
       } catch (error) {
         print(error);
-        // TODO emit(BookingFailureState());
       }
     });
 

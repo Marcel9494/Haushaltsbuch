@@ -5,25 +5,23 @@ import '/components/deco/bottom_sheet_line.dart';
 
 import '/models/account/account_repository.dart';
 
-class AccountInputField extends StatefulWidget {
+class FromAccountInputField extends StatefulWidget {
   final dynamic cubit;
   final FocusNode focusNode;
-  final String errorText;
   final String hintText;
 
-  const AccountInputField({
+  const FromAccountInputField({
     Key? key,
     required this.cubit,
     required this.focusNode,
-    required this.errorText,
     this.hintText = 'Konto',
   }) : super(key: key);
 
   @override
-  State<AccountInputField> createState() => _AccountInputFieldState();
+  State<FromAccountInputField> createState() => _FromAccountInputFieldState();
 }
 
-class _AccountInputFieldState extends State<AccountInputField> {
+class _FromAccountInputFieldState extends State<FromAccountInputField> {
   List<String> accountNames = [];
 
   void _openBottomSheetWithAccountList(BuildContext context) {
@@ -101,7 +99,7 @@ class _AccountInputFieldState extends State<AccountInputField> {
     return TextFormField(
       key: UniqueKey(),
       focusNode: widget.focusNode,
-      initialValue: widget.cubit.state.account,
+      initialValue: widget.cubit.state.fromAccount,
       textAlignVertical: TextAlignVertical.center,
       showCursor: false,
       readOnly: true,
