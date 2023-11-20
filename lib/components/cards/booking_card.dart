@@ -39,7 +39,7 @@ class BookingCard extends StatelessWidget {
 
   void _editBooking(BuildContext context) {
     if (booking.bookingRepeats == RepeatType.noRepetition.name) {
-      BlocProvider.of<BookingBloc>(context).add(CreateOrLoadBookingEvent(context, booking.boxIndex));
+      BlocProvider.of<BookingBloc>(context).add(CreateOrLoadBookingEvent(context, booking.boxIndex, SerieEditModeType.none));
     } else {
       // TODO hier weitermachen und else Block in booking_bloc.dart ziehen in CreateOrLoadBookingEvent? Oder wird dann die Funktion zu groß
       // in kleinere Funktionen aufteilen?
@@ -59,20 +59,17 @@ class BookingCard extends StatelessWidget {
                   Column(
                     children: [
                       ListTile(
-                        onTap: () =>
-                            Navigator.popAndPushNamed(context, createOrEditBookingRoute, arguments: CreateOrEditBookingScreenArguments(booking.boxIndex, SerieEditModeType.single)),
+                        onTap: () => BlocProvider.of<BookingBloc>(context).add(CreateOrLoadBookingEvent(context, booking.boxIndex, SerieEditModeType.single)),
                         leading: const Icon(Icons.looks_one_outlined, color: Colors.cyanAccent),
                         title: const Text('Nur diese Buchung'),
                       ),
                       ListTile(
-                        onTap: () => Navigator.popAndPushNamed(context, createOrEditBookingRoute,
-                            arguments: CreateOrEditBookingScreenArguments(booking.boxIndex, SerieEditModeType.onlyFuture)),
+                        onTap: () => BlocProvider.of<BookingBloc>(context).add(CreateOrLoadBookingEvent(context, booking.boxIndex, SerieEditModeType.onlyFuture)),
                         leading: const Icon(Icons.repeat_on_outlined, color: Colors.cyanAccent),
                         title: const Text('Alle zukünftige Buchungen'),
                       ),
                       ListTile(
-                        onTap: () =>
-                            Navigator.popAndPushNamed(context, createOrEditBookingRoute, arguments: CreateOrEditBookingScreenArguments(booking.boxIndex, SerieEditModeType.all)),
+                        onTap: () => BlocProvider.of<BookingBloc>(context).add(CreateOrLoadBookingEvent(context, booking.boxIndex, SerieEditModeType.all)),
                         leading: const Icon(Icons.all_inclusive_rounded, color: Colors.cyanAccent),
                         title: const Text('Alle Buchungen'),
                       ),

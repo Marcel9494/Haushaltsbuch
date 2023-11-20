@@ -14,8 +14,9 @@ class BookingSuccessState extends BookingState {
   final BuildContext context;
   final int bookingBoxIndex;
   final String errorText;
+  final SerieEditModeType serieEditModeType;
   final Function saveButtonController;
-  BookingSuccessState(this.context, this.bookingBoxIndex, this.errorText, this.saveButtonController);
+  BookingSuccessState(this.context, this.bookingBoxIndex, this.errorText, this.serieEditModeType, this.saveButtonController);
 }
 
 class CreateOrUpdateFailureState extends BookingState {

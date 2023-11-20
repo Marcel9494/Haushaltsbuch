@@ -90,7 +90,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
                           icon: const Icon(Icons.delete_forever_rounded),
                           onPressed: () {
                             // TODO hier weitermachen und Buchung löschen mit Bloc implementieren SerieEditModeType.single dynamisch machen
-                            bookingBloc.add(DeleteBookingEvent(context, bookingState.bookingBoxIndex, SerieEditModeType.none));
+                            bookingBloc.add(DeleteBookingEvent(context, bookingState.bookingBoxIndex, bookingState.serieEditModeType));
                           },
                         ),
                 ],
@@ -160,7 +160,8 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
                                   },
                                 ),
                           SaveButton(
-                              saveFunction: () => bookingBloc.add(CreateOrUpdateBookingEvent(context, bookingState.bookingBoxIndex, _saveButtonController)),
+                              saveFunction: () =>
+                                  bookingBloc.add(CreateOrUpdateBookingEvent(context, bookingState.bookingBoxIndex, bookingState.serieEditModeType, _saveButtonController)),
                               buttonController: _saveButtonController),
                         ],
                       );

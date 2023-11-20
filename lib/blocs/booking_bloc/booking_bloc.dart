@@ -59,7 +59,7 @@ class BookingBloc extends Bloc<BookingEvents, BookingState> {
 
       if (event.bookingBoxIndex == -1) {
         Navigator.pushNamed(event.context, createOrEditBookingRoute);
-        emit(BookingSuccessState(event.context, event.bookingBoxIndex, '', () => {}));
+        emit(BookingSuccessState(event.context, event.bookingBoxIndex, '', event.serieEditModeType, () => {}));
       } else {
         try {
           Booking booking = await bookingRepository.load(event.bookingBoxIndex);
@@ -85,25 +85,13 @@ class BookingBloc extends Bloc<BookingEvents, BookingState> {
           savedBooking.amount = booking.amount;
           savedBooking.booked = booking.booked;
           savedBooking.serieId = booking.serieId;
-          emit(BookingSuccessState(event.context, event.bookingBoxIndex, '', () => {}));
+          emit(BookingSuccessState(event.context, event.bookingBoxIndex, '', event.serieEditModeType, () => {}));
         } catch (error) {
           //emit(BookingFailureState());
         } finally {
           Navigator.pushNamed(event.context, createOrEditBookingRoute);
         }
       }
-      /*try {
-        if (event.booking.bookingRepeats == RepeatType.noRepetition.name) {
-          bookingRepository.create(event.booking);
-        } else {
-          bookingRepository.createSerie(event.booking);
-          GlobalStateRepository globalStateRepository = GlobalStateRepository();
-          globalStateRepository.increaseBookingSerieIndex();
-        }
-        emit(BookingSuccessState(event.context));
-      } catch (error) {
-        emit(BookingFailureState());
-      }*/
     });
 
     on<CreateOrUpdateBookingEvent>((event, emit) async {
@@ -199,9 +187,9 @@ class BookingBloc extends Bloc<BookingEvents, BookingState> {
             ..subcategorie = subcategorieInputFieldCubit.state
             ..fromAccount = fromAccountInputFieldCubit.state.fromAccount
             ..toAccount = toAccountInputFieldCubit.state.toAccount
-            ..serieId = -1 // TODO -1 dynamisch machen. Alter Code: boxIndex == -1 ? -1 : _loadedBooking.serieId
+            ..serieId = savedBooking.serieId // TODO -1 dynamisch machen. Alter Code: boxIndex == -1 ? -1 : _loadedBooking.serieId
             ..booked = DateTime.parse(dateInputFieldCubit.state.bookingDate).isAfter(DateTime.now()) ? false : true;
-          bookingRepository.update(booking, oldBooking, event.bookingBoxIndex, SerieEditModeType.single); // TODO SerieEditModeType dynamisch machen
+          bookingRepository.update(booking, oldBooking, event.bookingBoxIndex, event.serieEditModeType);
           event.saveButtonController.success();
           await Future.delayed(const Duration(milliseconds: transitionInMs));
           Navigator.popAndPushNamed(event.context, bottomNavBarRoute, arguments: BottomNavBarScreenArguments(0));
