@@ -178,6 +178,7 @@ class BookingBloc extends Bloc<BookingEvents, BookingState> {
             ..serieId = savedBooking.serieId // TODO -1 dynamisch machen. Alter Code: boxIndex == -1 ? -1 : _loadedBooking.serieId
             ..booked = savedBooking.booked; // DateTime.parse(dateInputFieldCubit.state.bookingDate).isAfter(DateTime.now()) ? false : true;
           Booking booking = Booking()
+            ..boxIndex = savedBooking.boxIndex
             ..transactionType = transactionStatsToggleButtonsCubit.state.transactionName
             ..bookingRepeats = dateInputFieldCubit.state.bookingRepeat
             ..title = titleInputFieldCubit.state.text
@@ -212,10 +213,12 @@ class BookingBloc extends Bloc<BookingEvents, BookingState> {
           Booking booking = await bookingRepository.load(event.bookingBoxIndex);
           bookingRepository.deleteSerieBookings(booking, event.bookingBoxIndex, event.serieEditMode);
         }
-        Navigator.pop(event.context);
-        Navigator.pop(event.context);
-        Navigator.popAndPushNamed(event.context, bottomNavBarRoute, arguments: BottomNavBarScreenArguments(0));
-        FocusScope.of(event.context).unfocus();
+        // Future.delayed Grund siehe: https://stackoverflow.com/questions/55618717/error-thrown-on-navigator-pop-until-debuglocked-is-not-true
+        // WICHTIG: Duration.zero wie bei Stack Overflow funktioniert nicht es muss einen Delay von wenigen Millisekunden geben!
+        await Future.delayed(const Duration(milliseconds: 100), () {
+          Navigator.pop(event.context);
+          Navigator.popAndPushNamed(event.context, bottomNavBarRoute, arguments: BottomNavBarScreenArguments(0));
+        });
       }
 
       showDialog(

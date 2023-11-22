@@ -7,6 +7,7 @@ abstract class BookingInterface {
       String toAccount, bool isSerieBooking);
   void createSerie(Booking templateBooking);
   void executeAccountTransaction(Booking booking);
+  // TODO update Funktion aufteilen für einfacheres Interface
   void update(Booking templateBooking, Booking oldBooking, int bookingBoxIndex, SerieEditModeType serieEditMode);
 
   Future<Booking> updateBookingBookedState(Booking updatedBooking);
