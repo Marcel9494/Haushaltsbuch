@@ -38,7 +38,7 @@ class BookingBloc extends Bloc<BookingEvents, BookingState> {
 
   BookingBloc() : super(BookingInitialState()) {
     on<CreateOrLoadBookingEvent>((event, emit) async {
-      emit(BookingLoadingState(event.bookingBoxIndex));
+      emit(BookingLoadingState());
       TransactionStatsToggleButtonsCubit transactionStatsToggleButtonsCubit = BlocProvider.of<TransactionStatsToggleButtonsCubit>(event.context);
       DateInputFieldCubit dateInputFieldCubit = BlocProvider.of<DateInputFieldCubit>(event.context);
       TextInputFieldCubit titleInputFieldCubit = BlocProvider.of<TextInputFieldCubit>(event.context);
@@ -57,149 +57,138 @@ class BookingBloc extends Bloc<BookingEvents, BookingState> {
       toAccountInputFieldCubit.resetValue();
       subcategorieInputFieldCubit.resetValue();
 
-      if (event.bookingBoxIndex == -1) {
-        Navigator.pushNamed(event.context, createOrEditBookingRoute);
-        emit(BookingSuccessState(event.context, event.bookingBoxIndex, '', event.serieEditModeType, () => {}));
-      } else {
-        try {
-          Booking booking = await bookingRepository.load(event.bookingBoxIndex);
-          transactionStatsToggleButtonsCubit.updateTransactionType(booking.transactionType);
-          dateInputFieldCubit.updateBookingDate(booking.date);
-          dateInputFieldCubit.updateBookingRepeat(booking.bookingRepeats);
-          titleInputFieldCubit.updateValue(booking.title);
-          moneyInputFieldCubit.updateValue(booking.amount);
-          categorieInputFieldCubit.updateValue(booking.categorie);
-          fromAccountInputFieldCubit.updateValue(booking.fromAccount);
-          toAccountInputFieldCubit.updateValue(booking.toAccount);
-          subcategorieInputFieldCubit.updateValue(booking.subcategorie);
+      if (event.bookingBoxIndex != -1) {
+        Booking loadedBooking = await bookingRepository.load(event.bookingBoxIndex);
+        transactionStatsToggleButtonsCubit.updateTransactionType(loadedBooking.transactionType);
+        dateInputFieldCubit.updateBookingDate(loadedBooking.date);
+        dateInputFieldCubit.updateBookingRepeat(loadedBooking.bookingRepeats);
+        titleInputFieldCubit.updateValue(loadedBooking.title);
+        moneyInputFieldCubit.updateValue(loadedBooking.amount);
+        categorieInputFieldCubit.updateValue(loadedBooking.categorie);
+        fromAccountInputFieldCubit.updateValue(loadedBooking.fromAccount);
+        toAccountInputFieldCubit.updateValue(loadedBooking.toAccount);
+        subcategorieInputFieldCubit.updateValue(loadedBooking.subcategorie);
 
-          savedBooking.boxIndex = booking.boxIndex;
-          savedBooking.title = booking.title;
-          savedBooking.transactionType = booking.transactionType;
-          savedBooking.bookingRepeats = booking.bookingRepeats;
-          savedBooking.date = booking.date;
-          savedBooking.fromAccount = booking.fromAccount;
-          savedBooking.toAccount = booking.toAccount;
-          savedBooking.categorie = booking.categorie;
-          savedBooking.subcategorie = booking.subcategorie;
-          savedBooking.amount = booking.amount;
-          savedBooking.booked = booking.booked;
-          savedBooking.serieId = booking.serieId;
-          emit(BookingSuccessState(event.context, event.bookingBoxIndex, '', event.serieEditModeType, () => {}));
-        } catch (error) {
-          //emit(BookingFailureState());
-        } finally {
-          Navigator.pushNamed(event.context, createOrEditBookingRoute);
-        }
+        // Alte Buchungswerte speichern, damit bereits gebuchte Buchungen rückgängig gemacht werden können.
+        savedBooking.boxIndex = loadedBooking.boxIndex;
+        savedBooking.title = loadedBooking.title;
+        savedBooking.transactionType = loadedBooking.transactionType;
+        savedBooking.bookingRepeats = loadedBooking.bookingRepeats;
+        savedBooking.date = loadedBooking.date;
+        savedBooking.fromAccount = loadedBooking.fromAccount;
+        savedBooking.toAccount = loadedBooking.toAccount;
+        savedBooking.categorie = loadedBooking.categorie;
+        savedBooking.subcategorie = loadedBooking.subcategorie;
+        savedBooking.amount = loadedBooking.amount;
+        savedBooking.booked = loadedBooking.booked;
+        savedBooking.serieId = loadedBooking.serieId;
       }
+      Navigator.pushNamed(event.context, createOrEditBookingRoute);
+      emit(BookingLoadedState(event.context, event.bookingBoxIndex, event.serieEditModeType));
     });
 
     on<CreateOrUpdateBookingEvent>((event, emit) async {
-      try {
-        TransactionStatsToggleButtonsCubit transactionStatsToggleButtonsCubit = BlocProvider.of<TransactionStatsToggleButtonsCubit>(event.context);
-        DateInputFieldCubit dateInputFieldCubit = BlocProvider.of<DateInputFieldCubit>(event.context);
-        TextInputFieldCubit titleInputFieldCubit = BlocProvider.of<TextInputFieldCubit>(event.context);
-        MoneyInputFieldCubit moneyInputFieldCubit = BlocProvider.of<MoneyInputFieldCubit>(event.context);
-        CategorieInputFieldCubit categorieInputFieldCubit = BlocProvider.of<CategorieInputFieldCubit>(event.context);
-        FromAccountInputFieldCubit fromAccountInputFieldCubit = BlocProvider.of<FromAccountInputFieldCubit>(event.context);
-        ToAccountInputFieldCubit toAccountInputFieldCubit = BlocProvider.of<ToAccountInputFieldCubit>(event.context);
-        SubcategorieInputFieldCubit subcategorieInputFieldCubit = BlocProvider.of<SubcategorieInputFieldCubit>(event.context);
-        if ((transactionStatsToggleButtonsCubit.state.transactionName == TransactionType.income.name ||
-            transactionStatsToggleButtonsCubit.state.transactionName == TransactionType.outcome.name)) {
-          if (titleInputFieldCubit.validateValue(titleInputFieldCubit.state.text) == false ||
-              moneyInputFieldCubit.validateValue(moneyInputFieldCubit.state.amount) == false ||
-              fromAccountInputFieldCubit.validateValue(fromAccountInputFieldCubit.state.fromAccount) == false ||
-              categorieInputFieldCubit.validateValue(categorieInputFieldCubit.state.categorie) == false) {
-            event.saveButtonController.error();
-            Timer(const Duration(milliseconds: transitionInMs), () {
-              event.saveButtonController.reset();
-            });
-            return;
-          }
-        } else if (transactionStatsToggleButtonsCubit.state.transactionName == TransactionType.transfer.name) {
-          if (titleInputFieldCubit.validateValue(titleInputFieldCubit.state.text) == false ||
-              moneyInputFieldCubit.validateValue(moneyInputFieldCubit.state.amount) == false ||
-              fromAccountInputFieldCubit.validateValue(fromAccountInputFieldCubit.state.fromAccount) == false ||
-              toAccountInputFieldCubit.validateValue(toAccountInputFieldCubit.state.toAccount) == false) {
-            event.saveButtonController.error();
-            Timer(const Duration(milliseconds: transitionInMs), () {
-              event.saveButtonController.reset();
-            });
-            return;
-          }
-        } else {
-          if (titleInputFieldCubit.validateValue(titleInputFieldCubit.state.text) == false ||
-              moneyInputFieldCubit.validateValue(moneyInputFieldCubit.state.amount) == false ||
-              fromAccountInputFieldCubit.validateValue(fromAccountInputFieldCubit.state.fromAccount) == false ||
-              toAccountInputFieldCubit.validateValue(toAccountInputFieldCubit.state.toAccount) == false ||
-              categorieInputFieldCubit.validateValue(categorieInputFieldCubit.state.categorie) == false) {
-            event.saveButtonController.error();
-            Timer(const Duration(milliseconds: transitionInMs), () {
-              event.saveButtonController.reset();
-            });
-            return;
-          }
+      TransactionStatsToggleButtonsCubit transactionStatsToggleButtonsCubit = BlocProvider.of<TransactionStatsToggleButtonsCubit>(event.context);
+      DateInputFieldCubit dateInputFieldCubit = BlocProvider.of<DateInputFieldCubit>(event.context);
+      TextInputFieldCubit titleInputFieldCubit = BlocProvider.of<TextInputFieldCubit>(event.context);
+      MoneyInputFieldCubit moneyInputFieldCubit = BlocProvider.of<MoneyInputFieldCubit>(event.context);
+      CategorieInputFieldCubit categorieInputFieldCubit = BlocProvider.of<CategorieInputFieldCubit>(event.context);
+      FromAccountInputFieldCubit fromAccountInputFieldCubit = BlocProvider.of<FromAccountInputFieldCubit>(event.context);
+      ToAccountInputFieldCubit toAccountInputFieldCubit = BlocProvider.of<ToAccountInputFieldCubit>(event.context);
+      SubcategorieInputFieldCubit subcategorieInputFieldCubit = BlocProvider.of<SubcategorieInputFieldCubit>(event.context);
+
+      if ((transactionStatsToggleButtonsCubit.state.transactionName == TransactionType.income.name ||
+          transactionStatsToggleButtonsCubit.state.transactionName == TransactionType.outcome.name)) {
+        if (titleInputFieldCubit.validateValue(titleInputFieldCubit.state.text) == false ||
+            moneyInputFieldCubit.validateValue(moneyInputFieldCubit.state.amount) == false ||
+            fromAccountInputFieldCubit.validateValue(fromAccountInputFieldCubit.state.fromAccount) == false ||
+            categorieInputFieldCubit.validateValue(categorieInputFieldCubit.state.categorie) == false) {
+          event.saveButtonController.error();
+          Timer(const Duration(milliseconds: transitionInMs), () {
+            event.saveButtonController.reset();
+          });
+          return;
         }
-        if (event.bookingBoxIndex == -1) {
-          GlobalStateRepository globalStateRepository = GlobalStateRepository();
-          Booking newBooking = Booking()
-            ..transactionType = transactionStatsToggleButtonsCubit.state.transactionName
-            ..bookingRepeats = dateInputFieldCubit.state.bookingRepeat
-            ..title = titleInputFieldCubit.state.text
-            ..date = dateInputFieldCubit.state.bookingDate
-            ..amount = moneyInputFieldCubit.state.amount
-            ..categorie = categorieInputFieldCubit.state.categorie
-            ..subcategorie = subcategorieInputFieldCubit.state
-            ..fromAccount = fromAccountInputFieldCubit.state.fromAccount
-            ..toAccount = toAccountInputFieldCubit.state.toAccount
-            ..serieId = dateInputFieldCubit.state.bookingRepeat == RepeatType.noRepetition.name ? -1 : await globalStateRepository.getBookingSerieIndex()
-            ..booked = DateTime.parse(dateInputFieldCubit.state.bookingDate).isAfter(DateTime.now()) ? false : true;
-          if (dateInputFieldCubit.state.bookingRepeat == RepeatType.noRepetition.name) {
-            bookingRepository.create(newBooking);
-          } else {
-            bookingRepository.createSerie(newBooking);
-            globalStateRepository.increaseBookingSerieIndex();
-          }
-          event.saveButtonController.success();
-          await Future.delayed(const Duration(milliseconds: transitionInMs));
-          Navigator.popAndPushNamed(event.context, bottomNavBarRoute, arguments: BottomNavBarScreenArguments(0));
-        } else {
-          Booking oldBooking = Booking()
-            ..boxIndex = savedBooking.boxIndex
-            ..transactionType = savedBooking.transactionType
-            ..bookingRepeats = savedBooking.bookingRepeats
-            ..title = savedBooking.title
-            ..date = savedBooking.date
-            ..amount = savedBooking.amount
-            ..categorie = savedBooking.categorie
-            ..subcategorie = savedBooking.subcategorie
-            ..fromAccount = savedBooking.fromAccount
-            ..toAccount = savedBooking.toAccount
-            ..serieId = savedBooking.serieId // TODO -1 dynamisch machen. Alter Code: boxIndex == -1 ? -1 : _loadedBooking.serieId
-            ..booked = savedBooking.booked; // DateTime.parse(dateInputFieldCubit.state.bookingDate).isAfter(DateTime.now()) ? false : true;
-          Booking booking = Booking()
-            ..boxIndex = savedBooking.boxIndex
-            ..transactionType = transactionStatsToggleButtonsCubit.state.transactionName
-            ..bookingRepeats = dateInputFieldCubit.state.bookingRepeat
-            ..title = titleInputFieldCubit.state.text
-            ..date = dateInputFieldCubit.state.bookingDate
-            ..amount = moneyInputFieldCubit.state.amount
-            ..categorie = categorieInputFieldCubit.state.categorie
-            ..subcategorie = subcategorieInputFieldCubit.state
-            ..fromAccount = fromAccountInputFieldCubit.state.fromAccount
-            ..toAccount = toAccountInputFieldCubit.state.toAccount
-            ..serieId = savedBooking.serieId // TODO -1 dynamisch machen. Alter Code: boxIndex == -1 ? -1 : _loadedBooking.serieId
-            ..booked = DateTime.parse(dateInputFieldCubit.state.bookingDate).isAfter(DateTime.now()) ? false : true;
-          bookingRepository.update(booking, oldBooking, event.bookingBoxIndex, event.serieEditModeType);
-          event.saveButtonController.success();
-          await Future.delayed(const Duration(milliseconds: transitionInMs));
-          Navigator.popAndPushNamed(event.context, bottomNavBarRoute, arguments: BottomNavBarScreenArguments(0));
+      } else if (transactionStatsToggleButtonsCubit.state.transactionName == TransactionType.transfer.name) {
+        if (titleInputFieldCubit.validateValue(titleInputFieldCubit.state.text) == false ||
+            moneyInputFieldCubit.validateValue(moneyInputFieldCubit.state.amount) == false ||
+            fromAccountInputFieldCubit.validateValue(fromAccountInputFieldCubit.state.fromAccount) == false ||
+            toAccountInputFieldCubit.validateValue(toAccountInputFieldCubit.state.toAccount) == false) {
+          event.saveButtonController.error();
+          Timer(const Duration(milliseconds: transitionInMs), () {
+            event.saveButtonController.reset();
+          });
+          return;
         }
-      } catch (error) {
-        print(error);
+      } else {
+        if (titleInputFieldCubit.validateValue(titleInputFieldCubit.state.text) == false ||
+            moneyInputFieldCubit.validateValue(moneyInputFieldCubit.state.amount) == false ||
+            fromAccountInputFieldCubit.validateValue(fromAccountInputFieldCubit.state.fromAccount) == false ||
+            toAccountInputFieldCubit.validateValue(toAccountInputFieldCubit.state.toAccount) == false ||
+            categorieInputFieldCubit.validateValue(categorieInputFieldCubit.state.categorie) == false) {
+          event.saveButtonController.error();
+          Timer(const Duration(milliseconds: transitionInMs), () {
+            event.saveButtonController.reset();
+          });
+          return;
+        }
       }
+      if (event.bookingBoxIndex == -1) {
+        GlobalStateRepository globalStateRepository = GlobalStateRepository();
+        Booking newBooking = Booking()
+          ..transactionType = transactionStatsToggleButtonsCubit.state.transactionName
+          ..bookingRepeats = dateInputFieldCubit.state.bookingRepeat
+          ..title = titleInputFieldCubit.state.text
+          ..date = dateInputFieldCubit.state.bookingDate
+          ..amount = moneyInputFieldCubit.state.amount
+          ..categorie = categorieInputFieldCubit.state.categorie
+          ..subcategorie = subcategorieInputFieldCubit.state
+          ..fromAccount = fromAccountInputFieldCubit.state.fromAccount
+          ..toAccount = toAccountInputFieldCubit.state.toAccount
+          ..serieId = dateInputFieldCubit.state.bookingRepeat == RepeatType.noRepetition.name ? -1 : await globalStateRepository.getBookingSerieIndex()
+          ..booked = DateTime.parse(dateInputFieldCubit.state.bookingDate).isAfter(DateTime.now()) ? false : true;
+        if (dateInputFieldCubit.state.bookingRepeat == RepeatType.noRepetition.name) {
+          bookingRepository.create(newBooking);
+        } else {
+          bookingRepository.createSerie(newBooking);
+          globalStateRepository.increaseBookingSerieIndex();
+        }
+      } else {
+        Booking oldBooking = Booking()
+          ..boxIndex = savedBooking.boxIndex
+          ..transactionType = savedBooking.transactionType
+          ..bookingRepeats = savedBooking.bookingRepeats
+          ..title = savedBooking.title
+          ..date = savedBooking.date
+          ..amount = savedBooking.amount
+          ..categorie = savedBooking.categorie
+          ..subcategorie = savedBooking.subcategorie
+          ..fromAccount = savedBooking.fromAccount
+          ..toAccount = savedBooking.toAccount
+          ..serieId = savedBooking.serieId
+          ..booked = savedBooking.booked;
+        Booking updatedBooking = Booking()
+          ..boxIndex = savedBooking.boxIndex
+          ..transactionType = transactionStatsToggleButtonsCubit.state.transactionName
+          ..bookingRepeats = dateInputFieldCubit.state.bookingRepeat
+          ..title = titleInputFieldCubit.state.text
+          ..date = dateInputFieldCubit.state.bookingDate
+          ..amount = moneyInputFieldCubit.state.amount
+          ..categorie = categorieInputFieldCubit.state.categorie
+          ..subcategorie = subcategorieInputFieldCubit.state
+          ..fromAccount = fromAccountInputFieldCubit.state.fromAccount
+          ..toAccount = toAccountInputFieldCubit.state.toAccount
+          ..serieId = savedBooking.serieId
+          ..booked = DateTime.parse(dateInputFieldCubit.state.bookingDate).isAfter(DateTime.now()) ? false : true;
+        // TODO hier weitermachen und update Methode aufteilen in 3 Methoden
+        bookingRepository.update(updatedBooking, oldBooking, event.bookingBoxIndex, event.serieEditModeType);
+      }
+      event.saveButtonController.success();
+      await Future.delayed(const Duration(milliseconds: transitionInMs));
+      Navigator.popAndPushNamed(event.context, bottomNavBarRoute, arguments: BottomNavBarScreenArguments(0));
     });
 
+    // TODO kann wahrscheinlich entfernt werden
     on<LoadBookingEvent>((event, emit) async {
       BlocProvider.of<BookingCubit>(event.context).loadExistingBooking(event.bookingBoxIndex);
       Navigator.pushNamed(event.context, createOrEditBookingRoute);

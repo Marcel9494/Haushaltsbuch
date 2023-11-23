@@ -9,10 +9,12 @@ import '/utils/date_formatters/date_formatter.dart';
 
 class DateInputField extends StatelessWidget {
   final dynamic cubit;
+  final FocusNode focusNode;
 
   const DateInputField({
     Key? key,
     required this.cubit,
+    required this.focusNode,
   }) : super(key: key);
 
   void _openBottomSheetWithRepeatList(BuildContext context) {
@@ -81,6 +83,7 @@ class DateInputField extends StatelessWidget {
       children: [
         TextFormField(
           key: UniqueKey(),
+          focusNode: focusNode,
           initialValue: dateFormatterDDMMYYYYEE.format(DateTime.parse(cubit.state.bookingDate)),
           maxLength: 10,
           readOnly: true,

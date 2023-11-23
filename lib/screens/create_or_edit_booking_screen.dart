@@ -24,7 +24,6 @@ import '/components/buttons/save_button.dart';
 import '/components/deco/loading_indicator.dart';
 
 import '/models/enums/categorie_types.dart';
-import '/models/enums/serie_edit_modes.dart';
 import '/models/enums/transaction_types.dart';
 
 class CreateOrEditBookingScreen extends StatefulWidget {
@@ -50,6 +49,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
 
   UniqueKey titleFieldUniqueKey = UniqueKey();
 
+  FocusNode dateFocusNode = FocusNode();
   FocusNode titleFocusNode = FocusNode();
   FocusNode amountFocusNode = FocusNode();
   FocusNode fromAccountFocusNode = FocusNode();
@@ -78,7 +78,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
         builder: (context, bookingState) {
           if (bookingState is BookingLoadingState) {
             return const LoadingIndicator();
-          } else if (bookingState is BookingSuccessState) {
+          } else if (bookingState is BookingLoadedState) {
             return Scaffold(
               resizeToAvoidBottomInset: false,
               appBar: AppBar(
@@ -89,7 +89,6 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
                       : IconButton(
                           icon: const Icon(Icons.delete_forever_rounded),
                           onPressed: () {
-                            // TODO hier weitermachen und Buchung löschen mit Bloc implementieren SerieEditModeType.single dynamisch machen
                             bookingBloc.add(DeleteBookingEvent(context, bookingState.bookingBoxIndex, bookingState.serieEditModeType));
                           },
                         ),
@@ -110,7 +109,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
                           TransactionToggleButtons(cubit: transactionStatsToggleButtonsCubit),
                           BlocBuilder<DateInputFieldCubit, DateInputFieldState>(
                             builder: (context, state) {
-                              return DateInputField(cubit: dateInputFieldCubit);
+                              return DateInputField(cubit: dateInputFieldCubit, focusNode: dateFocusNode);
                             },
                           ),
                           BlocBuilder<TextInputFieldCubit, TextInputFieldModel>(
@@ -127,14 +126,14 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
                             children: [
                               BlocBuilder<FromAccountInputFieldCubit, FromAccountInputFieldModel>(
                                 builder: (context, state) {
-                                  return FromAccountInputField(cubit: fromAccountInputFieldCubit, focusNode: fromAccountFocusNode, hintText: 'Von');
+                                  return FromAccountInputField(cubit: fromAccountInputFieldCubit, focusNode: fromAccountFocusNode, hintText: 'Abbuchungskonto');
                                 },
                               ),
                               BlocBuilder<ToAccountInputFieldCubit, ToAccountInputFieldModel>(
                                 builder: (context, state) {
                                   if (transactionStatsToggleButtonsCubit.state.transactionName == TransactionType.transfer.name ||
                                       transactionStatsToggleButtonsCubit.state.transactionName == TransactionType.investment.name) {
-                                    return ToAccountInputField(cubit: toAccountInputFieldCubit, focusNode: toAccountFocusNode, hintText: 'Nach');
+                                    return ToAccountInputField(cubit: toAccountInputFieldCubit, focusNode: toAccountFocusNode, hintText: 'Zielkonto');
                                   } else {
                                     return const SizedBox();
                                   }
@@ -147,9 +146,10 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
                               : BlocBuilder<CategorieInputFieldCubit, CategorieInputFieldModel>(
                                   builder: (context, state) {
                                     return CategorieInputField(
-                                        cubit: categorieInputFieldCubit,
-                                        focusNode: categorieFocusNode,
-                                        categorieType: CategorieTypeExtension.getCategorieType(transactionStatsToggleButtonsCubit.state.transactionName));
+                                      cubit: categorieInputFieldCubit,
+                                      focusNode: categorieFocusNode,
+                                      categorieType: CategorieTypeExtension.getCategorieType(transactionStatsToggleButtonsCubit.state.transactionName),
+                                    );
                                   },
                                 ),
                           transactionStatsToggleButtonsCubit.state.transactionName == TransactionType.transfer.name
@@ -160,8 +160,14 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
                                   },
                                 ),
                           SaveButton(
-                              saveFunction: () =>
-                                  bookingBloc.add(CreateOrUpdateBookingEvent(context, bookingState.bookingBoxIndex, bookingState.serieEditModeType, _saveButtonController)),
+                              saveFunction: () => bookingBloc.add(
+                                    CreateOrUpdateBookingEvent(
+                                      context,
+                                      bookingState.bookingBoxIndex,
+                                      bookingState.serieEditModeType,
+                                      _saveButtonController,
+                                    ),
+                                  ),
                               buttonController: _saveButtonController),
                         ],
                       );
@@ -171,7 +177,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
               ),
             );
           } else {
-            return const Text("Unbekannter Fehler");
+            return const Text("Fehler bei Buchungsseite");
           }
         },
       ),
