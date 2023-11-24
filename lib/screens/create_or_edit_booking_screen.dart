@@ -1,3 +1,4 @@
+import 'package:another_flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
@@ -24,7 +25,11 @@ import '/components/buttons/save_button.dart';
 import '/components/deco/loading_indicator.dart';
 
 import '/models/enums/categorie_types.dart';
+import '/models/enums/serie_edit_modes.dart';
 import '/models/enums/transaction_types.dart';
+import '/models/screen_arguments/bottom_nav_bar_screen_arguments.dart';
+
+import '/utils/consts/route_consts.dart';
 
 class CreateOrEditBookingScreen extends StatefulWidget {
   const CreateOrEditBookingScreen({Key? key}) : super(key: key);
@@ -89,7 +94,57 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
                       : IconButton(
                           icon: const Icon(Icons.delete_forever_rounded),
                           onPressed: () {
-                            bookingBloc.add(DeleteBookingEvent(context, bookingState.bookingBoxIndex, bookingState.serieEditModeType));
+                            showDialog(
+                              context: context,
+                              builder: (context) {
+                                return AlertDialog(
+                                  title: Text(bookingState.serieEditModeType == SerieEditModeType.none || bookingState.serieEditModeType == SerieEditModeType.single
+                                      ? 'Buchung löschen?'
+                                      : 'Buchungen löschen?'),
+                                  actions: <Widget>[
+                                    TextButton(
+                                      child: const Text(
+                                        'Nein',
+                                        style: TextStyle(
+                                          color: Colors.cyanAccent,
+                                        ),
+                                      ),
+                                      onPressed: () => {
+                                        Navigator.pop(context),
+                                        FocusScope.of(context).unfocus(),
+                                      },
+                                    ),
+                                    ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        foregroundColor: Colors.black87,
+                                        backgroundColor: Colors.cyanAccent,
+                                      ),
+                                      onPressed: () => {
+                                        bookingBloc.add(DeleteBookingEvent(context, bookingState.bookingBoxIndex, bookingState.serieEditModeType)),
+                                        Navigator.pop(context),
+                                        Navigator.popAndPushNamed(context, bottomNavBarRoute, arguments: BottomNavBarScreenArguments(0)),
+                                        Flushbar(
+                                          title: bookingState.serieEditModeType == SerieEditModeType.none || bookingState.serieEditModeType == SerieEditModeType.single
+                                              ? 'Buchung wurde gelöscht'
+                                              : 'Buchungen wurden gelöscht',
+                                          message: bookingState.serieEditModeType == SerieEditModeType.none || bookingState.serieEditModeType == SerieEditModeType.single
+                                              ? 'Buchung wurde erfolgreich gelöscht.'
+                                              : 'Buchungen wurden erfolgreich gelöscht',
+                                          icon: const Icon(
+                                            Icons.info_outline,
+                                            size: 28.0,
+                                            color: Colors.cyanAccent,
+                                          ),
+                                          duration: const Duration(seconds: 3),
+                                          leftBarIndicatorColor: Colors.cyanAccent,
+                                        )..show(context),
+                                      },
+                                      child: const Text('Ja'),
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
                           },
                         ),
                 ],

@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:another_flushbar/flushbar.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 
 import '/blocs/input_fields_bloc/date_input_field_cubit.dart';
@@ -14,9 +13,6 @@ import '../input_fields_bloc/subcategorie_input_field_cubit.dart';
 import '../input_fields_bloc/text_input_field_cubit.dart';
 import '../input_fields_bloc/to_account_input_field_cubit.dart';
 
-import '/utils/consts/route_consts.dart';
-import '/utils/consts/global_consts.dart';
-
 import '/models/enums/repeat_types.dart';
 import '/models/booking/booking_model.dart';
 import '/models/enums/serie_edit_modes.dart';
@@ -25,9 +21,10 @@ import '/models/booking/booking_repository.dart';
 import '/models/global_state/global_state_repository.dart';
 import '/models/screen_arguments/bottom_nav_bar_screen_arguments.dart';
 
-import 'package:flutter_bloc/flutter_bloc.dart';
+import '/utils/consts/route_consts.dart';
+import '/utils/consts/global_consts.dart';
 
-import 'booking_cubit.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 part 'booking_event.dart';
 part 'booking_state.dart';
@@ -180,82 +177,29 @@ class BookingBloc extends Bloc<BookingEvents, BookingState> {
           ..toAccount = toAccountInputFieldCubit.state.toAccount
           ..serieId = savedBooking.serieId
           ..booked = DateTime.parse(dateInputFieldCubit.state.bookingDate).isAfter(DateTime.now()) ? false : true;
-        // TODO hier weitermachen und update Methode aufteilen in 3 Methoden
-        bookingRepository.update(updatedBooking, oldBooking, event.bookingBoxIndex, event.serieEditModeType);
+        if (event.serieEditModeType == SerieEditModeType.none || event.serieEditModeType == SerieEditModeType.single) {
+          bookingRepository.updateSingleBooking(updatedBooking, oldBooking, event.bookingBoxIndex);
+        } else if (event.serieEditModeType == SerieEditModeType.onlyFuture) {
+          bookingRepository.updateOnlyFutureBookingsFromSerie(updatedBooking, oldBooking, event.bookingBoxIndex);
+        } else if (event.serieEditModeType == SerieEditModeType.all) {
+          bookingRepository.updateAllBookingsFromSerie(updatedBooking, oldBooking, event.bookingBoxIndex);
+        }
       }
       event.saveButtonController.success();
       await Future.delayed(const Duration(milliseconds: transitionInMs));
       Navigator.popAndPushNamed(event.context, bottomNavBarRoute, arguments: BottomNavBarScreenArguments(0));
     });
 
-    // TODO kann wahrscheinlich entfernt werden
-    on<LoadBookingEvent>((event, emit) async {
-      BlocProvider.of<BookingCubit>(event.context).loadExistingBooking(event.bookingBoxIndex);
-      Navigator.pushNamed(event.context, createOrEditBookingRoute);
-    });
-
     on<DeleteBookingEvent>((event, emit) async {
-      void _yesPressed(int index) async {
-        if (event.serieEditMode == SerieEditModeType.none) {
-          bookingRepository.delete(event.bookingBoxIndex);
-        } else {
-          Booking booking = await bookingRepository.load(event.bookingBoxIndex);
-          bookingRepository.deleteSerieBookings(booking, event.bookingBoxIndex, event.serieEditMode);
-        }
-        // Future.delayed Grund siehe: https://stackoverflow.com/questions/55618717/error-thrown-on-navigator-pop-until-debuglocked-is-not-true
-        // WICHTIG: Duration.zero wie bei Stack Overflow funktioniert nicht es muss einen Delay von wenigen Millisekunden geben!
-        await Future.delayed(const Duration(milliseconds: 100), () {
-          Navigator.pop(event.context);
-          Navigator.popAndPushNamed(event.context, bottomNavBarRoute, arguments: BottomNavBarScreenArguments(0));
-        });
+      if (event.serieEditMode == SerieEditModeType.none || event.serieEditMode == SerieEditModeType.single) {
+        bookingRepository.deleteSingleBooking(event.bookingBoxIndex);
+      } else if (event.serieEditMode == SerieEditModeType.onlyFuture) {
+        Booking booking = await bookingRepository.load(event.bookingBoxIndex);
+        bookingRepository.deleteOnlyFutureBookingsFromSerie(booking, event.bookingBoxIndex);
+      } else if (event.serieEditMode == SerieEditModeType.all) {
+        Booking booking = await bookingRepository.load(event.bookingBoxIndex);
+        bookingRepository.deleteAllBookingsFromSerie(booking, event.bookingBoxIndex);
       }
-
-      showDialog(
-        context: event.context,
-        builder: (context) {
-          return AlertDialog(
-            title: Text(event.serieEditMode == SerieEditModeType.none || event.serieEditMode == SerieEditModeType.single ? 'Buchung löschen?' : 'Buchungen löschen?'),
-            actions: <Widget>[
-              TextButton(
-                child: const Text(
-                  'Nein',
-                  style: TextStyle(
-                    color: Colors.cyanAccent,
-                  ),
-                ),
-                onPressed: () => {
-                  Navigator.pop(context),
-                  FocusScope.of(context).unfocus(),
-                },
-              ),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  foregroundColor: Colors.black87,
-                  backgroundColor: Colors.cyanAccent,
-                ),
-                onPressed: () => {
-                  _yesPressed(event.bookingBoxIndex),
-                  Flushbar(
-                    title:
-                        event.serieEditMode == SerieEditModeType.none || event.serieEditMode == SerieEditModeType.single ? 'Buchung wurde gelöscht' : 'Buchungen wurden gelöscht',
-                    message: event.serieEditMode == SerieEditModeType.none || event.serieEditMode == SerieEditModeType.single
-                        ? 'Buchung wurde erfolgreich gelöscht.'
-                        : 'Buchungen wurden erfolgreich gelöscht',
-                    icon: const Icon(
-                      Icons.info_outline,
-                      size: 28.0,
-                      color: Colors.cyanAccent,
-                    ),
-                    duration: const Duration(seconds: 3),
-                    leftBarIndicatorColor: Colors.cyanAccent,
-                  )..show(context),
-                },
-                child: const Text('Ja'),
-              ),
-            ],
-          );
-        },
-      );
     });
   }
 }

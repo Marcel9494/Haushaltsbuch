@@ -15,9 +15,3 @@ class BookingLoadedState extends BookingState {
   final SerieEditModeType serieEditModeType;
   BookingLoadedState(this.context, this.bookingBoxIndex, this.serieEditModeType);
 }
-
-class BookingFailureState extends BookingState {
-  BookingFailureState();
-}
-
-class BookingInitial extends BookingState {}

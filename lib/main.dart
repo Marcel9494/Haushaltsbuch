@@ -28,7 +28,6 @@ import 'models/screen_arguments/create_or_edit_budget_screen_arguments.dart';
 import 'models/screen_arguments/create_or_edit_categorie_screen_arguments.dart';
 
 import '/blocs/booking_bloc/booking_bloc.dart';
-import '/blocs/booking_bloc/booking_cubit.dart';
 import '/blocs/input_fields_bloc/text_input_field_cubit.dart';
 import '/blocs/input_fields_bloc/money_input_field_cubit.dart';
 import '/blocs/input_fields_bloc/from_account_input_field_cubit.dart';
@@ -76,9 +75,6 @@ void main() async {
       providers: [
         BlocProvider<BookingBloc>(
           create: (context) => BookingBloc(),
-        ),
-        BlocProvider<BookingCubit>(
-          create: (context) => BookingCubit(),
         ),
         BlocProvider<TextInputFieldCubit>(
           create: (context) => TextInputFieldCubit(),
