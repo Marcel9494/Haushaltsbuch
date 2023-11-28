@@ -1,14 +1,17 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:haushaltsbuch/models/categorie/categorie_repository.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
+
+import '../../blocs/input_field_blocs/text_input_field_bloc/text_input_field_cubit.dart';
 
 import '/components/buttons/save_button.dart';
 import '/components/input_fields/text_input_field.dart';
 
 import '/models/enums/mode_types.dart';
 import '/models/categorie/categorie_model.dart';
+import '/models/categorie/categorie_repository.dart';
 
 import '/utils/consts/route_consts.dart';
 import '/utils/consts/global_consts.dart';
@@ -34,11 +37,13 @@ class CreateOrEditSubcategorieScreen extends StatefulWidget {
 class _CreateOrEditSubcategorieScreenState extends State<CreateOrEditSubcategorieScreen> {
   final TextEditingController _subcategorieNameController = TextEditingController();
   final RoundedLoadingButtonController _saveButtonController = RoundedLoadingButtonController();
+  late final TextInputFieldCubit textInputFieldCubit;
   String _subcategorieNameErrorText = '';
   String _oldSubcategorie = '';
 
   @override
   void initState() {
+    textInputFieldCubit = BlocProvider.of<TextInputFieldCubit>(context);
     super.initState();
     if (widget.mode == ModeType.editMode) {
       _oldSubcategorie = widget.categorie.subcategorieNames[widget.subcategorieIndex];
@@ -54,9 +59,9 @@ class _CreateOrEditSubcategorieScreenState extends State<CreateOrEditSubcategori
     }
     CategorieRepository categorieRepository = CategorieRepository();
     if (widget.mode == ModeType.creationMode) {
-      categorieRepository.createSubcategorie(widget.categorie.name, _subcategorieNameController.text.trim());
+      // TODO categorieRepository.createSubcategorie(widget.categorie.name, textInputFieldCubit.state.trim());
     } else {
-      categorieRepository.updateSubcategorie(widget.categorie.name, _oldSubcategorie, _subcategorieNameController.text.trim());
+      // TODO categorieRepository.updateSubcategorie(widget.categorie.name, _oldSubcategorie, textInputFieldCubit.state.trim());
     }
     _setSaveButtonAnimation(true);
     Timer(const Duration(milliseconds: transitionInMs), () {
@@ -71,12 +76,13 @@ class _CreateOrEditSubcategorieScreenState extends State<CreateOrEditSubcategori
 
   // TODO Validierung in Categorie Model auslagern / implementieren
   Future<bool> _validSubcategorieName(String subcategorieName) async {
-    if (subcategorieName.isEmpty) {
+    // TODO implementieren
+    /*if (textInputFieldCubit.state.isEmpty) {
       setState(() {
         _subcategorieNameErrorText = 'Bitte geben Sie einen Unterkategorienamen ein.';
       });
       return false;
-    }
+    }*/
     // TODO muss noch implementiert werden
     /*if (widget.mode == ModeType.creationMode) {
       bool categorieNameExisting = await categorie.existsSubcategorieName(categorie);
@@ -118,7 +124,7 @@ class _CreateOrEditSubcategorieScreenState extends State<CreateOrEditSubcategori
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                TextInputField(textEditingController: _subcategorieNameController, errorText: _subcategorieNameErrorText, hintText: 'Unterkategoriename', autofocus: true),
+                // TODO TextInputField(textCubit: textInputFieldCubit, errorText: _subcategorieNameErrorText, hintText: 'Unterkategoriename', autofocus: true, fieldKey: UniqueKey()),
                 SaveButton(saveFunction: _createOrUpdateSubcategorie, buttonController: _saveButtonController),
               ],
             ),

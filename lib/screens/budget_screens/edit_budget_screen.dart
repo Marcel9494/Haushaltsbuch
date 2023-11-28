@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../models/default_budget/default_budget_repository.dart';
+import '/models/default_budget/default_budget_repository.dart';
 import '/models/budget/budget_model.dart';
 import '/models/budget/budget_repository.dart';
 import '/models/default_budget/default_budget_model.dart';

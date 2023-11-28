@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 
-import '../models/default_budget/default_budget_repository.dart';
 import '/utils/consts/hive_consts.dart';
 import '/utils/consts/global_consts.dart';
 import '/utils/consts/route_consts.dart';
@@ -19,6 +18,7 @@ import '/components/buttons/save_button.dart';
 
 import '/models/budget/budget_model.dart';
 import '/models/default_budget/default_budget_model.dart';
+import '/models/default_budget/default_budget_repository.dart';
 import '/models/subbudget/subbudget_model.dart';
 import '/models/subbudget/subbudget_repository.dart';
 import '/models/budget/budget_repository.dart';
@@ -304,17 +304,17 @@ class _CreateOrEditBudgetScreenState extends State<CreateOrEditBudgetScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                widget.budgetBoxIndex == -1
-                    ? CategorieInputField(
+                /*widget.budgetBoxIndex == -1
+                    ?  TODO CategorieInputField(
                         textController: _categorieTextController,
                         errorText: _categorieErrorText,
                         categorieType: CategorieTypeExtension.getCategorieType(TransactionType.outcome.name),
                         categorieStringCallback: (categorie) => setState(() => _categorieTextController.text = categorie),
                         title: 'Kategorie für Budget auswählen:',
                         autofocus: true)
-                    : const SizedBox(),
-                SubcategorieInputField(textController: _subcategorieTextController, categorieName: _categorieTextController.text),
-                MoneyInputField(textController: _budgetTextController, errorText: _budgetErrorText, hintText: 'Budget', bottomSheetTitle: 'Budget eingeben:'),
+                    : const SizedBox(),*/
+                // TODO SubcategorieInputField(textController: _subcategorieTextController, categorieName: _categorieTextController.text),
+                // TODO MoneyInputField(textController: _budgetTextController, errorText: _budgetErrorText, hintText: 'Budget', bottomSheetTitle: 'Budget eingeben:'),
                 SaveButton(saveFunction: _saveBudget, buttonController: _saveButtonController),
               ],
             ),

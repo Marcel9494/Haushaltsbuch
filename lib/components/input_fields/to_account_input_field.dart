@@ -1,71 +1,52 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
-
-import '../../blocs/input_field_blocs/subcategorie_input_field_bloc/subcategorie_input_field_cubit.dart';
-
-import '/models/enums/categorie_types.dart';
-import '/models/categorie/categorie_repository.dart';
 
 import '/components/deco/bottom_sheet_line.dart';
 
-class CategorieInputField extends StatefulWidget {
+import '/models/account/account_repository.dart';
+
+class ToAccountInputField extends StatefulWidget {
   final dynamic cubit;
   final FocusNode focusNode;
-  final CategorieType categorieType;
-  final String title;
-  final bool autofocus;
+  final String hintText;
 
-  const CategorieInputField({
+  const ToAccountInputField({
     Key? key,
     required this.cubit,
     required this.focusNode,
-    required this.categorieType,
-    this.title = 'Kategorie auswählen:',
-    this.autofocus = false,
+    this.hintText = 'Konto',
   }) : super(key: key);
 
   @override
-  State<CategorieInputField> createState() => _CategorieInputFieldState();
+  State<ToAccountInputField> createState() => _ToAccountInputFieldState();
 }
 
-class _CategorieInputFieldState extends State<CategorieInputField> {
-  List<String> _categorieNames = [];
+class _ToAccountInputFieldState extends State<ToAccountInputField> {
+  List<String> accountNames = [];
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (widget.autofocus) {
-      // Future.delayed Grund siehe: https://stackoverflow.com/q/58027568/15943768
-      Future.delayed(Duration.zero, () {
-        _openBottomSheetWithCategorieList(context);
-      });
-    }
-  }
-
-  void _openBottomSheetWithCategorieList(BuildContext context) {
+  void _openBottomSheetWithAccountList(BuildContext context) {
     showCupertinoModalBottomSheet<void>(
       context: context,
       builder: (BuildContext context) {
         return Material(
           child: SizedBox(
-            height: 400,
+            height: 400.0,
             child: ListView(
               children: [
                 const BottomSheetLine(),
-                Padding(
-                  padding: const EdgeInsets.only(top: 16.0, left: 20.0),
-                  child: Text(widget.title, style: const TextStyle(fontSize: 18.0)),
+                const Padding(
+                  padding: EdgeInsets.only(top: 16.0, left: 20.0),
+                  child: Text('Konto auswählen:', style: TextStyle(fontSize: 18.0)),
                 ),
                 FutureBuilder(
-                  future: _loadCategorieNameList(),
+                  future: _loadAccountNameList(),
                   builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
                     switch (snapshot.connectionState) {
                       case ConnectionState.waiting:
                         return const SizedBox();
                       case ConnectionState.done:
-                        if (_categorieNames.isEmpty) {
-                          return const Text('Erstelle zuerst eine Kategorie.');
+                        if (accountNames.isEmpty) {
+                          return const Text('Erstelle zuerst ein Konto.');
                         } else {
                           return Center(
                             child: GridView.count(
@@ -76,15 +57,14 @@ class _CategorieInputFieldState extends State<CategorieInputField> {
                               crossAxisSpacing: 5,
                               shrinkWrap: true,
                               children: <Widget>[
-                                for (int i = 0; i < _categorieNames.length; i++)
+                                for (int i = 0; i < accountNames.length; i++)
                                   OutlinedButton(
                                     onPressed: () => {
-                                      widget.cubit.updateValue(_categorieNames[i]),
-                                      BlocProvider.of<SubcategorieInputFieldCubit>(context).resetValue(),
+                                      widget.cubit.updateValue(accountNames[i]),
                                       Navigator.pop(context),
                                     },
                                     child: Text(
-                                      _categorieNames[i],
+                                      accountNames[i],
                                       textAlign: TextAlign.center,
                                       style: const TextStyle(
                                         color: Colors.white70,
@@ -108,10 +88,10 @@ class _CategorieInputFieldState extends State<CategorieInputField> {
     );
   }
 
-  Future<List<String>> _loadCategorieNameList() async {
-    CategorieRepository categorieRepository = CategorieRepository();
-    _categorieNames = await categorieRepository.loadCategorieNameList(widget.categorieType);
-    return _categorieNames;
+  Future<List<String>> _loadAccountNameList() async {
+    AccountRepository accountRepository = AccountRepository();
+    accountNames = await accountRepository.loadAccountNameList();
+    return accountNames;
   }
 
   @override
@@ -119,16 +99,15 @@ class _CategorieInputFieldState extends State<CategorieInputField> {
     return TextFormField(
       key: UniqueKey(),
       focusNode: widget.focusNode,
-      initialValue: widget.cubit.state.categorie,
+      initialValue: widget.cubit.state.toAccount,
       textAlignVertical: TextAlignVertical.center,
       showCursor: false,
       readOnly: true,
-      autofocus: widget.autofocus,
-      onTap: () => _openBottomSheetWithCategorieList(context),
+      onTap: () => _openBottomSheetWithAccountList(context),
       decoration: InputDecoration(
-        hintText: 'Kategorie',
+        hintText: widget.hintText,
         prefixIcon: const Icon(
-          Icons.donut_small_rounded,
+          Icons.account_balance_rounded,
           color: Colors.grey,
         ),
         focusedBorder: const UnderlineInputBorder(

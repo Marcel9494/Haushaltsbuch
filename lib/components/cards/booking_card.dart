@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
-import '../deco/bottom_sheet_line.dart';
+import '/blocs/booking_bloc/booking_bloc.dart';
 
 import '/models/booking/booking_model.dart';
 import '/models/enums/repeat_types.dart';
@@ -10,6 +11,8 @@ import '/models/enums/transaction_types.dart';
 import '/models/screen_arguments/create_or_edit_booking_screen_arguments.dart';
 
 import '/utils/consts/route_consts.dart';
+
+import '../deco/bottom_sheet_line.dart';
 
 class BookingCard extends StatelessWidget {
   final Booking booking;
@@ -36,7 +39,7 @@ class BookingCard extends StatelessWidget {
 
   void _editBooking(BuildContext context) {
     if (booking.bookingRepeats == RepeatType.noRepetition.name) {
-      Navigator.pushNamed(context, createOrEditBookingRoute, arguments: CreateOrEditBookingScreenArguments(booking.boxIndex, SerieEditModeType.none));
+      BlocProvider.of<BookingBloc>(context).add(CreateOrLoadBookingEvent(context, booking.boxIndex, SerieEditModeType.none));
     } else {
       showCupertinoModalBottomSheet<void>(
         context: context,
@@ -54,20 +57,17 @@ class BookingCard extends StatelessWidget {
                   Column(
                     children: [
                       ListTile(
-                        onTap: () =>
-                            Navigator.popAndPushNamed(context, createOrEditBookingRoute, arguments: CreateOrEditBookingScreenArguments(booking.boxIndex, SerieEditModeType.single)),
+                        onTap: () => BlocProvider.of<BookingBloc>(context).add(CreateOrLoadBookingEvent(context, booking.boxIndex, SerieEditModeType.single)),
                         leading: const Icon(Icons.looks_one_outlined, color: Colors.cyanAccent),
                         title: const Text('Nur diese Buchung'),
                       ),
                       ListTile(
-                        onTap: () => Navigator.popAndPushNamed(context, createOrEditBookingRoute,
-                            arguments: CreateOrEditBookingScreenArguments(booking.boxIndex, SerieEditModeType.onlyFuture)),
+                        onTap: () => BlocProvider.of<BookingBloc>(context).add(CreateOrLoadBookingEvent(context, booking.boxIndex, SerieEditModeType.onlyFuture)),
                         leading: const Icon(Icons.repeat_on_outlined, color: Colors.cyanAccent),
                         title: const Text('Alle zukünftige Buchungen'),
                       ),
                       ListTile(
-                        onTap: () =>
-                            Navigator.popAndPushNamed(context, createOrEditBookingRoute, arguments: CreateOrEditBookingScreenArguments(booking.boxIndex, SerieEditModeType.all)),
+                        onTap: () => BlocProvider.of<BookingBloc>(context).add(CreateOrLoadBookingEvent(context, booking.boxIndex, SerieEditModeType.all)),
                         leading: const Icon(Icons.all_inclusive_rounded, color: Colors.cyanAccent),
                         title: const Text('Alle Buchungen'),
                       ),

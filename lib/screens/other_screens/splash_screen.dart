@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '/screens/introduction_screens.dart';
+import 'introduction_screens.dart';
 
 import '/components/deco/loading_indicator.dart';
 import '/components/bottom_nav_bar/bottom_nav_bar.dart';

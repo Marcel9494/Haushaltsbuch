@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '/screens/bookings_screen.dart';
-import '/screens/budgets_screen.dart';
-import '/screens/accounts_screen.dart';
+import '/blocs/booking_bloc/booking_bloc.dart';
+
+import '/screens/booking_screens/bookings_screen.dart';
+import '../../screens/budget_screens/budgets_screen.dart';
+import '/screens/account_screens/accounts_screen.dart';
 
 import '/models/enums/serie_edit_modes.dart';
 import '/models/enums/budget_mode_types.dart';
-import '/models/screen_arguments/create_or_edit_booking_screen_arguments.dart';
 import '/models/screen_arguments/create_or_edit_budget_screen_arguments.dart';
 
 import '/utils/consts/route_consts.dart';
@@ -55,7 +57,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
       floatingActionButton: _selectedIndex == 0 || _selectedIndex == 1
           ? FloatingActionButton(
               onPressed: () => _selectedIndex == 0
-                  ? Navigator.pushNamed(context, createOrEditBookingRoute, arguments: CreateOrEditBookingScreenArguments(-1, SerieEditModeType.none))
+                  ? BlocProvider.of<BookingBloc>(context).add(CreateOrLoadBookingEvent(context, -1, SerieEditModeType.none))
                   : Navigator.pushNamed(context, createOrEditBudgetRoute, arguments: CreateOrEditBudgetScreenArguments(BudgetModeType.budgetCreationMode, -1)),
               child: Container(
                 width: 60,

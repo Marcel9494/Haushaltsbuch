@@ -1,19 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+
+import '../../blocs/input_field_blocs/categorie_input_field_bloc/categorie_input_field_cubit.dart';
 
 import '/models/categorie/categorie_repository.dart';
 
 import '../deco/bottom_sheet_line.dart';
 
 class SubcategorieInputField extends StatefulWidget {
-  final TextEditingController textController;
-  final String categorieName;
+  final dynamic cubit;
+  final FocusNode focusNode;
   final String title;
 
   const SubcategorieInputField({
     Key? key,
-    required this.textController,
-    required this.categorieName,
+    required this.cubit,
+    required this.focusNode,
     this.title = 'Unterkategorie auswählen:',
   }) : super(key: key);
 
@@ -60,7 +63,7 @@ class _SubcategorieInputFieldState extends State<SubcategorieInputField> {
                                 for (int i = 0; i < _subcategorieNames.length; i++)
                                   OutlinedButton(
                                     onPressed: () => {
-                                      widget.textController.text = _subcategorieNames[i],
+                                      widget.cubit.updateValue(_subcategorieNames[i]),
                                       Navigator.pop(context),
                                     },
                                     child: Text(
@@ -90,14 +93,16 @@ class _SubcategorieInputFieldState extends State<SubcategorieInputField> {
 
   Future<List<String>> _loadSubcategorieNameList() async {
     CategorieRepository categorieRepository = CategorieRepository();
-    _subcategorieNames = await categorieRepository.loadSubcategorieNameList(widget.categorieName);
+    _subcategorieNames = await categorieRepository.loadSubcategorieNameList(BlocProvider.of<CategorieInputFieldCubit>(context).state.categorie);
     return _subcategorieNames;
   }
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
-      controller: widget.textController,
+      key: UniqueKey(),
+      focusNode: widget.focusNode,
+      initialValue: widget.cubit.state,
       textAlignVertical: TextAlignVertical.center,
       showCursor: false,
       readOnly: true,

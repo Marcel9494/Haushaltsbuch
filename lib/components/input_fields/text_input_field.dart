@@ -1,61 +1,48 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
-class TextInputField extends StatefulWidget {
-  final TextEditingController textEditingController;
+import '../../blocs/input_field_blocs/text_input_field_bloc/text_input_field_cubit.dart';
+
+class TextInputField extends StatelessWidget {
+  final FocusNode focusNode;
+  final UniqueKey fieldKey;
+  final dynamic textCubit;
   final String hintText;
-  final String errorText;
   final int maxLength;
   final bool autofocus;
 
   const TextInputField({
     Key? key,
-    required this.textEditingController,
+    required this.focusNode,
+    required this.fieldKey,
+    required this.textCubit,
     required this.hintText,
-    this.errorText = '',
     this.maxLength = 60,
     this.autofocus = false,
   }) : super(key: key);
 
   @override
-  State<TextInputField> createState() => _TextInputFieldState();
-}
-
-class _TextInputFieldState extends State<TextInputField> {
-  @override
   Widget build(BuildContext context) {
     return TextFormField(
+      key: fieldKey,
+      focusNode: focusNode,
+      initialValue: textCubit.state.text,
       textCapitalization: TextCapitalization.words,
-      controller: widget.textEditingController,
-      maxLength: widget.maxLength,
-      autofocus: widget.autofocus,
+      maxLength: maxLength,
+      autofocus: autofocus,
       textAlignVertical: TextAlignVertical.center,
-      onChanged: (_) => setState(() {
-        widget.textEditingController;
-      }),
+      onChanged: (newText) => textCubit.updateValue(newText),
       decoration: InputDecoration(
-        hintText: widget.hintText,
+        hintText: hintText,
         counterText: '',
         prefixIcon: const Icon(
           Icons.title_rounded,
           color: Colors.grey,
         ),
-        suffixIcon: widget.textEditingController.text.isNotEmpty
-            ? IconButton(
-                onPressed: () {
-                  setState(() {
-                    widget.textEditingController.clear();
-                  });
-                },
-                icon: const Icon(
-                  Icons.clear,
-                  color: Colors.grey,
-                ),
-              )
-            : const SizedBox(),
         focusedBorder: const UnderlineInputBorder(
           borderSide: BorderSide(color: Colors.cyanAccent, width: 1.5),
         ),
-        errorText: widget.errorText.isEmpty ? null : widget.errorText,
+        errorText: textCubit.state.errorText.isEmpty ? null : textCubit.state.errorText,
       ),
     );
   }

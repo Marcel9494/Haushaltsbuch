@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../models/enums/categorie_types.dart';
-import '../../screens/create_or_edit_categorie_screen.dart';
+import '../../screens/categorie_screens/create_or_edit_categorie_screen.dart';
 
 typedef CategorieTypeStringCallback = void Function(String currentCategorieType);
 

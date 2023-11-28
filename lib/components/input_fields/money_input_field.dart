@@ -6,22 +6,22 @@ import '/components/deco/bottom_sheet_line.dart';
 import '/utils/number_formatters/number_formatter.dart';
 
 class MoneyInputField extends StatelessWidget {
-  final TextEditingController textController;
-  final String errorText;
+  final FocusNode focusNode;
+  final dynamic cubit;
   final String hintText;
   final String bottomSheetTitle;
   bool _clearedInputField = false;
 
   MoneyInputField({
     Key? key,
-    required this.textController,
-    required this.errorText,
+    required this.focusNode,
+    required this.cubit,
     required this.hintText,
     required this.bottomSheetTitle,
   }) : super(key: key);
 
   void _openBottomSheetForNumberInput(BuildContext context) {
-    _clearedInputField = textController.text.isEmpty ? true : false;
+    _clearedInputField = cubit.state.amount.isEmpty ? true : false;
     showCupertinoModalBottomSheet<void>(
       context: context,
       builder: (BuildContext context) {
@@ -59,7 +59,7 @@ class MoneyInputField extends StatelessWidget {
                       ),
                       OutlinedButton(
                         onPressed: () {
-                          textController.text = '';
+                          cubit.resetValue();
                         },
                         child: const Icon(Icons.clear_rounded, color: Colors.cyanAccent),
                       ),
@@ -77,8 +77,8 @@ class MoneyInputField extends StatelessWidget {
                       ),
                       OutlinedButton(
                         onPressed: () {
-                          if (textController.text.isNotEmpty) {
-                            textController.text = textController.text.substring(0, textController.text.length - 1);
+                          if (cubit.state.amount.isNotEmpty) {
+                            cubit.updateValue(cubit.state.amount.substring(0, cubit.state.amount.length - 1));
                           }
                         },
                         child: const Icon(Icons.backspace_rounded, color: Colors.cyanAccent),
@@ -122,8 +122,8 @@ class MoneyInputField extends StatelessWidget {
         );
       },
     ).whenComplete(() {
-      if (textController.text.isNotEmpty) {
-        textController.text = formatToMoneyAmount(textController.text);
+      if (cubit.state.amount.isNotEmpty && !cubit.state.amount.contains('€')) {
+        cubit.updateValue(formatToMoneyAmount(cubit.state.amount));
       }
     });
   }
@@ -132,15 +132,15 @@ class MoneyInputField extends StatelessWidget {
     // Eingabefeld wird automatisch geleert => Benutzer muss das Eingabefeld nicht mehr mit X löschen, wenn
     // ein neuer Betrag eingegeben wird.
     if (_clearedInputField == false) {
-      textController.text = '';
+      cubit.resetValue();
       _clearedInputField = true;
     }
-    if (amount == ',' && textController.text.contains(',')) {
-      textController.text;
+    if (amount == ',' && cubit.state.amount.contains(',')) {
+      cubit.updateValue(amount);
     } else {
       final regex = RegExp(r'^\d+(,\d{0,2})?$');
-      if (regex.hasMatch(textController.text + amount)) {
-        textController.text += amount;
+      if (regex.hasMatch(cubit.state.amount + amount)) {
+        cubit.updateValue(cubit.state.amount + amount);
       }
     }
   }
@@ -148,11 +148,13 @@ class MoneyInputField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
-      maxLength: 9,
-      controller: textController,
+      key: UniqueKey(),
+      focusNode: focusNode,
+      initialValue: cubit.state.amount,
       textAlignVertical: TextAlignVertical.center,
       showCursor: false,
       readOnly: true,
+      maxLength: 9,
       onTap: () => _openBottomSheetForNumberInput(context),
       decoration: InputDecoration(
         hintText: hintText,
@@ -164,7 +166,7 @@ class MoneyInputField extends StatelessWidget {
         focusedBorder: const UnderlineInputBorder(
           borderSide: BorderSide(color: Colors.cyanAccent, width: 1.5),
         ),
-        errorText: errorText.isEmpty ? null : errorText,
+        errorText: cubit.state.errorText.isEmpty ? null : cubit.state.errorText,
       ),
     );
   }

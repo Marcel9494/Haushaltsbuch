@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hive_flutter/adapters.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 import '/utils/consts/route_consts.dart';
@@ -23,25 +24,34 @@ import 'models/screen_arguments/bottom_nav_bar_screen_arguments.dart';
 import 'models/screen_arguments/account_details_screen_arguments.dart';
 import 'models/screen_arguments/categorie_amount_list_screen_arguments.dart';
 import 'models/screen_arguments/create_or_edit_account_screen_arguments.dart';
-import 'models/screen_arguments/create_or_edit_booking_screen_arguments.dart';
 import 'models/screen_arguments/create_or_edit_budget_screen_arguments.dart';
 import 'models/screen_arguments/create_or_edit_categorie_screen_arguments.dart';
 
+import '/blocs/booking_bloc/booking_bloc.dart';
+import 'blocs/input_field_blocs/text_input_field_bloc/text_input_field_cubit.dart';
+import 'blocs/input_field_blocs/money_input_field_bloc/money_input_field_cubit.dart';
+import 'blocs/input_field_blocs/account_input_field_bloc/from_account_input_field_cubit.dart';
+import 'blocs/input_field_blocs/categorie_input_field_bloc/categorie_input_field_cubit.dart';
+import 'blocs/input_field_blocs/subcategorie_input_field_bloc/subcategorie_input_field_cubit.dart';
+import 'blocs/button_blocs/transaction_stats_toggle_buttons_bloc/transaction_stats_toggle_buttons_cubit.dart';
+import 'blocs/input_field_blocs/date_input_field_bloc/date_input_field_cubit.dart';
+import '/blocs/input_field_blocs/account_input_field_bloc/to_account_input_field_cubit.dart';
+
 import '/components/bottom_nav_bar/bottom_nav_bar.dart';
 
-import '/screens/overview_budgets_screen.dart';
-import '/screens/create_or_edit_booking_screen.dart';
-import '/screens/create_or_edit_account_screen.dart';
-import '/screens/create_or_edit_categorie_screen.dart';
-import '/screens/create_or_edit_subcategorie_screen.dart';
-import '/screens/categories_screen.dart';
-import '/screens/account_details_screen.dart';
-import '/screens/create_or_edit_budget_screen.dart';
-import '/screens/categorie_amount_list_screen.dart';
-import '/screens/edit_budget_screen.dart';
-import '/screens/edit_subbudget_screen.dart';
-import '/screens/settings_screen.dart';
-import '/screens/splash_screen.dart';
+import 'screens/budget_screens/overview_budgets_screen.dart';
+import '/screens/booking_screens/create_or_edit_booking_screen.dart';
+import '/screens/account_screens/create_or_edit_account_screen.dart';
+import 'screens/categorie_screens/create_or_edit_categorie_screen.dart';
+import 'screens/categorie_screens/create_or_edit_subcategorie_screen.dart';
+import 'screens/categorie_screens/categories_screen.dart';
+import 'screens/account_screens/account_details_screen.dart';
+import 'screens/budget_screens/create_or_edit_budget_screen.dart';
+import 'screens/categorie_screens/categorie_amount_list_screen.dart';
+import 'screens/budget_screens/edit_budget_screen.dart';
+import 'screens/budget_screens/edit_subbudget_screen.dart';
+import 'screens/other_screens/settings_screen.dart';
+import 'screens/other_screens/splash_screen.dart';
 
 void main() async {
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
@@ -60,7 +70,40 @@ void main() async {
   Hive.registerAdapter(IntroScreenStateAdapter());
   IntroScreenStateRepository introScreenStateRepository = IntroScreenStateRepository();
   introScreenStateRepository.init();
-  runApp(const BudgetBookApp());
+  runApp(
+    MultiBlocProvider(
+      providers: [
+        BlocProvider<BookingBloc>(
+          create: (context) => BookingBloc(),
+        ),
+        BlocProvider<TextInputFieldCubit>(
+          create: (context) => TextInputFieldCubit(),
+        ),
+        BlocProvider<MoneyInputFieldCubit>(
+          create: (context) => MoneyInputFieldCubit(),
+        ),
+        BlocProvider<CategorieInputFieldCubit>(
+          create: (context) => CategorieInputFieldCubit(),
+        ),
+        BlocProvider<SubcategorieInputFieldCubit>(
+          create: (context) => SubcategorieInputFieldCubit(),
+        ),
+        BlocProvider<FromAccountInputFieldCubit>(
+          create: (context) => FromAccountInputFieldCubit(),
+        ),
+        BlocProvider<ToAccountInputFieldCubit>(
+          create: (context) => ToAccountInputFieldCubit(),
+        ),
+        BlocProvider<TransactionStatsToggleButtonsCubit>(
+          create: (context) => TransactionStatsToggleButtonsCubit(),
+        ),
+        BlocProvider<DateInputFieldCubit>(
+          create: (context) => DateInputFieldCubit(),
+        ),
+      ],
+      child: const BudgetBookApp(),
+    ),
+  );
 }
 
 class BudgetBookApp extends StatelessWidget {
@@ -93,6 +136,7 @@ class BudgetBookApp extends StatelessWidget {
       ],
       home: const SplashScreen(),
       routes: {
+        createOrEditBookingRoute: (context) => const CreateOrEditBookingScreen(),
         categoriesRoute: (context) => const CategoriesScreen(),
         overviewBudgetsRoute: (context) => const OverviewBudgetsScreen(),
         settingsRoute: (context) => const SettingsScreen(),
@@ -115,7 +159,7 @@ class BudgetBookApp extends StatelessWidget {
               ),
               settings: settings,
             );
-          case createOrEditBookingRoute:
+          /*case createOrEditBookingRoute:
             final args = settings.arguments as CreateOrEditBookingScreenArguments;
             return MaterialPageRoute<String>(
               builder: (BuildContext context) => CreateOrEditBookingScreen(
@@ -123,7 +167,7 @@ class BudgetBookApp extends StatelessWidget {
                 serieEditMode: args.serieEditMode,
               ),
               settings: settings,
-            );
+            );*/
           case createOrEditAccountRoute:
             final args = settings.arguments as CreateOrEditAccountScreenArguments;
             return MaterialPageRoute<String>(
