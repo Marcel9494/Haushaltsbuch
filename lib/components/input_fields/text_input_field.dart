@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../../blocs/input_field_blocs/text_input_field_bloc/text_input_field_cubit.dart';
 
 class TextInputField extends StatelessWidget {
   final FocusNode focusNode;
@@ -36,17 +39,6 @@ class TextInputField extends StatelessWidget {
           Icons.title_rounded,
           color: Colors.grey,
         ),
-        /* TODO suffixIcon: textCubit.state != ''
-            ? IconButton(
-                onPressed: () {
-                  textCubit.resetValue();
-                },
-                icon: const Icon(
-                  Icons.clear,
-                  color: Colors.grey,
-                ),
-              )
-            : const SizedBox(),*/
         focusedBorder: const UnderlineInputBorder(
           borderSide: BorderSide(color: Colors.cyanAccent, width: 1.5),
         ),

@@ -9,7 +9,7 @@ class WealthDevelopmentStats {
   late String month;
   late double wealth;
 
-  // TODO hier weitermachen und Vermögensenticklung für die Vergangenheit pro Monat berechnen.
+  // TODO hier weitermachen und Vermögensentwicklung für die Vergangenheit pro Monat berechnen.
   static Future<double> calculatePastWealth(DateTime currentDate, double currentBalance) async {
     BookingRepository bookingRepository = BookingRepository();
     List<Booking> _bookingList = await bookingRepository.loadMonthlyBookingList(currentDate.month - 1, currentDate.year);

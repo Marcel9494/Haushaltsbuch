@@ -42,7 +42,7 @@ class DateInputField extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(horizontal: 30.0, vertical: 4.0),
                           child: ListTile(
                             title: Text(RepeatType.values[index].name, textAlign: TextAlign.center),
-                            // TODO hier weitermachen und Funktionalität in Cubit auslagern
+                            // TODO Funktionalität in Cubit auslagern?
                             onTap: () => {
                               cubit.updateBookingRepeat(RepeatType.values[index].name),
                               if (RepeatType.values[index].name == RepeatType.beginningOfMonth.name)

@@ -9,7 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:haushaltsbuch/main.dart';
-import 'package:haushaltsbuch/screens/bookings_screen.dart';
+import 'package:haushaltsbuch/screens/booking_screens/bookings_screen.dart';
 
 void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {

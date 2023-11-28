@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 
-import '/blocs/input_fields_bloc/text_input_field_cubit.dart';
+import '../../blocs/input_field_blocs/text_input_field_bloc/text_input_field_cubit.dart';
 
 import '/components/buttons/save_button.dart';
 import '/components/input_fields/text_input_field.dart';

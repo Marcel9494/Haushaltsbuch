@@ -3,15 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 
-import '/blocs/input_fields_bloc/to_account_input_field_cubit.dart';
-import '/blocs/input_fields_bloc/date_input_field_cubit.dart';
 import '/blocs/booking_bloc/booking_bloc.dart';
-import '/blocs/input_fields_bloc/text_input_field_cubit.dart';
-import '/blocs/input_fields_bloc/money_input_field_cubit.dart';
-import '/blocs/input_fields_bloc/from_account_input_field_cubit.dart';
-import '/blocs/input_fields_bloc/categorie_input_field_cubit.dart';
-import '/blocs/input_fields_bloc/subcategorie_input_field_cubit.dart';
-import '/blocs/button_bloc/transaction_stats_toggle_buttons_cubit.dart';
+import '/blocs/input_field_blocs/account_input_field_bloc/to_account_input_field_cubit.dart';
+import '/blocs/input_field_blocs/date_input_field_bloc/date_input_field_cubit.dart';
+import '/blocs/input_field_blocs/text_input_field_bloc/text_input_field_cubit.dart';
+import '/blocs/input_field_blocs/money_input_field_bloc/money_input_field_cubit.dart';
+import '/blocs/input_field_blocs/account_input_field_bloc/from_account_input_field_cubit.dart';
+import '/blocs/input_field_blocs/categorie_input_field_bloc/categorie_input_field_cubit.dart';
+import '/blocs/input_field_blocs/subcategorie_input_field_bloc/subcategorie_input_field_cubit.dart';
+import '/blocs/button_blocs/transaction_stats_toggle_buttons_bloc/transaction_stats_toggle_buttons_cubit.dart';
 
 import '/components/input_fields/subcategorie_input_field.dart';
 import '/components/buttons/transaction_toggle_buttons.dart';

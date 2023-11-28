@@ -3,15 +3,15 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 
-import '/blocs/input_fields_bloc/date_input_field_cubit.dart';
+import '../input_field_blocs/date_input_field_bloc/date_input_field_cubit.dart';
 
-import '../button_bloc/transaction_stats_toggle_buttons_cubit.dart';
-import '../input_fields_bloc/from_account_input_field_cubit.dart';
-import '../input_fields_bloc/categorie_input_field_cubit.dart';
-import '../input_fields_bloc/money_input_field_cubit.dart';
-import '../input_fields_bloc/subcategorie_input_field_cubit.dart';
-import '../input_fields_bloc/text_input_field_cubit.dart';
-import '../input_fields_bloc/to_account_input_field_cubit.dart';
+import '../button_blocs/transaction_stats_toggle_buttons_bloc/transaction_stats_toggle_buttons_cubit.dart';
+import '../input_field_blocs/account_input_field_bloc/from_account_input_field_cubit.dart';
+import '../input_field_blocs/categorie_input_field_bloc/categorie_input_field_cubit.dart';
+import '../input_field_blocs/money_input_field_bloc/money_input_field_cubit.dart';
+import '../input_field_blocs/subcategorie_input_field_bloc/subcategorie_input_field_cubit.dart';
+import '../input_field_blocs/text_input_field_bloc/text_input_field_cubit.dart';
+import '../input_field_blocs/account_input_field_bloc/to_account_input_field_cubit.dart';
 
 import '/models/enums/repeat_types.dart';
 import '/models/booking/booking_model.dart';

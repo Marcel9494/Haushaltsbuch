@@ -13,7 +13,7 @@ class TransactionToggleButtons extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ToggleButtons(
-      onPressed: (selectedIndex) => cubit.setSelectedTransaction(selectedIndex, cubit.state.selectedTransaction),
+      onPressed: (selectedIndex) => cubit.setSelectedTransaction(selectedIndex, cubit.state.selectedTransaction, context),
       borderRadius: const BorderRadius.only(
         topRight: Radius.circular(18.0),
         topLeft: Radius.circular(18.0),

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
-import '/blocs/input_fields_bloc/subcategorie_input_field_cubit.dart';
+import '../../blocs/input_field_blocs/subcategorie_input_field_bloc/subcategorie_input_field_cubit.dart';
 
 import '/models/enums/categorie_types.dart';
 import '/models/categorie/categorie_repository.dart';

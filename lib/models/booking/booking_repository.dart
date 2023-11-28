@@ -398,9 +398,7 @@ class BookingRepository extends BookingInterface {
     return investments;
   }
 
-  // TODO Funktion implementieren, ob seit letztem mal eine neue Buchung z.B. eine angelegte Serienbuchung als Abrechnung
-  // TODO dazu gekommen ist. Extra Variable bei Buchungen einführen, ob Buchung bereits auf ein Konto verbucht wurde oder nicht?!
-  // TODO testen bei Konto Übersichtsseite
+  // TODO Funktion implementieren, ob seit letztem mal eine neue Buchung z.B. eine angelegte Serienbuchung als Abrechnung dazu gekommen ist
   @override
   void checkForNewSerieBookings() async {
     var bookingBox = await Hive.openBox(bookingsBox);

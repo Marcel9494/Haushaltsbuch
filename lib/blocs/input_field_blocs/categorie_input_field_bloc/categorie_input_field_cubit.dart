@@ -2,7 +2,6 @@ import 'package:bloc/bloc.dart';
 
 part 'categorie_input_field_model.dart';
 
-// TODO hier weitermachen und für Bloc eine sauberere Ordnerstruktur überlegen und umsetzen
 class CategorieInputFieldCubit extends Cubit<CategorieInputFieldModel> {
   CategorieInputFieldCubit() : super(CategorieInputFieldModel("", ""));
   void updateValue(String newValue) => emit(CategorieInputFieldModel(newValue, ""));
