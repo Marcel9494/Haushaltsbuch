@@ -1,8 +1,12 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:rounded_loading_button/rounded_loading_button.dart';
+
+import '/blocs/input_field_blocs/money_input_field_bloc/money_input_field_cubit.dart';
+import '/blocs/input_field_blocs/text_input_field_bloc/text_input_field_cubit.dart';
 
 import '/components/dialogs/choice_dialog.dart';
 import '/components/deco/loading_indicator.dart';
@@ -49,6 +53,14 @@ class _CreateOrEditAccountScreenState extends State<CreateOrEditAccountScreen> {
   bool _primaryAccountsLoaded = false;
   final Account _account = Account();
 
+  late final TextInputFieldCubit accountNameInputFieldCubit;
+  late final MoneyInputFieldCubit accountBalanceInputFieldCubit;
+
+  UniqueKey accountNameFieldUniqueKey = UniqueKey();
+
+  FocusNode accountNameFocusNode = FocusNode();
+  FocusNode accountBalanceFocusNode = FocusNode();
+
   String _accountNameErrorText = '';
   String _accountGroupErrorText = '';
   String _bankBalanceErrorText = '';
@@ -59,6 +71,8 @@ class _CreateOrEditAccountScreenState extends State<CreateOrEditAccountScreen> {
   @override
   void initState() {
     super.initState();
+    accountNameInputFieldCubit = BlocProvider.of<TextInputFieldCubit>(context);
+    accountBalanceInputFieldCubit = BlocProvider.of<MoneyInputFieldCubit>(context);
     if (widget.accountBoxIndex != -1) {
       _loadAccount();
     }
@@ -247,10 +261,18 @@ class _CreateOrEditAccountScreenState extends State<CreateOrEditAccountScreen> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         AccountTypeInputField(textController: _accountGroupTextController, errorText: _accountGroupErrorText),
-                        // TODO TextInputField(textEditingController: _accountNameController, errorText: _accountNameErrorText, hintText: 'Name'),
-                        // TODO MoneyInputField(
-                        //    textController: _bankBalanceTextController, errorText: _bankBalanceErrorText, hintText: 'Kontostand', bottomSheetTitle: 'Kontostand eingeben:'),
-                        PreselectAccountInputField(textController: _preselectedAccountTextController),
+                        BlocBuilder<TextInputFieldCubit, TextInputFieldModel>(
+                          builder: (context, state) {
+                            return TextInputField(fieldKey: accountNameFieldUniqueKey, focusNode: accountNameFocusNode, textCubit: accountNameInputFieldCubit, hintText: 'Name');
+                          },
+                        ),
+                        BlocBuilder<MoneyInputFieldCubit, MoneyInputFieldModel>(
+                          builder: (context, state) {
+                            return MoneyInputField(
+                                focusNode: accountBalanceFocusNode, cubit: accountBalanceInputFieldCubit, hintText: 'Kontostand', bottomSheetTitle: 'Kontostand eingeben:');
+                          },
+                        ),
+                        // TODO PreselectAccountInputField(textController: _preselectedAccountTextController),
                         SaveButton(saveFunction: _createOrUpdateAccount, buttonController: _saveButtonController),
                       ],
                     );

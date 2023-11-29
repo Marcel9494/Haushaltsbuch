@@ -169,7 +169,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
                           ),
                           BlocBuilder<TextInputFieldCubit, TextInputFieldModel>(
                             builder: (context, state) {
-                              return TextInputField(fieldKey: titleFieldUniqueKey, focusNode: titleFocusNode, textCubit: titleInputFieldCubit, hintText: 'Titel');
+                              return TextInputField(fieldKey: titleFieldUniqueKey, focusNode: titleFocusNode, textCubit: titleInputFieldCubit, hintText: 'Titel', maxLength: 100);
                             },
                           ),
                           BlocBuilder<MoneyInputFieldCubit, MoneyInputFieldModel>(

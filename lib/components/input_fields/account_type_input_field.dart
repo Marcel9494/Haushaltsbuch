@@ -5,6 +5,7 @@ import '../deco/bottom_sheet_line.dart';
 
 import '/models/enums/account_types.dart';
 
+// TODO hier weitermachen und Account Type Eingabefeld auf Bloc umziehen siehe andere Eingabefelder als Beispiel
 class AccountTypeInputField extends StatelessWidget {
   final TextEditingController textController;
   final String errorText;
