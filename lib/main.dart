@@ -23,11 +23,11 @@ import 'models/screen_arguments/edit_subbudget_screen_arguments.dart';
 import 'models/screen_arguments/bottom_nav_bar_screen_arguments.dart';
 import 'models/screen_arguments/account_details_screen_arguments.dart';
 import 'models/screen_arguments/categorie_amount_list_screen_arguments.dart';
-import 'models/screen_arguments/create_or_edit_account_screen_arguments.dart';
 import 'models/screen_arguments/create_or_edit_budget_screen_arguments.dart';
 import 'models/screen_arguments/create_or_edit_categorie_screen_arguments.dart';
 
-import '/blocs/booking_bloc/booking_bloc.dart';
+import 'blocs/booking_bloc/booking_bloc.dart';
+import 'blocs/account_bloc/account_bloc.dart';
 import 'blocs/input_field_blocs/text_input_field_bloc/text_input_field_cubit.dart';
 import 'blocs/input_field_blocs/money_input_field_bloc/money_input_field_cubit.dart';
 import 'blocs/input_field_blocs/account_input_field_bloc/from_account_input_field_cubit.dart';
@@ -35,13 +35,14 @@ import 'blocs/input_field_blocs/categorie_input_field_bloc/categorie_input_field
 import 'blocs/input_field_blocs/subcategorie_input_field_bloc/subcategorie_input_field_cubit.dart';
 import 'blocs/button_blocs/transaction_stats_toggle_buttons_bloc/transaction_stats_toggle_buttons_cubit.dart';
 import 'blocs/input_field_blocs/date_input_field_bloc/date_input_field_cubit.dart';
-import '/blocs/input_field_blocs/account_input_field_bloc/to_account_input_field_cubit.dart';
+import 'blocs/input_field_blocs/account_type_input_field_bloc/account_type_input_field_cubit.dart';
+import 'blocs/input_field_blocs/account_input_field_bloc/to_account_input_field_cubit.dart';
 
 import '/components/bottom_nav_bar/bottom_nav_bar.dart';
 
 import 'screens/budget_screens/overview_budgets_screen.dart';
-import '/screens/booking_screens/create_or_edit_booking_screen.dart';
-import '/screens/account_screens/create_or_edit_account_screen.dart';
+import 'screens/booking_screens/create_or_edit_booking_screen.dart';
+import 'screens/account_screens/create_or_edit_account_screen.dart';
 import 'screens/categorie_screens/create_or_edit_categorie_screen.dart';
 import 'screens/categorie_screens/create_or_edit_subcategorie_screen.dart';
 import 'screens/categorie_screens/categories_screen.dart';
@@ -76,6 +77,9 @@ void main() async {
         BlocProvider<BookingBloc>(
           create: (context) => BookingBloc(),
         ),
+        BlocProvider<AccountBloc>(
+          create: (context) => AccountBloc(),
+        ),
         BlocProvider<TextInputFieldCubit>(
           create: (context) => TextInputFieldCubit(),
         ),
@@ -99,6 +103,9 @@ void main() async {
         ),
         BlocProvider<DateInputFieldCubit>(
           create: (context) => DateInputFieldCubit(),
+        ),
+        BlocProvider<AccountTypeInputFieldCubit>(
+          create: (context) => AccountTypeInputFieldCubit(),
         ),
       ],
       child: const BudgetBookApp(),
@@ -137,6 +144,7 @@ class BudgetBookApp extends StatelessWidget {
       home: const SplashScreen(),
       routes: {
         createOrEditBookingRoute: (context) => const CreateOrEditBookingScreen(),
+        createOrEditAccountRoute: (context) => const CreateOrEditAccountScreen(),
         categoriesRoute: (context) => const CategoriesScreen(),
         overviewBudgetsRoute: (context) => const OverviewBudgetsScreen(),
         settingsRoute: (context) => const SettingsScreen(),
@@ -159,23 +167,14 @@ class BudgetBookApp extends StatelessWidget {
               ),
               settings: settings,
             );
-          /*case createOrEditBookingRoute:
-            final args = settings.arguments as CreateOrEditBookingScreenArguments;
-            return MaterialPageRoute<String>(
-              builder: (BuildContext context) => CreateOrEditBookingScreen(
-                bookingBoxIndex: args.bookingBoxIndex,
-                serieEditMode: args.serieEditMode,
-              ),
-              settings: settings,
-            );*/
-          case createOrEditAccountRoute:
+          /*case createOrEditAccountRoute:
             final args = settings.arguments as CreateOrEditAccountScreenArguments;
             return MaterialPageRoute<String>(
               builder: (BuildContext context) => CreateOrEditAccountScreen(
                 accountBoxIndex: args.accountBoxIndex,
               ),
               settings: settings,
-            );
+            );*/
           case createOrEditCategorieRoute:
             final args = settings.arguments as CreateOrEditCategorieScreenArguments;
             return MaterialPageRoute<String>(

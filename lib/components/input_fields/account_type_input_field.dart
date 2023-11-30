@@ -7,22 +7,13 @@ import '/models/enums/account_types.dart';
 
 // TODO hier weitermachen und Account Type Eingabefeld auf Bloc umziehen siehe andere Eingabefelder als Beispiel
 class AccountTypeInputField extends StatelessWidget {
-  final TextEditingController textController;
-  final String errorText;
-  List<String> accountTypes = [
-    AccountType.account.name,
-    AccountType.capitalInvestments.name,
-    AccountType.cash.name,
-    AccountType.card.name,
-    AccountType.insurance.name,
-    AccountType.credit.name,
-    AccountType.other.name,
-  ];
+  final dynamic cubit;
+  final FocusNode focusNode;
 
-  AccountTypeInputField({
+  const AccountTypeInputField({
     Key? key,
-    required this.textController,
-    required this.errorText,
+    required this.cubit,
+    required this.focusNode,
   }) : super(key: key);
 
   void _openBottomSheetWithAccountTypeList(BuildContext context) {
@@ -42,23 +33,23 @@ class AccountTypeInputField extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.only(top: 16.0),
                   child: SizedBox(
-                    height: 460.0,
+                    height: 460.0, // TODO dynamisch machen
                     child: ListView.builder(
-                      itemCount: accountTypes.length,
+                      itemCount: AccountType.values.length,
                       itemBuilder: (BuildContext context, int index) {
                         return Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 30.0, vertical: 4.0),
                           child: ListTile(
-                            title: Text(accountTypes[index], textAlign: TextAlign.center),
+                            title: Text(AccountType.values[index].name, textAlign: TextAlign.center),
                             onTap: () => {
-                              textController.text = accountTypes[index],
+                              cubit.updateValue(AccountType.values[index].name),
                               Navigator.pop(context),
                             },
                             visualDensity: const VisualDensity(vertical: -4.0),
                             shape: RoundedRectangleBorder(
                               side: BorderSide(
-                                  color: textController.text == accountTypes[index] ? Colors.cyanAccent.shade400 : Colors.grey,
-                                  width: textController.text == accountTypes[index] ? 1.2 : 0.4),
+                                  color: cubit.state.accountType == AccountType.values[index].name ? Colors.cyanAccent.shade400 : Colors.grey,
+                                  width: cubit.state.accountType == AccountType.values[index].name ? 1.2 : 0.4),
                               borderRadius: BorderRadius.circular(8.0),
                             ),
                             tileColor: Colors.grey.shade800,
@@ -79,7 +70,9 @@ class AccountTypeInputField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
-      controller: textController,
+      key: UniqueKey(),
+      focusNode: focusNode,
+      initialValue: cubit.state.accountType,
       textAlignVertical: TextAlignVertical.center,
       showCursor: false,
       readOnly: true,
@@ -93,7 +86,7 @@ class AccountTypeInputField extends StatelessWidget {
         focusedBorder: const UnderlineInputBorder(
           borderSide: BorderSide(color: Colors.cyanAccent, width: 1.5),
         ),
-        errorText: errorText.isEmpty ? null : errorText,
+        errorText: cubit.state.errorText.isEmpty ? null : cubit.state.errorText,
       ),
     );
   }

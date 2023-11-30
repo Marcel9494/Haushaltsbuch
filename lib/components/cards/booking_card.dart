@@ -8,9 +8,6 @@ import '/models/booking/booking_model.dart';
 import '/models/enums/repeat_types.dart';
 import '/models/enums/serie_edit_modes.dart';
 import '/models/enums/transaction_types.dart';
-import '/models/screen_arguments/create_or_edit_booking_screen_arguments.dart';
-
-import '/utils/consts/route_consts.dart';
 
 import '../deco/bottom_sheet_line.dart';
 

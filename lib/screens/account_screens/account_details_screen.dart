@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:haushaltsbuch/models/account/account_repository.dart';
 
+import '../../blocs/account_bloc/account_bloc.dart';
 import '/components/buttons/month_picker_buttons.dart';
 import '/components/dialogs/choice_dialog.dart';
 import '/components/tab_views/monthly_booking_tab_view.dart';
@@ -46,10 +48,6 @@ class _AccountDetailsScreenState extends State<AccountDetailsScreen> {
     FocusScope.of(context).unfocus();
   }
 
-  void _editAccount() {
-    Navigator.pushNamed(context, createOrEditAccountRoute, arguments: CreateOrEditAccountScreenArguments(widget.account.boxIndex));
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -57,7 +55,7 @@ class _AccountDetailsScreenState extends State<AccountDetailsScreen> {
         title: Text(widget.account.name),
         actions: [
           IconButton(
-            onPressed: () => _editAccount(),
+            onPressed: () => BlocProvider.of<AccountBloc>(context).add(CreateOrLoadAccountEvent(context, widget.account.boxIndex)),
             icon: const Icon(Icons.edit_rounded),
           ),
           IconButton(

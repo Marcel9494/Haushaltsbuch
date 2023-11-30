@@ -34,7 +34,7 @@ class DateInputField extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.only(top: 16.0),
                   child: SizedBox(
-                    height: 584.0,
+                    height: 584.0, // TODO dynamisch machen
                     child: ListView.builder(
                       itemCount: RepeatType.values.length,
                       itemBuilder: (BuildContext context, int index) {
@@ -42,7 +42,6 @@ class DateInputField extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(horizontal: 30.0, vertical: 4.0),
                           child: ListTile(
                             title: Text(RepeatType.values[index].name, textAlign: TextAlign.center),
-                            // TODO Funktionalität in Cubit auslagern?
                             onTap: () => {
                               cubit.updateBookingRepeat(RepeatType.values[index].name),
                               if (RepeatType.values[index].name == RepeatType.beginningOfMonth.name)

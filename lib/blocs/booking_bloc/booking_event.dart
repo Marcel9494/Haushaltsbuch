@@ -1,5 +1,6 @@
 part of 'booking_bloc.dart';
 
+@immutable
 abstract class BookingEvents {}
 
 class CreateOrLoadBookingEvent extends BookingEvents {
