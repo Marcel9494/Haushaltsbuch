@@ -5,8 +5,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 
-import '../../blocs/account_bloc/account_bloc.dart';
-import '../../blocs/input_field_blocs/account_type_input_field_bloc/account_type_input_field_cubit.dart';
+import '/blocs/account_bloc/account_bloc.dart';
+import '/blocs/input_field_blocs/account_type_input_field_bloc/account_type_input_field_cubit.dart';
 import '/blocs/input_field_blocs/money_input_field_bloc/money_input_field_cubit.dart';
 import '/blocs/input_field_blocs/text_input_field_bloc/text_input_field_cubit.dart';
 
@@ -273,7 +273,9 @@ class _CreateOrEditAccountScreenState extends State<CreateOrEditAccountScreen> {
                         },
                       ),
                       // TODO PreselectAccountInputField(textController: _preselectedAccountTextController),
-                      SaveButton(saveFunction: _createOrUpdateAccount, buttonController: _saveButtonController),
+                      SaveButton(
+                          saveFunction: () => accountBloc.add(CreateOrUpdateAccountEvent(context, accountState.accountBoxIndex, _saveButtonController)),
+                          buttonController: _saveButtonController),
                     ],
                   ),
                 ),
