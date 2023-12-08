@@ -247,6 +247,7 @@ class BookingRepository extends BookingInterface {
       Booking booking = await bookingBox.getAt(i);
       if (booking.fromAccount == oldAccountName) {
         Booking updatedBookingWithNewAccountName = Booking()
+          ..boxIndex = i
           ..transactionType = booking.transactionType
           ..bookingRepeats = booking.bookingRepeats
           ..title = booking.title
@@ -262,6 +263,7 @@ class BookingRepository extends BookingInterface {
       }
       if (booking.toAccount == oldAccountName) {
         Booking updatedBookingWithNewAccountName = Booking()
+          ..boxIndex = i
           ..transactionType = booking.transactionType
           ..bookingRepeats = booking.bookingRepeats
           ..title = booking.title

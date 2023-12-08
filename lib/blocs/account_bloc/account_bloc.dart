@@ -44,13 +44,15 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
     TextInputFieldCubit accountNameInputFieldCubit = BlocProvider.of<TextInputFieldCubit>(context);
     MoneyInputFieldCubit accountBalanceInputFieldCubit = BlocProvider.of<MoneyInputFieldCubit>(context);
     String transactionType = '';
-    double difference = 0.0;
+    double newBankBalance = 0.0;
+    double difference = (formatMoneyAmountToDouble(savedAccount.bankBalance) - formatMoneyAmountToDouble(accountBalanceInputFieldCubit.state.amount)).abs();
     if (formatMoneyAmountToDouble(savedAccount.bankBalance) >= formatMoneyAmountToDouble(accountBalanceInputFieldCubit.state.amount)) {
+      newBankBalance = formatMoneyAmountToDouble(accountBalanceInputFieldCubit.state.amount) + difference;
       transactionType = TransactionType.outcome.name;
     } else {
+      newBankBalance = formatMoneyAmountToDouble(accountBalanceInputFieldCubit.state.amount) - difference;
       transactionType = TransactionType.income.name;
     }
-    difference = (formatMoneyAmountToDouble(savedAccount.bankBalance) - formatMoneyAmountToDouble(accountBalanceInputFieldCubit.state.amount)).abs();
     Booking newBooking = Booking()
       ..transactionType = transactionType
       ..bookingRepeats = RepeatType.noRepetition.name
@@ -58,7 +60,7 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
       ..date = DateTime.now().toString()
       ..amount = formatToMoneyAmount(difference.toString())
       ..categorie = 'Differenz'
-      ..subcategorie = 'Differenz'
+      ..subcategorie = ''
       ..fromAccount = accountNameInputFieldCubit.state.text
       ..toAccount = accountNameInputFieldCubit.state.text
       ..serieId = -1
@@ -67,7 +69,7 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
     Account updatedAccount = Account()
       ..boxIndex = savedAccount.boxIndex
       ..accountType = accountTypeInputFieldCubit.state.accountType
-      ..bankBalance = accountBalanceInputFieldCubit.state.amount
+      ..bankBalance = formatToMoneyAmount(newBankBalance.toString())
       ..name = accountNameInputFieldCubit.state.text;
     accountRepository.update(updatedAccount, savedAccount.boxIndex, savedAccount.name);
     for (int i = 0; i < 4; i++) {
@@ -122,7 +124,6 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
           ..name = accountNameInputFieldCubit.state.text;
         accountRepository.create(newAccount);
       } else {
-        // TODO hier weitermachen Betrag wird 2x gutgeschrieben bzw. abgezogen + Code danach vereinfachen und aufräumen
         if (savedAccount.bankBalance != accountBalanceInputFieldCubit.state.amount) {
           showChoiceDialog(
               event.context,
