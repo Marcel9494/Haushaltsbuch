@@ -138,7 +138,6 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
             ..bankBalance = accountBalanceInputFieldCubit.state.amount
             ..name = accountNameInputFieldCubit.state.text;
           accountRepository.update(updatedAccount, event.accountBoxIndex, savedAccount.name);
-          // TODO _updateAccount();
         }
       }
       event.saveButtonController.success();

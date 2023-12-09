@@ -169,41 +169,6 @@ class _CreateOrEditAccountScreenState extends State<CreateOrEditAccountScreen> {
     }
   }
 
-  void _recordBooking() {
-    String transactionType = '';
-    double difference = 0.0;
-    if (_oldBankBalance >= formatMoneyAmountToDouble(_bankBalanceTextController.text)) {
-      transactionType = TransactionType.outcome.name;
-    } else {
-      transactionType = TransactionType.income.name;
-    }
-    difference = (_oldBankBalance - formatMoneyAmountToDouble(_bankBalanceTextController.text)).abs();
-    Booking newBooking = Booking()
-      ..transactionType = transactionType
-      ..bookingRepeats = RepeatType.noRepetition.name
-      ..title = 'Betrag Änderung'
-      ..date = DateTime.now().toString()
-      ..amount = formatToMoneyAmount(difference.toString())
-      ..categorie = 'Differenz'
-      ..fromAccount = _accountNameController.text
-      ..toAccount = _accountNameController.text;
-    // TODO newBooking.createBooking();
-    // TODO entfernen? newBooking.createBooking(newBooking);
-    //accountRepository.update(_account, widget.accountBoxIndex, _loadedAccount.name);
-    for (int i = 0; i < 4; i++) {
-      Navigator.pop(context);
-    }
-    Navigator.pushNamed(context, bottomNavBarRoute, arguments: BottomNavBarScreenArguments(2));
-  }
-
-  void _noPressed() {
-    //accountRepository.update(_account, widget.accountBoxIndex, _loadedAccount.name);
-    for (int i = 0; i < 4; i++) {
-      Navigator.pop(context);
-    }
-    Navigator.pushNamed(context, bottomNavBarRoute, arguments: BottomNavBarScreenArguments(2));
-  }
-
   void _updateAccount() {
     //accountRepository.update(_account, widget.accountBoxIndex, _loadedAccount.name);
     _navigateToAccountScreen();
@@ -272,7 +237,7 @@ class _CreateOrEditAccountScreenState extends State<CreateOrEditAccountScreen> {
                               focusNode: accountBalanceFocusNode, cubit: accountBalanceInputFieldCubit, hintText: 'Kontostand', bottomSheetTitle: 'Kontostand eingeben:');
                         },
                       ),
-                      // TODO PreselectAccountInputField(textController: _preselectedAccountTextController),
+                      // TODO hier weitermachen und vorselektierte Kontos implementieren PreselectAccountInputField(textController: _preselectedAccountTextController),
                       SaveButton(
                           saveFunction: () => accountBloc.add(CreateOrUpdateAccountEvent(context, accountState.accountBoxIndex, _saveButtonController)),
                           buttonController: _saveButtonController),
