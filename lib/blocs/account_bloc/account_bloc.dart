@@ -31,15 +31,7 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
   BookingRepository bookingRepository = BookingRepository();
   Account savedAccount = Account();
 
-  void noPressed(BuildContext context) {
-    //accountRepository.update(_account, widget.accountBoxIndex, _loadedAccount.name);
-    for (int i = 0; i < 4; i++) {
-      Navigator.pop(context);
-    }
-    Navigator.pushNamed(context, bottomNavBarRoute, arguments: BottomNavBarScreenArguments(2));
-  }
-
-  void recordBooking(BuildContext context) {
+  void onPress(BuildContext context, bool recordBooking) {
     AccountTypeInputFieldCubit accountTypeInputFieldCubit = BlocProvider.of<AccountTypeInputFieldCubit>(context);
     TextInputFieldCubit accountNameInputFieldCubit = BlocProvider.of<TextInputFieldCubit>(context);
     MoneyInputFieldCubit accountBalanceInputFieldCubit = BlocProvider.of<MoneyInputFieldCubit>(context);
@@ -53,19 +45,23 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
       newBankBalance = formatMoneyAmountToDouble(accountBalanceInputFieldCubit.state.amount) - difference;
       transactionType = TransactionType.income.name;
     }
-    Booking newBooking = Booking()
-      ..transactionType = transactionType
-      ..bookingRepeats = RepeatType.noRepetition.name
-      ..title = 'Betrag Änderung'
-      ..date = DateTime.now().toString()
-      ..amount = formatToMoneyAmount(difference.toString())
-      ..categorie = 'Differenz'
-      ..subcategorie = ''
-      ..fromAccount = accountNameInputFieldCubit.state.text
-      ..toAccount = accountNameInputFieldCubit.state.text
-      ..serieId = -1
-      ..booked = true;
-    bookingRepository.create(newBooking);
+    if (recordBooking) {
+      Booking newBooking = Booking()
+        ..transactionType = transactionType
+        ..bookingRepeats = RepeatType.noRepetition.name
+        ..title = 'Betrag Änderung'
+        ..date = DateTime.now().toString()
+        ..amount = formatToMoneyAmount(difference.toString())
+        ..categorie = 'Differenz'
+        ..subcategorie = ''
+        ..fromAccount = accountNameInputFieldCubit.state.text
+        ..toAccount = accountNameInputFieldCubit.state.text
+        ..serieId = -1
+        ..booked = true;
+      bookingRepository.create(newBooking);
+    } else {
+      accountRepository.calculateNewAccountBalance(accountNameInputFieldCubit.state.text, formatToMoneyAmount(difference.toString()), transactionType);
+    }
     Account updatedAccount = Account()
       ..boxIndex = savedAccount.boxIndex
       ..accountType = accountTypeInputFieldCubit.state.accountType
@@ -128,8 +124,8 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
           showChoiceDialog(
               event.context,
               'Buchung erfassen?',
-              () => recordBooking(event.context),
-              () => noPressed(event.context),
+              () => onPress(event.context, true),
+              () => onPress(event.context, false),
               'Buchung wurde erstellt',
               'Buchung wurde erfolgreich erstellt.',
               Icons.info_outline,
