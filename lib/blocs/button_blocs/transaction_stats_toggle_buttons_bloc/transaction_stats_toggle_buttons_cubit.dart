@@ -1,8 +1,9 @@
-import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../input_field_blocs/categorie_input_field_bloc/categorie_input_field_cubit.dart';
+import '../../input_field_blocs/subcategorie_input_field_bloc/subcategorie_input_field_cubit.dart';
+
 import '/models/enums/transaction_types.dart';
 
 part 'transaction_stats_toggle_buttons_model.dart';
@@ -17,6 +18,7 @@ class TransactionStatsToggleButtonsCubit extends Cubit<TransactionStatsToggleBut
 
   void setSelectedTransaction(int selectedIndex, List<bool> selectedTransaction, BuildContext context) {
     BlocProvider.of<CategorieInputFieldCubit>(context).resetValue();
+    BlocProvider.of<SubcategorieInputFieldCubit>(context).resetValue();
     for (int i = 0; i < selectedTransaction.length; i++) {
       selectedTransaction[i] = i == selectedIndex;
     }

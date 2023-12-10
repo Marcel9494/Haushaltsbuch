@@ -186,6 +186,7 @@ class BookingBloc extends Bloc<BookingEvents, BookingState> {
       }
       event.saveButtonController.success();
       await Future.delayed(const Duration(milliseconds: transitionInMs));
+      Navigator.pop(event.context);
       Navigator.popAndPushNamed(event.context, bottomNavBarRoute, arguments: BottomNavBarScreenArguments(0));
     });
 

@@ -54,17 +54,26 @@ class BookingCard extends StatelessWidget {
                   Column(
                     children: [
                       ListTile(
-                        onTap: () => BlocProvider.of<BookingBloc>(context).add(CreateOrLoadBookingEvent(context, booking.boxIndex, SerieEditModeType.single)),
+                        onTap: () => {
+                          Navigator.pop(context),
+                          BlocProvider.of<BookingBloc>(context).add(CreateOrLoadBookingEvent(context, booking.boxIndex, SerieEditModeType.single)),
+                        },
                         leading: const Icon(Icons.looks_one_outlined, color: Colors.cyanAccent),
                         title: const Text('Nur diese Buchung'),
                       ),
                       ListTile(
-                        onTap: () => BlocProvider.of<BookingBloc>(context).add(CreateOrLoadBookingEvent(context, booking.boxIndex, SerieEditModeType.onlyFuture)),
+                        onTap: () => {
+                          Navigator.pop(context),
+                          BlocProvider.of<BookingBloc>(context).add(CreateOrLoadBookingEvent(context, booking.boxIndex, SerieEditModeType.onlyFuture)),
+                        },
                         leading: const Icon(Icons.repeat_on_outlined, color: Colors.cyanAccent),
                         title: const Text('Alle zukünftige Buchungen'),
                       ),
                       ListTile(
-                        onTap: () => BlocProvider.of<BookingBloc>(context).add(CreateOrLoadBookingEvent(context, booking.boxIndex, SerieEditModeType.all)),
+                        onTap: () => {
+                          Navigator.pop(context),
+                          BlocProvider.of<BookingBloc>(context).add(CreateOrLoadBookingEvent(context, booking.boxIndex, SerieEditModeType.all)),
+                        },
                         leading: const Icon(Icons.all_inclusive_rounded, color: Colors.cyanAccent),
                         title: const Text('Alle Buchungen'),
                       ),

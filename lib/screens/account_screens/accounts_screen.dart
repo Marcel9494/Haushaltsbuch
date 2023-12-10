@@ -45,7 +45,10 @@ class _AccountsScreenState extends State<AccountsScreen> {
               Column(
                 children: [
                   ListTile(
-                    onTap: () => BlocProvider.of<AccountBloc>(context).add(CreateOrLoadAccountEvent(context, -1)),
+                    onTap: () => {
+                      Navigator.pop(context),
+                      BlocProvider.of<AccountBloc>(context).add(CreateOrLoadAccountEvent(context, -1)),
+                    },
                     leading: const Icon(Icons.add_circle_outline_rounded, color: Colors.cyanAccent),
                     title: const Text('Konto erstellen'),
                   ),

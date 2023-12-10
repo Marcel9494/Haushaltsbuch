@@ -127,6 +127,8 @@ class BookingRepository extends BookingInterface {
     }
   }
 
+  // TODO hier weitermachen Bug beheben Buchung kann unter bestimmten Bedingungen nicht mehr bearbeitet werden
+  // TODO wird hier for Schleife über Bookings überhaupt benötigt? Kann nicht gleich templateBooking verwendet werden?
   @override
   void updateSingleBooking(Booking templateBooking, Booking oldBooking, int bookingBoxIndex) async {
     var bookingBox = await Hive.openBox(bookingsBox);
