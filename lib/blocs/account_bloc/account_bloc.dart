@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:haushaltsbuch/blocs/input_field_blocs/preselect_account_input_field_bloc/preselect_account_input_field_cubit.dart';
 
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 
@@ -80,10 +81,12 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
       AccountTypeInputFieldCubit accountTypeInputFieldCubit = BlocProvider.of<AccountTypeInputFieldCubit>(event.context);
       TextInputFieldCubit accountNameInputFieldCubit = BlocProvider.of<TextInputFieldCubit>(event.context);
       MoneyInputFieldCubit accountBalanceInputFieldCubit = BlocProvider.of<MoneyInputFieldCubit>(event.context);
+      PreselectAccountInputFieldCubit preselectAccountInputFieldCubit = BlocProvider.of<PreselectAccountInputFieldCubit>(event.context);
 
       accountTypeInputFieldCubit.resetValue();
       accountNameInputFieldCubit.resetValue();
       accountBalanceInputFieldCubit.resetValue();
+      preselectAccountInputFieldCubit.resetValue();
 
       if (event.accountBoxIndex != -1) {
         Account loadedAccount = await accountRepository.load(event.accountBoxIndex);

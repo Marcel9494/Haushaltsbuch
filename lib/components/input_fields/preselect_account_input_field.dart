@@ -8,11 +8,13 @@ import '/models/enums/preselect_account_types.dart';
 import '../deco/bottom_sheet_line.dart';
 
 class PreselectAccountInputField extends StatefulWidget {
-  final TextEditingController textController;
+  final dynamic cubit;
+  final FocusNode focusNode;
 
   const PreselectAccountInputField({
     Key? key,
-    required this.textController,
+    required this.cubit,
+    required this.focusNode,
   }) : super(key: key);
 
   @override
@@ -160,17 +162,18 @@ class _PreselectAccountInputFieldState extends State<PreselectAccountInputField>
   void _setPreselectedAccountText(bool isNewAccountSelected, String newText) {
     String separator = ', ';
     if (isNewAccountSelected) {
-      widget.textController.text += widget.textController.text.isEmpty ? newText : separator + newText;
+      String text = widget.cubit.state.preselectedAccount.isEmpty ? newText : separator + newText;
+      widget.cubit.updateValue(widget.cubit.state.preselectedAccount + text);
     } else {
-      widget.textController.text = widget.textController.text.replaceFirst(newText, '');
-      if (widget.textController.text.startsWith(separator)) {
-        widget.textController.text = widget.textController.text.replaceFirst(separator, '');
+      widget.cubit.updateValue(widget.cubit.state.preselectedAccount.replaceFirst(newText, ''));
+      if (widget.cubit.state.preselectedAccount.startsWith(separator)) {
+        widget.cubit.updateValue(widget.cubit.state.preselectedAccount.replaceFirst(separator, ''));
       }
-      if (widget.textController.text.endsWith(separator)) {
-        widget.textController.text = widget.textController.text.substring(0, widget.textController.text.length - 2);
+      if (widget.cubit.state.preselectedAccount.endsWith(separator)) {
+        widget.cubit.updateValue(widget.cubit.state.preselectedAccount.substring(0, widget.cubit.state.preselectedAccount.length - 2));
       }
-      if (widget.textController.text.contains(separator + ',')) {
-        widget.textController.text = widget.textController.text.replaceFirst(separator + ',', ',');
+      if (widget.cubit.state.preselectedAccount.contains(separator + ',')) {
+        widget.cubit.updateValue(widget.cubit.state.preselectedAccount.replaceFirst(separator + ',', ','));
       }
     }
   }
@@ -183,18 +186,20 @@ class _PreselectAccountInputFieldState extends State<PreselectAccountInputField>
   }
 
   void _setPrimaryAccounts() {
-    widget.textController.text.contains(PreselectAccountType.income.name) ? preselectedAccount[0] = true : preselectedAccount[0] = false;
-    widget.textController.text.contains(PreselectAccountType.outcome.name) ? preselectedAccount[1] = true : preselectedAccount[1] = false;
-    widget.textController.text.contains(PreselectAccountType.transferFrom.name) ? preselectedAccount[2] = true : preselectedAccount[2] = false;
-    widget.textController.text.contains(PreselectAccountType.transferTo.name) ? preselectedAccount[3] = true : preselectedAccount[3] = false;
-    widget.textController.text.contains(PreselectAccountType.investmentFrom.name) ? preselectedAccount[4] = true : preselectedAccount[4] = false;
-    widget.textController.text.contains(PreselectAccountType.investmentTo.name) ? preselectedAccount[5] = true : preselectedAccount[5] = false;
+    widget.cubit.state.preselectedAccount.contains(PreselectAccountType.income.name) ? preselectedAccount[0] = true : preselectedAccount[0] = false;
+    widget.cubit.state.preselectedAccount.contains(PreselectAccountType.outcome.name) ? preselectedAccount[1] = true : preselectedAccount[1] = false;
+    widget.cubit.state.preselectedAccount.contains(PreselectAccountType.transferFrom.name) ? preselectedAccount[2] = true : preselectedAccount[2] = false;
+    widget.cubit.state.preselectedAccount.contains(PreselectAccountType.transferTo.name) ? preselectedAccount[3] = true : preselectedAccount[3] = false;
+    widget.cubit.state.preselectedAccount.contains(PreselectAccountType.investmentFrom.name) ? preselectedAccount[4] = true : preselectedAccount[4] = false;
+    widget.cubit.state.preselectedAccount.contains(PreselectAccountType.investmentTo.name) ? preselectedAccount[5] = true : preselectedAccount[5] = false;
   }
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
-      controller: widget.textController,
+      key: UniqueKey(),
+      focusNode: widget.focusNode,
+      initialValue: widget.cubit.state.preselectedAccount,
       textAlignVertical: TextAlignVertical.center,
       showCursor: false,
       readOnly: true,
@@ -208,7 +213,6 @@ class _PreselectAccountInputFieldState extends State<PreselectAccountInputField>
         focusedBorder: UnderlineInputBorder(
           borderSide: BorderSide(color: Colors.cyanAccent, width: 1.5),
         ),
-        // TODO errorText: widget.errorText.isEmpty ? null : widget.errorText,
       ),
     );
   }

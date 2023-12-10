@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:haushaltsbuch/blocs/input_field_blocs/preselect_account_input_field_bloc/preselect_account_input_field_cubit.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -97,6 +98,9 @@ void main() async {
         ),
         BlocProvider<ToAccountInputFieldCubit>(
           create: (context) => ToAccountInputFieldCubit(),
+        ),
+        BlocProvider<PreselectAccountInputFieldCubit>(
+          create: (context) => PreselectAccountInputFieldCubit(),
         ),
         BlocProvider<TransactionStatsToggleButtonsCubit>(
           create: (context) => TransactionStatsToggleButtonsCubit(),

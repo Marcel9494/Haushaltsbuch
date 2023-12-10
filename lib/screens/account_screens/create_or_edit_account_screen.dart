@@ -6,11 +6,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 
 import '/blocs/account_bloc/account_bloc.dart';
-import '/blocs/input_field_blocs/account_type_input_field_bloc/account_type_input_field_cubit.dart';
-import '/blocs/input_field_blocs/money_input_field_bloc/money_input_field_cubit.dart';
 import '/blocs/input_field_blocs/text_input_field_bloc/text_input_field_cubit.dart';
+import '/blocs/input_field_blocs/money_input_field_bloc/money_input_field_cubit.dart';
+import '/blocs/input_field_blocs/account_type_input_field_bloc/account_type_input_field_cubit.dart';
+import '/blocs/input_field_blocs/preselect_account_input_field_bloc/preselect_account_input_field_cubit.dart';
 
-import '/components/dialogs/choice_dialog.dart';
 import '/components/deco/loading_indicator.dart';
 import '/components/input_fields/account_type_input_field.dart';
 import '/components/input_fields/money_input_field.dart';
@@ -18,10 +18,7 @@ import '/components/input_fields/text_input_field.dart';
 import '/components/input_fields/preselect_account_input_field.dart';
 import '/components/buttons/save_button.dart';
 
-import '/models/enums/repeat_types.dart';
-import '/models/booking/booking_model.dart';
 import '/models/account/account_model.dart';
-import '/models/enums/transaction_types.dart';
 import '/models/account/account_repository.dart';
 import '/models/primary_account/primary_account_model.dart';
 import '/models/primary_account/primary_account_repository.dart';
@@ -54,12 +51,14 @@ class _CreateOrEditAccountScreenState extends State<CreateOrEditAccountScreen> {
   late final AccountTypeInputFieldCubit accountTypeInputFieldCubit;
   late final TextInputFieldCubit accountNameInputFieldCubit;
   late final MoneyInputFieldCubit accountBalanceInputFieldCubit;
+  late final PreselectAccountInputFieldCubit preselectedAccountInputFieldCubit;
 
   UniqueKey accountNameFieldUniqueKey = UniqueKey();
 
   FocusNode accountTypeFocusNode = FocusNode();
   FocusNode accountNameFocusNode = FocusNode();
   FocusNode accountBalanceFocusNode = FocusNode();
+  FocusNode preselectedAccountFocusNode = FocusNode();
 
   String _accountNameErrorText = '';
   String _accountGroupErrorText = '';
@@ -75,6 +74,7 @@ class _CreateOrEditAccountScreenState extends State<CreateOrEditAccountScreen> {
     accountTypeInputFieldCubit = BlocProvider.of<AccountTypeInputFieldCubit>(context);
     accountNameInputFieldCubit = BlocProvider.of<TextInputFieldCubit>(context);
     accountBalanceInputFieldCubit = BlocProvider.of<MoneyInputFieldCubit>(context);
+    preselectedAccountInputFieldCubit = BlocProvider.of<PreselectAccountInputFieldCubit>(context);
     //if (widget.accountBoxIndex != -1) {
     //  _loadAccount();
     //}
@@ -237,7 +237,11 @@ class _CreateOrEditAccountScreenState extends State<CreateOrEditAccountScreen> {
                               focusNode: accountBalanceFocusNode, cubit: accountBalanceInputFieldCubit, hintText: 'Kontostand', bottomSheetTitle: 'Kontostand eingeben:');
                         },
                       ),
-                      // TODO hier weitermachen und vorselektierte Kontos implementieren PreselectAccountInputField(textController: _preselectedAccountTextController),
+                      BlocBuilder<PreselectAccountInputFieldCubit, PreselectAccountInputFieldModel>(
+                        builder: (context, state) {
+                          return PreselectAccountInputField(cubit: preselectedAccountInputFieldCubit, focusNode: preselectedAccountFocusNode);
+                        },
+                      ),
                       SaveButton(
                           saveFunction: () => accountBloc.add(CreateOrUpdateAccountEvent(context, accountState.accountBoxIndex, _saveButtonController)),
                           buttonController: _saveButtonController),
