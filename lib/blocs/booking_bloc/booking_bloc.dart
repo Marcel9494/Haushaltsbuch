@@ -66,7 +66,7 @@ class BookingBloc extends Bloc<BookingEvents, BookingState> {
         subcategorieInputFieldCubit.updateValue(loadedBooking.subcategorie);
 
         // Alte Buchungswerte speichern, damit bereits gebuchte Buchungen rückgängig gemacht werden können.
-        savedBooking.boxIndex = loadedBooking.boxIndex;
+        savedBooking.boxIndex = event.bookingBoxIndex;
         savedBooking.title = loadedBooking.title;
         savedBooking.transactionType = loadedBooking.transactionType;
         savedBooking.bookingRepeats = loadedBooking.bookingRepeats;

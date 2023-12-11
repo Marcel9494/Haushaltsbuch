@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:haushaltsbuch/blocs/input_field_blocs/preselect_account_input_field_bloc/preselect_account_input_field_cubit.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -29,6 +28,7 @@ import 'models/screen_arguments/create_or_edit_categorie_screen_arguments.dart';
 
 import 'blocs/booking_bloc/booking_bloc.dart';
 import 'blocs/account_bloc/account_bloc.dart';
+import 'blocs/primary_account_bloc/primary_account_bloc.dart';
 import 'blocs/input_field_blocs/text_input_field_bloc/text_input_field_cubit.dart';
 import 'blocs/input_field_blocs/money_input_field_bloc/money_input_field_cubit.dart';
 import 'blocs/input_field_blocs/account_input_field_bloc/from_account_input_field_cubit.dart';
@@ -38,6 +38,7 @@ import 'blocs/button_blocs/transaction_stats_toggle_buttons_bloc/transaction_sta
 import 'blocs/input_field_blocs/date_input_field_bloc/date_input_field_cubit.dart';
 import 'blocs/input_field_blocs/account_type_input_field_bloc/account_type_input_field_cubit.dart';
 import 'blocs/input_field_blocs/account_input_field_bloc/to_account_input_field_cubit.dart';
+import 'blocs/input_field_blocs/preselect_account_input_field_bloc/preselect_account_input_field_cubit.dart';
 
 import '/components/bottom_nav_bar/bottom_nav_bar.dart';
 
@@ -80,6 +81,9 @@ void main() async {
         ),
         BlocProvider<AccountBloc>(
           create: (context) => AccountBloc(),
+        ),
+        BlocProvider<PrimaryAccountBloc>(
+          create: (context) => PrimaryAccountBloc(),
         ),
         BlocProvider<TextInputFieldCubit>(
           create: (context) => TextInputFieldCubit(),
