@@ -27,7 +27,7 @@ class _PreselectAccountInputFieldState extends State<PreselectAccountInputField>
   List<bool> preselectedAccount = [false, false, false, false, false, false];
 
   void _openBottomSheetWithTransactionTypes(BuildContext context) {
-    BlocProvider.of<PrimaryAccountBloc>(context).add(LoadPrimaryAccountEvent());
+    BlocProvider.of<PrimaryAccountBloc>(context).add(LoadPrimaryAccountEvent(context));
     showCupertinoModalBottomSheet<void>(
       context: context,
       builder: (BuildContext context) {

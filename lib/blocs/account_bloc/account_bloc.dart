@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:haushaltsbuch/blocs/primary_account_bloc/primary_account_bloc.dart';
 
 import '/blocs/input_field_blocs/preselect_account_input_field_bloc/preselect_account_input_field_cubit.dart';
 
@@ -94,6 +95,7 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
         accountTypeInputFieldCubit.updateValue(loadedAccount.accountType);
         accountNameInputFieldCubit.updateValue(loadedAccount.name);
         accountBalanceInputFieldCubit.updateValue(loadedAccount.bankBalance);
+        // TODO preselectAccountInputFieldCubit.updateValue(loadedAccount.)
 
         savedAccount.boxIndex = event.accountBoxIndex;
         savedAccount.bankBalance = accountBalanceInputFieldCubit.state.amount;
@@ -117,12 +119,13 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
         });
         return;
       }
+      Account account = Account();
       if (event.accountBoxIndex == -1) {
-        Account newAccount = Account()
+        account = Account()
           ..accountType = accountTypeInputFieldCubit.state.accountType
           ..bankBalance = accountBalanceInputFieldCubit.state.amount
           ..name = accountNameInputFieldCubit.state.text;
-        accountRepository.create(newAccount);
+        accountRepository.create(account);
       } else {
         if (savedAccount.bankBalance != accountBalanceInputFieldCubit.state.amount) {
           showChoiceDialog(
@@ -136,14 +139,17 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
               'Der Betragsunterschied wurde in deinem Account gespeichert. Möchtest du die Differenz als ${formatMoneyAmountToDouble(savedAccount.bankBalance) >= formatMoneyAmountToDouble(accountBalanceInputFieldCubit.state.amount) ? TransactionType.outcome.name : TransactionType.income.name} erfassen?');
           return;
         } else {
-          Account updatedAccount = Account()
+          account = Account()
             ..boxIndex = event.accountBoxIndex
             ..accountType = accountTypeInputFieldCubit.state.accountType
             ..bankBalance = accountBalanceInputFieldCubit.state.amount
             ..name = accountNameInputFieldCubit.state.text;
-          accountRepository.update(updatedAccount, event.accountBoxIndex, savedAccount.name);
+          accountRepository.update(account, event.accountBoxIndex, savedAccount.name);
         }
       }
+      PrimaryAccountBloc primaryAccountBloc = BlocProvider.of<PrimaryAccountBloc>(event.context);
+      primaryAccountBloc.add(SavePrimaryAccountEvent(event.context, account.name, account.accountType));
+
       event.saveButtonController.success();
       await Future.delayed(const Duration(milliseconds: transitionInMs));
       Navigator.popAndPushNamed(event.context, bottomNavBarRoute, arguments: BottomNavBarScreenArguments(2));

@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 
+import '../../blocs/primary_account_bloc/primary_account_bloc.dart';
 import '/blocs/account_bloc/account_bloc.dart';
 import '/blocs/input_field_blocs/text_input_field_bloc/text_input_field_cubit.dart';
 import '/blocs/input_field_blocs/money_input_field_bloc/money_input_field_cubit.dart';
@@ -71,6 +72,7 @@ class _CreateOrEditAccountScreenState extends State<CreateOrEditAccountScreen> {
   void initState() {
     super.initState();
     accountBloc = BlocProvider.of<AccountBloc>(context);
+    BlocProvider.of<PrimaryAccountBloc>(context).add(LoadPrimaryAccountEvent(context));
     accountTypeInputFieldCubit = BlocProvider.of<AccountTypeInputFieldCubit>(context);
     accountNameInputFieldCubit = BlocProvider.of<TextInputFieldCubit>(context);
     accountBalanceInputFieldCubit = BlocProvider.of<MoneyInputFieldCubit>(context);
