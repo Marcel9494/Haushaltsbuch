@@ -128,17 +128,12 @@ class BookingRepository extends BookingInterface {
   }
 
   @override
-  void updateSingleBooking(Booking templateBooking, Booking oldBooking, int bookingBoxIndex) async {
+  void updateSingleBooking(Booking updatedBooking, Booking oldBooking, int bookingBoxIndex) async {
     var bookingBox = await Hive.openBox(bookingsBox);
-    for (int i = 0; i < bookingBox.length; i++) {
-      Booking booking = await bookingBox.getAt(i);
-      if (booking.boxIndex == bookingBoxIndex) {
-        bookingBox.putAt(bookingBoxIndex, templateBooking);
-        if (booking.booked) {
-          accountRepository.undoneAccountBooking(oldBooking);
-          executeAccountTransaction(templateBooking);
-        }
-      }
+    bookingBox.putAt(bookingBoxIndex, updatedBooking);
+    if (updatedBooking.booked) {
+      accountRepository.undoneAccountBooking(oldBooking);
+      executeAccountTransaction(updatedBooking);
     }
   }
 
@@ -245,7 +240,8 @@ class BookingRepository extends BookingInterface {
     var bookingBox = await Hive.openBox(bookingsBox);
     for (int i = 0; i < bookingBox.length; i++) {
       Booking booking = await bookingBox.getAt(i);
-      if (booking.fromAccount == oldAccountName) {
+      // if für Performanceverbesserung => nur betroffene Buchungen werden geupdatet
+      if (booking.fromAccount == oldAccountName || booking.toAccount == oldAccountName) {
         Booking updatedBookingWithNewAccountName = Booking()
           ..transactionType = booking.transactionType
           ..bookingRepeats = booking.bookingRepeats
@@ -254,26 +250,11 @@ class BookingRepository extends BookingInterface {
           ..amount = booking.amount
           ..categorie = booking.categorie
           ..subcategorie = booking.subcategorie
-          ..fromAccount = newAccountName
-          ..toAccount = booking.toAccount
+          ..fromAccount = booking.fromAccount == oldAccountName ? newAccountName : oldAccountName
+          ..toAccount = booking.toAccount == oldAccountName ? newAccountName : oldAccountName
           ..serieId = booking.serieId
           ..booked = booking.booked;
-        bookingBox.putAt(updatedBookingWithNewAccountName.boxIndex, updatedBookingWithNewAccountName);
-      }
-      if (booking.toAccount == oldAccountName) {
-        Booking updatedBookingWithNewAccountName = Booking()
-          ..transactionType = booking.transactionType
-          ..bookingRepeats = booking.bookingRepeats
-          ..title = booking.title
-          ..date = booking.date
-          ..amount = booking.amount
-          ..categorie = booking.categorie
-          ..subcategorie = booking.subcategorie
-          ..fromAccount = booking.fromAccount
-          ..toAccount = newAccountName
-          ..serieId = booking.serieId
-          ..booked = booking.booked;
-        bookingBox.putAt(updatedBookingWithNewAccountName.boxIndex, updatedBookingWithNewAccountName);
+        bookingBox.putAt(i, updatedBookingWithNewAccountName);
       }
     }
   }

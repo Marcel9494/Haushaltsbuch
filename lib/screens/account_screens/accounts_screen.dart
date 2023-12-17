@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+
+import '/blocs/account_bloc/account_bloc.dart';
 
 import '/components/tab_views/asset_future_development_statistic_tab_view.dart';
 import '/components/tab_views/asset_development_statistic_tab_view.dart';
@@ -13,7 +16,6 @@ import '/utils/consts/route_consts.dart';
 
 import '/models/booking/booking_repository.dart';
 import '/models/account/account_repository.dart';
-import '/models/screen_arguments/create_or_edit_account_screen_arguments.dart';
 
 class AccountsScreen extends StatefulWidget {
   const AccountsScreen({Key? key}) : super(key: key);
@@ -43,7 +45,10 @@ class _AccountsScreenState extends State<AccountsScreen> {
               Column(
                 children: [
                   ListTile(
-                    onTap: () => Navigator.popAndPushNamed(context, createOrEditAccountRoute, arguments: CreateOrEditAccountScreenArguments(-1)),
+                    onTap: () => {
+                      Navigator.pop(context),
+                      BlocProvider.of<AccountBloc>(context).add(CreateOrLoadAccountEvent(context, -1)),
+                    },
                     leading: const Icon(Icons.add_circle_outline_rounded, color: Colors.cyanAccent),
                     title: const Text('Konto erstellen'),
                   ),

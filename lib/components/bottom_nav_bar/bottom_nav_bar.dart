@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '/blocs/booking_bloc/booking_bloc.dart';
 
 import '/screens/booking_screens/bookings_screen.dart';
-import '../../screens/budget_screens/budgets_screen.dart';
+import '/screens/budget_screens/budgets_screen.dart';
 import '/screens/account_screens/accounts_screen.dart';
 
 import '/models/enums/serie_edit_modes.dart';
