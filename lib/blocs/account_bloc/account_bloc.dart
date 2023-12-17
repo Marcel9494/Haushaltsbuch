@@ -152,8 +152,8 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
 
       event.saveButtonController.success();
       await Future.delayed(const Duration(milliseconds: transitionInMs));
+      Navigator.pop(event.context);
       Navigator.popAndPushNamed(event.context, bottomNavBarRoute, arguments: BottomNavBarScreenArguments(2));
     });
-    // TODO hier weitermachen und weitere Funktionalitäten von Konto in Bloc umziehen
   }
 }

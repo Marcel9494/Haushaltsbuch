@@ -8,7 +8,7 @@ class TextInputFieldCubit extends Cubit<TextInputFieldModel> {
   void resetValue() => emit(TextInputFieldModel("", ""));
   bool validateValue(String value) {
     if (value.isEmpty) {
-      emit(TextInputFieldModel(value, "Bitte geben Sie einen Titel für die Buchung ein."));
+      emit(TextInputFieldModel(value, "Bitte geben Sie einen Text ein."));
       return false;
     }
     return true;

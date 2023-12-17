@@ -23,7 +23,10 @@ class PrimaryAccountBloc extends Bloc<PrimaryAccountEvent, PrimaryAccountState> 
       // TODO hier weitermachen und Formatierung noch richtig implementieren
       for (int i = 0; i < loadedPrimaryAccounts.length; i++) {
         if (loadedPrimaryAccounts[i].accountName == accountNameInputFieldCubit.state.text) {
-          loadedTransactionTypes += loadedPrimaryAccounts[i].transactionType + ', ';
+          preselectAccountInputFieldCubit.state.preselectedAccount.isEmpty
+              ? preselectAccountInputFieldCubit.state.preselectedAccount = loadedPrimaryAccounts[i].transactionType
+              : preselectAccountInputFieldCubit.state.preselectedAccount += ', ' + loadedPrimaryAccounts[i].transactionType;
+          //loadedTransactionTypes += ;
         }
       }
       preselectAccountInputFieldCubit.updateValue(loadedTransactionTypes);
