@@ -12,6 +12,5 @@ class BudgetLoadingState extends BudgetState {
 class BudgetLoadedState extends BudgetState {
   final BuildContext context;
   final int budgetBoxIndex;
-  final BudgetModeType budgetModeType;
-  BudgetLoadedState(this.context, this.budgetBoxIndex, this.budgetModeType);
+  BudgetLoadedState(this.context, this.budgetBoxIndex);
 }

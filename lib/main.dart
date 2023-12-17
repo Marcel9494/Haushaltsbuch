@@ -23,9 +23,9 @@ import 'models/screen_arguments/edit_subbudget_screen_arguments.dart';
 import 'models/screen_arguments/bottom_nav_bar_screen_arguments.dart';
 import 'models/screen_arguments/account_details_screen_arguments.dart';
 import 'models/screen_arguments/categorie_amount_list_screen_arguments.dart';
-import 'models/screen_arguments/create_or_edit_budget_screen_arguments.dart';
 import 'models/screen_arguments/create_or_edit_categorie_screen_arguments.dart';
 
+import 'blocs/budget_bloc/budget_bloc.dart';
 import 'blocs/booking_bloc/booking_bloc.dart';
 import 'blocs/account_bloc/account_bloc.dart';
 import 'blocs/primary_account_bloc/primary_account_bloc.dart';
@@ -81,6 +81,9 @@ void main() async {
         ),
         BlocProvider<AccountBloc>(
           create: (context) => AccountBloc(),
+        ),
+        BlocProvider<BudgetBloc>(
+          create: (context) => BudgetBloc(),
         ),
         BlocProvider<PrimaryAccountBloc>(
           create: (context) => PrimaryAccountBloc(),
@@ -152,6 +155,7 @@ class BudgetBookApp extends StatelessWidget {
       home: const SplashScreen(),
       routes: {
         createOrEditBookingRoute: (context) => const CreateOrEditBookingScreen(),
+        createOrEditBudgetRoute: (context) => const CreateOrEditBudgetScreen(),
         createOrEditAccountRoute: (context) => const CreateOrEditAccountScreen(),
         categoriesRoute: (context) => const CategoriesScreen(),
         overviewBudgetsRoute: (context) => const OverviewBudgetsScreen(),
@@ -175,14 +179,6 @@ class BudgetBookApp extends StatelessWidget {
               ),
               settings: settings,
             );
-          /*case createOrEditAccountRoute:
-            final args = settings.arguments as CreateOrEditAccountScreenArguments;
-            return MaterialPageRoute<String>(
-              builder: (BuildContext context) => CreateOrEditAccountScreen(
-                accountBoxIndex: args.accountBoxIndex,
-              ),
-              settings: settings,
-            );*/
           case createOrEditCategorieRoute:
             final args = settings.arguments as CreateOrEditCategorieScreenArguments;
             return MaterialPageRoute<String>(
@@ -199,16 +195,6 @@ class BudgetBookApp extends StatelessWidget {
                 categorie: args.categorie,
                 mode: args.mode,
                 subcategorieIndex: args.subcategorieIndex,
-              ),
-              settings: settings,
-            );
-          case createOrEditBudgetRoute:
-            final args = settings.arguments as CreateOrEditBudgetScreenArguments;
-            return MaterialPageRoute<String>(
-              builder: (BuildContext context) => CreateOrEditBudgetScreen(
-                budgetModeType: args.budgetModeType,
-                budgetBoxIndex: args.budgetBoxIndex,
-                budgetCategorie: args.budgetCategorie,
               ),
               settings: settings,
             );

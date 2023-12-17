@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../blocs/budget_bloc/budget_bloc.dart';
 import '/blocs/booking_bloc/booking_bloc.dart';
 
 import '/screens/booking_screens/bookings_screen.dart';
@@ -58,7 +59,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
           ? FloatingActionButton(
               onPressed: () => _selectedIndex == 0
                   ? BlocProvider.of<BookingBloc>(context).add(CreateOrLoadBookingEvent(context, -1, SerieEditModeType.none))
-                  : Navigator.pushNamed(context, createOrEditBudgetRoute, arguments: CreateOrEditBudgetScreenArguments(BudgetModeType.budgetCreationMode, -1)),
+                  : BlocProvider.of<BudgetBloc>(context).add(CreateBudgetEvent(context)),
               child: Container(
                 width: 60,
                 height: 60,
