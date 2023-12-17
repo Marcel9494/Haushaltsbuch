@@ -1,9 +1,16 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:hive/hive.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
+
+import '../../components/deco/loading_indicator.dart';
+import '/blocs/budget_bloc/budget_bloc.dart';
+import '/blocs/input_field_blocs/money_input_field_bloc/money_input_field_cubit.dart';
+import '/blocs/input_field_blocs/subcategorie_input_field_bloc/subcategorie_input_field_cubit.dart';
+import '/blocs/input_field_blocs/categorie_input_field_bloc/categorie_input_field_cubit.dart';
 
 import '/utils/consts/hive_consts.dart';
 import '/utils/consts/global_consts.dart';
@@ -45,6 +52,16 @@ class CreateOrEditBudgetScreen extends StatefulWidget {
 }
 
 class _CreateOrEditBudgetScreenState extends State<CreateOrEditBudgetScreen> {
+  late final BudgetBloc budgetBloc;
+
+  late final CategorieInputFieldCubit categorieInputFieldCubit;
+  late final SubcategorieInputFieldCubit subcategorieInputFieldCubit;
+  late final MoneyInputFieldCubit moneyInputFieldCubit;
+
+  FocusNode categorieFocusNode = FocusNode();
+  FocusNode subcategorieFocusNode = FocusNode();
+  FocusNode amountFocusNode = FocusNode();
+
   final TextEditingController _categorieTextController = TextEditingController();
   final TextEditingController _subcategorieTextController = TextEditingController();
   final TextEditingController _budgetTextController = TextEditingController();
@@ -61,6 +78,9 @@ class _CreateOrEditBudgetScreenState extends State<CreateOrEditBudgetScreen> {
   @override
   void initState() {
     super.initState();
+    categorieInputFieldCubit = BlocProvider.of<CategorieInputFieldCubit>(context);
+    subcategorieInputFieldCubit = BlocProvider.of<SubcategorieInputFieldCubit>(context);
+    moneyInputFieldCubit = BlocProvider.of<MoneyInputFieldCubit>(context);
     if (widget.budgetModeType == BudgetModeType.updateDefaultBudgetMode) {
       _loadDefaultBudget();
     } else if (widget.budgetBoxIndex != -1) {
@@ -290,36 +310,58 @@ class _CreateOrEditBudgetScreenState extends State<CreateOrEditBudgetScreen> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text(widget.budgetBoxIndex == -1 ? 'Budget erstellen' : 'Budget bearbeiten'),
-        ),
-        body: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 24.0),
-          child: Card(
-            color: const Color(0xff1c2b30),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(18.0),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                /*widget.budgetBoxIndex == -1
-                    ?  TODO CategorieInputField(
-                        textController: _categorieTextController,
-                        errorText: _categorieErrorText,
-                        categorieType: CategorieTypeExtension.getCategorieType(TransactionType.outcome.name),
-                        categorieStringCallback: (categorie) => setState(() => _categorieTextController.text = categorie),
-                        title: 'Kategorie für Budget auswählen:',
-                        autofocus: true)
-                    : const SizedBox(),*/
-                // TODO SubcategorieInputField(textController: _subcategorieTextController, categorieName: _categorieTextController.text),
-                // TODO MoneyInputField(textController: _budgetTextController, errorText: _budgetErrorText, hintText: 'Budget', bottomSheetTitle: 'Budget eingeben:'),
-                SaveButton(saveFunction: _saveBudget, buttonController: _saveButtonController),
-              ],
-            ),
-          ),
-        ),
+      child: BlocBuilder<BudgetBloc, BudgetState>(
+        builder: (context, budgetState) {
+          if (budgetState is BudgetLoadingState) {
+            return const LoadingIndicator();
+          } else if (budgetState is BudgetLoadedState) {
+            return Scaffold(
+              appBar: AppBar(
+                title: Text(widget.budgetBoxIndex == -1 ? 'Budget erstellen' : 'Budget bearbeiten'),
+              ),
+              body: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 24.0),
+                child: Card(
+                  color: const Color(0xff1c2b30),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(18.0),
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      widget.budgetBoxIndex == -1
+                          ? BlocBuilder<CategorieInputFieldCubit, CategorieInputFieldModel>(
+                              builder: (context, state) {
+                                return CategorieInputField(
+                                  cubit: categorieInputFieldCubit,
+                                  focusNode: categorieFocusNode,
+                                  categorieType: CategorieTypeExtension.getCategorieType(TransactionType.outcome.name),
+                                );
+                              },
+                            )
+                          : const SizedBox(),
+                      BlocBuilder<SubcategorieInputFieldCubit, String>(
+                        builder: (context, state) {
+                          return SubcategorieInputField(cubit: subcategorieInputFieldCubit, focusNode: subcategorieFocusNode);
+                        },
+                      ),
+                      BlocBuilder<MoneyInputFieldCubit, MoneyInputFieldModel>(
+                        builder: (context, state) {
+                          return MoneyInputField(cubit: moneyInputFieldCubit, focusNode: amountFocusNode, hintText: 'Budget', bottomSheetTitle: 'Budget eingeben:');
+                        },
+                      ),
+                      SaveButton(
+                          saveFunction: () => budgetBloc.add(SaveBudgetEvent(context, budgetState.budgetBoxIndex, budgetState.budgetModeType, _saveButtonController)),
+                          buttonController: _saveButtonController),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          } else {
+            return const Text("Fehler bei Budgetseite");
+          }
+        },
       ),
     );
   }
