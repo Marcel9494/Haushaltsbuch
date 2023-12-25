@@ -28,6 +28,8 @@ import 'models/screen_arguments/create_or_edit_categorie_screen_arguments.dart';
 import 'blocs/budget_bloc/budget_bloc.dart';
 import 'blocs/booking_bloc/booking_bloc.dart';
 import 'blocs/account_bloc/account_bloc.dart';
+import 'blocs/categorie_bloc/categorie_bloc.dart';
+import 'blocs/subbudget_bloc/subbudget_bloc.dart';
 import 'blocs/primary_account_bloc/primary_account_bloc.dart';
 import 'blocs/input_field_blocs/text_input_field_bloc/text_input_field_cubit.dart';
 import 'blocs/input_field_blocs/money_input_field_bloc/money_input_field_cubit.dart';
@@ -84,6 +86,12 @@ void main() async {
         ),
         BlocProvider<BudgetBloc>(
           create: (context) => BudgetBloc(),
+        ),
+        BlocProvider<SubbudgetBloc>(
+          create: (context) => SubbudgetBloc(),
+        ),
+        BlocProvider<CategorieBloc>(
+          create: (context) => CategorieBloc(),
         ),
         BlocProvider<PrimaryAccountBloc>(
           create: (context) => PrimaryAccountBloc(),
@@ -157,6 +165,7 @@ class BudgetBookApp extends StatelessWidget {
         createOrEditBookingRoute: (context) => const CreateOrEditBookingScreen(),
         createOrEditBudgetRoute: (context) => const CreateOrEditBudgetScreen(),
         createOrEditAccountRoute: (context) => const CreateOrEditAccountScreen(),
+        createOrEditCategorieRoute: (context) => const CreateOrEditCategorieScreen(),
         categoriesRoute: (context) => const CategoriesScreen(),
         overviewBudgetsRoute: (context) => const OverviewBudgetsScreen(),
         settingsRoute: (context) => const SettingsScreen(),
@@ -176,15 +185,6 @@ class BudgetBookApp extends StatelessWidget {
             return MaterialPageRoute<String>(
               builder: (BuildContext context) => AccountDetailsScreen(
                 account: args.account,
-              ),
-              settings: settings,
-            );
-          case createOrEditCategorieRoute:
-            final args = settings.arguments as CreateOrEditCategorieScreenArguments;
-            return MaterialPageRoute<String>(
-              builder: (BuildContext context) => CreateOrEditCategorieScreen(
-                categorieName: args.categorieName,
-                categorieType: args.categorieType,
               ),
               settings: settings,
             );

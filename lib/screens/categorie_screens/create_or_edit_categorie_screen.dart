@@ -1,7 +1,12 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
+
+import '../../components/deco/loading_indicator.dart';
+import '/blocs/categorie_bloc/categorie_bloc.dart';
+import '/blocs/input_field_blocs/text_input_field_bloc/text_input_field_cubit.dart';
 
 import '/models/categorie/categorie_model.dart';
 import '/models/categorie/categorie_repository.dart';
@@ -14,14 +19,7 @@ import '/utils/consts/route_consts.dart';
 import '/utils/consts/global_consts.dart';
 
 class CreateOrEditCategorieScreen extends StatefulWidget {
-  final String categorieName;
-  final String categorieType;
-
-  const CreateOrEditCategorieScreen({
-    Key? key,
-    required this.categorieName,
-    required this.categorieType,
-  }) : super(key: key);
+  const CreateOrEditCategorieScreen({Key? key}) : super(key: key);
 
   @override
   State<CreateOrEditCategorieScreen> createState() => _CreateOrEditCategorieScreenState();
@@ -30,20 +28,28 @@ class CreateOrEditCategorieScreen extends StatefulWidget {
 }
 
 class _CreateOrEditCategorieScreenState extends State<CreateOrEditCategorieScreen> {
-  final TextEditingController _categorieNameController = TextEditingController();
+  late final CategorieBloc categorieBloc;
+  late final TextInputFieldCubit categorieNameInputFieldCubit;
+  //final TextEditingController _categorieNameController = TextEditingController();
   final RoundedLoadingButtonController _saveButtonController = RoundedLoadingButtonController();
   CategorieRepository categorieRepository = CategorieRepository();
   String _categorieNameErrorText = '';
   String _currentCategorieType = '';
 
+  UniqueKey categorieNameUniqueKey = UniqueKey();
+
+  FocusNode categorieNameFocusNode = FocusNode();
+
   @override
   void initState() {
     super.initState();
-    _categorieNameController.text = widget.categorieName;
-    _currentCategorieType = widget.categorieType;
+    categorieBloc = BlocProvider.of<CategorieBloc>(context);
+    categorieNameInputFieldCubit = BlocProvider.of<TextInputFieldCubit>(context);
+    //_categorieNameController.text = widget.categorieName;
+    //_currentCategorieType = widget.categorieType;
   }
 
-  void _createOrUpdateCategorie() async {
+  /*void _createOrUpdateCategorie() async {
     final Categorie categorie = Categorie();
     categorie.name = _categorieNameController.text.trim();
     categorie.type = _currentCategorieType;
@@ -68,7 +74,7 @@ class _CreateOrEditCategorieScreenState extends State<CreateOrEditCategorieScree
         Navigator.pushNamed(context, categoriesRoute);
       }
     });
-  }
+  }*/
 
   Future<bool> _validCategorieName(Categorie categorie) async {
     if (categorie.name.isEmpty) {
@@ -77,7 +83,7 @@ class _CreateOrEditCategorieScreenState extends State<CreateOrEditCategorieScree
       });
       return false;
     }
-    if (widget.categorieName == '') {
+    /*if (widget.categorieName == '') {
       bool categorieNameExisting = await categorieRepository.existsCategorieName(categorie);
       if (categorieNameExisting) {
         setState(() {
@@ -85,7 +91,7 @@ class _CreateOrEditCategorieScreenState extends State<CreateOrEditCategorieScree
         });
         return false;
       }
-    }
+    }*/
     _categorieNameErrorText = '';
     return true;
   }
@@ -104,29 +110,48 @@ class _CreateOrEditCategorieScreenState extends State<CreateOrEditCategorieScree
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      child: Scaffold(
-        resizeToAvoidBottomInset: false,
-        appBar: AppBar(
-          title: widget.categorieName == '' ? const Text('Hauptkategorie erstellen') : const Text('Hauptkategorie bearbeiten'),
-        ),
-        body: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 24.0),
-          child: Card(
-            color: const Color(0xff1c2b30),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(18.0),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                CategorieTypeToggleButtons(
-                    currentCategorieType: _currentCategorieType, categorieTypeStringCallback: (categorie) => setState(() => _currentCategorieType = categorie)),
-                // TODO TextInputField(textEditingController: _categorieNameController, errorText: _categorieNameErrorText, hintText: 'Kategoriename', autofocus: true),
-                SaveButton(saveFunction: _createOrUpdateCategorie, buttonController: _saveButtonController),
-              ],
-            ),
-          ),
-        ),
+      child: BlocBuilder<CategorieBloc, CategorieState>(
+        builder: (context, categorieState) {
+          if (categorieState is CategorieLoadingState) {
+            return const LoadingIndicator();
+          } else if (categorieState is CategorieLoadedState) {
+            return Scaffold(
+              resizeToAvoidBottomInset: false,
+              appBar: AppBar(
+                title: categorieState.categorieBoxIndex == -1 ? const Text('Kategorie erstellen') : const Text('Kategorie bearbeiten'),
+              ),
+              body: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 24.0),
+                child: Card(
+                  color: const Color(0xff1c2b30),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(18.0),
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      CategorieTypeToggleButtons(
+                          currentCategorieType: _currentCategorieType, categorieTypeStringCallback: (categorie) => setState(() => _currentCategorieType = categorie)),
+                      BlocBuilder<TextInputFieldCubit, TextInputFieldModel>(
+                        builder: (context, state) {
+                          return TextInputField(
+                              fieldKey: categorieNameUniqueKey,
+                              focusNode: categorieNameFocusNode,
+                              textCubit: categorieNameInputFieldCubit,
+                              hintText: 'Kategoriename',
+                              maxLength: 60);
+                        },
+                      ),
+                      SaveButton(saveFunction: () => categorieBloc.add(CreateCategorieEvent(context, _saveButtonController)), buttonController: _saveButtonController),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          } else {
+            return const Text("Fehler bei Kategorieseite");
+          }
+        },
       ),
     );
   }
