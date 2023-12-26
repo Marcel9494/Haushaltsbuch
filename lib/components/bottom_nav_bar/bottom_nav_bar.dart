@@ -59,7 +59,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
           ? FloatingActionButton(
               onPressed: () => _selectedIndex == 0
                   ? BlocProvider.of<BookingBloc>(context).add(CreateOrLoadBookingEvent(context, -1, SerieEditModeType.none))
-                  : BlocProvider.of<BudgetBloc>(context).add(CreateBudgetEvent(context)),
+                  : BlocProvider.of<BudgetBloc>(context).add(InitializeBudgetEvent(context)),
               child: Container(
                 width: 60,
                 height: 60,

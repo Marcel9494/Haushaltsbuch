@@ -23,7 +23,7 @@ class BudgetBloc extends Bloc<BudgetEvents, BudgetState> {
   BudgetRepository budgetRepository = BudgetRepository();
 
   BudgetBloc() : super(BudgetInitial()) {
-    on<CreateBudgetEvent>((event, emit) {
+    on<InitializeBudgetEvent>((event, emit) {
       emit(BudgetLoadingState());
       CategorieInputFieldCubit categorieInputFieldCubit = BlocProvider.of<CategorieInputFieldCubit>(event.context);
       SubcategorieInputFieldCubit subcategorieInputFieldCubit = BlocProvider.of<SubcategorieInputFieldCubit>(event.context);

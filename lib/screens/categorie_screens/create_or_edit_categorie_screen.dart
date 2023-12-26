@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 
+import '../../blocs/button_blocs/categorie_type_toggle_buttons_bloc/categorie_type_toggle_buttons_cubit.dart';
 import '../../components/deco/loading_indicator.dart';
 import '/blocs/categorie_bloc/categorie_bloc.dart';
 import '/blocs/input_field_blocs/text_input_field_bloc/text_input_field_cubit.dart';
@@ -29,6 +30,7 @@ class CreateOrEditCategorieScreen extends StatefulWidget {
 
 class _CreateOrEditCategorieScreenState extends State<CreateOrEditCategorieScreen> {
   late final CategorieBloc categorieBloc;
+  late final CategorieTypeToggleButtonsCubit categorieTypeToggleButtonsCubit;
   late final TextInputFieldCubit categorieNameInputFieldCubit;
   //final TextEditingController _categorieNameController = TextEditingController();
   final RoundedLoadingButtonController _saveButtonController = RoundedLoadingButtonController();
@@ -45,6 +47,7 @@ class _CreateOrEditCategorieScreenState extends State<CreateOrEditCategorieScree
     super.initState();
     categorieBloc = BlocProvider.of<CategorieBloc>(context);
     categorieNameInputFieldCubit = BlocProvider.of<TextInputFieldCubit>(context);
+    categorieTypeToggleButtonsCubit = BlocProvider.of<CategorieTypeToggleButtonsCubit>(context);
     //_categorieNameController.text = widget.categorieName;
     //_currentCategorieType = widget.categorieType;
   }
@@ -130,8 +133,11 @@ class _CreateOrEditCategorieScreenState extends State<CreateOrEditCategorieScree
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      CategorieTypeToggleButtons(
-                          currentCategorieType: _currentCategorieType, categorieTypeStringCallback: (categorie) => setState(() => _currentCategorieType = categorie)),
+                      BlocBuilder<CategorieTypeToggleButtonsCubit, CategorieTypeToggleButtonsModel>(
+                        builder: (context, state) {
+                          return CategorieTypeToggleButtons(cubit: categorieTypeToggleButtonsCubit);
+                        },
+                      ),
                       BlocBuilder<TextInputFieldCubit, TextInputFieldModel>(
                         builder: (context, state) {
                           return TextInputField(

@@ -10,9 +10,9 @@ class SaveBudgetEvent extends BudgetEvents {
   SaveBudgetEvent(this.context, this.budgetBoxIndex, this.saveButtonController);
 }
 
-class CreateBudgetEvent extends BudgetEvents {
+class InitializeBudgetEvent extends BudgetEvents {
   final BuildContext context;
-  CreateBudgetEvent(this.context);
+  InitializeBudgetEvent(this.context);
 }
 
 class LoadBudgetEvent extends BudgetEvents {

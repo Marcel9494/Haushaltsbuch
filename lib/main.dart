@@ -23,7 +23,6 @@ import 'models/screen_arguments/edit_subbudget_screen_arguments.dart';
 import 'models/screen_arguments/bottom_nav_bar_screen_arguments.dart';
 import 'models/screen_arguments/account_details_screen_arguments.dart';
 import 'models/screen_arguments/categorie_amount_list_screen_arguments.dart';
-import 'models/screen_arguments/create_or_edit_categorie_screen_arguments.dart';
 
 import 'blocs/budget_bloc/budget_bloc.dart';
 import 'blocs/booking_bloc/booking_bloc.dart';
@@ -36,6 +35,7 @@ import 'blocs/input_field_blocs/money_input_field_bloc/money_input_field_cubit.d
 import 'blocs/input_field_blocs/account_input_field_bloc/from_account_input_field_cubit.dart';
 import 'blocs/input_field_blocs/categorie_input_field_bloc/categorie_input_field_cubit.dart';
 import 'blocs/input_field_blocs/subcategorie_input_field_bloc/subcategorie_input_field_cubit.dart';
+import 'blocs/button_blocs/categorie_type_toggle_buttons_bloc/categorie_type_toggle_buttons_cubit.dart';
 import 'blocs/button_blocs/transaction_stats_toggle_buttons_bloc/transaction_stats_toggle_buttons_cubit.dart';
 import 'blocs/input_field_blocs/date_input_field_bloc/date_input_field_cubit.dart';
 import 'blocs/input_field_blocs/account_type_input_field_bloc/account_type_input_field_cubit.dart';
@@ -119,6 +119,9 @@ void main() async {
         ),
         BlocProvider<TransactionStatsToggleButtonsCubit>(
           create: (context) => TransactionStatsToggleButtonsCubit(),
+        ),
+        BlocProvider<CategorieTypeToggleButtonsCubit>(
+          create: (context) => CategorieTypeToggleButtonsCubit(),
         ),
         BlocProvider<DateInputFieldCubit>(
           create: (context) => DateInputFieldCubit(),
