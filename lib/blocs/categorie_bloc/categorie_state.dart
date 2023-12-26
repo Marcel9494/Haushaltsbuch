@@ -14,3 +14,13 @@ class CategorieLoadedState extends CategorieState {
   final int categorieBoxIndex;
   CategorieLoadedState(this.context, this.categorieBoxIndex);
 }
+
+class SubcategorieLoadingState extends CategorieState {
+  SubcategorieLoadingState();
+}
+
+class SubcategorieLoadedState extends CategorieState {
+  final BuildContext context;
+  final int categorieBoxIndex;
+  SubcategorieLoadedState(this.context, this.categorieBoxIndex);
+}

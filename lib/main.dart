@@ -17,7 +17,6 @@ import 'models/intro_screen_state/intro_screen_state_model.dart';
 import 'models/intro_screen_state/intro_screen_state_repository.dart';
 import 'models/primary_account/primary_account_model.dart';
 import 'models/subbudget/subbudget_model.dart';
-import 'models/screen_arguments/create_or_edit_subcategorie_screen_arguments.dart';
 import 'models/screen_arguments/edit_budget_screen_arguments.dart';
 import 'models/screen_arguments/edit_subbudget_screen_arguments.dart';
 import 'models/screen_arguments/bottom_nav_bar_screen_arguments.dart';
@@ -169,6 +168,7 @@ class BudgetBookApp extends StatelessWidget {
         createOrEditBudgetRoute: (context) => const CreateOrEditBudgetScreen(),
         createOrEditAccountRoute: (context) => const CreateOrEditAccountScreen(),
         createOrEditCategorieRoute: (context) => const CreateOrEditCategorieScreen(),
+        createOrEditSubcategorieRoute: (context) => const CreateOrEditSubcategorieScreen(),
         categoriesRoute: (context) => const CategoriesScreen(),
         overviewBudgetsRoute: (context) => const OverviewBudgetsScreen(),
         settingsRoute: (context) => const SettingsScreen(),
@@ -188,16 +188,6 @@ class BudgetBookApp extends StatelessWidget {
             return MaterialPageRoute<String>(
               builder: (BuildContext context) => AccountDetailsScreen(
                 account: args.account,
-              ),
-              settings: settings,
-            );
-          case createOrEditSubcategorieRoute:
-            final args = settings.arguments as CreateOrEditSubcategorieScreenArguments;
-            return MaterialPageRoute<String>(
-              builder: (BuildContext context) => CreateOrEditSubcategorieScreen(
-                categorie: args.categorie,
-                mode: args.mode,
-                subcategorieIndex: args.subcategorieIndex,
               ),
               settings: settings,
             );

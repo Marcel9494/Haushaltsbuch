@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:another_flushbar/flushbar.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:haushaltsbuch/models/categorie/categorie_repository.dart';
 
+import '../../blocs/categorie_bloc/categorie_bloc.dart';
 import '/models/enums/mode_types.dart';
 import '/models/categorie/categorie_model.dart';
 import '/models/screen_arguments/create_or_edit_categorie_screen_arguments.dart';
@@ -161,8 +163,9 @@ class _CategorieCardState extends State<CategorieCard> {
                 padding: const EdgeInsets.only(left: 4.0, right: 12.0),
                 constraints: const BoxConstraints(),
                 icon: const Icon(Icons.add_rounded),
-                onPressed: () =>
-                    Navigator.pushNamed(context, createOrEditSubcategorieRoute, arguments: CreateOrEditSubcategorieScreenArguments(widget.categorie, ModeType.creationMode, -1)),
+                onPressed: () {
+                  BlocProvider.of<CategorieBloc>(context).add(InitializeSubcategorieEvent(context, widget.categorie.name));
+                },
               ),
             ],
           ),

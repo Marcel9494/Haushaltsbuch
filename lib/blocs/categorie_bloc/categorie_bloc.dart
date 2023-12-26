@@ -17,6 +17,7 @@ part 'categorie_state.dart';
 
 class CategorieBloc extends Bloc<CategorieEvents, CategorieState> {
   CategorieRepository categorieRepository = CategorieRepository();
+  String categorieName = "";
 
   CategorieBloc() : super(CategorieInitial()) {
     on<InitializeCategorieEvent>((event, emit) {
@@ -47,6 +48,35 @@ class CategorieBloc extends Bloc<CategorieEvents, CategorieState> {
           ..subcategorieNames = []
           ..type = categorieTypeToggleButtonsCubit.state.categorieType;
         categorieRepository.create(newCategorie);
+      }
+      event.saveButtonController.success();
+      await Future.delayed(const Duration(milliseconds: transitionInMs));
+      Navigator.pop(event.context);
+      Navigator.popAndPushNamed(event.context, categoriesRoute);
+    });
+
+    on<InitializeSubcategorieEvent>((event, emit) {
+      emit(SubcategorieLoadingState());
+      TextInputFieldCubit subcategorieNameInputFieldCubit = BlocProvider.of<TextInputFieldCubit>(event.context);
+      categorieName = event.categorieName;
+
+      subcategorieNameInputFieldCubit.resetValue();
+
+      Navigator.pushNamed(event.context, createOrEditSubcategorieRoute);
+      emit(SubcategorieLoadedState(event.context, -1));
+    });
+
+    on<CreateSubcategorieEvent>((event, emit) async {
+      TextInputFieldCubit subcategorieNameInputFieldCubit = BlocProvider.of<TextInputFieldCubit>(event.context);
+
+      if (subcategorieNameInputFieldCubit.validateValue(subcategorieNameInputFieldCubit.state.text) == false) {
+        event.saveButtonController.error();
+        Timer(const Duration(milliseconds: transitionInMs), () {
+          event.saveButtonController.reset();
+        });
+        return;
+      } else {
+        categorieRepository.createSubcategorie(categorieName, subcategorieNameInputFieldCubit.state.text);
       }
       event.saveButtonController.success();
       await Future.delayed(const Duration(milliseconds: transitionInMs));
