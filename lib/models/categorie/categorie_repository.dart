@@ -30,6 +30,7 @@ class CategorieRepository extends CategorieInterface {
     }
   }
 
+  // Anmerkung: Es wird die Hauptkategorie und alle untergeordneten Subkategorien gelöscht
   @override
   void delete(Categorie deleteCategorie) async {
     var categorieBox = await Hive.openBox(categoriesBox);
@@ -123,10 +124,9 @@ class CategorieRepository extends CategorieInterface {
           if (categorie.subcategorieNames[j] == deleteSubcategorie) {
             categorie.subcategorieNames.removeAt(j);
             categorieBox.putAt(i, categorie);
-            break;
+            return;
           }
         }
-        break;
       }
     }
   }

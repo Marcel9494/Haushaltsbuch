@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:another_flushbar/flushbar.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:haushaltsbuch/models/categorie/categorie_repository.dart';
 
-import '../../blocs/categorie_bloc/categorie_bloc.dart';
+import '/blocs/categorie_bloc/categorie_bloc.dart';
+
 import '/models/enums/mode_types.dart';
 import '/models/categorie/categorie_model.dart';
 import '/models/screen_arguments/create_or_edit_categorie_screen_arguments.dart';
@@ -26,7 +25,7 @@ class CategorieCard extends StatefulWidget {
 }
 
 class _CategorieCardState extends State<CategorieCard> {
-  void _deleteCategorie(int index) {
+  void _showDeleteCategorieDialog() {
     showDialog(
       context: context,
       builder: (context) {
@@ -40,7 +39,7 @@ class _CategorieCardState extends State<CategorieCard> {
                   color: Colors.cyanAccent,
                 ),
               ),
-              onPressed: () => _noPressed(),
+              onPressed: () => Navigator.pop(context),
             ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
@@ -48,18 +47,7 @@ class _CategorieCardState extends State<CategorieCard> {
                 backgroundColor: Colors.cyanAccent,
               ),
               onPressed: () => {
-                _yesPressed(index),
-                Flushbar(
-                  title: 'Kategorie wurde gelöscht',
-                  message: 'Kategorie ${widget.categorie.name} wurde erfolgreich gelöscht.',
-                  icon: const Icon(
-                    Icons.info_outline,
-                    size: 28.0,
-                    color: Colors.cyanAccent,
-                  ),
-                  duration: const Duration(seconds: 3),
-                  leftBarIndicatorColor: Colors.cyanAccent,
-                )..show(context),
+                BlocProvider.of<CategorieBloc>(context).add(DeleteCategorieEvent(context, widget.categorie)),
               },
               child: const Text('Ja'),
             ),
@@ -69,7 +57,7 @@ class _CategorieCardState extends State<CategorieCard> {
     );
   }
 
-  void _deleteSubcategorie(int index) {
+  void _showDeleteSubcategorieDialog(int index) {
     showDialog(
       context: context,
       builder: (context) {
@@ -83,7 +71,7 @@ class _CategorieCardState extends State<CategorieCard> {
                   color: Colors.cyanAccent,
                 ),
               ),
-              onPressed: () => _noPressed(),
+              onPressed: () => Navigator.pop(context),
             ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
@@ -91,18 +79,7 @@ class _CategorieCardState extends State<CategorieCard> {
                 backgroundColor: Colors.cyanAccent,
               ),
               onPressed: () => {
-                _yesPressed(index),
-                Flushbar(
-                  title: 'Unterkategorie wurde gelöscht',
-                  message: 'Unterkategorie ${widget.categorie.subcategorieNames[index]} wurde erfolgreich gelöscht.',
-                  icon: const Icon(
-                    Icons.info_outline,
-                    size: 28.0,
-                    color: Colors.cyanAccent,
-                  ),
-                  duration: const Duration(seconds: 3),
-                  leftBarIndicatorColor: Colors.cyanAccent,
-                )..show(context),
+                BlocProvider.of<CategorieBloc>(context).add(DeleteSubcategorieEvent(context, widget.categorie, widget.categorie.subcategorieNames[index])),
               },
               child: const Text('Ja'),
             ),
@@ -110,20 +87,6 @@ class _CategorieCardState extends State<CategorieCard> {
         );
       },
     );
-  }
-
-  void _yesPressed(int index) {
-    CategorieRepository categorieRepository = CategorieRepository();
-    setState(() {
-      categorieRepository.deleteSubcategorie(widget.categorie, widget.categorie.subcategorieNames[index]);
-    });
-    Navigator.pop(context);
-    FocusScope.of(context).unfocus();
-  }
-
-  void _noPressed() {
-    Navigator.pop(context);
-    FocusScope.of(context).unfocus();
   }
 
   @override
@@ -157,7 +120,7 @@ class _CategorieCardState extends State<CategorieCard> {
                 padding: const EdgeInsets.symmetric(horizontal: 6.0),
                 constraints: const BoxConstraints(),
                 icon: const Icon(Icons.remove_rounded),
-                onPressed: () => _deleteCategorie(widget.categorieIndex),
+                onPressed: () => _showDeleteCategorieDialog(),
               ),
               IconButton(
                 padding: const EdgeInsets.only(left: 4.0, right: 12.0),
@@ -193,7 +156,7 @@ class _CategorieCardState extends State<CategorieCard> {
                             padding: const EdgeInsets.symmetric(horizontal: 6.0),
                             constraints: const BoxConstraints(),
                             icon: const Icon(Icons.remove_rounded, color: Colors.white70),
-                            onPressed: () => _deleteSubcategorie(subcategorieIndex),
+                            onPressed: () => _showDeleteSubcategorieDialog(subcategorieIndex),
                           ),
                         ],
                       ),
