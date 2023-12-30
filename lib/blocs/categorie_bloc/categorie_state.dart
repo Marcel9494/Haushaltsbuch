@@ -11,8 +11,8 @@ class CategorieLoadingState extends CategorieState {
 
 class CategorieLoadedState extends CategorieState {
   final BuildContext context;
-  final int categorieBoxIndex;
-  CategorieLoadedState(this.context, this.categorieBoxIndex);
+  final int categorieIndex;
+  CategorieLoadedState(this.context, this.categorieIndex);
 }
 
 class SubcategorieLoadingState extends CategorieState {
@@ -21,6 +21,6 @@ class SubcategorieLoadingState extends CategorieState {
 
 class SubcategorieLoadedState extends CategorieState {
   final BuildContext context;
-  final int categorieBoxIndex;
-  SubcategorieLoadedState(this.context, this.categorieBoxIndex);
+  final int categorieIndex;
+  SubcategorieLoadedState(this.context, this.categorieIndex);
 }

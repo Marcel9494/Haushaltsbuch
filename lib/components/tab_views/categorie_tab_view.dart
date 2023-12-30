@@ -55,7 +55,7 @@ class _CategorieTabViewState extends State<CategorieTabView> {
                         child: ListView.builder(
                           itemCount: _categorieList.length,
                           itemBuilder: (BuildContext context, int index) {
-                            return CategorieCard(categorie: _categorieList[index], categorieIndex: index);
+                            return CategorieCard(categorie: _categorieList[index]);
                           },
                         ),
                       ),

@@ -8,7 +8,9 @@ class GlobalStateRepository extends GlobalStateInterface {
   @override
   void create() async {
     var globalBox = await Hive.openBox(globalStateBox);
-    var startGlobalState = GlobalState()..bookingSerieIndex = 0;
+    var startGlobalState = GlobalState()
+      ..categorieIndex = 0
+      ..bookingSerieIndex = 0;
     globalBox.add(startGlobalState);
   }
 
@@ -24,6 +26,21 @@ class GlobalStateRepository extends GlobalStateInterface {
     var globalBox = await Hive.openBox(globalStateBox);
     GlobalState globalState = await globalBox.getAt(0);
     globalState.bookingSerieIndex = globalState.bookingSerieIndex + 1;
+    globalBox.putAt(0, globalState);
+  }
+
+  @override
+  Future<int> getCategorieIndex() async {
+    var globalBox = await Hive.openBox(globalStateBox);
+    GlobalState globalState = await globalBox.getAt(0);
+    return globalState.categorieIndex;
+  }
+
+  @override
+  void increaseCategorieIndex() async {
+    var globalBox = await Hive.openBox(globalStateBox);
+    GlobalState globalState = await globalBox.getAt(0);
+    globalState.categorieIndex = globalState.categorieIndex + 1;
     globalBox.putAt(0, globalState);
   }
 }

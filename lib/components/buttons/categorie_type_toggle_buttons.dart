@@ -13,7 +13,7 @@ class CategorieTypeToggleButtons extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ToggleButtons(
-      onPressed: (selectedIndex) => cubit.setSelectedCategorieType(selectedIndex, cubit.state.selectedCategorieType, context),
+      onPressed: (selectedIndex) => cubit.updateSelectedCategorieType(selectedIndex, cubit.state.selectedCategorieType, context),
       borderRadius: const BorderRadius.only(
         topRight: Radius.circular(18.0),
         topLeft: Radius.circular(18.0),

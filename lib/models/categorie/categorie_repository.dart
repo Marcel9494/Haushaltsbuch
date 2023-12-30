@@ -1,6 +1,7 @@
 import 'package:hive/hive.dart';
 
 import '../booking/booking_repository.dart';
+import '../global_state/global_state_repository.dart';
 import 'categorie_model.dart';
 
 import '../enums/categorie_types.dart';
@@ -44,15 +45,29 @@ class CategorieRepository extends CategorieInterface {
   }
 
   @override
-  Future<bool> existsCategorieName(Categorie categorie) async {
+  Future<Categorie> load(int categorieIndex) async {
+    var categorieBox = await Hive.openBox(categoriesBox);
+    Categorie categorie = Categorie();
+    for (int i = 0; i < categorieBox.length; i++) {
+      categorie = await categorieBox.getAt(i);
+      if (categorie.index == categorieIndex) {
+        return categorie;
+      }
+    }
+    return categorie;
+  }
+
+  // Jeder Kategoriename darf nur einmal pro Kategorietyp (Ausgabe, Einnahme & Investition) vorkommen
+  @override
+  Future<bool> existsCategorieName(String categorieName, String categorieType) async {
     var categorieBox = await Hive.openBox(categoriesBox);
     for (int i = 0; i < categorieBox.length; i++) {
       Categorie currentCategorie = await categorieBox.getAt(i);
-      if (categorie.name.trim().toLowerCase() == currentCategorie.name.trim().toLowerCase() && categorie.type == currentCategorie.type) {
-        return Future.value(true);
+      if (categorieName.trim().toLowerCase() == currentCategorie.name.trim().toLowerCase() && categorieType == currentCategorie.type) {
+        return true;
       }
     }
-    return Future.value(false);
+    return false;
   }
 
   @override
@@ -160,15 +175,15 @@ class CategorieRepository extends CategorieInterface {
   }
 
   @override
-  void createStartExpenditureCategories() async {
+  void createStartCategories() async {
     var categorieBox = await Hive.openBox(categoriesBox);
-    for (int i = 0; i < categorieBox.length; i++) {
-      Categorie categorie = await categorieBox.getAt(i);
-      if (categorie.type == CategorieType.outcome.name) {
-        return;
-      }
+    if (categorieBox.isNotEmpty) {
+      return;
     }
-    List<String> categorieNames = [
+    GlobalStateRepository globalStateRepository = GlobalStateRepository();
+    int categorieIndex = await globalStateRepository.getCategorieIndex();
+    // Start Ausgabe Kategorien erstellen
+    List<String> outcomeCategorieNames = [
       'Lebensmittel',
       'Haushaltswaren',
       'Transport',
@@ -184,50 +199,41 @@ class CategorieRepository extends CategorieInterface {
       'Finanzverluste',
       'Sonstiges'
     ];
-    for (int i = 0; i < categorieNames.length; i++) {
+    for (int i = 0; i < outcomeCategorieNames.length; i++) {
+      categorieIndex = await globalStateRepository.getCategorieIndex();
       Categorie categorie = Categorie()
+        ..index = categorieIndex
         ..type = CategorieType.outcome.name
-        ..name = categorieNames[i]
+        ..name = outcomeCategorieNames[i]
         ..subcategorieNames = [];
       categorieBox.add(categorie);
+      globalStateRepository.increaseCategorieIndex();
     }
-  }
 
-  @override
-  void createStartRevenueCategories() async {
-    var categorieBox = await Hive.openBox(categoriesBox);
-    for (int i = 0; i < categorieBox.length; i++) {
-      Categorie categorie = await categorieBox.getAt(i);
-      if (categorie.type == CategorieType.income.name) {
-        return;
-      }
-    }
-    List<String> categorieNames = ['Gehalt', 'Bonuszahlung', 'Bargeld Geschenk', 'Dividende', 'Zinsen', 'Mieteinkommen', 'Finanzgewinne', 'Sonstiges'];
-    for (int i = 0; i < categorieNames.length; i++) {
+    // Start Einnahme Kategorien erstellen
+    List<String> incomeCategorieNames = ['Gehalt', 'Bonuszahlung', 'Bargeld Geschenk', 'Dividende', 'Zinsen', 'Mieteinkommen', 'Finanzgewinne', 'Sonstiges'];
+    for (int i = 0; i < incomeCategorieNames.length; i++) {
+      categorieIndex = await globalStateRepository.getCategorieIndex();
       Categorie categorie = Categorie()
+        ..index = categorieIndex
         ..type = CategorieType.income.name
-        ..name = categorieNames[i]
+        ..name = incomeCategorieNames[i]
         ..subcategorieNames = [];
       categorieBox.add(categorie);
+      globalStateRepository.increaseCategorieIndex();
     }
-  }
 
-  @override
-  void createStartInvestmentCategories() async {
-    var categorieBox = await Hive.openBox(categoriesBox);
-    for (int i = 0; i < categorieBox.length; i++) {
-      Categorie categorie = await categorieBox.getAt(i);
-      if (categorie.type == CategorieType.investment.name) {
-        return;
-      }
-    }
-    List<String> categorieNames = ['ETF', 'Aktie', 'Fond', 'Krypto', 'Rohstoff', 'P2P', 'Sonstiges'];
-    for (int i = 0; i < categorieNames.length; i++) {
+    // Start Investment Kategorien erstellen
+    List<String> investmentCategorieNames = ['ETF', 'Aktie', 'Fond', 'Krypto', 'Rohstoff', 'P2P', 'Sonstiges'];
+    for (int i = 0; i < investmentCategorieNames.length; i++) {
+      categorieIndex = await globalStateRepository.getCategorieIndex();
       Categorie categorie = Categorie()
+        ..index = categorieIndex
         ..type = CategorieType.investment.name
-        ..name = categorieNames[i]
+        ..name = investmentCategorieNames[i]
         ..subcategorieNames = [];
       categorieBox.add(categorie);
+      globalStateRepository.increaseCategorieIndex();
     }
   }
 }

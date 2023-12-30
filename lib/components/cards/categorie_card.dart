@@ -5,19 +5,16 @@ import '/blocs/categorie_bloc/categorie_bloc.dart';
 
 import '/models/enums/mode_types.dart';
 import '/models/categorie/categorie_model.dart';
-import '/models/screen_arguments/create_or_edit_categorie_screen_arguments.dart';
 import '/models/screen_arguments/create_or_edit_subcategorie_screen_arguments.dart';
 
 import '/utils/consts/route_consts.dart';
 
 class CategorieCard extends StatefulWidget {
   final Categorie categorie;
-  final int categorieIndex;
 
   const CategorieCard({
     Key? key,
     required this.categorie,
-    required this.categorieIndex,
   }) : super(key: key);
 
   @override
@@ -46,9 +43,7 @@ class _CategorieCardState extends State<CategorieCard> {
                 foregroundColor: Colors.black87,
                 backgroundColor: Colors.cyanAccent,
               ),
-              onPressed: () => {
-                BlocProvider.of<CategorieBloc>(context).add(DeleteCategorieEvent(context, widget.categorie)),
-              },
+              onPressed: () => BlocProvider.of<CategorieBloc>(context).add(DeleteCategorieEvent(context, widget.categorie)),
               child: const Text('Ja'),
             ),
           ],
@@ -78,9 +73,7 @@ class _CategorieCardState extends State<CategorieCard> {
                 foregroundColor: Colors.black87,
                 backgroundColor: Colors.cyanAccent,
               ),
-              onPressed: () => {
-                BlocProvider.of<CategorieBloc>(context).add(DeleteSubcategorieEvent(context, widget.categorie, widget.categorie.subcategorieNames[index])),
-              },
+              onPressed: () => BlocProvider.of<CategorieBloc>(context).add(DeleteSubcategorieEvent(context, widget.categorie, widget.categorie.subcategorieNames[index])),
               child: const Text('Ja'),
             ),
           ],
@@ -113,8 +106,7 @@ class _CategorieCardState extends State<CategorieCard> {
                 padding: const EdgeInsets.symmetric(horizontal: 6.0),
                 constraints: const BoxConstraints(),
                 icon: const Icon(Icons.edit),
-                onPressed: () =>
-                    Navigator.pushNamed(context, createOrEditCategorieRoute, arguments: CreateOrEditCategorieScreenArguments(widget.categorie.name, widget.categorie.type!)),
+                onPressed: () => BlocProvider.of<CategorieBloc>(context).add(EditCategorieEvent(context, widget.categorie.index)),
               ),
               IconButton(
                 padding: const EdgeInsets.symmetric(horizontal: 6.0),
@@ -126,9 +118,7 @@ class _CategorieCardState extends State<CategorieCard> {
                 padding: const EdgeInsets.only(left: 4.0, right: 12.0),
                 constraints: const BoxConstraints(),
                 icon: const Icon(Icons.add_rounded),
-                onPressed: () {
-                  BlocProvider.of<CategorieBloc>(context).add(InitializeSubcategorieEvent(context, widget.categorie.name));
-                },
+                onPressed: () => BlocProvider.of<CategorieBloc>(context).add(InitializeSubcategorieEvent(context, widget.categorie.name)),
               ),
             ],
           ),

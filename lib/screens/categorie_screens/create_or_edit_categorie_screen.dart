@@ -121,7 +121,7 @@ class _CreateOrEditCategorieScreenState extends State<CreateOrEditCategorieScree
             return Scaffold(
               resizeToAvoidBottomInset: false,
               appBar: AppBar(
-                title: categorieState.categorieBoxIndex == -1 ? const Text('Kategorie erstellen') : const Text('Kategorie bearbeiten'),
+                title: categorieState.categorieIndex == -1 ? const Text('Kategorie erstellen') : const Text('Kategorie bearbeiten'),
               ),
               body: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 24.0),
@@ -148,7 +148,11 @@ class _CreateOrEditCategorieScreenState extends State<CreateOrEditCategorieScree
                               maxLength: 60);
                         },
                       ),
-                      SaveButton(saveFunction: () => categorieBloc.add(CreateCategorieEvent(context, _saveButtonController)), buttonController: _saveButtonController),
+                      SaveButton(
+                          saveFunction: () => categorieBloc.add(categorieState.categorieIndex == -1
+                              ? CreateCategorieEvent(context, _saveButtonController)
+                              : UpdateCategorieEvent(context, _saveButtonController, categorieState.categorieIndex)),
+                          buttonController: _saveButtonController),
                     ],
                   ),
                 ),

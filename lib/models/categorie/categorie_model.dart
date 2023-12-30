@@ -5,10 +5,12 @@ import '/utils/consts/hive_consts.dart';
 @HiveType(typeId: categoryTypeId)
 class Categorie extends HiveObject {
   @HiveField(0)
-  String? type;
+  late int index;
   @HiveField(1)
-  late String name;
+  String? type;
   @HiveField(2)
+  late String name;
+  @HiveField(3)
   late List<String> subcategorieNames;
 }
 
@@ -19,6 +21,7 @@ class CategorieAdapter extends TypeAdapter<Categorie> {
   @override
   Categorie read(BinaryReader reader) {
     return Categorie()
+      ..index = reader.read()
       ..name = reader.read()
       ..type = reader.read()
       ..subcategorieNames = reader.read();
@@ -26,6 +29,7 @@ class CategorieAdapter extends TypeAdapter<Categorie> {
 
   @override
   void write(BinaryWriter writer, Categorie obj) {
+    writer.write(obj.index);
     writer.write(obj.name);
     writer.write(obj.type);
     writer.write(obj.subcategorieNames);

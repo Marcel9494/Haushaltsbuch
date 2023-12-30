@@ -13,6 +13,19 @@ class CreateCategorieEvent extends CategorieEvents {
   CreateCategorieEvent(this.context, this.saveButtonController);
 }
 
+class EditCategorieEvent extends CategorieEvents {
+  final BuildContext context;
+  final int categorieIndex;
+  EditCategorieEvent(this.context, this.categorieIndex);
+}
+
+class UpdateCategorieEvent extends CategorieEvents {
+  final BuildContext context;
+  final RoundedLoadingButtonController saveButtonController;
+  final int categorieIndex;
+  UpdateCategorieEvent(this.context, this.saveButtonController, this.categorieIndex);
+}
+
 class DeleteCategorieEvent extends CategorieEvents {
   final BuildContext context;
   final Categorie deleteCategorie;

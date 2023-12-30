@@ -116,7 +116,7 @@ class _CreateOrEditSubcategorieScreenState extends State<CreateOrEditSubcategori
             return Scaffold(
               resizeToAvoidBottomInset: false,
               appBar: AppBar(
-                title: subcategorieState.categorieBoxIndex == -1 ? const Text('Unterkategorie erstellen') : const Text('Unterkategorie bearbeiten'),
+                title: subcategorieState.categorieIndex == -1 ? const Text('Unterkategorie erstellen') : const Text('Unterkategorie bearbeiten'),
               ),
               body: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 24.0),

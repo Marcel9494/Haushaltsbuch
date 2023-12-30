@@ -24,16 +24,14 @@ class _IntroductionScreensState extends State<IntroductionScreens> {
   }
 
   void _createStartCategoriesAndAccounts() {
+    GlobalStateRepository globalStateRepository = GlobalStateRepository();
+    globalStateRepository.create();
     AccountRepository accountRepository = AccountRepository();
     accountRepository.createStartAccounts();
     CategorieRepository categorieRepository = CategorieRepository();
-    categorieRepository.createStartExpenditureCategories();
-    categorieRepository.createStartRevenueCategories();
-    categorieRepository.createStartInvestmentCategories();
+    categorieRepository.createStartCategories();
     PrimaryAccountRepository primaryAccountRepository = PrimaryAccountRepository();
     primaryAccountRepository.createStartPrimaryAccounts();
-    GlobalStateRepository globalStateRepository = GlobalStateRepository();
-    globalStateRepository.create();
     Navigator.popAndPushNamed(context, bottomNavBarRoute, arguments: BottomNavBarScreenArguments(0));
   }
 
