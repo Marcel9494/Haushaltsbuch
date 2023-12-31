@@ -138,7 +138,11 @@ class _CreateOrEditSubcategorieScreenState extends State<CreateOrEditSubcategori
                               maxLength: 60);
                         },
                       ),
-                      SaveButton(saveFunction: () => categorieBloc.add(CreateSubcategorieEvent(context, _saveButtonController)), buttonController: _saveButtonController),
+                      SaveButton(
+                          saveFunction: () => categorieBloc.add(subcategorieState.categorieIndex == -1
+                              ? CreateSubcategorieEvent(context, _saveButtonController)
+                              : UpdateSubcategorieEvent(context, _saveButtonController, subcategorieState.categorie)),
+                          buttonController: _saveButtonController),
                     ],
                   ),
                 ),

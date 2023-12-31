@@ -1,3 +1,4 @@
+import 'package:haushaltsbuch/models/budget/budget_repository.dart';
 import 'package:hive/hive.dart';
 
 import '../booking/booking_repository.dart';
@@ -20,12 +21,14 @@ class CategorieRepository extends CategorieInterface {
   @override
   void update(Categorie updatedCategorie, String oldCategorieName) async {
     BookingRepository bookingRepository = BookingRepository();
+    BudgetRepository budgetRepository = BudgetRepository();
     var categorieBox = await Hive.openBox(categoriesBox);
     for (int i = 0; i < categorieBox.length; i++) {
       Categorie categorie = await categorieBox.getAt(i);
       if (oldCategorieName == categorie.name) {
         categorieBox.putAt(i, updatedCategorie);
         bookingRepository.updateBookingCategorieName(oldCategorieName, updatedCategorie.name);
+        budgetRepository.updateBudgetCategorieName(oldCategorieName, updatedCategorie.name);
         break;
       }
     }
@@ -105,23 +108,23 @@ class CategorieRepository extends CategorieInterface {
       if (mainCategorie == categorie.name) {
         categorie.subcategorieNames.add(newSubcategorie);
         categorieBox.putAt(i, categorie);
-        // TODO Booking.updateBookingCategorieName(oldCategorieName, updatedCategorie.name);
         break;
       }
     }
   }
 
   @override
-  void updateSubcategorie(String mainCategorie, String oldSubcategorie, String newSubcategorie) async {
+  void updateSubcategorie(String mainCategorie, String oldSubcategorieName, String newSubcategorieName) async {
+    BookingRepository bookingRepository = BookingRepository();
     var categorieBox = await Hive.openBox(categoriesBox);
     for (int i = 0; i < categorieBox.length; i++) {
       Categorie categorie = await categorieBox.getAt(i);
       if (mainCategorie == categorie.name) {
         for (int j = 0; j < categorie.subcategorieNames.length; j++) {
-          if (categorie.subcategorieNames[j] == oldSubcategorie) {
-            categorie.subcategorieNames[categorie.subcategorieNames.indexWhere((element) => element == oldSubcategorie)] = newSubcategorie;
+          if (categorie.subcategorieNames[j] == oldSubcategorieName) {
+            categorie.subcategorieNames[categorie.subcategorieNames.indexWhere((element) => element == oldSubcategorieName)] = newSubcategorieName;
             categorieBox.putAt(i, categorie);
-            // TODO Booking.updateBookingCategorieName(oldCategorieName, updatedCategorie.name);
+            bookingRepository.updateBookingSubcategorieName(oldSubcategorieName, newSubcategorieName);
             break;
           }
         }
@@ -154,12 +157,12 @@ class CategorieRepository extends CategorieInterface {
       for (int j = 0; j < currentCategorie.subcategorieNames.length; j++) {
         for (int k = 0; k < currentCategorie.subcategorieNames.length; k++) {
           if (categorie.subcategorieNames[j] == currentCategorie.subcategorieNames[k] && categorie.type == currentCategorie.type) {
-            return Future.value(true);
+            return true;
           }
         }
       }
     }
-    return Future.value(false);
+    return false;
   }
 
   @override

@@ -22,5 +22,6 @@ class SubcategorieLoadingState extends CategorieState {
 class SubcategorieLoadedState extends CategorieState {
   final BuildContext context;
   final int categorieIndex;
-  SubcategorieLoadedState(this.context, this.categorieIndex);
+  final Categorie categorie;
+  SubcategorieLoadedState(this.context, this.categorieIndex, this.categorie);
 }

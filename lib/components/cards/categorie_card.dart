@@ -3,11 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '/blocs/categorie_bloc/categorie_bloc.dart';
 
-import '/models/enums/mode_types.dart';
 import '/models/categorie/categorie_model.dart';
-import '/models/screen_arguments/create_or_edit_subcategorie_screen_arguments.dart';
-
-import '/utils/consts/route_consts.dart';
 
 class CategorieCard extends StatefulWidget {
   final Categorie categorie;
@@ -106,7 +102,7 @@ class _CategorieCardState extends State<CategorieCard> {
                 padding: const EdgeInsets.symmetric(horizontal: 6.0),
                 constraints: const BoxConstraints(),
                 icon: const Icon(Icons.edit),
-                onPressed: () => BlocProvider.of<CategorieBloc>(context).add(EditCategorieEvent(context, widget.categorie.index)),
+                onPressed: () => BlocProvider.of<CategorieBloc>(context).add(LoadCategorieEvent(context, widget.categorie.index)),
               ),
               IconButton(
                 padding: const EdgeInsets.symmetric(horizontal: 6.0),
@@ -118,7 +114,7 @@ class _CategorieCardState extends State<CategorieCard> {
                 padding: const EdgeInsets.only(left: 4.0, right: 12.0),
                 constraints: const BoxConstraints(),
                 icon: const Icon(Icons.add_rounded),
-                onPressed: () => BlocProvider.of<CategorieBloc>(context).add(InitializeSubcategorieEvent(context, widget.categorie.name)),
+                onPressed: () => BlocProvider.of<CategorieBloc>(context).add(InitializeSubcategorieEvent(context, widget.categorie)),
               ),
             ],
           ),
@@ -139,8 +135,8 @@ class _CategorieCardState extends State<CategorieCard> {
                             padding: const EdgeInsets.symmetric(horizontal: 6.0),
                             constraints: const BoxConstraints(),
                             icon: const Icon(Icons.edit, color: Colors.white70),
-                            onPressed: () => Navigator.pushNamed(context, createOrEditSubcategorieRoute,
-                                arguments: CreateOrEditSubcategorieScreenArguments(widget.categorie, ModeType.editMode, subcategorieIndex)),
+                            onPressed: () => BlocProvider.of<CategorieBloc>(context)
+                                .add(LoadSubcategorieEvent(context, widget.categorie, widget.categorie.subcategorieNames[subcategorieIndex])),
                           ),
                           IconButton(
                             padding: const EdgeInsets.symmetric(horizontal: 6.0),

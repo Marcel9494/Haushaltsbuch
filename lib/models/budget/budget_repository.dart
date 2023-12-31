@@ -64,6 +64,22 @@ class BudgetRepository extends BudgetInterface {
   }
 
   @override
+  Future<void> updateBudgetCategorieName(String oldCategorieName, String newCategorieName) async {
+    var budgetBox = await Hive.openBox(budgetsBox);
+    for (int i = 0; i < budgetBox.length; i++) {
+      Budget budget = await budgetBox.getAt(i);
+      if (budget.categorie == oldCategorieName) {
+        Budget updatedBudgetWithNewCategorieName = Budget()
+          ..boxIndex = i
+          ..categorie = newCategorieName
+          ..budget = budget.budget
+          ..budgetDate = budget.budgetDate;
+        budgetBox.putAt(i, updatedBudgetWithNewCategorieName);
+      }
+    }
+  }
+
+  @override
   void deleteAllBudgetsFromCategorie(String budgetCategorie) async {
     var budgetBox = await Hive.openBox(budgetsBox);
     for (int i = budgetBox.length - 1; i >= 0; i--) {

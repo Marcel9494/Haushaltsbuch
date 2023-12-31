@@ -13,10 +13,10 @@ class CreateCategorieEvent extends CategorieEvents {
   CreateCategorieEvent(this.context, this.saveButtonController);
 }
 
-class EditCategorieEvent extends CategorieEvents {
+class LoadCategorieEvent extends CategorieEvents {
   final BuildContext context;
   final int categorieIndex;
-  EditCategorieEvent(this.context, this.categorieIndex);
+  LoadCategorieEvent(this.context, this.categorieIndex);
 }
 
 class UpdateCategorieEvent extends CategorieEvents {
@@ -34,14 +34,28 @@ class DeleteCategorieEvent extends CategorieEvents {
 
 class InitializeSubcategorieEvent extends CategorieEvents {
   final BuildContext context;
-  final String categorieName;
-  InitializeSubcategorieEvent(this.context, this.categorieName);
+  final Categorie categorie;
+  InitializeSubcategorieEvent(this.context, this.categorie);
 }
 
 class CreateSubcategorieEvent extends CategorieEvents {
   final BuildContext context;
   final RoundedLoadingButtonController saveButtonController;
   CreateSubcategorieEvent(this.context, this.saveButtonController);
+}
+
+class LoadSubcategorieEvent extends CategorieEvents {
+  final BuildContext context;
+  final Categorie categorie;
+  final String subcategorieName;
+  LoadSubcategorieEvent(this.context, this.categorie, this.subcategorieName);
+}
+
+class UpdateSubcategorieEvent extends CategorieEvents {
+  final BuildContext context;
+  final RoundedLoadingButtonController saveButtonController;
+  final Categorie categorie;
+  UpdateSubcategorieEvent(this.context, this.saveButtonController, this.categorie);
 }
 
 class DeleteSubcategorieEvent extends CategorieEvents {

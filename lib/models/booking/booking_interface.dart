@@ -10,6 +10,7 @@ abstract class BookingInterface {
   void updateOnlyFutureBookingsFromSerie(Booking updatedBooking, Booking oldBooking, int bookingBoxIndex);
   void updateAllBookingsFromSerie(Booking templateBooking, Booking oldBooking, int bookingBoxIndex);
   void updateBookingCategorieName(String oldCategorieName, String newCategorieName);
+  void updateBookingSubcategorieName(String oldSubcategorieName, String newSubcategorieName);
   void updateBookingAccountName(String oldAccountName, String newAccountName);
 
   // Löschen Funktionen

@@ -13,7 +13,7 @@ abstract class CategorieInterface {
   Future<List<String>> loadCategorieNameList(CategorieType categorieType);
 
   void createSubcategorie(String mainCategorie, String newSubcategorie);
-  void updateSubcategorie(String mainCategorie, String oldSubcategorie, String newSubcategorie);
+  void updateSubcategorie(String mainCategorie, String oldSubcategorieName, String newSubcategorieName);
   void deleteSubcategorie(Categorie categorie, String deleteSubcategorie);
   Future<bool> existsSubcategorieName(Categorie categorie);
   Future<List<String>> loadSubcategorieNameList(String mainCategorie);
