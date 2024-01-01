@@ -1,7 +1,5 @@
-import 'package:haushaltsbuch/models/budget/budget_repository.dart';
 import 'package:hive/hive.dart';
 
-import '../booking/booking_repository.dart';
 import '../global_state/global_state_repository.dart';
 import 'categorie_model.dart';
 
@@ -20,15 +18,11 @@ class CategorieRepository extends CategorieInterface {
 
   @override
   void update(Categorie updatedCategorie, String oldCategorieName) async {
-    BookingRepository bookingRepository = BookingRepository();
-    BudgetRepository budgetRepository = BudgetRepository();
     var categorieBox = await Hive.openBox(categoriesBox);
     for (int i = 0; i < categorieBox.length; i++) {
       Categorie categorie = await categorieBox.getAt(i);
       if (oldCategorieName == categorie.name) {
         categorieBox.putAt(i, updatedCategorie);
-        bookingRepository.updateBookingCategorieName(oldCategorieName, updatedCategorie.name);
-        budgetRepository.updateBudgetCategorieName(oldCategorieName, updatedCategorie.name);
         break;
       }
     }
@@ -115,7 +109,6 @@ class CategorieRepository extends CategorieInterface {
 
   @override
   void updateSubcategorie(String mainCategorie, String oldSubcategorieName, String newSubcategorieName) async {
-    BookingRepository bookingRepository = BookingRepository();
     var categorieBox = await Hive.openBox(categoriesBox);
     for (int i = 0; i < categorieBox.length; i++) {
       Categorie categorie = await categorieBox.getAt(i);
@@ -124,7 +117,6 @@ class CategorieRepository extends CategorieInterface {
           if (categorie.subcategorieNames[j] == oldSubcategorieName) {
             categorie.subcategorieNames[categorie.subcategorieNames.indexWhere((element) => element == oldSubcategorieName)] = newSubcategorieName;
             categorieBox.putAt(i, categorie);
-            bookingRepository.updateBookingSubcategorieName(oldSubcategorieName, newSubcategorieName);
             break;
           }
         }

@@ -3,15 +3,17 @@ import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:haushaltsbuch/models/booking/booking_repository.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 
-import '../../models/screen_arguments/bottom_nav_bar_screen_arguments.dart';
 import '../input_field_blocs/text_input_field_bloc/text_input_field_cubit.dart';
 import '../button_blocs/categorie_type_toggle_buttons_bloc/categorie_type_toggle_buttons_cubit.dart';
 
+import '/models/budget/budget_repository.dart';
 import '/models/categorie/categorie_model.dart';
 import '/models/categorie/categorie_repository.dart';
 import '/models/global_state/global_state_repository.dart';
+import '/models/screen_arguments/bottom_nav_bar_screen_arguments.dart';
 
 import '/utils/consts/global_consts.dart';
 import '/utils/consts/route_consts.dart';
@@ -21,6 +23,8 @@ part 'categorie_state.dart';
 
 class CategorieBloc extends Bloc<CategorieEvents, CategorieState> {
   CategorieRepository categorieRepository = CategorieRepository();
+  BookingRepository bookingRepository = BookingRepository();
+  BudgetRepository budgetRepository = BudgetRepository();
   String savedCategorieName = "";
   String savedSubcategorieName = "";
   List<String> savedSubcategories = [];
@@ -115,6 +119,8 @@ class CategorieBloc extends Bloc<CategorieEvents, CategorieState> {
           ..subcategorieNames = savedSubcategories
           ..type = categorieType.state.categorieType;
         categorieRepository.update(updatedCategorie, savedCategorieName);
+        bookingRepository.updateBookingCategorieName(savedCategorieName, updatedCategorie.name);
+        budgetRepository.updateBudgetCategorieName(savedCategorieName, updatedCategorie.name);
       }
       event.saveButtonController.success();
       await Future.delayed(const Duration(milliseconds: transitionInMs));
@@ -126,12 +132,15 @@ class CategorieBloc extends Bloc<CategorieEvents, CategorieState> {
       Navigator.pushNamed(event.context, categoriesRoute);
     });
 
-    // TODO hier weitermachen, wenn eine Kategorie gelöscht wird müssen alle Buchungen mit dieser
-    // TODO Kategorie geupdatet werden mit Kategorie "Nicht zugeordnet" oder ähnlichem
     on<DeleteCategorieEvent>((event, emit) async {
       categorieRepository.delete(event.deleteCategorie);
+      budgetRepository.deleteAllBudgetsFromCategorie(event.deleteCategorie.name);
+      // Damit die Kategorien in der Budgetliste aktualisiert werden, wird der Bildschirm Stack abgebaut und neu aufgebaut.
       Navigator.pop(event.context);
-      Navigator.popAndPushNamed(event.context, categoriesRoute);
+      Navigator.pop(event.context);
+      Navigator.pop(event.context);
+      Navigator.pushNamed(event.context, bottomNavBarRoute, arguments: BottomNavBarScreenArguments(2));
+      Navigator.pushNamed(event.context, categoriesRoute);
     });
 
     on<InitializeSubcategorieEvent>((event, emit) {
@@ -203,6 +212,7 @@ class CategorieBloc extends Bloc<CategorieEvents, CategorieState> {
         return;
       } else {
         categorieRepository.updateSubcategorie(event.categorie.name, savedSubcategorieName, subcategorieName.state.text);
+        bookingRepository.updateBookingSubcategorieName(savedSubcategorieName, subcategorieName.state.text);
       }
       event.saveButtonController.success();
       await Future.delayed(const Duration(milliseconds: transitionInMs));
