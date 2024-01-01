@@ -54,7 +54,6 @@ class BudgetBloc extends Bloc<BudgetEvents, BudgetState> {
 
     on<SaveBudgetEvent>((event, emit) {
       CategorieInputFieldCubit categorieInputFieldCubit = BlocProvider.of<CategorieInputFieldCubit>(event.context);
-      SubcategorieInputFieldCubit subcategorieInputFieldCubit = BlocProvider.of<SubcategorieInputFieldCubit>(event.context);
       MoneyInputFieldCubit moneyInputFieldCubit = BlocProvider.of<MoneyInputFieldCubit>(event.context);
 
       if (categorieInputFieldCubit.validateValue(categorieInputFieldCubit.state.categorie) == false ||
@@ -73,6 +72,7 @@ class BudgetBloc extends Bloc<BudgetEvents, BudgetState> {
             ..percentage = 0.0
             ..budgetDate = DateTime.now().toString();
           budgetRepository.create(newBudget);
+          // TODO hier weitermachen und updateBudget in extra Event auslagern UpdateBudgetEvent (muss noch erstellt werden)
         } else {
           Budget updatedBudget = Budget()
             ..categorie = categorieInputFieldCubit.state.categorie
@@ -82,14 +82,7 @@ class BudgetBloc extends Bloc<BudgetEvents, BudgetState> {
             ..budgetDate = DateTime.now().toString();
           budgetRepository.update(updatedBudget, event.budgetBoxIndex);
         }
-        // TODO hier weitermachen und Subbudgets erstellen / bearbeiten implementieren extra Bloc für Subbudgets erstellen?!
-        /*if (event.budgetModeType == BudgetModeType.budgetCreationMode) {
-          if (subcategorieInputFieldCubit.state.isEmpty) {
-            //budgetRepository.create(newBudget)
-          } else {
-            // TODO _createSubbudget();
-          }
-        } else if (event.budgetModeType == BudgetModeType.updateDefaultBudgetMode) {
+        /*if (event.budgetModeType == BudgetModeType.updateDefaultBudgetMode) {
           // TODO _updateAllFutureBudgets();
         } else {
           // TODO _updateBudget();
@@ -97,7 +90,6 @@ class BudgetBloc extends Bloc<BudgetEvents, BudgetState> {
         // TODO if (_budgetExistsAlready == false) {
         event.saveButtonController.success();
         Timer(const Duration(milliseconds: transitionInMs), () {
-          //if (mounted) {
           FocusScope.of(event.context).requestFocus(FocusNode());
           Navigator.pop(event.context);
           Navigator.pop(event.context);
@@ -106,9 +98,7 @@ class BudgetBloc extends Bloc<BudgetEvents, BudgetState> {
             Navigator.pop(event.context);
           }
           Navigator.pushNamed(event.context, bottomNavBarRoute, arguments: BottomNavBarScreenArguments(1));
-          //}
         });
-        //}
       }
     });
   }

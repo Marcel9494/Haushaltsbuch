@@ -23,6 +23,18 @@ class SubbudgetRepository extends SubbudgetInterface {
   }
 
   @override
+  void create(Subbudget newSubbudget) async {
+    var subbudgetBox = await Hive.openBox(subbudgetsBox);
+    subbudgetBox.add(newSubbudget);
+    // TODO Anzahl der Budgets erhöhen, damit für die nächsten 10 Jahre Subbudgets erstellt werden. 3 nur als Test.
+    for (int i = 0; i < 3; i++) {
+      Subbudget nextSubbudget = createInstance(newSubbudget);
+      nextSubbudget.budgetDate = DateTime(DateTime.now().year, DateTime.now().month + i + 1, 1).toString(); // TODO Jahr dynamisch implementieren
+      subbudgetBox.add(nextSubbudget);
+    }
+  }
+
+  @override
   void createSubbudgets(String mainCategorie, String subcategorie, List<String> subcategorieNames) async {
     var subbudgetBox = await Hive.openBox(subbudgetsBox);
     for (int i = 0; i < subcategorieNames.length; i++) {
@@ -124,10 +136,10 @@ class SubbudgetRepository extends SubbudgetInterface {
     for (int i = 0; i < subbudgetBox.length; i++) {
       Subbudget subbudget = await subbudgetBox.getAt(i);
       if (subbudget.subcategorieName == subbudgetCategorie) {
-        return Future.value(true);
+        return true;
       }
     }
-    return Future.value(false);
+    return false;
   }
 
   @override

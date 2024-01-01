@@ -156,10 +156,10 @@ class BudgetRepository extends BudgetInterface {
     for (int i = 0; i < budgetBox.length; i++) {
       Budget budget = await budgetBox.getAt(i);
       if (budget.categorie == budgetCategorie) {
-        return Future.value(true);
+        return true;
       }
     }
-    return Future.value(false);
+    return false;
   }
 
   @override

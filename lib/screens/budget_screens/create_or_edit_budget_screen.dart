@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive/hive.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 
+import '../../blocs/subbudget_bloc/subbudget_bloc.dart';
 import '/blocs/budget_bloc/budget_bloc.dart';
 import '/blocs/input_field_blocs/money_input_field_bloc/money_input_field_cubit.dart';
 import '/blocs/input_field_blocs/subcategorie_input_field_bloc/subcategorie_input_field_cubit.dart';
@@ -53,6 +54,7 @@ class CreateOrEditBudgetScreen extends StatefulWidget {
 
 class _CreateOrEditBudgetScreenState extends State<CreateOrEditBudgetScreen> {
   late final BudgetBloc budgetBloc;
+  late final SubbudgetBloc subbudgetBloc;
 
   late final CategorieInputFieldCubit categorieInputFieldCubit;
   late final SubcategorieInputFieldCubit subcategorieInputFieldCubit;
@@ -79,6 +81,7 @@ class _CreateOrEditBudgetScreenState extends State<CreateOrEditBudgetScreen> {
   void initState() {
     super.initState();
     budgetBloc = BlocProvider.of<BudgetBloc>(context);
+    subbudgetBloc = BlocProvider.of<SubbudgetBloc>(context);
     categorieInputFieldCubit = BlocProvider.of<CategorieInputFieldCubit>(context);
     subcategorieInputFieldCubit = BlocProvider.of<SubcategorieInputFieldCubit>(context);
     moneyInputFieldCubit = BlocProvider.of<MoneyInputFieldCubit>(context);
@@ -352,7 +355,10 @@ class _CreateOrEditBudgetScreenState extends State<CreateOrEditBudgetScreen> {
                         },
                       ),
                       SaveButton(
-                          saveFunction: () => budgetBloc.add(SaveBudgetEvent(context, budgetState.budgetBoxIndex, _saveButtonController)), buttonController: _saveButtonController),
+                          saveFunction: () => subcategorieInputFieldCubit.state.isEmpty
+                              ? budgetBloc.add(SaveBudgetEvent(context, budgetState.budgetBoxIndex, _saveButtonController))
+                              : subbudgetBloc.add(SaveSubbudgetEvent(context, budgetState.budgetBoxIndex, _saveButtonController)),
+                          buttonController: _saveButtonController),
                     ],
                   ),
                 ),
