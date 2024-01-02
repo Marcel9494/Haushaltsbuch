@@ -1,55 +1,51 @@
 import 'package:flutter/material.dart';
 
-import '/models/subbudget/subbudget_model.dart';
-import '/models/subbudget/subbudget_repository.dart';
-import '/models/default_budget/default_budget_model.dart';
 import '/models/default_budget/default_budget_repository.dart';
+import '/models/budget/budget_model.dart';
+import '/models/budget/budget_repository.dart';
+import '/models/default_budget/default_budget_model.dart';
 
 import '/utils/consts/route_consts.dart';
 
 import '/components/dialogs/choice_dialog.dart';
 import '/components/deco/loading_indicator.dart';
 import '/components/cards/default_budget_card.dart';
+import '/components/cards/separate_budget_card.dart';
 import '/components/buttons/year_picker_buttons.dart';
-import '/components/cards/separate_subbudget_card.dart';
 
-class EditSubbudgetScreen extends StatefulWidget {
-  final Subbudget subbudget;
+class OverviewOneBudgetScreen extends StatefulWidget {
+  final Budget budget;
 
-  const EditSubbudgetScreen({
+  const OverviewOneBudgetScreen({
     Key? key,
-    required this.subbudget,
+    required this.budget,
   }) : super(key: key);
 
   @override
-  State<EditSubbudgetScreen> createState() => _EditSubbudgetScreenState();
+  State<OverviewOneBudgetScreen> createState() => _OverviewOneBudgetScreenState();
 }
 
-class _EditSubbudgetScreenState extends State<EditSubbudgetScreen> {
-  List<Subbudget> _subbudgetList = [];
-  // TODO hier weitermachen und überlegen, ob für Unterkategorie Budgets ebenfalls
-  // TODO eine separate Standardbudgets Datenstruktur angelegt werden soll oder ob die
-  // TODO bereits vorhandene Standardbudgets verwendet werden soll? => Entscheidung: Bereits erstellte DefaultBudget Datenstruktur verwenden!
-  // TODO Danach Unterkategorie Budgets laden und anzeigen lassen (neue Laden Funktionen implementieren)
+class _OverviewOneBudgetScreenState extends State<OverviewOneBudgetScreen> {
+  List<Budget> _budgetList = [];
   DefaultBudget _defaultBudget = DefaultBudget();
   DateTime _selectedYear = DateTime.now();
+  BudgetRepository budgetRepository = BudgetRepository();
 
-  Future<List<Subbudget>> _loadOneSubbudgetCategorie() async {
-    SubbudgetRepository subbudgetRepository = SubbudgetRepository();
+  Future<List<Budget>> _loadOneBudgetCategorie() async {
     DefaultBudgetRepository defaultBudgetRepository = DefaultBudgetRepository();
-    _defaultBudget = await defaultBudgetRepository.load(widget.subbudget.subcategorieName);
-    _subbudgetList = await subbudgetRepository.loadOneSubbudget(widget.subbudget.subcategorieName);
-    return _subbudgetList;
+    _defaultBudget = await defaultBudgetRepository.load(widget.budget.categorie);
+    _budgetList = await budgetRepository.loadOneBudgetCategorie(widget.budget.categorie, _selectedYear.year);
+    return _budgetList;
   }
 
-  void _deleteSubbudget() {
-    showChoiceDialog(context, 'Budget löschen?', _yesPressed, _noPressed, 'Budget wurde gelöscht', 'Budget für ${widget.subbudget.subcategorieName} wurde erfolgreich gelöscht.',
-        Icons.info_outline);
+  void _deleteBudget() {
+    showChoiceDialog(
+        context, 'Budget löschen?', _yesPressed, _noPressed, 'Budget wurde gelöscht', 'Budget für ${widget.budget.categorie} wurde erfolgreich gelöscht.', Icons.info_outline);
   }
 
   void _yesPressed() {
     setState(() {
-      // TODO widget.subbudget.deleteAllBudgetsFromCategorie(widget.subbudget.categorie);
+      budgetRepository.deleteAllBudgetsFromCategorie(widget.budget.categorie);
     });
     Navigator.pop(context);
     Navigator.pop(context);
@@ -69,7 +65,7 @@ class _EditSubbudgetScreenState extends State<EditSubbudgetScreen> {
         title: const Text('Budgets'),
         actions: <Widget>[
           IconButton(
-            onPressed: () => _deleteSubbudget(),
+            onPressed: () => _deleteBudget(),
             icon: const Icon(Icons.delete_forever_rounded),
           ),
         ],
@@ -79,13 +75,13 @@ class _EditSubbudgetScreenState extends State<EditSubbudgetScreen> {
         children: [
           YearPickerButtons(selectedYear: _selectedYear, selectedYearCallback: (selectedYear) => setState(() => _selectedYear = selectedYear)),
           FutureBuilder(
-            future: _loadOneSubbudgetCategorie(),
-            builder: (BuildContext context, AsyncSnapshot<List<Subbudget>> snapshot) {
+            future: _loadOneBudgetCategorie(),
+            builder: (BuildContext context, AsyncSnapshot<List<Budget>> snapshot) {
               switch (snapshot.connectionState) {
                 case ConnectionState.waiting:
                   return const LoadingIndicator();
                 case ConnectionState.done:
-                  if (_subbudgetList.isEmpty) {
+                  if (_budgetList.isEmpty) {
                     return const Expanded(
                       child: Center(
                         child: Text('Keine Budgets vorhanden'),
@@ -102,7 +98,7 @@ class _EditSubbudgetScreenState extends State<EditSubbudgetScreen> {
                           ),
                           RefreshIndicator(
                             onRefresh: () async {
-                              _subbudgetList = await _loadOneSubbudgetCategorie();
+                              _budgetList = await _loadOneBudgetCategorie();
                               setState(() {});
                               return;
                             },
@@ -110,9 +106,9 @@ class _EditSubbudgetScreenState extends State<EditSubbudgetScreen> {
                             child: ListView.builder(
                               scrollDirection: Axis.vertical,
                               shrinkWrap: true,
-                              itemCount: _subbudgetList.length,
+                              itemCount: _budgetList.length,
                               itemBuilder: (BuildContext context, int index) {
-                                return SeparateSubbudgetCard(subbudget: _subbudgetList[index]);
+                                return SeparateBudgetCard(budget: _budgetList[index]);
                               },
                             ),
                           ),

@@ -37,16 +37,7 @@ import '/models/enums/transaction_types.dart';
 import '/models/screen_arguments/bottom_nav_bar_screen_arguments.dart';
 
 class CreateOrEditBudgetScreen extends StatefulWidget {
-  //final BudgetModeType budgetModeType;
-  //final int? budgetBoxIndex; // budgetBoxIndex == -1 = Budget bearbeiten / -2 = Standardbudget bearbeiten / >= 0 = Budget erstellen
-  //final String? budgetCategorie;
-
-  const CreateOrEditBudgetScreen({
-    Key? key,
-    //required this.budgetModeType,
-    //required this.budgetBoxIndex,
-    //this.budgetCategorie,
-  }) : super(key: key);
+  const CreateOrEditBudgetScreen({Key? key}) : super(key: key);
 
   @override
   State<CreateOrEditBudgetScreen> createState() => _CreateOrEditBudgetScreenState();
@@ -333,6 +324,7 @@ class _CreateOrEditBudgetScreenState extends State<CreateOrEditBudgetScreen> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
+                      // TODO hier weitermachen und Create_or_edit_budget_screen in 3 Screens aufteilen Create, Edit Budget und Edit Subbudget
                       budgetState.budgetBoxIndex == -1
                           ? BlocBuilder<CategorieInputFieldCubit, CategorieInputFieldModel>(
                               builder: (context, state) {

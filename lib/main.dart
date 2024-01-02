@@ -43,7 +43,7 @@ import 'blocs/input_field_blocs/preselect_account_input_field_bloc/preselect_acc
 
 import '/components/bottom_nav_bar/bottom_nav_bar.dart';
 
-import 'screens/budget_screens/overview_budgets_screen.dart';
+import 'screens/budget_screens/overview_all_budgets_screen.dart';
 import 'screens/booking_screens/create_or_edit_booking_screen.dart';
 import 'screens/account_screens/create_or_edit_account_screen.dart';
 import 'screens/categorie_screens/create_or_edit_categorie_screen.dart';
@@ -52,8 +52,8 @@ import 'screens/categorie_screens/categories_screen.dart';
 import 'screens/account_screens/account_details_screen.dart';
 import 'screens/budget_screens/create_or_edit_budget_screen.dart';
 import 'screens/categorie_screens/categorie_amount_list_screen.dart';
-import 'screens/budget_screens/edit_budget_screen.dart';
-import 'screens/budget_screens/edit_subbudget_screen.dart';
+import 'screens/budget_screens/overview_one_budget_screen.dart';
+import 'screens/budget_screens/overview_one_subbudget_screen.dart';
 import 'screens/other_screens/settings_screen.dart';
 import 'screens/other_screens/splash_screen.dart';
 
@@ -170,7 +170,7 @@ class BudgetBookApp extends StatelessWidget {
         createOrEditCategorieRoute: (context) => const CreateOrEditCategorieScreen(),
         createOrEditSubcategorieRoute: (context) => const CreateOrEditSubcategorieScreen(),
         categoriesRoute: (context) => const CategoriesScreen(),
-        overviewBudgetsRoute: (context) => const OverviewBudgetsScreen(),
+        overviewBudgetsRoute: (context) => const OverviewAllBudgetsScreen(),
         settingsRoute: (context) => const SettingsScreen(),
       },
       onGenerateRoute: (RouteSettings settings) {
@@ -194,7 +194,7 @@ class BudgetBookApp extends StatelessWidget {
           case editBudgetRoute:
             final args = settings.arguments as EditBudgetScreenArguments;
             return MaterialPageRoute<String>(
-              builder: (BuildContext context) => EditBudgetScreen(
+              builder: (BuildContext context) => OverviewOneBudgetScreen(
                 budget: args.budget,
               ),
               settings: settings,
@@ -202,7 +202,7 @@ class BudgetBookApp extends StatelessWidget {
           case editSubbudgetRoute:
             final args = settings.arguments as EditSubbudgetScreenArguments;
             return MaterialPageRoute<String>(
-              builder: (BuildContext context) => EditSubbudgetScreen(
+              builder: (BuildContext context) => OverviewOneSubbudgetScreen(
                 subbudget: args.subbudget,
               ),
               settings: settings,

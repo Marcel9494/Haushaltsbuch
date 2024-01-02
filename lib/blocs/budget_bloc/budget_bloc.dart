@@ -40,12 +40,10 @@ class BudgetBloc extends Bloc<BudgetEvents, BudgetState> {
     on<LoadBudgetEvent>((event, emit) async {
       emit(BudgetLoadingState());
       CategorieInputFieldCubit categorieInputFieldCubit = BlocProvider.of<CategorieInputFieldCubit>(event.context);
-      SubcategorieInputFieldCubit subcategorieInputFieldCubit = BlocProvider.of<SubcategorieInputFieldCubit>(event.context);
       MoneyInputFieldCubit moneyInputFieldCubit = BlocProvider.of<MoneyInputFieldCubit>(event.context);
 
       Budget loadedBudget = await budgetRepository.load(event.budgetBoxIndex);
       categorieInputFieldCubit.updateValue(loadedBudget.categorie);
-      subcategorieInputFieldCubit.updateValue("");
       moneyInputFieldCubit.updateValue(formatToMoneyAmount(loadedBudget.budget.toString()));
 
       Navigator.pushNamed(event.context, createOrEditBudgetRoute);
@@ -64,41 +62,47 @@ class BudgetBloc extends Bloc<BudgetEvents, BudgetState> {
         });
         return;
       } else {
-        if (event.budgetBoxIndex == -1) {
-          Budget newBudget = Budget()
-            ..categorie = categorieInputFieldCubit.state.categorie
-            ..budget = formatMoneyAmountToDouble(moneyInputFieldCubit.state.amount)
-            ..currentExpenditure = 0.0
-            ..percentage = 0.0
-            ..budgetDate = DateTime.now().toString();
-          budgetRepository.create(newBudget);
-          // TODO hier weitermachen und updateBudget in extra Event auslagern UpdateBudgetEvent (muss noch erstellt werden)
-        } else {
-          Budget updatedBudget = Budget()
-            ..categorie = categorieInputFieldCubit.state.categorie
-            ..budget = formatMoneyAmountToDouble(moneyInputFieldCubit.state.amount)
-            ..currentExpenditure = 0.0
-            ..percentage = 0.0
-            ..budgetDate = DateTime.now().toString();
-          budgetRepository.update(updatedBudget, event.budgetBoxIndex);
+        Budget newBudget = Budget()
+          ..categorie = categorieInputFieldCubit.state.categorie
+          ..budget = formatMoneyAmountToDouble(moneyInputFieldCubit.state.amount)
+          ..currentExpenditure = 0.0
+          ..percentage = 0.0
+          ..budgetDate = DateTime.now().toString();
+        budgetRepository.create(newBudget);
+        // TODO hier weitermachen und updateBudget in extra Event auslagern UpdateBudgetEvent (muss noch erstellt werden)
+      }
+      event.saveButtonController.success();
+      Timer(const Duration(milliseconds: transitionInMs), () {
+        FocusScope.of(event.context).requestFocus(FocusNode());
+        Navigator.pop(event.context);
+        Navigator.pop(event.context);
+        if (event.budgetBoxIndex != -1) {
+          Navigator.pop(event.context);
+          Navigator.pop(event.context);
         }
-        /*if (event.budgetModeType == BudgetModeType.updateDefaultBudgetMode) {
-          // TODO _updateAllFutureBudgets();
-        } else {
-          // TODO _updateBudget();
-        }*/
-        // TODO if (_budgetExistsAlready == false) {
-        event.saveButtonController.success();
+        Navigator.pushNamed(event.context, bottomNavBarRoute, arguments: BottomNavBarScreenArguments(1));
+      });
+    });
+
+    on<UpdateBudgetEvent>((event, emit) {
+      CategorieInputFieldCubit categorieInputFieldCubit = BlocProvider.of<CategorieInputFieldCubit>(event.context);
+      MoneyInputFieldCubit moneyInputFieldCubit = BlocProvider.of<MoneyInputFieldCubit>(event.context);
+
+      if (categorieInputFieldCubit.validateValue(categorieInputFieldCubit.state.categorie) == false ||
+          moneyInputFieldCubit.validateValue(moneyInputFieldCubit.state.amount) == false) {
+        event.saveButtonController.error();
         Timer(const Duration(milliseconds: transitionInMs), () {
-          FocusScope.of(event.context).requestFocus(FocusNode());
-          Navigator.pop(event.context);
-          Navigator.pop(event.context);
-          if (event.budgetBoxIndex != -1) {
-            Navigator.pop(event.context);
-            Navigator.pop(event.context);
-          }
-          Navigator.pushNamed(event.context, bottomNavBarRoute, arguments: BottomNavBarScreenArguments(1));
+          event.saveButtonController.reset();
         });
+        return;
+      } else {
+        Budget updatedBudget = Budget()
+          ..categorie = categorieInputFieldCubit.state.categorie
+          ..budget = formatMoneyAmountToDouble(moneyInputFieldCubit.state.amount)
+          ..currentExpenditure = 0.0
+          ..percentage = 0.0
+          ..budgetDate = DateTime.now().toString();
+        budgetRepository.update(updatedBudget, event.budgetBoxIndex);
       }
     });
   }

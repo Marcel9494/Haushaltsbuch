@@ -6,17 +6,17 @@ import '/models/budget/budget_repository.dart';
 import '/components/cards/edit_budget_card.dart';
 import '/components/deco/loading_indicator.dart';
 
-class OverviewBudgetsScreen extends StatefulWidget {
-  const OverviewBudgetsScreen({Key? key}) : super(key: key);
+class OverviewAllBudgetsScreen extends StatefulWidget {
+  const OverviewAllBudgetsScreen({Key? key}) : super(key: key);
 
   @override
-  State<OverviewBudgetsScreen> createState() => _OverviewBudgetsScreenState();
+  State<OverviewAllBudgetsScreen> createState() => _OverviewAllBudgetsScreenState();
 }
 
 // TODO hier weitermachen und Budgets verwalten um Unterkategorien erweitern.
 // TODO Dabei den Benutzer auf dieser Seite auswählen lassen können, ob er eine
 // TODO Hauptkategorie oder Unterkategorie bearbeiten möchte.
-class _OverviewBudgetsScreenState extends State<OverviewBudgetsScreen> {
+class _OverviewAllBudgetsScreenState extends State<OverviewAllBudgetsScreen> {
   List<Budget> _budgetList = [];
 
   Future<List<Budget>> _loadAllBudgetCategories() async {

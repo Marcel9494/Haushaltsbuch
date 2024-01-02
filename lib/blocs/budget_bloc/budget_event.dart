@@ -20,3 +20,10 @@ class LoadBudgetEvent extends BudgetEvents {
   final int budgetBoxIndex;
   LoadBudgetEvent(this.context, this.budgetBoxIndex);
 }
+
+class UpdateBudgetEvent extends BudgetEvents {
+  final BuildContext context;
+  final int budgetBoxIndex;
+  final RoundedLoadingButtonController saveButtonController;
+  UpdateBudgetEvent(this.context, this.budgetBoxIndex, this.saveButtonController);
+}
