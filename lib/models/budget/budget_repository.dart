@@ -123,7 +123,7 @@ class BudgetRepository extends BudgetInterface {
   }
 
   @override
-  Future<List<Budget>> loadOneBudgetCategorie(String budgetCategorie, [int selectedYear = -1]) async {
+  Future<List<Budget>> loadBudgetListFromOneCategorie(String budgetCategorie, [int selectedYear = -1]) async {
     var budgetBox = await Hive.openBox(budgetsBox);
     List<Budget> budgetList = [];
     for (int i = 0; i < budgetBox.length; i++) {

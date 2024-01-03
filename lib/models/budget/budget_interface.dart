@@ -14,7 +14,7 @@ abstract class BudgetInterface {
 
   Future<Budget> load(int budgetBoxIndex);
   Future<List<Budget>> loadAllBudgetCategories();
-  Future<List<Budget>> loadOneBudgetCategorie(String budgetCategorie, [int selectedYear = -1]);
+  Future<List<Budget>> loadBudgetListFromOneCategorie(String budgetCategorie, [int selectedYear = -1]);
   Future<List<Budget>> loadMonthlyBudgetList(DateTime selectedDate);
 
   Future<bool> existsBudgetForCategorie(String budgetCategorie);

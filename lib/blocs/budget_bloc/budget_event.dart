@@ -21,6 +21,13 @@ class LoadBudgetEvent extends BudgetEvents {
   LoadBudgetEvent(this.context, this.budgetBoxIndex);
 }
 
+class LoadBudgetListFromOneCategorieEvent extends BudgetEvents {
+  final BuildContext context;
+  final String categorie;
+  final int selectedYear;
+  LoadBudgetListFromOneCategorieEvent(this.context, this.categorie, this.selectedYear);
+}
+
 class UpdateBudgetEvent extends BudgetEvents {
   final BuildContext context;
   final int budgetBoxIndex;
