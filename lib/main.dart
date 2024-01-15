@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:haushaltsbuch/screens/budget_screens/edit_budget_screen.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -43,6 +42,7 @@ import 'blocs/input_field_blocs/preselect_account_input_field_bloc/preselect_acc
 
 import '/components/bottom_nav_bar/bottom_nav_bar.dart';
 
+import '/screens/budget_screens/edit_budget_screen.dart';
 import 'screens/budget_screens/overview_all_budgets_screen.dart';
 import 'screens/booking_screens/create_or_edit_booking_screen.dart';
 import 'screens/account_screens/create_or_edit_account_screen.dart';

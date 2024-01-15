@@ -19,7 +19,8 @@ class SeparateBudgetCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => BlocProvider.of<BudgetBloc>(context).add(LoadBudgetEvent(context, budget.boxIndex)),
+      onTap: () =>
+          BlocProvider.of<BudgetBloc>(context).add(LoadBudgetListFromOneCategorieEvent(context, budget.boxIndex, budget.categorie, DateTime.parse(budget.budgetDate).year)),
       child: Card(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(14.0),

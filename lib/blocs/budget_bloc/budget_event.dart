@@ -15,17 +15,12 @@ class SaveBudgetEvent extends BudgetEvents {
   SaveBudgetEvent(this.context, this.budgetBoxIndex, this.saveButtonController);
 }
 
-class LoadBudgetEvent extends BudgetEvents {
-  final BuildContext context;
-  final int budgetBoxIndex;
-  LoadBudgetEvent(this.context, this.budgetBoxIndex);
-}
-
 class LoadBudgetListFromOneCategorieEvent extends BudgetEvents {
   final BuildContext context;
+  final int budgetBoxIndex;
   final String categorie;
   final int selectedYear;
-  LoadBudgetListFromOneCategorieEvent(this.context, this.categorie, this.selectedYear);
+  LoadBudgetListFromOneCategorieEvent(this.context, this.budgetBoxIndex, this.categorie, this.selectedYear);
 }
 
 class UpdateBudgetEvent extends BudgetEvents {

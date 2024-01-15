@@ -61,9 +61,9 @@ class _OverviewOneBudgetScreenState extends State<OverviewOneBudgetScreen> {
     return SafeArea(
       child: BlocBuilder<BudgetBloc, BudgetState>(
         builder: (context, budgetState) {
-          if (budgetState is BudgetListLoadingState) {
+          if (budgetState is BudgetLoadingState) {
             return const LoadingIndicator();
-          } else if (budgetState is BudgetListLoadedState) {
+          } else if (budgetState is BudgetLoadedState) {
             if (budgetState.budgetList.isEmpty) {
               return const Expanded(
                 child: Center(
@@ -93,7 +93,7 @@ class _OverviewOneBudgetScreenState extends State<OverviewOneBudgetScreen> {
                     RefreshIndicator(
                       onRefresh: () async {
                         // TODO _budgetList = await _loadOneBudgetCategorie();
-                        setState(() {});
+                        //setState(() {});
                         return;
                       },
                       color: Colors.cyanAccent,
@@ -111,7 +111,7 @@ class _OverviewOneBudgetScreenState extends State<OverviewOneBudgetScreen> {
               );
             }
           } else {
-            return const Text("Fehler bei Budget editieren Seite");
+            return const Text("Fehler bei Budget Übersichts Seite");
           }
         },
       ),

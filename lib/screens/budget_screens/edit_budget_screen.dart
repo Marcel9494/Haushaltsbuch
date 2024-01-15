@@ -43,16 +43,16 @@ class _EditBudgetScreenState extends State<EditBudgetScreen> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      child: BlocBuilder<BudgetBloc, BudgetState>(
-        builder: (context, budgetState) {
-          if (budgetState is BudgetLoadingState) {
-            return const LoadingIndicator();
-          } else if (budgetState is BudgetLoadedState) {
-            return Scaffold(
-              appBar: AppBar(
-                title: Text(budgetState.budgetBoxIndex == -1 ? 'Budget erstellen' : 'Budget bearbeiten'),
-              ),
-              body: Padding(
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Budget bearbeiten'),
+        ),
+        body: BlocBuilder<BudgetBloc, BudgetState>(
+          builder: (context, budgetState) {
+            if (budgetState is BudgetLoadingState) {
+              return const LoadingIndicator();
+            } else if (budgetState is BudgetLoadedState) {
+              return Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 24.0),
                 child: Card(
                   color: const Color(0xff1c2b30),
@@ -82,12 +82,12 @@ class _EditBudgetScreenState extends State<EditBudgetScreen> {
                     ],
                   ),
                 ),
-              ),
-            );
-          } else {
-            return const Text("Fehler bei Budget editieren Seite");
-          }
-        },
+              );
+            } else {
+              return const Text("");
+            }
+          },
+        ),
       ),
     );
   }

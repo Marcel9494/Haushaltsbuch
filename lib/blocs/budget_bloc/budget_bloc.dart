@@ -4,8 +4,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 
-import '../../models/default_budget/default_budget_model.dart';
-import '../../models/default_budget/default_budget_repository.dart';
+import '/models/default_budget/default_budget_model.dart';
+import '/models/default_budget/default_budget_repository.dart';
 import '/models/budget/budget_model.dart';
 import '/models/budget/budget_repository.dart';
 import '/models/screen_arguments/bottom_nav_bar_screen_arguments.dart';
@@ -37,7 +37,7 @@ class BudgetBloc extends Bloc<BudgetEvents, BudgetState> {
       moneyInputFieldCubit.resetValue();
 
       Navigator.pushNamed(event.context, createOrEditBudgetRoute);
-      emit(BudgetLoadedState(event.context, -1));
+      emit(BudgetLoadedState(event.context, -1, [], "" as DefaultBudget, ""));
     });
 
     on<SaveBudgetEvent>((event, emit) {
@@ -59,7 +59,6 @@ class BudgetBloc extends Bloc<BudgetEvents, BudgetState> {
           ..percentage = 0.0
           ..budgetDate = DateTime.now().toString();
         budgetRepository.create(newBudget);
-        // TODO hier weitermachen und updateBudget in extra Event auslagern UpdateBudgetEvent (muss noch erstellt werden)
       }
       event.saveButtonController.success();
       Timer(const Duration(milliseconds: transitionInMs), () {
@@ -74,26 +73,24 @@ class BudgetBloc extends Bloc<BudgetEvents, BudgetState> {
       });
     });
 
-    on<LoadBudgetEvent>((event, emit) async {
-      emit(BudgetLoadingState());
-      CategorieInputFieldCubit categorieInputFieldCubit = BlocProvider.of<CategorieInputFieldCubit>(event.context);
-      MoneyInputFieldCubit moneyInputFieldCubit = BlocProvider.of<MoneyInputFieldCubit>(event.context);
-
-      Budget loadedBudget = await budgetRepository.load(event.budgetBoxIndex);
-      categorieInputFieldCubit.updateValue(loadedBudget.categorie);
-      moneyInputFieldCubit.updateValue(formatToMoneyAmount(loadedBudget.budget.toString()));
-
-      // TODO hier weitermachen und auf editBudgetRoute Screen verweisen
-      Navigator.pushNamed(event.context, createOrEditBudgetRoute);
-      emit(BudgetLoadedState(event.context, event.budgetBoxIndex));
-    });
-
+    // TODO kann eventuell noch verbessert / vereinfacht werden
     on<LoadBudgetListFromOneCategorieEvent>((event, emit) async {
-      emit(BudgetListLoadingState(event.context));
+      emit(BudgetLoadingState());
       DefaultBudget defaultBudget = await defaultBudgetRepository.load(event.categorie);
       List<Budget> budgetList = await budgetRepository.loadBudgetListFromOneCategorie(event.categorie, event.selectedYear);
-      Navigator.pushNamed(event.context, overviewOneBudgetRoute);
-      emit(BudgetListLoadedState(event.context, budgetList, defaultBudget, event.categorie));
+
+      if (event.budgetBoxIndex >= 0) {
+        CategorieInputFieldCubit categorieInputFieldCubit = BlocProvider.of<CategorieInputFieldCubit>(event.context);
+        MoneyInputFieldCubit moneyInputFieldCubit = BlocProvider.of<MoneyInputFieldCubit>(event.context);
+        Budget loadedBudget = await budgetRepository.load(event.budgetBoxIndex);
+        categorieInputFieldCubit.updateValue(loadedBudget.categorie);
+        moneyInputFieldCubit.updateValue(formatToMoneyAmount(loadedBudget.budget.toString()));
+        Navigator.pushNamed(event.context, editBudgetRoute);
+      } else {
+        Navigator.pushNamed(event.context, overviewOneBudgetRoute);
+      }
+
+      emit(BudgetLoadedState(event.context, event.budgetBoxIndex, budgetList, defaultBudget, event.categorie));
     });
 
     on<UpdateBudgetEvent>((event, emit) {

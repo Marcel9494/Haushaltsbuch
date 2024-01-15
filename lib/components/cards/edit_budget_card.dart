@@ -65,7 +65,7 @@ class _EditBudgetCardState extends State<EditBudgetCard> {
                 flex: 1,
                 child: IconButton(
                   icon: const Icon(Icons.edit_rounded),
-                  onPressed: () => BlocProvider.of<BudgetBloc>(context).add(LoadBudgetListFromOneCategorieEvent(context, widget.budget.categorie, DateTime.now().year)),
+                  onPressed: () => BlocProvider.of<BudgetBloc>(context).add(LoadBudgetListFromOneCategorieEvent(context, -1, widget.budget.categorie, DateTime.now().year)),
                 ),
               ),
             ],
