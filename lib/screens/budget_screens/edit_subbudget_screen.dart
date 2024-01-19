@@ -2,32 +2,30 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 
-import '/models/enums/categorie_types.dart';
-import '/models/enums/transaction_types.dart';
-
-import '/blocs/budget_bloc/budget_bloc.dart';
+import '/blocs/subbudget_bloc/subbudget_bloc.dart';
 import '/blocs/input_field_blocs/money_input_field_bloc/money_input_field_cubit.dart';
 import '/blocs/input_field_blocs/categorie_input_field_bloc/categorie_input_field_cubit.dart';
+import '/blocs/input_field_blocs/subcategorie_input_field_bloc/subcategorie_input_field_cubit.dart';
 
 import '/components/buttons/save_button.dart';
 import '/components/deco/loading_indicator.dart';
 import '/components/input_fields/money_input_field.dart';
-import '/components/input_fields/categorie_input_field.dart';
+import '/components/input_fields/subcategorie_input_field.dart';
 
-class EditBudgetScreen extends StatefulWidget {
-  const EditBudgetScreen({Key? key}) : super(key: key);
+class EditSubbudgetScreen extends StatefulWidget {
+  const EditSubbudgetScreen({Key? key}) : super(key: key);
 
   @override
-  State<EditBudgetScreen> createState() => _EditBudgetScreenState();
+  State<EditSubbudgetScreen> createState() => _EditSubbudgetScreenState();
 }
 
-class _EditBudgetScreenState extends State<EditBudgetScreen> {
-  late final BudgetBloc budgetBloc;
+class _EditSubbudgetScreenState extends State<EditSubbudgetScreen> {
+  late final SubbudgetBloc subbudgetBloc;
 
-  late final CategorieInputFieldCubit categorieInputFieldCubit;
+  late final SubcategorieInputFieldCubit subcategorieInputFieldCubit;
   late final MoneyInputFieldCubit moneyInputFieldCubit;
 
-  FocusNode categorieFocusNode = FocusNode();
+  FocusNode subcategorieFocusNode = FocusNode();
   FocusNode amountFocusNode = FocusNode();
 
   final RoundedLoadingButtonController _saveButtonController = RoundedLoadingButtonController();
@@ -35,8 +33,8 @@ class _EditBudgetScreenState extends State<EditBudgetScreen> {
   @override
   void initState() {
     super.initState();
-    budgetBloc = BlocProvider.of<BudgetBloc>(context);
-    categorieInputFieldCubit = BlocProvider.of<CategorieInputFieldCubit>(context);
+    subbudgetBloc = BlocProvider.of<SubbudgetBloc>(context);
+    subcategorieInputFieldCubit = BlocProvider.of<SubcategorieInputFieldCubit>(context);
     moneyInputFieldCubit = BlocProvider.of<MoneyInputFieldCubit>(context);
   }
 
@@ -45,13 +43,13 @@ class _EditBudgetScreenState extends State<EditBudgetScreen> {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Budget bearbeiten'),
+          title: const Text('Unterbudget bearbeiten'),
         ),
-        body: BlocBuilder<BudgetBloc, BudgetState>(
+        body: BlocBuilder<SubbudgetBloc, SubbudgetState>(
           builder: (context, budgetState) {
-            if (budgetState is BudgetLoadingState) {
+            if (budgetState is SubbudgetLoadingState) {
               return const LoadingIndicator();
-            } else if (budgetState is BudgetLoadedState) {
+            } else if (budgetState is SubbudgetLoadedState) {
               return Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 24.0),
                 child: Card(
@@ -64,10 +62,9 @@ class _EditBudgetScreenState extends State<EditBudgetScreen> {
                     children: [
                       BlocBuilder<CategorieInputFieldCubit, CategorieInputFieldModel>(
                         builder: (context, state) {
-                          return CategorieInputField(
-                            cubit: categorieInputFieldCubit,
-                            focusNode: categorieFocusNode,
-                            categorieType: CategorieTypeExtension.getCategorieType(TransactionType.outcome.name),
+                          return SubcategorieInputField(
+                            cubit: subcategorieInputFieldCubit,
+                            focusNode: subcategorieFocusNode,
                           );
                         },
                       ),
@@ -77,14 +74,14 @@ class _EditBudgetScreenState extends State<EditBudgetScreen> {
                         },
                       ),
                       SaveButton(
-                          saveFunction: () => budgetBloc.add(UpdateBudgetEvent(context, budgetState.budgetBoxIndex, _saveButtonController)),
+                          saveFunction: () => subbudgetBloc.add(UpdateSubbudgetEvent(context, budgetState.subbudgetBoxIndex, _saveButtonController)),
                           buttonController: _saveButtonController),
                     ],
                   ),
                 ),
               );
             } else {
-              return const Text("Fehler bei Budget editieren Seite");
+              return const Text("Fehler bei Unterbudget editieren Seite");
             }
           },
         ),

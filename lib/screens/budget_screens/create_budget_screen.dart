@@ -6,14 +6,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive/hive.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 
-import '../../blocs/subbudget_bloc/subbudget_bloc.dart';
+import '/blocs/subbudget_bloc/subbudget_bloc.dart';
 import '/blocs/budget_bloc/budget_bloc.dart';
 import '/blocs/input_field_blocs/money_input_field_bloc/money_input_field_cubit.dart';
 import '/blocs/input_field_blocs/subcategorie_input_field_bloc/subcategorie_input_field_cubit.dart';
 import '/blocs/input_field_blocs/categorie_input_field_bloc/categorie_input_field_cubit.dart';
 
 import '/utils/consts/hive_consts.dart';
-import '/utils/consts/global_consts.dart';
 import '/utils/consts/route_consts.dart';
 import '/utils/number_formatters/number_formatter.dart';
 
@@ -32,18 +31,17 @@ import '/models/subbudget/subbudget_repository.dart';
 import '/models/budget/budget_repository.dart';
 import '/models/categorie/categorie_repository.dart';
 import '/models/enums/categorie_types.dart';
-import '/models/enums/budget_mode_types.dart';
 import '/models/enums/transaction_types.dart';
 import '/models/screen_arguments/bottom_nav_bar_screen_arguments.dart';
 
-class CreateOrEditBudgetScreen extends StatefulWidget {
-  const CreateOrEditBudgetScreen({Key? key}) : super(key: key);
+class CreateBudgetScreen extends StatefulWidget {
+  const CreateBudgetScreen({Key? key}) : super(key: key);
 
   @override
-  State<CreateOrEditBudgetScreen> createState() => _CreateOrEditBudgetScreenState();
+  State<CreateBudgetScreen> createState() => _CreateBudgetScreenState();
 }
 
-class _CreateOrEditBudgetScreenState extends State<CreateOrEditBudgetScreen> {
+class _CreateBudgetScreenState extends State<CreateBudgetScreen> {
   late final BudgetBloc budgetBloc;
   late final SubbudgetBloc subbudgetBloc;
 
@@ -76,56 +74,7 @@ class _CreateOrEditBudgetScreenState extends State<CreateOrEditBudgetScreen> {
     categorieInputFieldCubit = BlocProvider.of<CategorieInputFieldCubit>(context);
     subcategorieInputFieldCubit = BlocProvider.of<SubcategorieInputFieldCubit>(context);
     moneyInputFieldCubit = BlocProvider.of<MoneyInputFieldCubit>(context);
-    /*if (widget.budgetModeType == BudgetModeType.updateDefaultBudgetMode) {
-      _loadDefaultBudget();
-    } else if (widget.budgetBoxIndex != -1) {
-      // TODO if mit BudgetModeType ersetzen
-      _loadBudget();
-    }*/
   }
-
-  /*Future<void> _loadBudget() async {
-    _loadedBudget = await budgetRepository.load(widget.budgetBoxIndex!);
-    _budgetTextController.text = formatToMoneyAmount(_loadedBudget.budget.toString());
-  }
-
-  Future<void> _loadDefaultBudget() async {
-    _loadedDefaultBudget = await defaultBudgetRepository.load(widget.budgetCategorie!);
-    _budgetTextController.text = formatToMoneyAmount(_loadedDefaultBudget.defaultBudget.toString());
-  }*/
-
-/*void _saveBudget() {
-    if (_validCategorie(_categorieTextController.text) == false || _validBudget(_budgetTextController.text) == false) {
-      _setSaveButtonAnimation(false);
-      return;
-    }
-    if (widget.budgetModeType == BudgetModeType.budgetCreationMode) {
-      if (_subcategorieTextController.text.isEmpty) {
-        _createBudget();
-      } else {
-        _createSubbudget();
-      }
-    } else if (widget.budgetModeType == BudgetModeType.updateDefaultBudgetMode) {
-      _updateAllFutureBudgets();
-    } else {
-      _updateBudget();
-    }
-    if (_budgetExistsAlready == false) {
-      _setSaveButtonAnimation(true);
-      Timer(const Duration(milliseconds: transitionInMs), () {
-        if (mounted) {
-          FocusScope.of(context).requestFocus(FocusNode());
-          Navigator.pop(context);
-          Navigator.pop(context);
-          if (widget.budgetBoxIndex != -1) {
-            Navigator.pop(context);
-            Navigator.pop(context);
-          }
-          Navigator.pushNamed(context, bottomNavBarRoute, arguments: BottomNavBarScreenArguments(1));
-        }
-      });
-    }
-  }*/
 
   void _createBudget() async {
     _budgetExistsAlready = await budgetRepository.existsBudgetForCategorie(_categorieTextController.text);
@@ -232,55 +181,6 @@ class _CreateOrEditBudgetScreenState extends State<CreateOrEditBudgetScreen> {
     }
   }
 
-  void _updateAllFutureBudgets() async {
-    DefaultBudget updatedDefaultBudget = DefaultBudget()
-      ..categorie = _loadedDefaultBudget.categorie
-      ..defaultBudget = formatMoneyAmountToDouble(_budgetTextController.text);
-    defaultBudgetRepository.update(updatedDefaultBudget);
-    budgetRepository.updateAllFutureBudgetsFromCategorie(updatedDefaultBudget);
-  }
-
-  /*void _updateBudget() {
-    Budget updatedBudget = Budget()
-      ..categorie = _loadedBudget.categorie
-      ..budget = formatMoneyAmountToDouble(_budgetTextController.text)
-      ..currentExpenditure = 0.0
-      ..percentage = 0.0
-      ..budgetDate = _loadedBudget.budgetDate.toString();
-    budgetRepository.update(updatedBudget, widget.budgetBoxIndex!);
-  }
-
-  bool _validCategorie(String categorieInput) {
-    if (_categorieTextController.text.isEmpty && widget.budgetBoxIndex == -1) {
-      setState(() {
-        _categorieErrorText = 'Bitte wählen Sie eine Kategorie aus.';
-      });
-      return false;
-    }
-    _categorieErrorText = '';
-    return true;
-  }*/
-
-  bool _validBudget(String budgetInput) {
-    if (_budgetTextController.text.isEmpty) {
-      setState(() {
-        _budgetErrorText = 'Bitte geben Sie ein Budget ein.';
-      });
-      return false;
-    }
-    _budgetErrorText = '';
-    return true;
-  }
-
-  void _setSaveButtonAnimation(bool successful) {
-    successful ? _saveButtonController.success() : _saveButtonController.error();
-    if (successful == false) {
-      Timer(const Duration(seconds: 1), () {
-        _saveButtonController.reset();
-      });
-    }
-  }
-
   void _yesPressed() {
     setState(() {
       DefaultBudget updatedDefaultBudget = DefaultBudget()
@@ -289,7 +189,6 @@ class _CreateOrEditBudgetScreenState extends State<CreateOrEditBudgetScreen> {
       defaultBudgetRepository.update(updatedDefaultBudget);
       budgetRepository.updateAllBudgetsFromCategorie(updatedDefaultBudget);
     });
-    _setSaveButtonAnimation(true);
     Navigator.pop(context);
     Navigator.pop(context);
     Navigator.popAndPushNamed(context, bottomNavBarRoute, arguments: BottomNavBarScreenArguments(1));
@@ -297,7 +196,6 @@ class _CreateOrEditBudgetScreenState extends State<CreateOrEditBudgetScreen> {
   }
 
   void _noPressed() {
-    _setSaveButtonAnimation(false);
     Navigator.pop(context);
     FocusScope.of(context).unfocus();
   }
@@ -307,12 +205,12 @@ class _CreateOrEditBudgetScreenState extends State<CreateOrEditBudgetScreen> {
     return SafeArea(
       child: BlocBuilder<BudgetBloc, BudgetState>(
         builder: (context, budgetState) {
-          if (budgetState is BudgetLoadingState) {
+          if (budgetState is BudgetInitializingState) {
             return const LoadingIndicator();
-          } else if (budgetState is BudgetLoadedState) {
+          } else if (budgetState is BudgetInitializedState) {
             return Scaffold(
               appBar: AppBar(
-                title: Text(budgetState.budgetBoxIndex == -1 ? 'Budget erstellen' : 'Budget bearbeiten'),
+                title: const Text('Budget erstellen'),
               ),
               body: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 24.0),
@@ -324,18 +222,15 @@ class _CreateOrEditBudgetScreenState extends State<CreateOrEditBudgetScreen> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      // TODO hier weitermachen und Create_or_edit_budget_screen in 3 Screens aufteilen Create, Edit Budget und Edit Subbudget
-                      budgetState.budgetBoxIndex == -1
-                          ? BlocBuilder<CategorieInputFieldCubit, CategorieInputFieldModel>(
-                              builder: (context, state) {
-                                return CategorieInputField(
-                                  cubit: categorieInputFieldCubit,
-                                  focusNode: categorieFocusNode,
-                                  categorieType: CategorieTypeExtension.getCategorieType(TransactionType.outcome.name),
-                                );
-                              },
-                            )
-                          : const SizedBox(),
+                      BlocBuilder<CategorieInputFieldCubit, CategorieInputFieldModel>(
+                        builder: (context, state) {
+                          return CategorieInputField(
+                            cubit: categorieInputFieldCubit,
+                            focusNode: categorieFocusNode,
+                            categorieType: CategorieTypeExtension.getCategorieType(TransactionType.outcome.name),
+                          );
+                        },
+                      ),
                       BlocBuilder<SubcategorieInputFieldCubit, String>(
                         builder: (context, state) {
                           return SubcategorieInputField(cubit: subcategorieInputFieldCubit, focusNode: subcategorieFocusNode);
@@ -348,8 +243,8 @@ class _CreateOrEditBudgetScreenState extends State<CreateOrEditBudgetScreen> {
                       ),
                       SaveButton(
                           saveFunction: () => subcategorieInputFieldCubit.state.isEmpty
-                              ? budgetBloc.add(SaveBudgetEvent(context, budgetState.budgetBoxIndex, _saveButtonController))
-                              : subbudgetBloc.add(SaveSubbudgetEvent(context, budgetState.budgetBoxIndex, _saveButtonController)),
+                              ? budgetBloc.add(CreateBudgetEvent(context, _saveButtonController))
+                              : subbudgetBloc.add(CreateSubbudgetEvent(context, _saveButtonController)),
                           buttonController: _saveButtonController),
                     ],
                   ),

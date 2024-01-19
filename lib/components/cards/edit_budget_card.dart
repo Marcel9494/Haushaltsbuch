@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../blocs/budget_bloc/budget_bloc.dart';
+import '../../blocs/subbudget_bloc/subbudget_bloc.dart';
 import '/utils/consts/route_consts.dart';
 import '/utils/number_formatters/number_formatter.dart';
 
@@ -65,7 +66,7 @@ class _EditBudgetCardState extends State<EditBudgetCard> {
                 flex: 1,
                 child: IconButton(
                   icon: const Icon(Icons.edit_rounded),
-                  onPressed: () => BlocProvider.of<BudgetBloc>(context).add(LoadBudgetListFromOneCategorieEvent(context, -1, widget.budget.categorie, DateTime.now().year)),
+                  onPressed: () => BlocProvider.of<BudgetBloc>(context).add(LoadBudgetListFromOneCategorieEvent(context, -1, widget.budget.categorie, DateTime.now().year, true)),
                 ),
               ),
             ],
@@ -116,7 +117,8 @@ class _EditBudgetCardState extends State<EditBudgetCard> {
                                   flex: 1,
                                   child: IconButton(
                                     icon: const Icon(Icons.edit_rounded),
-                                    onPressed: () => Navigator.pushNamed(context, editSubbudgetRoute, arguments: EditSubbudgetScreenArguments(_subbudgets[subcategorieIndex])),
+                                    onPressed: () => BlocProvider.of<SubbudgetBloc>(context)
+                                        .add(LoadSubbudgetListFromOneCategorieEvent(context, -1, _subbudgets[subcategorieIndex].subcategorieName, DateTime.now().year, true)),
                                   ),
                                 ),
                               ],

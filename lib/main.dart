@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:haushaltsbuch/screens/budget_screens/overview_one_subbudget_screen.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -17,7 +18,6 @@ import 'models/intro_screen_state/intro_screen_state_model.dart';
 import 'models/intro_screen_state/intro_screen_state_repository.dart';
 import 'models/primary_account/primary_account_model.dart';
 import 'models/subbudget/subbudget_model.dart';
-import 'models/screen_arguments/edit_subbudget_screen_arguments.dart';
 import 'models/screen_arguments/bottom_nav_bar_screen_arguments.dart';
 import 'models/screen_arguments/account_details_screen_arguments.dart';
 import 'models/screen_arguments/categorie_amount_list_screen_arguments.dart';
@@ -42,7 +42,8 @@ import 'blocs/input_field_blocs/preselect_account_input_field_bloc/preselect_acc
 
 import '/components/bottom_nav_bar/bottom_nav_bar.dart';
 
-import '/screens/budget_screens/edit_budget_screen.dart';
+import 'screens/budget_screens/edit_subbudget_screen.dart';
+import 'screens/budget_screens/edit_budget_screen.dart';
 import 'screens/budget_screens/overview_all_budgets_screen.dart';
 import 'screens/booking_screens/create_or_edit_booking_screen.dart';
 import 'screens/account_screens/create_or_edit_account_screen.dart';
@@ -50,10 +51,9 @@ import 'screens/categorie_screens/create_or_edit_categorie_screen.dart';
 import 'screens/categorie_screens/create_or_edit_subcategorie_screen.dart';
 import 'screens/categorie_screens/categories_screen.dart';
 import 'screens/account_screens/account_details_screen.dart';
-import 'screens/budget_screens/create_or_edit_budget_screen.dart';
+import 'screens/budget_screens/create_budget_screen.dart';
 import 'screens/categorie_screens/categorie_amount_list_screen.dart';
 import 'screens/budget_screens/overview_one_budget_screen.dart';
-import 'screens/budget_screens/overview_one_subbudget_screen.dart';
 import 'screens/other_screens/settings_screen.dart';
 import 'screens/other_screens/splash_screen.dart';
 
@@ -166,8 +166,10 @@ class BudgetBookApp extends StatelessWidget {
       routes: {
         createOrEditBookingRoute: (context) => const CreateOrEditBookingScreen(),
         overviewOneBudgetRoute: (context) => const OverviewOneBudgetScreen(),
-        createOrEditBudgetRoute: (context) => const CreateOrEditBudgetScreen(),
+        overviewOneSubbudgetRoute: (context) => const OverviewOneSubbudgetScreen(),
+        createBudgetRoute: (context) => const CreateBudgetScreen(),
         editBudgetRoute: (context) => const EditBudgetScreen(),
+        editSubbudgetRoute: (context) => const EditSubbudgetScreen(),
         createOrEditAccountRoute: (context) => const CreateOrEditAccountScreen(),
         createOrEditCategorieRoute: (context) => const CreateOrEditCategorieScreen(),
         createOrEditSubcategorieRoute: (context) => const CreateOrEditSubcategorieScreen(),
@@ -190,14 +192,6 @@ class BudgetBookApp extends StatelessWidget {
             return MaterialPageRoute<String>(
               builder: (BuildContext context) => AccountDetailsScreen(
                 account: args.account,
-              ),
-              settings: settings,
-            );
-          case editSubbudgetRoute:
-            final args = settings.arguments as EditSubbudgetScreenArguments;
-            return MaterialPageRoute<String>(
-              builder: (BuildContext context) => OverviewOneSubbudgetScreen(
-                subbudget: args.subbudget,
               ),
               settings: settings,
             );

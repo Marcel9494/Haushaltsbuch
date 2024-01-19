@@ -148,9 +148,9 @@ class _BudgetCardState extends State<BudgetCard> {
                           return const SizedBox();
                         case ConnectionState.done:
                           return SizedBox(
-                            height: _subcategorieNames.length * 58.0,
+                            height: _subcategorieBudgets.length * 58.0,
                             child: ListView.builder(
-                              itemCount: _subcategorieNames.length,
+                              itemCount: _subcategorieBudgets.length,
                               physics: const NeverScrollableScrollPhysics(),
                               itemBuilder: (BuildContext context, int subcategorieIndex) {
                                 return ListTile(

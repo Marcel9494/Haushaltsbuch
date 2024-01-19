@@ -64,6 +64,12 @@ class SubbudgetRepository extends SubbudgetInterface {
   }
 
   @override
+  void update(Subbudget updatedSubbudget, int subbudgetBoxIndex) async {
+    var subbudgetBox = await Hive.openBox(subbudgetsBox);
+    subbudgetBox.putAt(subbudgetBoxIndex, updatedSubbudget);
+  }
+
+  @override
   void updateAllSubbudgetsForCategorie(String budgetCategorie, double newBudgetAmount) async {
     var subbudgetBox = await Hive.openBox(subbudgetsBox);
     for (int i = 0; i < subbudgetBox.length; i++) {
@@ -114,6 +120,27 @@ class SubbudgetRepository extends SubbudgetInterface {
       }
     }
     return subcategorieBudgetList;
+  }
+
+  @override
+  Future<Subbudget> load(int subbudgetBoxIndex) async {
+    var subbudgetBox = await Hive.openBox(subbudgetsBox);
+    Subbudget subbudget = await subbudgetBox.getAt(subbudgetBoxIndex);
+    return subbudget;
+  }
+
+  @override
+  Future<List<Subbudget>> loadSubbudgetListFromOneCategorie(String subbudgetCategorie, [int selectedYear = -1]) async {
+    var subbudgetBox = await Hive.openBox(subbudgetsBox);
+    List<Subbudget> subbudgetList = [];
+    for (int i = 0; i < subbudgetBox.length; i++) {
+      Subbudget subbudget = await subbudgetBox.getAt(i);
+      if (DateTime.parse(subbudget.budgetDate).year == selectedYear && subbudget.subcategorieName == subbudgetCategorie && selectedYear != -1) {
+        subbudget.boxIndex = i;
+        subbudgetList.add(subbudget);
+      }
+    }
+    return subbudgetList;
   }
 
   @override

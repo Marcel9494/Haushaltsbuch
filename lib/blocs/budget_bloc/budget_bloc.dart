@@ -27,7 +27,7 @@ class BudgetBloc extends Bloc<BudgetEvents, BudgetState> {
 
   BudgetBloc() : super(BudgetInitial()) {
     on<InitializeBudgetEvent>((event, emit) {
-      emit(BudgetLoadingState());
+      emit(BudgetInitializingState());
       CategorieInputFieldCubit categorieInputFieldCubit = BlocProvider.of<CategorieInputFieldCubit>(event.context);
       SubcategorieInputFieldCubit subcategorieInputFieldCubit = BlocProvider.of<SubcategorieInputFieldCubit>(event.context);
       MoneyInputFieldCubit moneyInputFieldCubit = BlocProvider.of<MoneyInputFieldCubit>(event.context);
@@ -36,11 +36,11 @@ class BudgetBloc extends Bloc<BudgetEvents, BudgetState> {
       subcategorieInputFieldCubit.resetValue();
       moneyInputFieldCubit.resetValue();
 
-      Navigator.pushNamed(event.context, createOrEditBudgetRoute);
-      emit(BudgetLoadedState(event.context, -1, [], "" as DefaultBudget, ""));
+      Navigator.pushNamed(event.context, createBudgetRoute);
+      emit(BudgetInitializedState());
     });
 
-    on<SaveBudgetEvent>((event, emit) {
+    on<CreateBudgetEvent>((event, emit) {
       CategorieInputFieldCubit categorieInputFieldCubit = BlocProvider.of<CategorieInputFieldCubit>(event.context);
       MoneyInputFieldCubit moneyInputFieldCubit = BlocProvider.of<MoneyInputFieldCubit>(event.context);
 
@@ -64,12 +64,7 @@ class BudgetBloc extends Bloc<BudgetEvents, BudgetState> {
       Timer(const Duration(milliseconds: transitionInMs), () {
         FocusScope.of(event.context).requestFocus(FocusNode());
         Navigator.pop(event.context);
-        Navigator.pop(event.context);
-        if (event.budgetBoxIndex != -1) {
-          Navigator.pop(event.context);
-          Navigator.pop(event.context);
-        }
-        Navigator.pushNamed(event.context, bottomNavBarRoute, arguments: BottomNavBarScreenArguments(1));
+        Navigator.popAndPushNamed(event.context, bottomNavBarRoute, arguments: BottomNavBarScreenArguments(1));
       });
     });
 
@@ -85,17 +80,21 @@ class BudgetBloc extends Bloc<BudgetEvents, BudgetState> {
         Budget loadedBudget = await budgetRepository.load(event.budgetBoxIndex);
         categorieInputFieldCubit.updateValue(loadedBudget.categorie);
         moneyInputFieldCubit.updateValue(formatToMoneyAmount(loadedBudget.budget.toString()));
-        Navigator.pushNamed(event.context, editBudgetRoute);
+        if (event.pushNewScreen) {
+          Navigator.pushNamed(event.context, editBudgetRoute);
+        }
       } else {
-        Navigator.pushNamed(event.context, overviewOneBudgetRoute);
+        if (event.pushNewScreen) {
+          Navigator.pushNamed(event.context, overviewOneBudgetRoute);
+        }
       }
-
-      emit(BudgetLoadedState(event.context, event.budgetBoxIndex, budgetList, defaultBudget, event.categorie));
+      emit(BudgetLoadedState(event.context, event.budgetBoxIndex, budgetList, defaultBudget, event.categorie, event.selectedYear));
     });
 
-    on<UpdateBudgetEvent>((event, emit) {
+    on<UpdateBudgetEvent>((event, emit) async {
       CategorieInputFieldCubit categorieInputFieldCubit = BlocProvider.of<CategorieInputFieldCubit>(event.context);
       MoneyInputFieldCubit moneyInputFieldCubit = BlocProvider.of<MoneyInputFieldCubit>(event.context);
+      Budget loadedBudget = await budgetRepository.load(event.budgetBoxIndex);
 
       if (categorieInputFieldCubit.validateValue(categorieInputFieldCubit.state.categorie) == false ||
           moneyInputFieldCubit.validateValue(moneyInputFieldCubit.state.amount) == false) {
@@ -110,9 +109,17 @@ class BudgetBloc extends Bloc<BudgetEvents, BudgetState> {
           ..budget = formatMoneyAmountToDouble(moneyInputFieldCubit.state.amount)
           ..currentExpenditure = 0.0
           ..percentage = 0.0
-          ..budgetDate = DateTime.now().toString();
+          ..budgetDate = loadedBudget.budgetDate;
         budgetRepository.update(updatedBudget, event.budgetBoxIndex);
       }
+      event.saveButtonController.success();
+      DefaultBudget defaultBudget = await defaultBudgetRepository.load(categorieInputFieldCubit.state.categorie);
+      List<Budget> budgetList = await budgetRepository.loadBudgetListFromOneCategorie(categorieInputFieldCubit.state.categorie, DateTime.parse(loadedBudget.budgetDate).year);
+      await Future.delayed(const Duration(milliseconds: transitionInMs));
+      Navigator.pop(event.context);
+      Navigator.popAndPushNamed(event.context, overviewOneBudgetRoute);
+      emit(BudgetLoadedState(
+          event.context, event.budgetBoxIndex, budgetList, defaultBudget, categorieInputFieldCubit.state.categorie, DateTime.parse(loadedBudget.budgetDate).year));
     });
   }
 }

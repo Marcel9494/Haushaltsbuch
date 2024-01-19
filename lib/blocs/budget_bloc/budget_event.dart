@@ -8,11 +8,10 @@ class InitializeBudgetEvent extends BudgetEvents {
   InitializeBudgetEvent(this.context);
 }
 
-class SaveBudgetEvent extends BudgetEvents {
+class CreateBudgetEvent extends BudgetEvents {
   final BuildContext context;
-  final int budgetBoxIndex;
   final RoundedLoadingButtonController saveButtonController;
-  SaveBudgetEvent(this.context, this.budgetBoxIndex, this.saveButtonController);
+  CreateBudgetEvent(this.context, this.saveButtonController);
 }
 
 class LoadBudgetListFromOneCategorieEvent extends BudgetEvents {
@@ -20,7 +19,8 @@ class LoadBudgetListFromOneCategorieEvent extends BudgetEvents {
   final int budgetBoxIndex;
   final String categorie;
   final int selectedYear;
-  LoadBudgetListFromOneCategorieEvent(this.context, this.budgetBoxIndex, this.categorie, this.selectedYear);
+  final bool pushNewScreen;
+  LoadBudgetListFromOneCategorieEvent(this.context, this.budgetBoxIndex, this.categorie, this.selectedYear, this.pushNewScreen);
 }
 
 class UpdateBudgetEvent extends BudgetEvents {

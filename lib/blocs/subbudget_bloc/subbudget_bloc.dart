@@ -4,6 +4,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 
+import '/models/default_budget/default_budget_repository.dart';
+import '/models/default_budget/default_budget_model.dart';
 import '/models/budget/budget_model.dart';
 import '/models/budget/budget_repository.dart';
 import '/models/subbudget/subbudget_model.dart';
@@ -24,9 +26,10 @@ part 'subbudget_state.dart';
 class SubbudgetBloc extends Bloc<SubbudgetEvent, SubbudgetState> {
   BudgetRepository budgetRepository = BudgetRepository();
   SubbudgetRepository subbudgetRepository = SubbudgetRepository();
+  DefaultBudgetRepository defaultBudgetRepository = DefaultBudgetRepository();
 
   SubbudgetBloc() : super(SubbudgetInitial()) {
-    on<SaveSubbudgetEvent>((event, emit) async {
+    on<CreateSubbudgetEvent>((event, emit) async {
       CategorieInputFieldCubit categorie = BlocProvider.of<CategorieInputFieldCubit>(event.context);
       SubcategorieInputFieldCubit subcategorie = BlocProvider.of<SubcategorieInputFieldCubit>(event.context);
       MoneyInputFieldCubit budgetAmount = BlocProvider.of<MoneyInputFieldCubit>(event.context);
@@ -56,41 +59,66 @@ class SubbudgetBloc extends Bloc<SubbudgetEvent, SubbudgetState> {
           ..budgetDate = DateTime.now().toString();
         subbudgetRepository.create(newSubbudget);
       }
-      // TODO if (_budgetExistsAlready == false) {
       event.saveButtonController.success();
       Timer(const Duration(milliseconds: transitionInMs), () {
         FocusScope.of(event.context).requestFocus(FocusNode());
         Navigator.pop(event.context);
-        Navigator.pop(event.context);
-        if (event.subbudgetBoxIndex != -1) {
-          Navigator.pop(event.context);
-          Navigator.pop(event.context);
-        }
-        Navigator.pushNamed(event.context, bottomNavBarRoute, arguments: BottomNavBarScreenArguments(1));
+        Navigator.popAndPushNamed(event.context, bottomNavBarRoute, arguments: BottomNavBarScreenArguments(1));
       });
     });
 
-    on<LoadSubbudgetEvent>((event, emit) async {
+    on<LoadSubbudgetListFromOneCategorieEvent>((event, emit) async {
       emit(SubbudgetLoadingState());
-      CategorieInputFieldCubit categorie = BlocProvider.of<CategorieInputFieldCubit>(event.context);
-      SubcategorieInputFieldCubit subcategorie = BlocProvider.of<SubcategorieInputFieldCubit>(event.context);
-      MoneyInputFieldCubit budgetAmount = BlocProvider.of<MoneyInputFieldCubit>(event.context);
+      DefaultBudget defaultBudget = await defaultBudgetRepository.load(event.categorie);
+      List<Subbudget> subbudgetList = await subbudgetRepository.loadSubbudgetListFromOneCategorie(event.categorie, event.selectedYear);
 
-      Budget updatedBudget = Budget()
-        ..categorie = categorie.state.categorie
-        ..budget = formatMoneyAmountToDouble(budgetAmount.state.amount)
-        ..currentExpenditure = 0.0
-        ..percentage = 0.0
-        ..budgetDate = DateTime.now().toString();
-      // TODO subbudgetRepository.update(updatedBudget, event.budgetBoxIndex);
+      if (event.subbudgetBoxIndex >= 0) {
+        SubcategorieInputFieldCubit subcategorieInputFieldCubit = BlocProvider.of<SubcategorieInputFieldCubit>(event.context);
+        MoneyInputFieldCubit moneyInputFieldCubit = BlocProvider.of<MoneyInputFieldCubit>(event.context);
+        Subbudget loadedSubbudget = await subbudgetRepository.load(event.subbudgetBoxIndex);
+        subcategorieInputFieldCubit.updateValue(loadedSubbudget.subcategorieName);
+        moneyInputFieldCubit.updateValue(formatToMoneyAmount(loadedSubbudget.subcategorieBudget.toString()));
+        if (event.pushNewScreen) {
+          Navigator.pushNamed(event.context, editSubbudgetRoute);
+        }
+      } else {
+        if (event.pushNewScreen) {
+          Navigator.pushNamed(event.context, overviewOneSubbudgetRoute);
+        }
+      }
+      emit(SubbudgetLoadedState(event.context, event.subbudgetBoxIndex, subbudgetList, defaultBudget, event.categorie, event.selectedYear));
+    });
 
-      /*if (event.budgetModeType == BudgetModeType.updateDefaultBudgetMode) {
-          // TODO _updateAllFutureBudgets();
-        } else {
-          // TODO _updateBudget();
-        }*/
+    on<UpdateSubbudgetEvent>((event, emit) async {
+      SubcategorieInputFieldCubit subcategorieInputFieldCubit = BlocProvider.of<SubcategorieInputFieldCubit>(event.context);
+      MoneyInputFieldCubit moneyInputFieldCubit = BlocProvider.of<MoneyInputFieldCubit>(event.context);
+      Subbudget loadedSubbudget = await subbudgetRepository.load(event.subbudgetBoxIndex);
 
-      emit(SubbudgetLoadedState());
+      if (moneyInputFieldCubit.validateValue(moneyInputFieldCubit.state.amount) == false) {
+        event.saveButtonController.error();
+        Timer(const Duration(milliseconds: transitionInMs), () {
+          event.saveButtonController.reset();
+        });
+        return;
+      } else {
+        Subbudget updatedSubbudget = Subbudget()
+          ..categorie = loadedSubbudget.categorie
+          ..subcategorieName = subcategorieInputFieldCubit.state
+          ..subcategorieBudget = formatMoneyAmountToDouble(moneyInputFieldCubit.state.amount)
+          ..currentSubcategorieExpenditure = 0.0
+          ..currentSubcategoriePercentage = 0.0
+          ..budgetDate = loadedSubbudget.budgetDate;
+        subbudgetRepository.update(updatedSubbudget, event.subbudgetBoxIndex);
+      }
+      event.saveButtonController.success();
+      DefaultBudget defaultBudget = await defaultBudgetRepository.load(subcategorieInputFieldCubit.state);
+      List<Subbudget> subbudgetList =
+          await subbudgetRepository.loadSubbudgetListFromOneCategorie(subcategorieInputFieldCubit.state, DateTime.parse(loadedSubbudget.budgetDate).year);
+      await Future.delayed(const Duration(milliseconds: transitionInMs));
+      Navigator.pop(event.context);
+      Navigator.popAndPushNamed(event.context, overviewOneSubbudgetRoute);
+      emit(SubbudgetLoadedState(
+          event.context, event.subbudgetBoxIndex, subbudgetList, defaultBudget, subcategorieInputFieldCubit.state, DateTime.parse(loadedSubbudget.budgetDate).year));
     });
   }
 }
