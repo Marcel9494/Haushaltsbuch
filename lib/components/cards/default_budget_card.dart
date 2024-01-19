@@ -19,7 +19,7 @@ class DefaultBudgetCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () =>
-          Navigator.pushNamed(context, createOrEditBudgetRoute, arguments: CreateOrEditBudgetScreenArguments(BudgetModeType.updateDefaultBudgetMode, -1, defaultBudget.categorie)),
+          Navigator.pushNamed(context, createBudgetRoute, arguments: CreateOrEditBudgetScreenArguments(BudgetModeType.updateDefaultBudgetMode, -1, defaultBudget.categorie)),
       child: Card(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(14.0),

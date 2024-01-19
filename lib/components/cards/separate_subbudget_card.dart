@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '/blocs/subbudget_bloc/subbudget_bloc.dart';
 
 import '/models/subbudget/subbudget_model.dart';
-import '/models/enums/budget_mode_types.dart';
-import '/models/screen_arguments/create_or_edit_budget_screen_arguments.dart';
 
-import '/utils/consts/route_consts.dart';
 import '/utils/date_formatters/date_formatter.dart';
 import '/utils/number_formatters/number_formatter.dart';
 
@@ -19,7 +19,8 @@ class SeparateSubbudgetCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => Navigator.pushNamed(context, createOrEditBudgetRoute, arguments: CreateOrEditBudgetScreenArguments(BudgetModeType.budgetCreationMode, subbudget.boxIndex)),
+      onTap: () => BlocProvider.of<SubbudgetBloc>(context)
+          .add(LoadSubbudgetListFromOneCategorieEvent(context, subbudget.boxIndex, subbudget.categorie, DateTime.parse(subbudget.budgetDate).year, true)),
       child: Card(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(14.0),

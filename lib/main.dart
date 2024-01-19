@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:haushaltsbuch/screens/budget_screens/overview_one_subbudget_screen.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -17,23 +18,22 @@ import 'models/intro_screen_state/intro_screen_state_model.dart';
 import 'models/intro_screen_state/intro_screen_state_repository.dart';
 import 'models/primary_account/primary_account_model.dart';
 import 'models/subbudget/subbudget_model.dart';
-import 'models/screen_arguments/create_or_edit_subcategorie_screen_arguments.dart';
-import 'models/screen_arguments/edit_budget_screen_arguments.dart';
-import 'models/screen_arguments/edit_subbudget_screen_arguments.dart';
 import 'models/screen_arguments/bottom_nav_bar_screen_arguments.dart';
 import 'models/screen_arguments/account_details_screen_arguments.dart';
 import 'models/screen_arguments/categorie_amount_list_screen_arguments.dart';
-import 'models/screen_arguments/create_or_edit_budget_screen_arguments.dart';
-import 'models/screen_arguments/create_or_edit_categorie_screen_arguments.dart';
 
+import 'blocs/budget_bloc/budget_bloc.dart';
 import 'blocs/booking_bloc/booking_bloc.dart';
 import 'blocs/account_bloc/account_bloc.dart';
+import 'blocs/categorie_bloc/categorie_bloc.dart';
+import 'blocs/subbudget_bloc/subbudget_bloc.dart';
 import 'blocs/primary_account_bloc/primary_account_bloc.dart';
 import 'blocs/input_field_blocs/text_input_field_bloc/text_input_field_cubit.dart';
 import 'blocs/input_field_blocs/money_input_field_bloc/money_input_field_cubit.dart';
 import 'blocs/input_field_blocs/account_input_field_bloc/from_account_input_field_cubit.dart';
 import 'blocs/input_field_blocs/categorie_input_field_bloc/categorie_input_field_cubit.dart';
 import 'blocs/input_field_blocs/subcategorie_input_field_bloc/subcategorie_input_field_cubit.dart';
+import 'blocs/button_blocs/categorie_type_toggle_buttons_bloc/categorie_type_toggle_buttons_cubit.dart';
 import 'blocs/button_blocs/transaction_stats_toggle_buttons_bloc/transaction_stats_toggle_buttons_cubit.dart';
 import 'blocs/input_field_blocs/date_input_field_bloc/date_input_field_cubit.dart';
 import 'blocs/input_field_blocs/account_type_input_field_bloc/account_type_input_field_cubit.dart';
@@ -42,17 +42,18 @@ import 'blocs/input_field_blocs/preselect_account_input_field_bloc/preselect_acc
 
 import '/components/bottom_nav_bar/bottom_nav_bar.dart';
 
-import 'screens/budget_screens/overview_budgets_screen.dart';
+import 'screens/budget_screens/edit_subbudget_screen.dart';
+import 'screens/budget_screens/edit_budget_screen.dart';
+import 'screens/budget_screens/overview_all_budgets_screen.dart';
 import 'screens/booking_screens/create_or_edit_booking_screen.dart';
 import 'screens/account_screens/create_or_edit_account_screen.dart';
 import 'screens/categorie_screens/create_or_edit_categorie_screen.dart';
 import 'screens/categorie_screens/create_or_edit_subcategorie_screen.dart';
 import 'screens/categorie_screens/categories_screen.dart';
 import 'screens/account_screens/account_details_screen.dart';
-import 'screens/budget_screens/create_or_edit_budget_screen.dart';
+import 'screens/budget_screens/create_budget_screen.dart';
 import 'screens/categorie_screens/categorie_amount_list_screen.dart';
-import 'screens/budget_screens/edit_budget_screen.dart';
-import 'screens/budget_screens/edit_subbudget_screen.dart';
+import 'screens/budget_screens/overview_one_budget_screen.dart';
 import 'screens/other_screens/settings_screen.dart';
 import 'screens/other_screens/splash_screen.dart';
 
@@ -82,6 +83,15 @@ void main() async {
         BlocProvider<AccountBloc>(
           create: (context) => AccountBloc(),
         ),
+        BlocProvider<BudgetBloc>(
+          create: (context) => BudgetBloc(),
+        ),
+        BlocProvider<SubbudgetBloc>(
+          create: (context) => SubbudgetBloc(),
+        ),
+        BlocProvider<CategorieBloc>(
+          create: (context) => CategorieBloc(),
+        ),
         BlocProvider<PrimaryAccountBloc>(
           create: (context) => PrimaryAccountBloc(),
         ),
@@ -108,6 +118,9 @@ void main() async {
         ),
         BlocProvider<TransactionStatsToggleButtonsCubit>(
           create: (context) => TransactionStatsToggleButtonsCubit(),
+        ),
+        BlocProvider<CategorieTypeToggleButtonsCubit>(
+          create: (context) => CategorieTypeToggleButtonsCubit(),
         ),
         BlocProvider<DateInputFieldCubit>(
           create: (context) => DateInputFieldCubit(),
@@ -152,9 +165,16 @@ class BudgetBookApp extends StatelessWidget {
       home: const SplashScreen(),
       routes: {
         createOrEditBookingRoute: (context) => const CreateOrEditBookingScreen(),
+        overviewOneBudgetRoute: (context) => const OverviewOneBudgetScreen(),
+        overviewOneSubbudgetRoute: (context) => const OverviewOneSubbudgetScreen(),
+        createBudgetRoute: (context) => const CreateBudgetScreen(),
+        editBudgetRoute: (context) => const EditBudgetScreen(),
+        editSubbudgetRoute: (context) => const EditSubbudgetScreen(),
         createOrEditAccountRoute: (context) => const CreateOrEditAccountScreen(),
+        createOrEditCategorieRoute: (context) => const CreateOrEditCategorieScreen(),
+        createOrEditSubcategorieRoute: (context) => const CreateOrEditSubcategorieScreen(),
         categoriesRoute: (context) => const CategoriesScreen(),
-        overviewBudgetsRoute: (context) => const OverviewBudgetsScreen(),
+        overviewBudgetsRoute: (context) => const OverviewAllBudgetsScreen(),
         settingsRoute: (context) => const SettingsScreen(),
       },
       onGenerateRoute: (RouteSettings settings) {
@@ -172,59 +192,6 @@ class BudgetBookApp extends StatelessWidget {
             return MaterialPageRoute<String>(
               builder: (BuildContext context) => AccountDetailsScreen(
                 account: args.account,
-              ),
-              settings: settings,
-            );
-          /*case createOrEditAccountRoute:
-            final args = settings.arguments as CreateOrEditAccountScreenArguments;
-            return MaterialPageRoute<String>(
-              builder: (BuildContext context) => CreateOrEditAccountScreen(
-                accountBoxIndex: args.accountBoxIndex,
-              ),
-              settings: settings,
-            );*/
-          case createOrEditCategorieRoute:
-            final args = settings.arguments as CreateOrEditCategorieScreenArguments;
-            return MaterialPageRoute<String>(
-              builder: (BuildContext context) => CreateOrEditCategorieScreen(
-                categorieName: args.categorieName,
-                categorieType: args.categorieType,
-              ),
-              settings: settings,
-            );
-          case createOrEditSubcategorieRoute:
-            final args = settings.arguments as CreateOrEditSubcategorieScreenArguments;
-            return MaterialPageRoute<String>(
-              builder: (BuildContext context) => CreateOrEditSubcategorieScreen(
-                categorie: args.categorie,
-                mode: args.mode,
-                subcategorieIndex: args.subcategorieIndex,
-              ),
-              settings: settings,
-            );
-          case createOrEditBudgetRoute:
-            final args = settings.arguments as CreateOrEditBudgetScreenArguments;
-            return MaterialPageRoute<String>(
-              builder: (BuildContext context) => CreateOrEditBudgetScreen(
-                budgetModeType: args.budgetModeType,
-                budgetBoxIndex: args.budgetBoxIndex,
-                budgetCategorie: args.budgetCategorie,
-              ),
-              settings: settings,
-            );
-          case editBudgetRoute:
-            final args = settings.arguments as EditBudgetScreenArguments;
-            return MaterialPageRoute<String>(
-              builder: (BuildContext context) => EditBudgetScreen(
-                budget: args.budget,
-              ),
-              settings: settings,
-            );
-          case editSubbudgetRoute:
-            final args = settings.arguments as EditSubbudgetScreenArguments;
-            return MaterialPageRoute<String>(
-              builder: (BuildContext context) => EditSubbudgetScreen(
-                subbudget: args.subbudget,
               ),
               settings: settings,
             );

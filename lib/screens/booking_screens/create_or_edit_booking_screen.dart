@@ -177,7 +177,6 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
                               return MoneyInputField(cubit: moneyInputFieldCubit, focusNode: amountFocusNode, hintText: 'Betrag', bottomSheetTitle: 'Betrag eingeben:');
                             },
                           ),
-                          // TODO hier weitermachen und vorselektierte Konten gleich anzeigen lassen
                           Column(
                             children: [
                               BlocBuilder<FromAccountInputFieldCubit, FromAccountInputFieldModel>(

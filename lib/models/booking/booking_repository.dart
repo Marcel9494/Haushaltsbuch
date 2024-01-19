@@ -211,7 +211,6 @@ class BookingRepository extends BookingInterface {
     }
   }
 
-  // TODO subcategorie mit abhandeln oder eigene Funktion für updateBookingSubcategorie implementieren?
   @override
   Future<void> updateBookingCategorieName(String oldCategorieName, String newCategorieName) async {
     var bookingBox = await Hive.openBox(bookingsBox);
@@ -226,11 +225,36 @@ class BookingRepository extends BookingInterface {
           ..date = booking.date
           ..amount = booking.amount
           ..categorie = newCategorieName
+          ..subcategorie = booking.subcategorie
           ..fromAccount = booking.fromAccount
           ..toAccount = booking.toAccount
           ..serieId = booking.serieId
           ..booked = booking.booked;
-        bookingBox.putAt(updatedBookingWithNewCategorieName.boxIndex, updatedBookingWithNewCategorieName);
+        bookingBox.putAt(i, updatedBookingWithNewCategorieName);
+      }
+    }
+  }
+
+  @override
+  Future<void> updateBookingSubcategorieName(String oldSubcategorieName, String newSubcategorieName) async {
+    var bookingBox = await Hive.openBox(bookingsBox);
+    for (int i = 0; i < bookingBox.length; i++) {
+      Booking booking = await bookingBox.getAt(i);
+      if (booking.subcategorie.contains(oldSubcategorieName)) {
+        Booking updatedBookingWithNewCategorieName = Booking()
+          ..boxIndex = i
+          ..transactionType = booking.transactionType
+          ..bookingRepeats = booking.bookingRepeats
+          ..title = booking.title
+          ..date = booking.date
+          ..amount = booking.amount
+          ..categorie = booking.categorie
+          ..subcategorie = newSubcategorieName
+          ..fromAccount = booking.fromAccount
+          ..toAccount = booking.toAccount
+          ..serieId = booking.serieId
+          ..booked = booking.booked;
+        bookingBox.putAt(i, updatedBookingWithNewCategorieName);
       }
     }
   }

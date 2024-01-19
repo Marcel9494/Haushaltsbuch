@@ -64,6 +64,22 @@ class BudgetRepository extends BudgetInterface {
   }
 
   @override
+  Future<void> updateBudgetCategorieName(String oldCategorieName, String newCategorieName) async {
+    var budgetBox = await Hive.openBox(budgetsBox);
+    for (int i = 0; i < budgetBox.length; i++) {
+      Budget budget = await budgetBox.getAt(i);
+      if (budget.categorie == oldCategorieName) {
+        Budget updatedBudgetWithNewCategorieName = Budget()
+          ..boxIndex = i
+          ..categorie = newCategorieName
+          ..budget = budget.budget
+          ..budgetDate = budget.budgetDate;
+        budgetBox.putAt(i, updatedBudgetWithNewCategorieName);
+      }
+    }
+  }
+
+  @override
   void deleteAllBudgetsFromCategorie(String budgetCategorie) async {
     var budgetBox = await Hive.openBox(budgetsBox);
     for (int i = budgetBox.length - 1; i >= 0; i--) {
@@ -107,7 +123,7 @@ class BudgetRepository extends BudgetInterface {
   }
 
   @override
-  Future<List<Budget>> loadOneBudgetCategorie(String budgetCategorie, [int selectedYear = -1]) async {
+  Future<List<Budget>> loadBudgetListFromOneCategorie(String budgetCategorie, [int selectedYear = -1]) async {
     var budgetBox = await Hive.openBox(budgetsBox);
     List<Budget> budgetList = [];
     for (int i = 0; i < budgetBox.length; i++) {
@@ -140,10 +156,10 @@ class BudgetRepository extends BudgetInterface {
     for (int i = 0; i < budgetBox.length; i++) {
       Budget budget = await budgetBox.getAt(i);
       if (budget.categorie == budgetCategorie) {
-        return Future.value(true);
+        return true;
       }
     }
-    return Future.value(false);
+    return false;
   }
 
   @override

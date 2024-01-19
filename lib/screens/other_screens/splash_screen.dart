@@ -57,16 +57,14 @@ class _SplashScreenState extends State<SplashScreen> {
                     return const IntroductionScreens();
                   } else {
                     // Wenn State auf false => Initialisieren und Anzeigen der Buchungsseite
+                    GlobalStateRepository globalStateRepository = GlobalStateRepository();
+                    globalStateRepository.create();
                     AccountRepository accountRepository = AccountRepository();
                     accountRepository.createStartAccounts();
                     CategorieRepository categorieRepository = CategorieRepository();
-                    categorieRepository.createStartExpenditureCategories();
-                    categorieRepository.createStartRevenueCategories();
-                    categorieRepository.createStartInvestmentCategories();
+                    categorieRepository.createStartCategories();
                     PrimaryAccountRepository primaryAccountRepository = PrimaryAccountRepository();
                     primaryAccountRepository.createStartPrimaryAccounts();
-                    GlobalStateRepository globalStateRepository = GlobalStateRepository();
-                    globalStateRepository.create();
                     return const BottomNavBar(screenIndex: 0);
                   }
                 } else {
