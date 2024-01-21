@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '/blocs/subbudget_bloc/subbudget_bloc.dart';
 
 import '/utils/consts/route_consts.dart';
 
+import '/components/dialogs/choice_dialog.dart';
 import '/components/deco/loading_indicator.dart';
 import '/components/cards/default_budget_card.dart';
 import '/components/buttons/year_picker_buttons.dart';
@@ -62,8 +64,16 @@ class _OverviewOneSubbudgetScreenState extends State<OverviewOneSubbudgetScreen>
                   title: Text(budgetState.categorie + ' Budgets'),
                   actions: <Widget>[
                     IconButton(
-                      // TODO hier weitermachen und deleteBudget in Bloc auslagern
-                      onPressed: () => _deleteSubbudget(),
+                      onPressed: () => showChoiceDialog(
+                          context,
+                          'Budget löschen?',
+                          () => SchedulerBinding.instance.addPostFrameCallback((_) {
+                                BlocProvider.of<SubbudgetBloc>(context).add(DeleteSubbudgetEvent(context, budgetState.categorie));
+                              }),
+                          () => Navigator.pop(context),
+                          'Budget wurde gelöscht',
+                          'Budget für ${budgetState.categorie} wurde erfolgreich gelöscht.',
+                          Icons.info_outline),
                       icon: const Icon(Icons.delete_forever_rounded),
                     ),
                   ],
@@ -89,7 +99,16 @@ class _OverviewOneSubbudgetScreenState extends State<OverviewOneSubbudgetScreen>
                   title: Text(budgetState.categorie + ' Budgets'),
                   actions: <Widget>[
                     IconButton(
-                      onPressed: () => _deleteSubbudget(),
+                      onPressed: () => showChoiceDialog(
+                          context,
+                          'Budget löschen?',
+                          () => SchedulerBinding.instance.addPostFrameCallback((_) {
+                                BlocProvider.of<SubbudgetBloc>(context).add(DeleteSubbudgetEvent(context, budgetState.categorie));
+                              }),
+                          () => Navigator.pop(context),
+                          'Budget wurde gelöscht',
+                          'Budget für ${budgetState.categorie} wurde erfolgreich gelöscht.',
+                          Icons.info_outline),
                       icon: const Icon(Icons.delete_forever_rounded),
                     ),
                   ],
