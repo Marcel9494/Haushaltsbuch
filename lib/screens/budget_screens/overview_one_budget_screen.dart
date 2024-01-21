@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '/blocs/budget_bloc/budget_bloc.dart';
 
+import '/components/dialogs/choice_dialog.dart';
 import '/components/deco/loading_indicator.dart';
 import '/components/cards/default_budget_card.dart';
 import '/components/cards/separate_budget_card.dart';
@@ -18,12 +20,6 @@ class OverviewOneBudgetScreen extends StatefulWidget {
 class _OverviewOneBudgetScreenState extends State<OverviewOneBudgetScreen> {
   final DateTime _selectedYear = DateTime.now();
 
-  // TODO in Bloc umziehen
-  void _deleteBudget() {
-    //showChoiceDialog(
-    //    context, 'Budget löschen?', _yesPressed, _noPressed, 'Budget wurde gelöscht', 'Budget für ${widget.budget.categorie} wurde erfolgreich gelöscht.', Icons.info_outline);
-  }
-
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -38,8 +34,16 @@ class _OverviewOneBudgetScreenState extends State<OverviewOneBudgetScreen> {
                   title: Text(budgetState.categorie + ' Budgets'),
                   actions: <Widget>[
                     IconButton(
-                      // TODO hier weitermachen und deleteBudget in Bloc auslagern
-                      onPressed: () => _deleteBudget(),
+                      onPressed: () => showChoiceDialog(
+                          context,
+                          'Budget löschen?',
+                          () => SchedulerBinding.instance.addPostFrameCallback((_) {
+                                BlocProvider.of<BudgetBloc>(context).add(DeleteBudgetEvent(context, budgetState.categorie));
+                              }),
+                          () => Navigator.pop(context),
+                          'Budget wurde gelöscht',
+                          'Budget für ${budgetState.categorie} wurde erfolgreich gelöscht.',
+                          Icons.info_outline),
                       icon: const Icon(Icons.delete_forever_rounded),
                     ),
                   ],
@@ -65,7 +69,16 @@ class _OverviewOneBudgetScreenState extends State<OverviewOneBudgetScreen> {
                   title: Text(budgetState.categorie + ' Budgets'),
                   actions: <Widget>[
                     IconButton(
-                      onPressed: () => _deleteBudget(),
+                      onPressed: () => showChoiceDialog(
+                          context,
+                          'Budget löschen?',
+                          () => SchedulerBinding.instance.addPostFrameCallback((_) {
+                                BlocProvider.of<BudgetBloc>(context).add(DeleteBudgetEvent(context, budgetState.categorie));
+                              }),
+                          () => Navigator.pop(context),
+                          'Budget wurde gelöscht',
+                          'Budget für ${budgetState.categorie} wurde erfolgreich gelöscht.',
+                          Icons.info_outline),
                       icon: const Icon(Icons.delete_forever_rounded),
                     ),
                   ],

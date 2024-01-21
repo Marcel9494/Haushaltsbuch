@@ -13,6 +13,9 @@ abstract class SubbudgetInterface {
   Future<List<Subbudget>> loadSubcategorieList(String categorie);
   Future<List<Subbudget>> loadSubcategorieBudgetList(String categorie, List<String> subcategorie, DateTime selectedDate);
   Future<List<Subbudget>> loadOneSubbudget(String subcategorieName);
+
+  void deleteAllBudgetsFromCategorie(String subbudgetCategorie);
+
   Future<bool> existsSubbudgetForCategorie(String subbudgetCategorie);
   Future<List<Subbudget>> calculateCurrentExpenditure(List<Subbudget> subbudgetList, DateTime selectedDate);
 }

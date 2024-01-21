@@ -30,3 +30,9 @@ class UpdateSubbudgetEvent extends SubbudgetEvent {
   final RoundedLoadingButtonController saveButtonController;
   UpdateSubbudgetEvent(this.context, this.subbudgetBoxIndex, this.saveButtonController);
 }
+
+class DeleteSubbudgetEvent extends SubbudgetEvent {
+  final BuildContext context;
+  final String subbudgetCategorie;
+  DeleteSubbudgetEvent(this.context, this.subbudgetCategorie);
+}

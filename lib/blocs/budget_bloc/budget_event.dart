@@ -29,3 +29,9 @@ class UpdateBudgetEvent extends BudgetEvents {
   final RoundedLoadingButtonController saveButtonController;
   UpdateBudgetEvent(this.context, this.budgetBoxIndex, this.saveButtonController);
 }
+
+class DeleteBudgetEvent extends BudgetEvents {
+  final BuildContext context;
+  final String budgetCategorie;
+  DeleteBudgetEvent(this.context, this.budgetCategorie);
+}

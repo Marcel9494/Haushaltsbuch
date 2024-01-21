@@ -158,6 +158,19 @@ class SubbudgetRepository extends SubbudgetInterface {
   }
 
   @override
+  void deleteAllBudgetsFromCategorie(String subbudgetCategorie) async {
+    var subbudgetBox = await Hive.openBox(subbudgetsBox);
+    for (int i = subbudgetBox.length - 1; i >= 0; i--) {
+      Subbudget subbudget = await subbudgetBox.getAt(i);
+      if (subbudget.subcategorieName == subbudgetCategorie) {
+        subbudgetBox.deleteAt(i);
+      }
+    }
+    DefaultBudgetRepository defaultBudgetRepository = DefaultBudgetRepository();
+    defaultBudgetRepository.delete(subbudgetCategorie);
+  }
+
+  @override
   Future<bool> existsSubbudgetForCategorie(String subbudgetCategorie) async {
     var subbudgetBox = await Hive.openBox(subbudgetsBox);
     for (int i = 0; i < subbudgetBox.length; i++) {

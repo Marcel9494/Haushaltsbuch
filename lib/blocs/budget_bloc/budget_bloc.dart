@@ -1,9 +1,11 @@
 import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 
+import '../../components/dialogs/choice_dialog.dart';
 import '/models/default_budget/default_budget_model.dart';
 import '/models/default_budget/default_budget_repository.dart';
 import '/models/budget/budget_model.dart';
@@ -120,6 +122,19 @@ class BudgetBloc extends Bloc<BudgetEvents, BudgetState> {
       Navigator.popAndPushNamed(event.context, overviewOneBudgetRoute);
       emit(BudgetLoadedState(
           event.context, event.budgetBoxIndex, budgetList, defaultBudget, categorieInputFieldCubit.state.categorie, DateTime.parse(loadedBudget.budgetDate).year));
+    });
+
+    on<DeleteBudgetEvent>((event, emit) async {
+      budgetRepository.deleteAllBudgetsFromCategorie(event.budgetCategorie);
+      SchedulerBinding.instance.addPostFrameCallback((_) {
+        Navigator.pop(event.context);
+        Navigator.pop(event.context);
+        Navigator.pop(event.context);
+        Navigator.pop(event.context);
+        Navigator.pop(event.context);
+        Navigator.pushNamed(event.context, bottomNavBarRoute, arguments: BottomNavBarScreenArguments(1));
+        Navigator.pushNamed(event.context, overviewBudgetsRoute);
+      });
     });
   }
 }

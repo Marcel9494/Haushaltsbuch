@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 
@@ -119,6 +120,19 @@ class SubbudgetBloc extends Bloc<SubbudgetEvent, SubbudgetState> {
       Navigator.popAndPushNamed(event.context, overviewOneSubbudgetRoute);
       emit(SubbudgetLoadedState(
           event.context, event.subbudgetBoxIndex, subbudgetList, defaultBudget, subcategorieInputFieldCubit.state, DateTime.parse(loadedSubbudget.budgetDate).year));
+    });
+
+    on<DeleteSubbudgetEvent>((event, emit) async {
+      subbudgetRepository.deleteAllBudgetsFromCategorie(event.subbudgetCategorie);
+      SchedulerBinding.instance.addPostFrameCallback((_) {
+        Navigator.pop(event.context);
+        Navigator.pop(event.context);
+        Navigator.pop(event.context);
+        Navigator.pop(event.context);
+        Navigator.pop(event.context);
+        Navigator.pushNamed(event.context, bottomNavBarRoute, arguments: BottomNavBarScreenArguments(1));
+        Navigator.pushNamed(event.context, overviewBudgetsRoute);
+      });
     });
   }
 }
