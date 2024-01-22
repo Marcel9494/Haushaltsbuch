@@ -110,7 +110,7 @@ class MoneyInputField extends StatelessWidget {
                         child: const Text('0', style: TextStyle(color: Colors.cyanAccent, fontSize: 26.0)),
                       ),
                       OutlinedButton(
-                        onPressed: () => _setAmount(','),
+                        onPressed: () => cubit.state.amount.contains(',') ? null : _setAmount(','),
                         child: const Text(',', style: TextStyle(color: Colors.cyanAccent, fontSize: 36.0)),
                       ),
                     ],
