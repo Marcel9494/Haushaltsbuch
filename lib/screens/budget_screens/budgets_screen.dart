@@ -69,7 +69,7 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
                 Padding(
                   padding: const EdgeInsets.only(right: 12.0),
                   child: DateTime.now().month == _selectedDate.month
-                      ? Text('Verbleibende Tage: ${DateTime(_selectedDate.year, _selectedDate.month + 1, 0).day - DateTime.now().day + 1}')
+                      ? Text('Restliche Tage: ${DateTime(_selectedDate.year, _selectedDate.month + 1, 0).day - DateTime.now().day + 1}')
                       : const SizedBox(),
                 ),
               ],
@@ -100,32 +100,51 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
                                 ),
                                 child: SingleChildScrollView(
                                   physics: const NeverScrollableScrollPhysics(),
-                                  child: CircularPercentIndicator(
-                                    radius: 84.0,
-                                    lineWidth: 10.0,
-                                    percent: _completeBudgetPercentage / 100 >= 1.0 ? 1.0 : _completeBudgetPercentage / 100,
-                                    center: Text('${_completeBudgetPercentage.toStringAsFixed(1)} %', style: const TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold)),
-                                    header: Padding(
-                                      padding: const EdgeInsets.symmetric(vertical: 12.0),
-                                      child: Text('${formatToMoneyAmount(_completeBudgetExpenditures.toString())} / ${formatToMoneyAmount(_completeBudgetAmount.toString())}',
-                                          style: const TextStyle(fontSize: 16.0)),
-                                    ),
-                                    progressColor: _completeBudgetPercentage < 80.0
-                                        ? Colors.greenAccent
-                                        : _completeBudgetPercentage < 100.0
-                                            ? Colors.yellowAccent.shade700
-                                            : Colors.redAccent,
-                                    arcType: ArcType.HALF,
-                                    circularStrokeCap: CircularStrokeCap.round,
-                                    arcBackgroundColor: Colors.grey,
-                                    animation: true,
-                                    animateFromLastPercent: true,
+                                  child: Column(
+                                    children: [
+                                      CircularPercentIndicator(
+                                        radius: 84.0,
+                                        lineWidth: 12.0,
+                                        percent: _completeBudgetPercentage / 100 >= 1.0 ? 1.0 : _completeBudgetPercentage / 100,
+                                        center: Text('${_completeBudgetPercentage.toStringAsFixed(1)} %', style: const TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold)),
+                                        header: Padding(
+                                          padding: const EdgeInsets.symmetric(vertical: 12.0),
+                                          child: Text(
+                                              'Gesamt: ${formatToMoneyAmount(_completeBudgetExpenditures.toString())} / ${formatToMoneyAmount(_completeBudgetAmount.toString())}',
+                                              style: const TextStyle(fontSize: 16.0)),
+                                        ),
+                                        progressColor: _completeBudgetPercentage < 80.0
+                                            ? Colors.greenAccent
+                                            : _completeBudgetPercentage < 100.0
+                                                ? Colors.yellowAccent.shade700
+                                                : Colors.redAccent,
+                                        arcType: ArcType.HALF,
+                                        circularStrokeCap: CircularStrokeCap.round,
+                                        arcBackgroundColor: Colors.grey,
+                                        animation: true,
+                                        animateFromLastPercent: true,
+                                        animationDuration: 1000,
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ),
                             ),
+                            Padding(
+                              padding: const EdgeInsets.only(top: 6.0, left: 8.0, right: 8.0),
+                              child: Text(
+                                _completeBudgetPercentage <= 100.0
+                                    ? 'Du kannst über alle Budgets noch ' +
+                                        formatToMoneyAmount(((_completeBudgetAmount - _completeBudgetExpenditures) /
+                                                (DateTime(_selectedDate.year, _selectedDate.month + 1, 0).day - DateTime.now().day + 1))
+                                            .toString()) +
+                                        ' / Tag ausgeben'
+                                    : 'Du hast dein Gesamtbudget um ' + formatToMoneyAmount((_completeBudgetExpenditures - _completeBudgetAmount).toString()) + ' überzogen',
+                                style: const TextStyle(fontSize: 12.0, color: Colors.grey),
+                              ),
+                            ),
                             const Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 12.0, vertical: 6.0),
+                              padding: EdgeInsets.symmetric(horizontal: 12.0, vertical: 4.0),
                               child: Divider(),
                             ),
                             Expanded(
@@ -138,7 +157,6 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
                                 color: Colors.cyanAccent,
                                 child: ListView.builder(
                                   scrollDirection: Axis.vertical,
-                                  shrinkWrap: true,
                                   itemCount: _budgetList.length,
                                   itemBuilder: (BuildContext context, int index) {
                                     return BudgetCard(budget: _budgetList[index], selectedDate: _selectedDate);
