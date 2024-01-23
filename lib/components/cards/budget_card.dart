@@ -71,70 +71,66 @@ class _BudgetCardState extends State<BudgetCard> {
                 textColor: Colors.white,
                 iconColor: Colors.white,
                 subtitle: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Expanded(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Expanded(
-                            flex: 3,
-                            child: Container(
-                              decoration: BoxDecoration(
-                                border: Border(right: BorderSide(color: Colors.grey.shade700, width: 0.5)),
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.only(left: 12.0, top: 14.0, bottom: 14.0),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(widget.budget.categorie, overflow: TextOverflow.ellipsis, maxLines: 2),
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 2.0),
-                                      child: Text(formatToMoneyAmount(widget.budget.budget.toString()), overflow: TextOverflow.ellipsis),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                          Expanded(
-                            flex: 3,
-                            child: Padding(
-                              padding: const EdgeInsets.only(left: 12.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(formatToMoneyAmount((widget.budget.budget - widget.budget.currentExpenditure).abs().toString()), overflow: TextOverflow.ellipsis),
-                                  Padding(
-                                    padding: const EdgeInsets.only(top: 2.0),
-                                    child: widget.budget.budget - widget.budget.currentExpenditure >= 0.0
-                                        ? const Text('noch verfügbar', style: TextStyle(color: Colors.grey))
-                                        : const Text('überschritten', style: TextStyle(color: Colors.grey)),
-                                  ),
-                                ],
+                      flex: 5,
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 12.0, top: 4.0, bottom: 4.0, right: 4.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(widget.budget.categorie +
+                                ': ' +
+                                formatToMoneyAmount(widget.budget.currentExpenditure.toString()) +
+                                ' / ' +
+                                formatToMoneyAmount(widget.budget.budget.toString())),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 8.0),
+                              child: LinearPercentIndicator(
+                                padding: EdgeInsets.zero,
+                                width: 200.0,
+                                lineHeight: 14.0,
+                                percent: widget.budget.percentage / 100 >= 1.0 ? 1.0 : widget.budget.percentage / 100,
+                                center: Text('${widget.budget.percentage.toStringAsFixed(0)} %',
+                                    style: const TextStyle(fontSize: 12.0, fontWeight: FontWeight.w500, color: Colors.black87)),
+                                progressColor: widget.budget.percentage < 80.0
+                                    ? Colors.green
+                                    : widget.budget.percentage < 100.0
+                                        ? Colors.yellowAccent.shade700
+                                        : Colors.redAccent,
+                                barRadius: const Radius.circular(20.0),
+                                animation: true,
+                                animateFromLastPercent: true,
+                                animationDuration: 1000,
                               ),
                             ),
-                          ),
-                        ],
+                            Text(
+                              widget.budget.percentage <= 100.0
+                                  ? 'Du kannst noch ' +
+                                      formatToMoneyAmount(((widget.budget.budget - widget.budget.currentExpenditure) /
+                                              (DateTime(widget.selectedDate.year, widget.selectedDate.month + 1, 0).day - DateTime.now().day + 1))
+                                          .toString()) +
+                                      ' / Tag ausgeben'
+                                  : 'Du hast das Budget um ' + formatToMoneyAmount((widget.budget.currentExpenditure - widget.budget.budget).toString()) + ' überzogen',
+                              style: const TextStyle(fontSize: 12.0, color: Colors.grey),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 6.0, horizontal: 12.0),
-                      child: CircularPercentIndicator(
-                        radius: 26.0,
-                        lineWidth: 5.0,
-                        percent: widget.budget.percentage / 100 >= 1.0 ? 1.0 : widget.budget.percentage / 100,
-                        center: Text('${widget.budget.percentage.toStringAsFixed(0)} %', style: const TextStyle(fontSize: 12.0)),
-                        progressColor: widget.budget.percentage < 80.0
-                            ? Colors.greenAccent
-                            : widget.budget.percentage < 100.0
-                                ? Colors.yellowAccent.shade700
-                                : Colors.redAccent,
-                        backgroundWidth: 2.2,
-                        circularStrokeCap: CircularStrokeCap.round,
-                        animation: true,
-                        animateFromLastPercent: true,
+                    Expanded(
+                      flex: 1,
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 8.0),
+                        child: IconButton(
+                          icon: const Icon(
+                            Icons.bar_chart_rounded,
+                            size: 28.0,
+                          ),
+                          onPressed: () =>
+                              Navigator.pushNamed(context, categorieAmountListRoute, arguments: CategorieAmountListScreenArguments(widget.selectedDate, widget.budget.categorie)),
+                        ),
                       ),
                     ),
                   ],
@@ -148,60 +144,63 @@ class _BudgetCardState extends State<BudgetCard> {
                           return const SizedBox();
                         case ConnectionState.done:
                           return SizedBox(
-                            height: _subcategorieBudgets.length * 58.0,
+                            height: _subcategorieBudgets.length * 80.0,
                             child: ListView.builder(
                               itemCount: _subcategorieBudgets.length,
                               physics: const NeverScrollableScrollPhysics(),
                               itemBuilder: (BuildContext context, int subcategorieIndex) {
                                 return ListTile(
-                                  title: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  subtitle: Row(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      Expanded(
-                                        flex: 2,
-                                        child: Padding(
-                                          padding: const EdgeInsets.only(left: 36.0),
-                                          child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                _subcategorieBudgets[subcategorieIndex].subcategorieName,
-                                                style: const TextStyle(fontSize: 14.0),
-                                                overflow: TextOverflow.ellipsis,
+                                      Padding(
+                                        padding: const EdgeInsets.only(left: 36.0, top: 4.0, bottom: 4.0, right: 4.0),
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(_subcategorieBudgets[subcategorieIndex].subcategorieName +
+                                                ': ' +
+                                                formatToMoneyAmount(_subcategorieBudgets[subcategorieIndex].currentSubcategorieExpenditure.toString()) +
+                                                ' / ' +
+                                                formatToMoneyAmount(_subcategorieBudgets[subcategorieIndex].subcategorieBudget.toString())),
+                                            Padding(
+                                              padding: const EdgeInsets.symmetric(vertical: 8.0),
+                                              child: LinearPercentIndicator(
+                                                padding: EdgeInsets.zero,
+                                                width: 200.0,
+                                                lineHeight: 14.0,
+                                                percent: _subcategorieBudgets[subcategorieIndex].currentSubcategoriePercentage / 100 >= 1.0
+                                                    ? 1.0
+                                                    : _subcategorieBudgets[subcategorieIndex].currentSubcategoriePercentage / 100,
+                                                center: Text('${_subcategorieBudgets[subcategorieIndex].currentSubcategoriePercentage.toStringAsFixed(0)} %',
+                                                    style: const TextStyle(fontSize: 12.0, color: Colors.black87)),
+                                                progressColor: _subcategorieBudgets[subcategorieIndex].currentSubcategoriePercentage < 80.0
+                                                    ? Colors.green
+                                                    : _subcategorieBudgets[subcategorieIndex].currentSubcategoriePercentage < 100.0
+                                                        ? Colors.yellowAccent.shade700
+                                                        : Colors.redAccent,
+                                                barRadius: const Radius.circular(20.0),
+                                                animation: true,
+                                                animateFromLastPercent: true,
+                                                animationDuration: 1000,
                                               ),
-                                              Text(
-                                                formatToMoneyAmount(_subcategorieBudgets[subcategorieIndex].subcategorieBudget.toString()),
-                                                style: const TextStyle(fontSize: 14.0),
-                                                overflow: TextOverflow.ellipsis,
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                      Expanded(
-                                        flex: 3,
-                                        child: Padding(
-                                          padding: const EdgeInsets.only(left: 20.0, right: 16.0),
-                                          child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                formatToMoneyAmount((_subcategorieBudgets[subcategorieIndex].subcategorieBudget -
-                                                        _subcategorieBudgets[subcategorieIndex].currentSubcategorieExpenditure)
-                                                    .toString()),
-                                                style: const TextStyle(fontSize: 14.0),
-                                                overflow: TextOverflow.ellipsis,
-                                              ),
-                                              Padding(
-                                                padding: const EdgeInsets.only(top: 2.0),
-                                                child: _subcategorieBudgets[subcategorieIndex].subcategorieBudget -
-                                                            _subcategorieBudgets[subcategorieIndex].currentSubcategorieExpenditure >=
-                                                        0.0
-                                                    ? const Text('noch verfügbar', style: TextStyle(color: Colors.grey, fontSize: 14.0))
-                                                    : const Text('überschritten', style: TextStyle(color: Colors.grey, fontSize: 14.0)),
-                                              ),
-                                            ],
-                                          ),
+                                            ),
+                                            Text(
+                                              _subcategorieBudgets[subcategorieIndex].currentSubcategoriePercentage <= 100.0
+                                                  ? 'Du kannst noch ' +
+                                                      formatToMoneyAmount(((_subcategorieBudgets[subcategorieIndex].subcategorieBudget -
+                                                                  _subcategorieBudgets[subcategorieIndex].currentSubcategorieExpenditure) /
+                                                              (DateTime(widget.selectedDate.year, widget.selectedDate.month + 1, 0).day - DateTime.now().day + 1))
+                                                          .toString()) +
+                                                      ' / Tag ausgeben'
+                                                  : 'Du hast dein Budget um ' +
+                                                      formatToMoneyAmount((_subcategorieBudgets[subcategorieIndex].currentSubcategorieExpenditure -
+                                                              _subcategorieBudgets[subcategorieIndex].subcategorieBudget)
+                                                          .toString()) +
+                                                      ' überschritten',
+                                              style: const TextStyle(fontSize: 12.0, color: Colors.grey),
+                                            ),
+                                          ],
                                         ),
                                       ),
                                     ],
