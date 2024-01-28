@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 
-import '../../models/percentage_stats/percentage_stats_model.dart';
-import '../../models/percentage_stats/percentage_stats_repository.dart';
+import '/models/percentage_stats/percentage_stats_model.dart';
+import '/models/percentage_stats/percentage_stats_repository.dart';
 import '/models/booking/booking_model.dart';
 import '/models/booking/booking_repository.dart';
 import '/models/enums/categorie_types.dart';

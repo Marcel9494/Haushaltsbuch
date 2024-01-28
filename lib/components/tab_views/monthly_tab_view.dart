@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '../buttons/month_picker_buttons.dart';
 
 import 'monthly_booking_tab_view.dart';
-import 'monthly_budget_tab_view.dart';
 import 'monthly_statistics_tab_view.dart';
 
 class MonthlyTabView extends StatefulWidget {
@@ -74,11 +73,7 @@ class _MonthlyTabViewState extends State<MonthlyTabView> {
               ),
             ],
           ),
-          _selectedTabOption[0]
-              ? MonthlyBookingTabView(selectedDate: _selectedDate, categorie: '', account: '')
-              : _selectedTabOption[1]
-                  ? MonthlyStatisticsTabView(selectedDate: _selectedDate)
-                  : const MonthlyBudgetTabView(),
+          _selectedTabOption[0] ? MonthlyBookingTabView(selectedDate: _selectedDate, categorie: '', account: '') : MonthlyStatisticsTabView(selectedDate: _selectedDate)
         ],
       ),
     );

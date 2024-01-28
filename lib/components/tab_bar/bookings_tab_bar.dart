@@ -1,6 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:haushaltsbuch/components/tab_views/yearly_statistics_tab_view.dart';
 
+import '../buttons/month_picker_buttons.dart';
+import '../buttons/year_picker_buttons.dart';
+import '../tab_views/monthly_booking_tab_view.dart';
+import '../tab_views/monthly_statistics_tab_view.dart';
 import '../tab_views/monthly_tab_view.dart';
+import '../tab_views/yearly_booking_tab_view.dart';
 import '../tab_views/yearly_tab_view.dart';
 
 class BookingsTabBar extends StatefulWidget {
@@ -11,23 +17,108 @@ class BookingsTabBar extends StatefulWidget {
 }
 
 class _BookingsTabBarState extends State<BookingsTabBar> {
+  DateTime _selectedDate = DateTime.now();
+  List<bool> _selectedTabOption = [true, false];
+
+  void _setSelectedTab(int selectedIndex) {
+    setState(() {
+      for (int i = 0; i < _selectedTabOption.length; i++) {
+        _selectedTabOption[i] = i == selectedIndex;
+      }
+      if (_selectedTabOption[0]) {
+        _selectedTabOption = [true, false];
+      } else if (_selectedTabOption[1]) {
+        _selectedTabOption = [false, true];
+      } else {
+        _selectedTabOption = [true, false];
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return const DefaultTabController(
+    return DefaultTabController(
       initialIndex: 0,
       length: 2,
       child: Scaffold(
-        appBar: TabBar(
+        appBar: const TabBar(
           indicatorColor: Colors.cyanAccent,
           tabs: <Widget>[
-            Tab(text: 'Monatlich'),
-            Tab(text: 'Jährlich'),
+            Tab(text: 'Buchungen'),
+            Tab(text: 'Statistiken'),
           ],
         ),
-        body: TabBarView(
-          children: <Widget>[
-            MonthlyTabView(),
-            YearlyTabView(),
+        body: Column(
+          children: [
+            Row(
+              children: [
+                SizedBox(
+                  width: MediaQuery.of(context).size.width / 2,
+                  child: _selectedTabOption[0]
+                      ? MonthPickerButtons(selectedDate: _selectedDate, selectedDateCallback: (selectedDate) => setState(() => _selectedDate = selectedDate))
+                      : YearPickerButtons(selectedYear: _selectedDate, selectedYearCallback: (selectedYear) => setState(() => _selectedDate = selectedYear)),
+                ),
+                SizedBox(
+                  width: MediaQuery.of(context).size.width / 2,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(right: 12.0, left: 12.0),
+                        child: ToggleButtons(
+                          onPressed: (selectedIndex) => _setSelectedTab(selectedIndex),
+                          borderRadius: BorderRadius.circular(6.0),
+                          selectedBorderColor: Colors.cyanAccent,
+                          fillColor: Colors.cyanAccent.shade700,
+                          selectedColor: Colors.white,
+                          color: Colors.white60,
+                          constraints: const BoxConstraints(
+                            minHeight: 30.0,
+                            minWidth: 50.0,
+                          ),
+                          isSelected: _selectedTabOption,
+                          children: [
+                            Row(
+                              children: const [
+                                Padding(
+                                  padding: EdgeInsets.symmetric(horizontal: 4.0),
+                                  child: Icon(Icons.calendar_month_rounded, size: 20.0),
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.only(right: 6.0),
+                                  child: Text('Monat'),
+                                ),
+                              ],
+                            ),
+                            Row(
+                              children: const [
+                                Padding(
+                                  padding: EdgeInsets.only(left: 6.0, right: 4.0),
+                                  child: Icon(Icons.today_rounded, size: 20.0),
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.only(right: 6.0),
+                                  child: Text('Jahr'),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            Expanded(
+              child: TabBarView(
+                children: <Widget>[
+                  // TODO hier weitermachen und nicht mehr benötigte Widgets entfernen z.B. YearlyTabView
+                  _selectedTabOption[0] ? MonthlyBookingTabView(selectedDate: _selectedDate, categorie: '', account: '') : YearlyBookingTabView(selectedDate: _selectedDate),
+                  _selectedTabOption[0] ? MonthlyStatisticsTabView(selectedDate: _selectedDate) : YearlyStatisticsTabView(selectedDate: _selectedDate),
+                ],
+              ),
+            ),
           ],
         ),
       ),
