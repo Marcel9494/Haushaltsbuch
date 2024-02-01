@@ -72,8 +72,8 @@ class _CategoriePercentageCardState extends State<CategoriePercentageCard> {
             child: ExpansionTile(
               title: const SizedBox.shrink(),
               controlAffinity: ListTileControlAffinity.leading,
-              textColor: widget.percentageStats.statColor,
-              iconColor: widget.percentageStats.statColor,
+              textColor: Colors.white,
+              iconColor: Colors.white,
               subtitle: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [

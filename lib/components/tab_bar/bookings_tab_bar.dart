@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:haushaltsbuch/components/tab_views/yearly_statistics_tab_view.dart';
+
+import '/components/tab_views/yearly_statistics_tab_view.dart';
 
 import '../buttons/month_picker_buttons.dart';
 import '../buttons/year_picker_buttons.dart';
 import '../tab_views/monthly_booking_tab_view.dart';
 import '../tab_views/monthly_statistics_tab_view.dart';
-import '../tab_views/monthly_tab_view.dart';
 import '../tab_views/yearly_booking_tab_view.dart';
-import '../tab_views/yearly_tab_view.dart';
 
 class BookingsTabBar extends StatefulWidget {
   const BookingsTabBar({Key? key}) : super(key: key);
@@ -73,7 +72,7 @@ class _BookingsTabBarState extends State<BookingsTabBar> {
                           selectedColor: Colors.white,
                           color: Colors.white60,
                           constraints: const BoxConstraints(
-                            minHeight: 30.0,
+                            minHeight: 26.0,
                             minWidth: 50.0,
                           ),
                           isSelected: _selectedTabOption,
@@ -82,23 +81,23 @@ class _BookingsTabBarState extends State<BookingsTabBar> {
                               children: const [
                                 Padding(
                                   padding: EdgeInsets.symmetric(horizontal: 4.0),
-                                  child: Icon(Icons.calendar_month_rounded, size: 20.0),
+                                  child: Icon(Icons.calendar_month_rounded, size: 17.0),
                                 ),
                                 Padding(
                                   padding: EdgeInsets.only(right: 6.0),
-                                  child: Text('Monat'),
+                                  child: Text('Monat', style: TextStyle(fontSize: 12.0)),
                                 ),
                               ],
                             ),
                             Row(
                               children: const [
                                 Padding(
-                                  padding: EdgeInsets.only(left: 6.0, right: 4.0),
-                                  child: Icon(Icons.today_rounded, size: 20.0),
+                                  padding: EdgeInsets.only(left: 8.0, right: 4.0),
+                                  child: Icon(Icons.today_rounded, size: 17.0),
                                 ),
                                 Padding(
-                                  padding: EdgeInsets.only(right: 6.0),
-                                  child: Text('Jahr'),
+                                  padding: EdgeInsets.only(right: 8.0),
+                                  child: Text('Jahr', style: TextStyle(fontSize: 12.0)),
                                 ),
                               ],
                             ),
@@ -113,7 +112,6 @@ class _BookingsTabBarState extends State<BookingsTabBar> {
             Expanded(
               child: TabBarView(
                 children: <Widget>[
-                  // TODO hier weitermachen und nicht mehr benötigte Widgets entfernen z.B. YearlyTabView
                   _selectedTabOption[0] ? MonthlyBookingTabView(selectedDate: _selectedDate, categorie: '', account: '') : YearlyBookingTabView(selectedDate: _selectedDate),
                   _selectedTabOption[0] ? MonthlyStatisticsTabView(selectedDate: _selectedDate) : YearlyStatisticsTabView(selectedDate: _selectedDate),
                 ],

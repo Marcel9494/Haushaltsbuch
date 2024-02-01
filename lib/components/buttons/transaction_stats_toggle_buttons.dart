@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:haushaltsbuch/components/tab_views/yearly_statistics_tab_view.dart';
 
 import '/models/enums/transaction_types.dart';
 
+import '/components/tab_views/yearly_statistics_tab_view.dart';
 import '/components/tab_views/monthly_statistics_tab_view.dart';
 
 class TransactionStatsToggleButtons extends StatefulWidget {
