@@ -70,74 +70,72 @@ class _YearlyBookingTabViewState extends State<YearlyBookingTabView> {
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-      child: FutureBuilder(
-        future: _loadMonthlyStatsList(),
-        builder: (BuildContext context, AsyncSnapshot<List<MonthlyStats>> snapshot) {
-          switch (snapshot.connectionState) {
-            case ConnectionState.waiting:
-              return const LoadingIndicator();
-            case ConnectionState.done:
-              if (_monthList.isEmpty) {
-                return Column(
-                  children: const [
-                    OverviewTile(
-                      shouldText: 'Einnahmen',
-                      should: 0.0,
-                      haveText: 'Ausgaben',
-                      have: 0.0,
-                      balanceText: 'Saldo',
-                      investmentText: 'Investitionen',
-                      availableText: 'Verfügbar',
-                      showInvestments: true,
-                      showAvailable: true,
+    return FutureBuilder(
+      future: _loadMonthlyStatsList(),
+      builder: (BuildContext context, AsyncSnapshot<List<MonthlyStats>> snapshot) {
+        switch (snapshot.connectionState) {
+          case ConnectionState.waiting:
+            return const LoadingIndicator();
+          case ConnectionState.done:
+            if (_monthList.isEmpty) {
+              return Column(
+                children: const [
+                  OverviewTile(
+                    shouldText: 'Einnahmen',
+                    should: 0.0,
+                    haveText: 'Ausgaben',
+                    have: 0.0,
+                    balanceText: 'Saldo',
+                    investmentText: 'Investitionen',
+                    availableText: 'Verfügbar',
+                    showInvestments: true,
+                    showAvailable: true,
+                  ),
+                  Expanded(
+                    child: Center(
+                      child: Text('Noch keine Buchungen vorhanden.'),
                     ),
-                    Expanded(
-                      child: Center(
-                        child: Text('Noch keine Buchungen vorhanden.'),
-                      ),
-                    ),
-                  ],
-                );
-              } else {
-                return Column(
-                  children: [
-                    OverviewTile(
-                      shouldText: 'Einnahmen',
-                      should: _getYearlyRevenues(),
-                      haveText: 'Ausgaben',
-                      have: _getYearlyExpenditures(),
-                      balanceText: 'Saldo',
-                      investmentText: 'Investitionen',
-                      availableText: 'Verfügbar',
-                      investmentAmount: _getYearlyInvestments(),
-                      showInvestments: true,
-                      showAvailable: true,
-                    ),
-                    Expanded(
-                      child: RefreshIndicator(
-                        onRefresh: () async {
-                          _monthList = await _loadMonthlyStatsList();
-                          setState(() {});
-                          return;
+                  ),
+                ],
+              );
+            } else {
+              return Column(
+                children: [
+                  OverviewTile(
+                    shouldText: 'Einnahmen',
+                    should: _getYearlyRevenues(),
+                    haveText: 'Ausgaben',
+                    have: _getYearlyExpenditures(),
+                    balanceText: 'Saldo',
+                    investmentText: 'Investitionen',
+                    availableText: 'Verfügbar',
+                    investmentAmount: _getYearlyInvestments(),
+                    showInvestments: true,
+                    showAvailable: true,
+                  ),
+                  Expanded(
+                    child: RefreshIndicator(
+                      onRefresh: () async {
+                        _monthList = await _loadMonthlyStatsList();
+                        setState(() {});
+                        return;
+                      },
+                      color: Colors.cyanAccent,
+                      child: ListView.builder(
+                        itemCount: _monthList.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          return MonthlyOverviewCard(monthlyStats: _monthList[index], selectedYear: widget.selectedDate.year);
                         },
-                        color: Colors.cyanAccent,
-                        child: ListView.builder(
-                          itemCount: _monthList.length,
-                          itemBuilder: (BuildContext context, int index) {
-                            return MonthlyOverviewCard(monthlyStats: _monthList[index], selectedYear: widget.selectedDate.year);
-                          },
-                        ),
                       ),
                     ),
-                  ],
-                );
-              }
-            default:
-              return const Text('Warten');
-          }
-        },
-      ),
+                  ),
+                ],
+              );
+            }
+          default:
+            return const Text('Warten');
+        }
+      },
     );
   }
 }

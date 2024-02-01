@@ -109,38 +109,36 @@ class _YearlyStatisticsTabViewState extends State<YearlyStatisticsTabView> {
             return const SizedBox();
           case ConnectionState.done:
             if (_percentageStats.isEmpty) {
-              return Expanded(
-                child: Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 8.0),
-                      child: AspectRatio(
-                        aspectRatio: 2.0,
-                        child: PieChart(
-                          PieChartData(
-                            borderData: FlBorderData(
-                              show: false,
-                            ),
-                            sectionsSpace: 4.0,
-                            centerSpaceRadius: 30.0,
-                            sections: _showingEmptyDiagram(),
+              return Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    child: AspectRatio(
+                      aspectRatio: 2.0,
+                      child: PieChart(
+                        PieChartData(
+                          borderData: FlBorderData(
+                            show: false,
                           ),
+                          sectionsSpace: 4.0,
+                          centerSpaceRadius: 30.0,
+                          sections: _showingEmptyDiagram(),
                         ),
                       ),
                     ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        TransactionStatsToggleButtons(currentTransaction: _currentCategorieType, monthlyStatistics: false),
-                      ],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      TransactionStatsToggleButtons(currentTransaction: _currentCategorieType, monthlyStatistics: false),
+                    ],
+                  ),
+                  Expanded(
+                    child: Center(
+                      child: Text('Noch keine $_currentCategorieType vorhanden.'),
                     ),
-                    Expanded(
-                      child: Center(
-                        child: Text('Noch keine $_currentCategorieType vorhanden.'),
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               );
             } else {
               return Column(
@@ -179,7 +177,7 @@ class _YearlyStatisticsTabViewState extends State<YearlyStatisticsTabView> {
                       child: ListView.builder(
                         itemCount: _percentageStats.length,
                         itemBuilder: (BuildContext context, int index) {
-                          return CategoriePercentageCard(percentageStats: _percentageStats[index], bookingList: _bookingList);
+                          return CategoriePercentageCard(percentageStats: _percentageStats[index], selectedDate: widget.selectedDate, bookingList: _bookingList);
                         },
                       ),
                     ),

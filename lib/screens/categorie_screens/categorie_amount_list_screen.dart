@@ -23,12 +23,14 @@ class _CategorieAmountListScreenState extends State<CategorieAmountListScreen> {
       appBar: AppBar(title: Text(widget.categorie)),
       body: Column(
         children: [
-          MonthlyBookingTabView(
-            selectedDate: widget.selectedDate,
-            categorie: widget.categorie,
-            account: '',
-            showOverviewTile: false,
-            showBarChart: true,
+          Expanded(
+            child: MonthlyBookingTabView(
+              selectedDate: widget.selectedDate,
+              categorie: widget.categorie,
+              account: '',
+              showOverviewTile: false,
+              showBarChart: true,
+            ),
           ),
         ],
       ),

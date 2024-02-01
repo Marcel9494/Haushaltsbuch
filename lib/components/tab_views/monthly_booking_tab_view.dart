@@ -87,161 +87,159 @@ class _MonthlyBookingTabViewState extends State<MonthlyBookingTabView> {
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-      child: FutureBuilder(
-        future: _loadMonthlyBookingList(),
-        builder: (BuildContext context, AsyncSnapshot<List<Booking>> snapshot) {
-          switch (snapshot.connectionState) {
-            case ConnectionState.waiting:
-              return const LoadingIndicator();
-            case ConnectionState.done:
-              if (_bookingList.isEmpty) {
-                return Column(
-                  children: [
-                    widget.showOverviewTile
-                        ? const OverviewTile(
-                            shouldText: 'Einnahmen',
-                            should: 0.0,
-                            haveText: 'Ausgaben',
-                            have: 0.0,
-                            balanceText: 'Saldo',
-                            showAverageValuesPerDay: true,
-                            investmentText: 'Investitionen',
-                            availableText: 'Verfügbar',
-                            showInvestments: true,
-                            showAvailable: true,
-                          )
-                        : const SizedBox(),
-                    widget.showBarChart
-                        ? Row(
-                            children: <Widget>[
-                              Expanded(
-                                flex: 2,
-                                child: MonthPickerButtons(
-                                  selectedDate: widget.selectedDate,
-                                  selectedDateCallback: (DateTime selectedDate) {
-                                    setState(() {
-                                      widget.selectedDate = selectedDate;
-                                    });
-                                  },
-                                ),
+    return FutureBuilder(
+      future: _loadMonthlyBookingList(),
+      builder: (BuildContext context, AsyncSnapshot<List<Booking>> snapshot) {
+        switch (snapshot.connectionState) {
+          case ConnectionState.waiting:
+            return const LoadingIndicator();
+          case ConnectionState.done:
+            if (_bookingList.isEmpty) {
+              return Column(
+                children: [
+                  widget.showOverviewTile
+                      ? const OverviewTile(
+                          shouldText: 'Einnahmen',
+                          should: 0.0,
+                          haveText: 'Ausgaben',
+                          have: 0.0,
+                          balanceText: 'Saldo',
+                          showAverageValuesPerDay: true,
+                          investmentText: 'Investitionen',
+                          availableText: 'Verfügbar',
+                          showInvestments: true,
+                          showAvailable: true,
+                        )
+                      : const SizedBox(),
+                  widget.showBarChart
+                      ? Row(
+                          children: <Widget>[
+                            Expanded(
+                              flex: 2,
+                              child: MonthPickerButtons(
+                                selectedDate: widget.selectedDate,
+                                selectedDateCallback: (DateTime selectedDate) {
+                                  setState(() {
+                                    widget.selectedDate = selectedDate;
+                                  });
+                                },
                               ),
-                              const TotalText(total: '0,0 €'),
-                            ],
-                          )
-                        : const SizedBox(),
-                    const Expanded(
-                      child: Center(
-                        child: Text('Noch keine Buchungen vorhanden.'),
-                      ),
+                            ),
+                            const TotalText(total: '0,0 €'),
+                          ],
+                        )
+                      : const SizedBox(),
+                  const Expanded(
+                    child: Center(
+                      child: Text('Noch keine Buchungen vorhanden.'),
                     ),
-                  ],
-                );
-              } else {
-                return Column(
-                  children: [
-                    widget.showOverviewTile
-                        ? OverviewTile(
-                            shouldText: 'Einnahmen',
-                            should: bookingRepository.getRevenues(_bookingList),
-                            haveText: 'Ausgaben',
-                            have: bookingRepository.getExpenditures(_bookingList),
-                            balanceText: 'Saldo',
-                            showAverageValuesPerDay: true,
-                            investmentText: 'Investitionen',
-                            investmentAmount: bookingRepository.getInvestments(_bookingList),
-                            availableText: 'Verfügbar',
-                            showAvailable: true,
-                            showInvestments: true,
-                          )
-                        : const SizedBox(),
-                    widget.showBarChart
-                        ? Column(
-                            children: [
-                              Row(
-                                children: <Widget>[
-                                  Expanded(
-                                    flex: 2,
-                                    child: MonthPickerButtons(
-                                      selectedDate: widget.selectedDate,
-                                      selectedDateCallback: (DateTime selectedDate) {
-                                        setState(() {
-                                          widget.selectedDate = selectedDate;
-                                        });
-                                      },
-                                    ),
+                  ),
+                ],
+              );
+            } else {
+              return Column(
+                children: [
+                  widget.showOverviewTile
+                      ? OverviewTile(
+                          shouldText: 'Einnahmen',
+                          should: bookingRepository.getRevenues(_bookingList),
+                          haveText: 'Ausgaben',
+                          have: bookingRepository.getExpenditures(_bookingList),
+                          balanceText: 'Saldo',
+                          showAverageValuesPerDay: true,
+                          investmentText: 'Investitionen',
+                          investmentAmount: bookingRepository.getInvestments(_bookingList),
+                          availableText: 'Verfügbar',
+                          showAvailable: true,
+                          showInvestments: true,
+                        )
+                      : const SizedBox(),
+                  widget.showBarChart
+                      ? Column(
+                          children: [
+                            Row(
+                              children: <Widget>[
+                                Expanded(
+                                  flex: 2,
+                                  child: MonthPickerButtons(
+                                    selectedDate: widget.selectedDate,
+                                    selectedDateCallback: (DateTime selectedDate) {
+                                      setState(() {
+                                        widget.selectedDate = selectedDate;
+                                      });
+                                    },
                                   ),
-                                  TotalText(total: formatToMoneyAmount(bookingRepository.getExpenditures(_bookingList, _bookingList[0].categorie).toString())),
-                                ],
-                              ),
-                              MonthlyBarChart(selectedDate: widget.selectedDate, categorie: _bookingList[0].categorie),
-                            ],
-                          )
-                        : const SizedBox(),
-                    Expanded(
-                      child: RefreshIndicator(
-                        onRefresh: () async {
-                          _bookingList = await _loadMonthlyBookingList();
-                          setState(() {});
-                          return;
-                        },
-                        color: Colors.cyanAccent,
-                        child: ListView.builder(
-                          itemCount: _bookingList.length,
-                          itemBuilder: (BuildContext context, int index) {
-                            DateTime previousBookingDate = DateTime(0, 0, 0);
-                            DateTime bookingDate = DateTime(0, 0, 0);
-                            if (index != 0) {
-                              previousBookingDate = DateTime(DateTime.parse(_bookingList[index - 1].date).year, DateTime.parse(_bookingList[index - 1].date).month,
-                                  DateTime.parse(_bookingList[index - 1].date).day);
-                              bookingDate = DateTime(
-                                  DateTime.parse(_bookingList[index].date).year, DateTime.parse(_bookingList[index].date).month, DateTime.parse(_bookingList[index].date).day);
-                            }
-                            if (index == 0 || previousBookingDate != bookingDate) {
-                              return Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Padding(
-                                    padding: EdgeInsets.only(top: index == 0 ? 0.0 : 10.0),
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        DateText(dateString: _bookingList[index].date),
-                                        Text(
-                                            formatToMoneyAmount(_todayRevenuesMap[DateTime(DateTime.parse(_bookingList[index].date).year,
+                                ),
+                                TotalText(total: formatToMoneyAmount(bookingRepository.getExpenditures(_bookingList, _bookingList[0].categorie).toString())),
+                              ],
+                            ),
+                            MonthlyBarChart(selectedDate: widget.selectedDate, categorie: _bookingList[0].categorie),
+                          ],
+                        )
+                      : const SizedBox(),
+                  Expanded(
+                    child: RefreshIndicator(
+                      onRefresh: () async {
+                        _bookingList = await _loadMonthlyBookingList();
+                        setState(() {});
+                        return;
+                      },
+                      color: Colors.cyanAccent,
+                      child: ListView.builder(
+                        itemCount: _bookingList.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          DateTime previousBookingDate = DateTime(0, 0, 0);
+                          DateTime bookingDate = DateTime(0, 0, 0);
+                          if (index != 0) {
+                            previousBookingDate = DateTime(DateTime.parse(_bookingList[index - 1].date).year, DateTime.parse(_bookingList[index - 1].date).month,
+                                DateTime.parse(_bookingList[index - 1].date).day);
+                            bookingDate = DateTime(
+                                DateTime.parse(_bookingList[index].date).year, DateTime.parse(_bookingList[index].date).month, DateTime.parse(_bookingList[index].date).day);
+                          }
+                          if (index == 0 || previousBookingDate != bookingDate) {
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Padding(
+                                  padding: EdgeInsets.only(top: index == 0 ? 0.0 : 10.0),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      DateText(dateString: _bookingList[index].date),
+                                      Text(
+                                          formatToMoneyAmount(_todayRevenuesMap[DateTime(DateTime.parse(_bookingList[index].date).year,
+                                                  DateTime.parse(_bookingList[index].date).month, DateTime.parse(_bookingList[index].date).day)]
+                                              .toString()),
+                                          style: const TextStyle(color: Colors.greenAccent)),
+                                      Padding(
+                                        padding: const EdgeInsets.only(right: 21.0),
+                                        child: Text(
+                                            formatToMoneyAmount(_todayExpendituresMap[DateTime(DateTime.parse(_bookingList[index].date).year,
                                                     DateTime.parse(_bookingList[index].date).month, DateTime.parse(_bookingList[index].date).day)]
                                                 .toString()),
-                                            style: const TextStyle(color: Colors.greenAccent)),
-                                        Padding(
-                                          padding: const EdgeInsets.only(right: 21.0),
-                                          child: Text(
-                                              formatToMoneyAmount(_todayExpendituresMap[DateTime(DateTime.parse(_bookingList[index].date).year,
-                                                      DateTime.parse(_bookingList[index].date).month, DateTime.parse(_bookingList[index].date).day)]
-                                                  .toString()),
-                                              style: const TextStyle(color: Color(0xfff4634f))),
-                                        ),
-                                      ],
-                                    ),
+                                            style: const TextStyle(color: Color(0xfff4634f))),
+                                      ),
+                                    ],
                                   ),
-                                  BookingCard(booking: _bookingList[index]),
-                                ],
-                              );
-                            } else if (previousBookingDate == bookingDate) {
-                              return BookingCard(booking: _bookingList[index]);
-                            }
-                            return const SizedBox();
-                          },
-                        ),
+                                ),
+                                BookingCard(booking: _bookingList[index]),
+                              ],
+                            );
+                          } else if (previousBookingDate == bookingDate) {
+                            return BookingCard(booking: _bookingList[index]);
+                          }
+                          return const SizedBox();
+                        },
                       ),
                     ),
-                  ],
-                );
-              }
-            default:
-              return const Text('Warten');
-          }
-        },
-      ),
+                  ),
+                ],
+              );
+            }
+          default:
+            return const Text('Warten');
+        }
+      },
     );
   }
 }

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:haushaltsbuch/models/account/account_repository.dart';
 
-import '../../blocs/account_bloc/account_bloc.dart';
+import '/blocs/account_bloc/account_bloc.dart';
+
 import '/components/buttons/month_picker_buttons.dart';
 import '/components/dialogs/choice_dialog.dart';
 import '/components/tab_views/monthly_booking_tab_view.dart';
@@ -10,8 +10,8 @@ import '/components/tab_views/monthly_booking_tab_view.dart';
 import '/utils/consts/route_consts.dart';
 
 import '/models/account/account_model.dart';
+import '/models/account/account_repository.dart';
 import '/models/screen_arguments/bottom_nav_bar_screen_arguments.dart';
-import '/models/screen_arguments/create_or_edit_account_screen_arguments.dart';
 
 class AccountDetailsScreen extends StatefulWidget {
   final Account account;
