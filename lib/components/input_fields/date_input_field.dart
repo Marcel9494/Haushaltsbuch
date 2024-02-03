@@ -46,11 +46,12 @@ class DateInputField extends StatelessWidget {
                               cubit.updateBookingRepeat(RepeatType.values[index].name),
                               if (RepeatType.values[index].name == RepeatType.beginningOfMonth.name)
                                 {
-                                  cubit.updateBookingDate(DateTime(DateTime.now().year, DateTime.now().month + 1, 1)),
+                                  cubit.updateBookingDate(DateTime(DateTime.now().year, DateTime.now().month + 1, 1).toString()),
                                 }
                               else if (RepeatType.values[index].name == RepeatType.endOfMonth.name)
                                 {
-                                  cubit.updateBookingDate(DateTime(DateTime.now().year, DateTime.now().month, DateTime(DateTime.now().year, DateTime.now().month + 1, 0).day)),
+                                  cubit.updateBookingDate(
+                                      DateTime(DateTime.now().year, DateTime.now().month, DateTime(DateTime.now().year, DateTime.now().month + 1, 0).day).toString()),
                                 },
                               Navigator.pop(context),
                             },
