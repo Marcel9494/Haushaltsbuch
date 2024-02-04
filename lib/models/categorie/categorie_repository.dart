@@ -1,6 +1,7 @@
 import 'package:hive/hive.dart';
 
 import '../global_state/global_state_repository.dart';
+
 import 'categorie_model.dart';
 
 import '../enums/categorie_types.dart';

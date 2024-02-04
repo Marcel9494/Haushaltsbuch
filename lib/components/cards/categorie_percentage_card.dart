@@ -30,9 +30,10 @@ class _CategoriePercentageCardState extends State<CategoriePercentageCard> {
   List<Booking> _subcategorieBookings = [];
   final List<double> _subcategorieAmounts = [];
   final List<double> _subcategoriePercentages = [];
+  String allSubcategorieNames = "";
 
   // TODO erweitern um getRevenues und getInvestments
-  Future<List<String>> _loadSubcategorieNameList() async {
+  Future<List<String>> _loadSubcategories() async {
     CategorieRepository categorieRepository = CategorieRepository();
     BookingRepository bookingRepository = BookingRepository();
     _subcategorieNames = await categorieRepository.loadSubcategorieNameList(widget.percentageStats.name);
@@ -43,6 +44,7 @@ class _CategoriePercentageCardState extends State<CategoriePercentageCard> {
         totalAmount += formatMoneyAmountToDouble(_subcategorieBookings[j].amount);
       }
       _subcategorieAmounts.add(totalAmount);
+      allSubcategorieNames += i == 0 ? _subcategorieNames[i] : " · " + _subcategorieNames[i];
     }
     double totalExpenditures = bookingRepository.getExpenditures(widget.bookingList);
     for (int i = 0; i < _subcategorieNames.length; i++) {
@@ -69,55 +71,83 @@ class _CategoriePercentageCardState extends State<CategoriePercentageCard> {
             contentPadding: const EdgeInsets.only(left: 8.0),
             horizontalTitleGap: 0.0,
             minLeadingWidth: 0.0,
-            child: ExpansionTile(
-              title: const SizedBox.shrink(),
-              controlAffinity: ListTileControlAffinity.leading,
-              textColor: Colors.white,
-              iconColor: Colors.white,
-              subtitle: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    flex: 7,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                      child: Text(
-                        '${widget.percentageStats.percentage.abs().toStringAsFixed(1).replaceAll('.', ',')} %\t\t${widget.percentageStats.name}',
-                        overflow: TextOverflow.ellipsis,
+            child: FutureBuilder(
+              future: _loadSubcategories(),
+              builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
+                switch (snapshot.connectionState) {
+                  case ConnectionState.waiting:
+                    return const SizedBox();
+                  case ConnectionState.done:
+                    return ExpansionTile(
+                      leading: const SizedBox.shrink(),
+                      controlAffinity: ListTileControlAffinity.leading,
+                      textColor: Colors.white,
+                      iconColor: Colors.white70,
+                      title: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            flex: 3,
+                            child: Padding(
+                              padding: const EdgeInsets.only(left: 6.0),
+                              child: Text(
+                                '${widget.percentageStats.percentage.abs().toStringAsFixed(1).replaceAll('.', ',')} %',
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(fontSize: 14.0),
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            flex: 8,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                border: Border(left: BorderSide(color: Colors.grey.shade700, width: 0.5)),
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      widget.percentageStats.name,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(fontSize: 14.0),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 6.0),
+                                      child: Text(
+                                        allSubcategorieNames != "" ? allSubcategorieNames : "-",
+                                        overflow: TextOverflow.ellipsis,
+                                        style: const TextStyle(fontSize: 12.0, color: Colors.grey),
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            flex: 4,
+                            child: Text(
+                              formatToMoneyAmount(formatMoneyAmountToDouble(widget.percentageStats.amount).abs().toString()),
+                              textAlign: TextAlign.right,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(fontSize: 14.0),
+                            ),
+                          ),
+                          Expanded(
+                            flex: 3,
+                            child: IconButton(
+                              icon: const Icon(Icons.bar_chart_rounded),
+                              onPressed: () => Navigator.pushNamed(context, categorieAmountListRoute,
+                                  arguments: CategorieAmountListScreenArguments(widget.selectedDate!, widget.percentageStats.name)),
+                              padding: const EdgeInsets.only(right: 6.0),
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
-                  ),
-                  Expanded(
-                    flex: 3,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 16.0),
-                      child: Text(
-                        formatToMoneyAmount(formatMoneyAmountToDouble(widget.percentageStats.amount).abs().toString()),
-                        textAlign: TextAlign.right,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    flex: 2,
-                    child: IconButton(
-                      icon: const Icon(Icons.bar_chart_rounded),
-                      onPressed: () =>
-                          Navigator.pushNamed(context, categorieAmountListRoute, arguments: CategorieAmountListScreenArguments(widget.selectedDate!, widget.percentageStats.name)),
-                      padding: const EdgeInsets.only(right: 6.0),
-                    ),
-                  ),
-                ],
-              ),
-              children: <Widget>[
-                FutureBuilder(
-                  future: _loadSubcategorieNameList(),
-                  builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
-                    switch (snapshot.connectionState) {
-                      case ConnectionState.waiting:
-                        return const SizedBox();
-                      case ConnectionState.done:
-                        return SizedBox(
+                      children: <Widget>[
+                        SizedBox(
                           height: _subcategorieNames.length * 58.0,
                           child: ListView.builder(
                             itemCount: _subcategorieNames.length,
@@ -127,34 +157,53 @@ class _CategoriePercentageCardState extends State<CategoriePercentageCard> {
                                 title: Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Padding(
-                                      padding: const EdgeInsets.only(left: 34.0, right: 8.0),
-                                      child: Text(
-                                        _subcategoriePercentages[subcategorieIndex].toStringAsFixed(1).replaceAll('.', ',') + ' %  ' + _subcategorieNames[subcategorieIndex],
-                                        style: const TextStyle(fontSize: 14.0),
-                                        overflow: TextOverflow.ellipsis,
+                                    Expanded(
+                                      flex: 3,
+                                      child: Padding(
+                                        padding: const EdgeInsets.only(left: 6.0),
+                                        child: Text(
+                                          _subcategoriePercentages[subcategorieIndex].toStringAsFixed(1).replaceAll('.', ',') + ' %',
+                                          style: const TextStyle(fontSize: 14.0),
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
                                       ),
                                     ),
-                                    Padding(
-                                      padding: const EdgeInsets.only(right: 52.0),
+                                    Expanded(
+                                      flex: 8,
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                                        child: Text(
+                                          _subcategorieNames[subcategorieIndex],
+                                          style: const TextStyle(fontSize: 14.0),
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                    ),
+                                    Expanded(
+                                      flex: 4,
                                       child: Text(
                                         formatToMoneyAmount(_subcategorieAmounts[subcategorieIndex].toString()),
-                                        style: const TextStyle(fontSize: 14.0),
+                                        textAlign: TextAlign.right,
                                         overflow: TextOverflow.ellipsis,
+                                        style: const TextStyle(fontSize: 14.0),
                                       ),
+                                    ),
+                                    const Expanded(
+                                      flex: 3,
+                                      child: SizedBox(),
                                     ),
                                   ],
                                 ),
                               );
                             },
                           ),
-                        );
-                      default:
-                        return const SizedBox();
-                    }
-                  },
-                ),
-              ],
+                        ),
+                      ],
+                    );
+                  default:
+                    return const Text('Unbekannter Fehler bei Kategorie Prozent Karten aufgetreten.');
+                }
+              },
             ),
           ),
         ),

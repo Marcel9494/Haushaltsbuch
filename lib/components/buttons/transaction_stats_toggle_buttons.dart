@@ -86,8 +86,7 @@ class _TransactionStatsToggleButtonsState extends State<TransactionStatsToggleBu
   Widget build(BuildContext context) {
     return ToggleButtons(
       onPressed: (selectedIndex) => _setSelectedTransaction(selectedIndex),
-      selectedBorderColor: _getSelectedBorderColor(),
-      selectedColor: Colors.white,
+      selectedColor: _getSelectedBorderColor(),
       color: Colors.white60,
       fillColor: Colors.transparent,
       borderColor: Colors.transparent,
@@ -98,9 +97,10 @@ class _TransactionStatsToggleButtonsState extends State<TransactionStatsToggleBu
       ),
       isSelected: _selectedTransaction,
       children: [
-        Text(TransactionType.outcome.pluralName, style: const TextStyle(fontSize: 12.0)),
-        Text(TransactionType.income.pluralName, style: const TextStyle(fontSize: 12.0)),
-        Text(TransactionType.investment.pluralName, style: const TextStyle(fontSize: 12.0)),
+        Text(TransactionType.outcome.pluralName, style: TextStyle(fontSize: _selectedTransaction[0] ? 14.0 : 12.0, fontWeight: _selectedTransaction[0] ? FontWeight.w400 : null)),
+        Text(TransactionType.income.pluralName, style: TextStyle(fontSize: _selectedTransaction[1] ? 14.0 : 12.0, fontWeight: _selectedTransaction[1] ? FontWeight.w400 : null)),
+        Text(TransactionType.investment.pluralName,
+            style: TextStyle(fontSize: _selectedTransaction[2] ? 14.0 : 12.0, fontWeight: _selectedTransaction[2] ? FontWeight.w400 : null)),
       ],
     );
   }
