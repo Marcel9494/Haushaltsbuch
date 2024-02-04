@@ -181,7 +181,10 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
                             children: [
                               BlocBuilder<FromAccountInputFieldCubit, FromAccountInputFieldModel>(
                                 builder: (context, state) {
-                                  return FromAccountInputField(cubit: fromAccountInputFieldCubit, focusNode: fromAccountFocusNode, hintText: 'Abbuchungskonto');
+                                  return FromAccountInputField(
+                                      cubit: fromAccountInputFieldCubit,
+                                      focusNode: fromAccountFocusNode,
+                                      hintText: transactionStatsToggleButtonsCubit.state.selectedTransaction[0] == true ? 'Konto' : 'Abbuchungskonto');
                                 },
                               ),
                               BlocBuilder<ToAccountInputFieldCubit, ToAccountInputFieldModel>(
