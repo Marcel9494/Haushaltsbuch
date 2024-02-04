@@ -1,6 +1,5 @@
 import 'categorie_model.dart';
 
-import '../global_state/global_state_repository.dart';
 import '../enums/categorie_types.dart';
 
 abstract class CategorieInterface {

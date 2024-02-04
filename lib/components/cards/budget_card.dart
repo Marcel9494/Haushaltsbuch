@@ -69,7 +69,7 @@ class _BudgetCardState extends State<BudgetCard> {
                 title: const SizedBox.shrink(),
                 controlAffinity: ListTileControlAffinity.leading,
                 textColor: Colors.white,
-                iconColor: Colors.white,
+                iconColor: Colors.white70,
                 subtitle: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
