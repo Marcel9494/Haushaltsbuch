@@ -331,16 +331,33 @@ class BookingRepository extends BookingInterface {
   }
 
   @override
-  Future<List<Booking>> loadMonthlyBookingList(int selectedMonth, int selectedYear, [String categorie = '', String account = '']) async {
+  Future<List<Booking>> loadMonthlyBookingList(int selectedMonth, int selectedYear, [String categorie = '', String account = '', String transactionType = '']) async {
     var bookingBox = await Hive.openBox(bookingsBox);
     List<Booking> bookingList = [];
     for (int i = 0; i < bookingBox.length; i++) {
       Booking booking = await bookingBox.getAt(i);
-      if ((DateTime.parse(booking.date).month == selectedMonth && DateTime.parse(booking.date).year == selectedYear && categorie == '' && account == '') ||
-          (DateTime.parse(booking.date).month == selectedMonth && DateTime.parse(booking.date).year == selectedYear && categorie != '' && booking.categorie == categorie) ||
-          (DateTime.parse(booking.date).month == selectedMonth && DateTime.parse(booking.date).year == selectedYear && account != '' && booking.fromAccount == account)) {
-        booking.boxIndex = i;
-        bookingList.add(booking);
+      // TODO Code verbessern?!
+      if (transactionType == TransactionType.income.pluralName) {
+        transactionType = TransactionType.income.name;
+      } else if (transactionType == TransactionType.outcome.pluralName) {
+        transactionType = TransactionType.outcome.name;
+      }
+      if (DateTime.parse(booking.date).month == selectedMonth && DateTime.parse(booking.date).year == selectedYear) {
+        if (categorie == '' && account == '' && transactionType == '') {
+          booking.boxIndex = i;
+          bookingList.add(booking);
+          continue;
+        }
+        if (transactionType != '' && booking.transactionType == transactionType && categorie != '' && booking.categorie == categorie) {
+          booking.boxIndex = i;
+          bookingList.add(booking);
+          continue;
+        }
+        if (account != '' && booking.fromAccount == account) {
+          booking.boxIndex = i;
+          bookingList.add(booking);
+          continue;
+        }
       }
     }
     bookingList.sort((first, second) => second.date.compareTo(first.date));

@@ -5,11 +5,13 @@ import '/components/tab_views/monthly_booking_tab_view.dart';
 class CategorieAmountListScreen extends StatefulWidget {
   final DateTime selectedDate;
   final String categorie;
+  final String transactionType;
 
   const CategorieAmountListScreen({
     Key? key,
     required this.selectedDate,
     required this.categorie,
+    required this.transactionType,
   }) : super(key: key);
 
   @override
@@ -28,6 +30,7 @@ class _CategorieAmountListScreenState extends State<CategorieAmountListScreen> {
               selectedDate: widget.selectedDate,
               categorie: widget.categorie,
               account: '',
+              transactionType: widget.transactionType,
               showOverviewTile: false,
               showBarChart: true,
             ),

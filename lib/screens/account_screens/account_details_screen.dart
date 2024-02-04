@@ -70,6 +70,7 @@ class _AccountDetailsScreenState extends State<AccountDetailsScreen> {
           MonthlyBookingTabView(
             selectedDate: _selectedDate,
             categorie: '',
+            transactionType: '',
             account: widget.account.name,
             showOverviewTile: false,
           ),

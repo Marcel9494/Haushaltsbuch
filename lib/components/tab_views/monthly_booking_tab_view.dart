@@ -21,6 +21,7 @@ class MonthlyBookingTabView extends StatefulWidget {
   DateTime selectedDate;
   final String categorie;
   final String account;
+  final String transactionType;
   final bool showOverviewTile;
   final bool showBarChart;
 
@@ -29,6 +30,7 @@ class MonthlyBookingTabView extends StatefulWidget {
     required this.selectedDate,
     required this.categorie,
     required this.account,
+    required this.transactionType,
     this.showOverviewTile = true,
     this.showBarChart = false,
   }) : super(key: key);
@@ -44,7 +46,7 @@ class _MonthlyBookingTabViewState extends State<MonthlyBookingTabView> {
   BookingRepository bookingRepository = BookingRepository();
 
   Future<List<Booking>> _loadMonthlyBookingList() async {
-    _bookingList = await bookingRepository.loadMonthlyBookingList(widget.selectedDate.month, widget.selectedDate.year, widget.categorie, widget.account);
+    _bookingList = await bookingRepository.loadMonthlyBookingList(widget.selectedDate.month, widget.selectedDate.year, widget.categorie, widget.account, widget.transactionType);
     _prepareMaps(_bookingList);
     _getTodayExpenditures(_bookingList);
     _getTodayRevenues(_bookingList);

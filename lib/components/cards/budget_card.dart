@@ -40,7 +40,7 @@ class _BudgetCardState extends State<BudgetCard> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => Navigator.pushNamed(context, categorieAmountListRoute, arguments: CategorieAmountListScreenArguments(widget.selectedDate, widget.budget.categorie)),
+      onTap: () => Navigator.pushNamed(context, categorieAmountListRoute, arguments: CategorieAmountListScreenArguments(widget.selectedDate, widget.budget.categorie, '')),
       child: Card(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(14.0),
@@ -128,8 +128,8 @@ class _BudgetCardState extends State<BudgetCard> {
                             Icons.bar_chart_rounded,
                             size: 28.0,
                           ),
-                          onPressed: () =>
-                              Navigator.pushNamed(context, categorieAmountListRoute, arguments: CategorieAmountListScreenArguments(widget.selectedDate, widget.budget.categorie)),
+                          onPressed: () => Navigator.pushNamed(context, categorieAmountListRoute,
+                              arguments: CategorieAmountListScreenArguments(widget.selectedDate, widget.budget.categorie, '')),
                         ),
                       ),
                     ),
