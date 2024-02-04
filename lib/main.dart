@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:haushaltsbuch/screens/budget_screens/overview_one_subbudget_screen.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -54,6 +53,7 @@ import 'screens/account_screens/account_details_screen.dart';
 import 'screens/budget_screens/create_budget_screen.dart';
 import 'screens/categorie_screens/categorie_amount_list_screen.dart';
 import 'screens/budget_screens/overview_one_budget_screen.dart';
+import 'screens/budget_screens/overview_one_subbudget_screen.dart';
 import 'screens/other_screens/settings_screen.dart';
 import 'screens/other_screens/splash_screen.dart';
 
@@ -201,6 +201,7 @@ class BudgetBookApp extends StatelessWidget {
               builder: (BuildContext context) => CategorieAmountListScreen(
                 selectedDate: args.selectedDate,
                 categorie: args.categorie,
+                transactionType: args.transactionType,
               ),
               settings: settings,
             );

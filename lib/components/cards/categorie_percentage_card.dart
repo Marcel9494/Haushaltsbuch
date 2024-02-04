@@ -13,11 +13,13 @@ class CategoriePercentageCard extends StatefulWidget {
   final PercentageStats percentageStats;
   final DateTime? selectedDate;
   final List<Booking> bookingList;
+  final String transactionType;
 
   const CategoriePercentageCard({
     Key? key,
     required this.percentageStats,
     required this.bookingList,
+    required this.transactionType,
     this.selectedDate,
   }) : super(key: key);
 
@@ -140,7 +142,7 @@ class _CategoriePercentageCardState extends State<CategoriePercentageCard> {
                             child: IconButton(
                               icon: const Icon(Icons.bar_chart_rounded),
                               onPressed: () => Navigator.pushNamed(context, categorieAmountListRoute,
-                                  arguments: CategorieAmountListScreenArguments(widget.selectedDate!, widget.percentageStats.name)),
+                                  arguments: CategorieAmountListScreenArguments(widget.selectedDate!, widget.percentageStats.name, widget.transactionType)),
                               padding: const EdgeInsets.only(right: 6.0),
                             ),
                           ),

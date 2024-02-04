@@ -112,7 +112,9 @@ class _BookingsTabBarState extends State<BookingsTabBar> {
             Expanded(
               child: TabBarView(
                 children: <Widget>[
-                  _selectedTabOption[0] ? MonthlyBookingTabView(selectedDate: _selectedDate, categorie: '', account: '') : YearlyBookingTabView(selectedDate: _selectedDate),
+                  _selectedTabOption[0]
+                      ? MonthlyBookingTabView(selectedDate: _selectedDate, categorie: '', account: '', transactionType: '')
+                      : YearlyBookingTabView(selectedDate: _selectedDate),
                   _selectedTabOption[0] ? MonthlyStatisticsTabView(selectedDate: _selectedDate) : YearlyStatisticsTabView(selectedDate: _selectedDate),
                 ],
               ),
