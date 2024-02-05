@@ -56,7 +56,7 @@ class _FutureWealthDevelopmentChartState extends State<FutureWealthDevelopmentCh
         currentYear = _selectedDate.year - 1;
         currentMonth = _selectedDate.month + 12 - i;
       }
-      _bookingList = await bookingRepository.loadMonthlyBookingList(currentMonth, currentYear);
+      _bookingList = await bookingRepository.loadMonthlyBookings(currentMonth, currentYear);
       _averageWealthGrowth += bookingRepository.getRevenues(_bookingList) - bookingRepository.getExpenditures(_bookingList);
     }
   }

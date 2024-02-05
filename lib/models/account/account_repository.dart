@@ -22,7 +22,7 @@ class AccountRepository extends AccountInterface {
     var accountBox = await Hive.openBox(accountsBox);
     accountBox.putAt(accountBoxIndex, updatedAccount);
     BookingRepository bookingRepository = BookingRepository();
-    bookingRepository.updateBookingAccountName(oldAccountName, updatedAccount.name);
+    bookingRepository.updateAccountName(oldAccountName, updatedAccount.name);
   }
 
   @override

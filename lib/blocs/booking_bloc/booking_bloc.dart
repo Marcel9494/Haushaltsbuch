@@ -177,7 +177,7 @@ class BookingBloc extends Bloc<BookingEvents, BookingState> {
           ..serieId = savedBooking.serieId
           ..booked = DateTime.parse(dateInputFieldCubit.state.bookingDate).isAfter(DateTime.now()) ? false : true;
         if (event.serieEditModeType == SerieEditModeType.none || event.serieEditModeType == SerieEditModeType.single) {
-          bookingRepository.updateSingleBooking(updatedBooking, oldBooking, event.bookingBoxIndex);
+          bookingRepository.updateSingle(updatedBooking, oldBooking, event.bookingBoxIndex);
         } else if (event.serieEditModeType == SerieEditModeType.onlyFuture) {
           bookingRepository.updateOnlyFutureBookingsFromSerie(updatedBooking, oldBooking, event.bookingBoxIndex);
         } else if (event.serieEditModeType == SerieEditModeType.all) {
@@ -192,7 +192,7 @@ class BookingBloc extends Bloc<BookingEvents, BookingState> {
 
     on<DeleteBookingEvent>((event, emit) async {
       if (event.serieEditMode == SerieEditModeType.none || event.serieEditMode == SerieEditModeType.single) {
-        bookingRepository.deleteSingleBooking(event.bookingBoxIndex);
+        bookingRepository.deleteSingle(event.bookingBoxIndex);
       } else if (event.serieEditMode == SerieEditModeType.onlyFuture) {
         Booking booking = await bookingRepository.load(event.bookingBoxIndex);
         bookingRepository.deleteOnlyFutureBookingsFromSerie(booking, event.bookingBoxIndex);

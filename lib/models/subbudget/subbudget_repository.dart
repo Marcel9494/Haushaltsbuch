@@ -185,7 +185,7 @@ class SubbudgetRepository extends SubbudgetInterface {
   @override
   Future<List<Subbudget>> calculateCurrentExpenditure(List<Subbudget> subbudgetList, DateTime selectedDate) async {
     BookingRepository bookingRepository = BookingRepository();
-    List<Booking> bookingList = await bookingRepository.loadMonthlyBookingList(selectedDate.month, selectedDate.year);
+    List<Booking> bookingList = await bookingRepository.loadMonthlyBookings(selectedDate.month, selectedDate.year);
     for (int i = 0; i < subbudgetList.length; i++) {
       subbudgetList[i].currentSubcategorieExpenditure = bookingRepository.getSubcategorieExpenditures(bookingList, subbudgetList[i].categorie, subbudgetList[i].subcategorieName);
     }
