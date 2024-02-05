@@ -4,6 +4,7 @@ import '../booking/booking_model.dart';
 import '../booking/booking_repository.dart';
 import '../default_budget/default_budget_model.dart';
 import '../default_budget/default_budget_repository.dart';
+
 import 'budget_interface.dart';
 import 'budget_model.dart';
 
@@ -165,7 +166,7 @@ class BudgetRepository extends BudgetInterface {
   @override
   Future<List<Budget>> calculateCurrentExpenditure(List<Budget> budgetList, DateTime selectedDate) async {
     BookingRepository bookingRepository = BookingRepository();
-    List<Booking> bookingList = await bookingRepository.loadMonthlyBookingList(selectedDate.month, selectedDate.year);
+    List<Booking> bookingList = await bookingRepository.loadMonthlyBookings(selectedDate.month, selectedDate.year);
     for (int i = 0; i < budgetList.length; i++) {
       budgetList[i].currentExpenditure = bookingRepository.getExpenditures(bookingList, budgetList[i].categorie);
     }

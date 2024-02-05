@@ -51,7 +51,7 @@ class MonthlyBarChartState extends State<MonthlyBarChart> {
         currentYear = widget.selectedDate.year - 1;
         currentMonth = widget.selectedDate.month + 12 - i;
       }
-      _bookingList = await bookingRepository.loadMonthlyBookingList(currentMonth, currentYear, widget.categorie);
+      _bookingList = await bookingRepository.loadMonthlyBookingsForCategorie(currentMonth, currentYear, widget.categorie);
       if (_bookingList.isEmpty) {
         _monthlyExpenditures.insert(i, 0.0);
         _monthlyExpendituresBarGroups.add(makeGroupData(i, _monthlyExpenditures[i]));

@@ -41,7 +41,7 @@ class _CategoriePercentageCardState extends State<CategoriePercentageCard> {
     _subcategorieNames = await categorieRepository.loadSubcategorieNameList(widget.percentageStats.name);
     for (int i = 0; i < _subcategorieNames.length; i++) {
       double totalAmount = 0.0;
-      _subcategorieBookings = await bookingRepository.loadSubcategorieBookingList(widget.bookingList, _subcategorieNames[i]);
+      _subcategorieBookings = await bookingRepository.loadSubcategorieBookings(widget.bookingList, _subcategorieNames[i]);
       for (int j = 0; j < _subcategorieBookings.length; j++) {
         totalAmount += formatMoneyAmountToDouble(_subcategorieBookings[j].amount);
       }

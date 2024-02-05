@@ -67,12 +67,14 @@ class _AccountDetailsScreenState extends State<AccountDetailsScreen> {
       body: Column(
         children: [
           MonthPickerButtons(selectedDate: _selectedDate, selectedDateCallback: (selectedDate) => setState(() => _selectedDate = selectedDate)),
-          MonthlyBookingTabView(
-            selectedDate: _selectedDate,
-            categorie: '',
-            transactionType: '',
-            account: widget.account.name,
-            showOverviewTile: false,
+          Expanded(
+            child: MonthlyBookingTabView(
+              selectedDate: _selectedDate,
+              categorie: '',
+              transactionType: '',
+              account: widget.account.name,
+              showOverviewTile: false,
+            ),
           ),
         ],
       ),

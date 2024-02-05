@@ -128,7 +128,7 @@ class BookingRepository extends BookingInterface {
   }
 
   @override
-  void updateSingleBooking(Booking updatedBooking, Booking oldBooking, int bookingBoxIndex) async {
+  void updateSingle(Booking updatedBooking, Booking oldBooking, int bookingBoxIndex) async {
     var bookingBox = await Hive.openBox(bookingsBox);
     bookingBox.putAt(bookingBoxIndex, updatedBooking);
     if (updatedBooking.booked) {
@@ -212,7 +212,7 @@ class BookingRepository extends BookingInterface {
   }
 
   @override
-  Future<void> updateBookingCategorieName(String oldCategorieName, String newCategorieName) async {
+  Future<void> updateCategorieName(String oldCategorieName, String newCategorieName) async {
     var bookingBox = await Hive.openBox(bookingsBox);
     for (int i = 0; i < bookingBox.length; i++) {
       Booking booking = await bookingBox.getAt(i);
@@ -236,7 +236,7 @@ class BookingRepository extends BookingInterface {
   }
 
   @override
-  Future<void> updateBookingSubcategorieName(String oldSubcategorieName, String newSubcategorieName) async {
+  Future<void> updateSubcategorieName(String oldSubcategorieName, String newSubcategorieName) async {
     var bookingBox = await Hive.openBox(bookingsBox);
     for (int i = 0; i < bookingBox.length; i++) {
       Booking booking = await bookingBox.getAt(i);
@@ -260,7 +260,7 @@ class BookingRepository extends BookingInterface {
   }
 
   @override
-  Future<void> updateBookingAccountName(String oldAccountName, String newAccountName) async {
+  Future<void> updateAccountName(String oldAccountName, String newAccountName) async {
     var bookingBox = await Hive.openBox(bookingsBox);
     for (int i = 0; i < bookingBox.length; i++) {
       Booking booking = await bookingBox.getAt(i);
@@ -284,7 +284,7 @@ class BookingRepository extends BookingInterface {
   }
 
   @override
-  void deleteSingleBooking(int bookingBoxIndex) async {
+  void deleteSingle(int bookingBoxIndex) async {
     var bookingBox = await Hive.openBox(bookingsBox);
     Booking booking = await bookingBox.getAt(bookingBoxIndex);
     if (booking.booked) {
@@ -331,7 +331,52 @@ class BookingRepository extends BookingInterface {
   }
 
   @override
-  Future<List<Booking>> loadMonthlyBookingList(int selectedMonth, int selectedYear, [String categorie = '', String account = '', String transactionType = '']) async {
+  Future<List<Booking>> loadMonthlyBookings(int selectedMonth, int selectedYear) async {
+    var bookingBox = await Hive.openBox(bookingsBox);
+    List<Booking> bookingList = [];
+    for (int i = 0; i < bookingBox.length; i++) {
+      Booking booking = await bookingBox.getAt(i);
+      if (DateTime.parse(booking.date).month == selectedMonth && DateTime.parse(booking.date).year == selectedYear) {
+        booking.boxIndex = i;
+        bookingList.add(booking);
+      }
+    }
+    bookingList.sort((first, second) => second.date.compareTo(first.date));
+    return bookingList;
+  }
+
+  @override
+  Future<List<Booking>> loadMonthlyBookingsForCategorie(int selectedMonth, int selectedYear, String categorie) async {
+    var bookingBox = await Hive.openBox(bookingsBox);
+    List<Booking> bookingList = [];
+    for (int i = 0; i < bookingBox.length; i++) {
+      Booking booking = await bookingBox.getAt(i);
+      if (DateTime.parse(booking.date).month == selectedMonth && DateTime.parse(booking.date).year == selectedYear && booking.categorie == categorie) {
+        booking.boxIndex = i;
+        bookingList.add(booking);
+      }
+    }
+    bookingList.sort((first, second) => second.date.compareTo(first.date));
+    return bookingList;
+  }
+
+  @override
+  Future<List<Booking>> loadMonthlyBookingsForAccount(int selectedMonth, int selectedYear, String account) async {
+    var bookingBox = await Hive.openBox(bookingsBox);
+    List<Booking> bookingList = [];
+    for (int i = 0; i < bookingBox.length; i++) {
+      Booking booking = await bookingBox.getAt(i);
+      if (DateTime.parse(booking.date).month == selectedMonth && DateTime.parse(booking.date).year == selectedYear && booking.fromAccount == account) {
+        booking.boxIndex = i;
+        bookingList.add(booking);
+      }
+    }
+    bookingList.sort((first, second) => second.date.compareTo(first.date));
+    return bookingList;
+  }
+
+  @override
+  Future<List<Booking>> loadMonthlyBookingsForCategorieAndTransactionType(int selectedMonth, int selectedYear, String categorie, String transactionType) async {
     var bookingBox = await Hive.openBox(bookingsBox);
     List<Booking> bookingList = [];
     for (int i = 0; i < bookingBox.length; i++) {
@@ -342,22 +387,12 @@ class BookingRepository extends BookingInterface {
       } else if (transactionType == TransactionType.outcome.pluralName) {
         transactionType = TransactionType.outcome.name;
       }
-      if (DateTime.parse(booking.date).month == selectedMonth && DateTime.parse(booking.date).year == selectedYear) {
-        if (categorie == '' && account == '' && transactionType == '') {
-          booking.boxIndex = i;
-          bookingList.add(booking);
-          continue;
-        }
-        if (transactionType != '' && booking.transactionType == transactionType && categorie != '' && booking.categorie == categorie) {
-          booking.boxIndex = i;
-          bookingList.add(booking);
-          continue;
-        }
-        if (account != '' && booking.fromAccount == account) {
-          booking.boxIndex = i;
-          bookingList.add(booking);
-          continue;
-        }
+      if (DateTime.parse(booking.date).month == selectedMonth &&
+          DateTime.parse(booking.date).year == selectedYear &&
+          booking.categorie == categorie &&
+          booking.transactionType == transactionType) {
+        booking.boxIndex = i;
+        bookingList.add(booking);
       }
     }
     bookingList.sort((first, second) => second.date.compareTo(first.date));
@@ -365,7 +400,7 @@ class BookingRepository extends BookingInterface {
   }
 
   @override
-  Future<List<Booking>> loadSubcategorieBookingList(List<Booking> bookingList, String subcategorie) async {
+  Future<List<Booking>> loadSubcategorieBookings(List<Booking> bookingList, String subcategorie) async {
     List<Booking> subcategorieBookingList = [];
     for (int i = 0; i < bookingList.length; i++) {
       if (bookingList[i].subcategorie == subcategorie) {

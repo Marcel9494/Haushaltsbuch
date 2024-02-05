@@ -119,7 +119,7 @@ class CategorieBloc extends Bloc<CategorieEvents, CategorieState> {
           ..subcategorieNames = savedSubcategories
           ..type = categorieType.state.categorieType;
         categorieRepository.update(updatedCategorie, savedCategorieName);
-        bookingRepository.updateBookingCategorieName(savedCategorieName, updatedCategorie.name);
+        bookingRepository.updateCategorieName(savedCategorieName, updatedCategorie.name);
         budgetRepository.updateBudgetCategorieName(savedCategorieName, updatedCategorie.name);
       }
       event.saveButtonController.success();
@@ -212,7 +212,7 @@ class CategorieBloc extends Bloc<CategorieEvents, CategorieState> {
         return;
       } else {
         categorieRepository.updateSubcategorie(event.categorie.name, savedSubcategorieName, subcategorieName.state.text);
-        bookingRepository.updateBookingSubcategorieName(savedSubcategorieName, subcategorieName.state.text);
+        bookingRepository.updateSubcategorieName(savedSubcategorieName, subcategorieName.state.text);
       }
       event.saveButtonController.success();
       await Future.delayed(const Duration(milliseconds: transitionInMs));

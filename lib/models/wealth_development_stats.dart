@@ -12,7 +12,7 @@ class WealthDevelopmentStats {
   // TODO hier weitermachen und Vermögensentwicklung für die Vergangenheit pro Monat berechnen.
   static Future<double> calculatePastWealth(DateTime currentDate, double currentBalance) async {
     BookingRepository bookingRepository = BookingRepository();
-    List<Booking> _bookingList = await bookingRepository.loadMonthlyBookingList(currentDate.month - 1, currentDate.year);
+    List<Booking> _bookingList = await bookingRepository.loadMonthlyBookings(currentDate.month - 1, currentDate.year);
     double monthExpenditures = bookingRepository.getExpenditures(_bookingList);
     double monthRevenues = bookingRepository.getRevenues(_bookingList);
     double monthInvestments = bookingRepository.getInvestments(_bookingList);

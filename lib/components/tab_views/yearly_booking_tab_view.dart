@@ -33,7 +33,7 @@ class _YearlyBookingTabViewState extends State<YearlyBookingTabView> {
     BookingRepository bookingRepository = BookingRepository();
     _monthList.clear();
     for (int i = 0; i < 12; i++) {
-      List<Booking> _bookingList = await bookingRepository.loadMonthlyBookingList(i + 1, widget.selectedDate.year);
+      List<Booking> _bookingList = await bookingRepository.loadMonthlyBookings(i + 1, widget.selectedDate.year);
       MonthlyStats monthlyStats = MonthlyStats();
       monthlyStats.month = dateFormatterMMMM.format(DateTime(widget.selectedDate.year, i + 1, 1)).toString();
       monthlyStats.revenues = bookingRepository.getRevenues(_bookingList);

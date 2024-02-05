@@ -41,7 +41,7 @@ class _YearlyStatisticsTabViewState extends State<YearlyStatisticsTabView> {
     BookingRepository bookingRepository = BookingRepository();
     _bookingList = [];
     for (int i = 0; i < 12; i++) {
-      _bookingList += await bookingRepository.loadMonthlyBookingList(i + 1, widget.selectedDate.year);
+      _bookingList += await bookingRepository.loadMonthlyBookings(i + 1, widget.selectedDate.year);
     }
     if (_currentCategorieType == CategorieType.outcome.pluralName) {
       return _loadYearlyStatistic(TransactionType.outcome);

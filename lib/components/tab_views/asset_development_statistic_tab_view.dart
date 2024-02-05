@@ -2,18 +2,17 @@ import 'dart:math' as math;
 
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:haushaltsbuch/models/booking/booking_repository.dart';
 import 'package:intl/intl.dart';
 
-import '../../models/booking/booking_model.dart';
+import '/models/booking/booking_model.dart';
+import '/models/wealth_development_stats.dart';
 import '/models/account/account_repository.dart';
+import '/models/booking/booking_repository.dart';
 
 import '../buttons/month_picker_buttons.dart';
 
 import '/utils/date_formatters/date_formatter.dart';
 import '/utils/number_formatters/number_formatter.dart';
-
-import '/models/wealth_development_stats.dart';
 
 class AssetDevelopmentStatisticTabView extends StatefulWidget {
   const AssetDevelopmentStatisticTabView({Key? key}) : super(key: key);
@@ -54,7 +53,7 @@ class _AssetDevelopmentStatisticTabViewState extends State<AssetDevelopmentStati
         currentYear = _selectedDate.year - 1;
         currentMonth = _selectedDate.month + 12 - i;
       }
-      List<Booking> bookingList = await bookingRepository.loadMonthlyBookingList(currentMonth, currentYear);
+      List<Booking> bookingList = await bookingRepository.loadMonthlyBookings(currentMonth, currentYear);
       double revenues = bookingRepository.getRevenues(bookingList);
       double expenditures = bookingRepository.getExpenditures(bookingList);
       WealthDevelopmentStats pastWealthDevelopmentStat = WealthDevelopmentStats();

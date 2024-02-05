@@ -39,7 +39,7 @@ class _MonthlyStatisticsTabViewState extends State<MonthlyStatisticsTabView> {
 
   Future<List<PercentageStats>> _loadStatistics() async {
     BookingRepository bookingRepository = BookingRepository();
-    _bookingList = await bookingRepository.loadMonthlyBookingList(widget.selectedDate.month, widget.selectedDate.year);
+    _bookingList = await bookingRepository.loadMonthlyBookings(widget.selectedDate.month, widget.selectedDate.year);
     if (_currentCategorieType == CategorieType.outcome.pluralName) {
       return _loadMonthlyStatistic(TransactionType.outcome);
     } else if (_currentCategorieType == CategorieType.income.pluralName) {
