@@ -34,13 +34,23 @@ class AccountCard extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Text(account.name),
+                  Expanded(
+                    flex: 3,
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Text(account.name),
+                    ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 16.0, bottom: 16.0, right: 16.0),
-                    child: Text(account.bankBalance),
+                  Expanded(
+                    flex: 2,
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 16.0, bottom: 16.0, right: 16.0),
+                      child: Text(
+                        account.bankBalance,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.right,
+                      ),
+                    ),
                   ),
                 ],
               ),
