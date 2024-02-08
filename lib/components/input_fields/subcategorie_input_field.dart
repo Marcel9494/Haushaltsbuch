@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
-import '../../blocs/input_field_blocs/categorie_input_field_bloc/categorie_input_field_cubit.dart';
+import '/blocs/input_field_blocs/categorie_input_field_bloc/categorie_input_field_cubit.dart';
 
 import '/models/categorie/categorie_repository.dart';
 
 import '../deco/bottom_sheet_line.dart';
+import '../deco/bottom_sheet_header.dart';
+import '../deco/bottom_sheet_empty_list.dart';
 
 class SubcategorieInputField extends StatefulWidget {
   final dynamic cubit;
@@ -33,14 +35,11 @@ class _SubcategorieInputFieldState extends State<SubcategorieInputField> {
       builder: (BuildContext context) {
         return Material(
           child: SizedBox(
-            height: 400,
+            height: MediaQuery.of(context).size.height / 2,
             child: ListView(
               children: [
                 const BottomSheetLine(),
-                Padding(
-                  padding: const EdgeInsets.only(top: 16.0, left: 20.0),
-                  child: Text(widget.title, style: const TextStyle(fontSize: 18.0)),
-                ),
+                BottomSheetHeader(title: widget.title),
                 FutureBuilder(
                   future: _loadSubcategorieNameList(),
                   builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
@@ -49,12 +48,12 @@ class _SubcategorieInputFieldState extends State<SubcategorieInputField> {
                         return const SizedBox();
                       case ConnectionState.done:
                         if (_subcategorieNames.isEmpty) {
-                          return const Text('Erstelle zuerst eine Unterkategorie.');
+                          return const BottomSheetEmptyList(text: 'Erstelle zuerst eine Unterkategorie.');
                         } else {
                           return Center(
                             child: GridView.count(
                               primary: false,
-                              padding: const EdgeInsets.all(20),
+                              padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
                               crossAxisCount: 4,
                               mainAxisSpacing: 5,
                               crossAxisSpacing: 5,

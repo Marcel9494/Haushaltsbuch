@@ -9,6 +9,9 @@ import '/models/categorie/categorie_repository.dart';
 
 import '/components/deco/bottom_sheet_line.dart';
 
+import '../deco/bottom_sheet_header.dart';
+import '../deco/bottom_sheet_empty_list.dart';
+
 class CategorieInputField extends StatefulWidget {
   final dynamic cubit;
   final FocusNode focusNode;
@@ -49,14 +52,11 @@ class _CategorieInputFieldState extends State<CategorieInputField> {
       builder: (BuildContext context) {
         return Material(
           child: SizedBox(
-            height: 400,
+            height: MediaQuery.of(context).size.height / 2,
             child: ListView(
               children: [
                 const BottomSheetLine(),
-                Padding(
-                  padding: const EdgeInsets.only(top: 16.0, left: 20.0),
-                  child: Text(widget.title, style: const TextStyle(fontSize: 18.0)),
-                ),
+                BottomSheetHeader(title: widget.title),
                 FutureBuilder(
                   future: _loadCategorieNameList(),
                   builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
@@ -65,12 +65,12 @@ class _CategorieInputFieldState extends State<CategorieInputField> {
                         return const SizedBox();
                       case ConnectionState.done:
                         if (_categorieNames.isEmpty) {
-                          return const Text('Erstelle zuerst eine Kategorie.');
+                          return const BottomSheetEmptyList(text: 'Erstelle zuerst eine Kategorie.');
                         } else {
                           return Center(
                             child: GridView.count(
                               primary: false,
-                              padding: const EdgeInsets.all(20),
+                              padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
                               crossAxisCount: 4,
                               mainAxisSpacing: 5,
                               crossAxisSpacing: 5,
