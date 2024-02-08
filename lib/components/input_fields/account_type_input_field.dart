@@ -22,7 +22,7 @@ class AccountTypeInputField extends StatelessWidget {
       builder: (BuildContext context) {
         return Material(
           child: SizedBox(
-            height: 460.0,
+            height: 460.0, // TODO dynamisch machen
             child: ListView(
               children: [
                 const BottomSheetLine(),

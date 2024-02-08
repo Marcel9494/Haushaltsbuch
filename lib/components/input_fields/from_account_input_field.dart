@@ -5,6 +5,9 @@ import '/components/deco/bottom_sheet_line.dart';
 
 import '/models/account/account_repository.dart';
 
+import '../deco/bottom_sheet_header.dart';
+import '../deco/bottom_sheet_empty_list.dart';
+
 class FromAccountInputField extends StatefulWidget {
   final dynamic cubit;
   final FocusNode focusNode;
@@ -30,14 +33,11 @@ class _FromAccountInputFieldState extends State<FromAccountInputField> {
       builder: (BuildContext context) {
         return Material(
           child: SizedBox(
-            height: 400.0,
+            height: MediaQuery.of(context).size.height / 2,
             child: ListView(
               children: [
                 const BottomSheetLine(),
-                const Padding(
-                  padding: EdgeInsets.only(top: 16.0, left: 20.0),
-                  child: Text('Konto auswählen:', style: TextStyle(fontSize: 18.0)),
-                ),
+                const BottomSheetHeader(title: 'Konto auswählen:'),
                 FutureBuilder(
                   future: _loadAccountNameList(),
                   builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
@@ -46,12 +46,12 @@ class _FromAccountInputFieldState extends State<FromAccountInputField> {
                         return const SizedBox();
                       case ConnectionState.done:
                         if (accountNames.isEmpty) {
-                          return const Text('Erstelle zuerst ein Konto.');
+                          return const BottomSheetEmptyList(text: 'Erstelle zuerst ein Konto.');
                         } else {
                           return Center(
                             child: GridView.count(
                               primary: false,
-                              padding: const EdgeInsets.all(20),
+                              padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
                               crossAxisCount: 4,
                               mainAxisSpacing: 5,
                               crossAxisSpacing: 5,
