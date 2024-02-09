@@ -18,6 +18,8 @@ class CategorieCard extends StatefulWidget {
 }
 
 class _CategorieCardState extends State<CategorieCard> {
+  String allSubcategorieNames = "";
+
   void _showDeleteCategorieDialog() {
     showDialog(
       context: context,
@@ -78,23 +80,52 @@ class _CategorieCardState extends State<CategorieCard> {
     );
   }
 
+  String _getSubcategorieNames(List<String> subcategorieNames) {
+    for (int i = 0; i < subcategorieNames.length; i++) {
+      allSubcategorieNames += i == 0 ? widget.categorie.subcategorieNames[i] : " · " + widget.categorie.subcategorieNames[i];
+    }
+    return allSubcategorieNames;
+  }
+
+  // TODO hier weitermachen und Karten UI verbessern siehe als Beispiel MoneyManager
   @override
   Widget build(BuildContext context) {
     return Card(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(14.0),
       ),
-      child: Theme(
-        data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+      child: ListTileTheme(
+        contentPadding: const EdgeInsets.only(left: 8.0),
+        horizontalTitleGap: 0.0,
+        minLeadingWidth: 0.0,
         child: ExpansionTile(
-          title: Padding(
-            padding: widget.categorie.subcategorieNames.isEmpty ? const EdgeInsets.only(left: 56.0) : EdgeInsets.zero,
-            child: Text(widget.categorie.name),
-          ),
-          controlAffinity: widget.categorie.subcategorieNames.isEmpty ? null : ListTileControlAffinity.leading,
-          tilePadding: const EdgeInsets.only(left: 8.0),
-          textColor: widget.categorie.subcategorieNames.isEmpty ? Colors.white : Colors.cyanAccent,
+          controlAffinity: ListTileControlAffinity.leading,
+          textColor: Colors.white,
           iconColor: Colors.white70,
+          tilePadding: const EdgeInsets.only(left: 8.0),
+          leading: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              IconButton(
+                padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                constraints: const BoxConstraints(),
+                icon: const Icon(Icons.remove_circle_outline_rounded),
+                onPressed: () => _showDeleteCategorieDialog(),
+              ),
+            ],
+          ),
+          title: Text(
+            widget.categorie.name,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(fontSize: 16.0),
+          ),
+          subtitle: widget.categorie.subcategorieNames.isEmpty
+              ? const Text('-', style: TextStyle(fontSize: 12.0, color: Colors.grey))
+              : Text(
+                  _getSubcategorieNames(widget.categorie.subcategorieNames),
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(fontSize: 12.0, color: Colors.grey),
+                ),
           trailing: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -103,12 +134,6 @@ class _CategorieCardState extends State<CategorieCard> {
                 constraints: const BoxConstraints(),
                 icon: const Icon(Icons.edit),
                 onPressed: () => BlocProvider.of<CategorieBloc>(context).add(LoadCategorieEvent(context, widget.categorie.index)),
-              ),
-              IconButton(
-                padding: const EdgeInsets.symmetric(horizontal: 6.0),
-                constraints: const BoxConstraints(),
-                icon: const Icon(Icons.remove_rounded),
-                onPressed: () => _showDeleteCategorieDialog(),
               ),
               IconButton(
                 padding: const EdgeInsets.only(left: 4.0, right: 12.0),
