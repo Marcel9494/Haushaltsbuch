@@ -18,6 +18,8 @@ class CategorieCard extends StatefulWidget {
 }
 
 class _CategorieCardState extends State<CategorieCard> {
+  String allSubcategorieNames = "";
+
   void _showDeleteCategorieDialog() {
     showDialog(
       context: context,
@@ -78,43 +80,79 @@ class _CategorieCardState extends State<CategorieCard> {
     );
   }
 
+  String _getSubcategorieNames(List<String> subcategorieNames) {
+    for (int i = 0; i < subcategorieNames.length; i++) {
+      allSubcategorieNames += i == 0 ? widget.categorie.subcategorieNames[i] : " · " + widget.categorie.subcategorieNames[i];
+    }
+    return allSubcategorieNames;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Card(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(14.0),
       ),
-      child: Theme(
-        data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+      child: ListTileTheme(
+        contentPadding: const EdgeInsets.only(left: 8.0),
+        horizontalTitleGap: 0.0,
+        minLeadingWidth: 0.0,
         child: ExpansionTile(
-          title: Padding(
-            padding: widget.categorie.subcategorieNames.isEmpty ? const EdgeInsets.only(left: 56.0) : EdgeInsets.zero,
-            child: Text(widget.categorie.name),
-          ),
-          controlAffinity: widget.categorie.subcategorieNames.isEmpty ? null : ListTileControlAffinity.leading,
-          tilePadding: const EdgeInsets.only(left: 8.0),
-          textColor: widget.categorie.subcategorieNames.isEmpty ? Colors.white : Colors.cyanAccent,
-          iconColor: Colors.white70,
-          trailing: Row(
-            mainAxisSize: MainAxisSize.min,
+          leading: const SizedBox.shrink(),
+          controlAffinity: ListTileControlAffinity.leading,
+          textColor: Colors.white,
+          iconColor: Colors.white,
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              IconButton(
-                padding: const EdgeInsets.symmetric(horizontal: 6.0),
-                constraints: const BoxConstraints(),
-                icon: const Icon(Icons.edit),
-                onPressed: () => BlocProvider.of<CategorieBloc>(context).add(LoadCategorieEvent(context, widget.categorie.index)),
+              Expanded(
+                flex: 2,
+                child: IconButton(
+                  constraints: const BoxConstraints(),
+                  icon: const Icon(Icons.remove_circle_outline_rounded, color: Colors.white),
+                  onPressed: () => _showDeleteCategorieDialog(),
+                ),
               ),
-              IconButton(
-                padding: const EdgeInsets.symmetric(horizontal: 6.0),
-                constraints: const BoxConstraints(),
-                icon: const Icon(Icons.remove_rounded),
-                onPressed: () => _showDeleteCategorieDialog(),
+              Expanded(
+                flex: 7,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 6.0),
+                      child: Text(
+                        widget.categorie.name,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(fontSize: 16.0),
+                      ),
+                    ),
+                    widget.categorie.subcategorieNames.isEmpty
+                        ? const Text('-', style: TextStyle(fontSize: 12.0, color: Colors.grey))
+                        : Text(
+                            _getSubcategorieNames(widget.categorie.subcategorieNames),
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(fontSize: 12.0, color: Colors.grey),
+                          ),
+                  ],
+                ),
               ),
-              IconButton(
-                padding: const EdgeInsets.only(left: 4.0, right: 12.0),
-                constraints: const BoxConstraints(),
-                icon: const Icon(Icons.add_rounded),
-                onPressed: () => BlocProvider.of<CategorieBloc>(context).add(InitializeSubcategorieEvent(context, widget.categorie)),
+              Expanded(
+                flex: 3,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      constraints: const BoxConstraints(),
+                      icon: const Icon(Icons.edit, color: Colors.white),
+                      onPressed: () => BlocProvider.of<CategorieBloc>(context).add(LoadCategorieEvent(context, widget.categorie.index)),
+                    ),
+                    IconButton(
+                      constraints: const BoxConstraints(),
+                      icon: const Icon(Icons.add_circle_outline_rounded, color: Colors.white),
+                      onPressed: () => BlocProvider.of<CategorieBloc>(context).add(InitializeSubcategorieEvent(context, widget.categorie)),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
@@ -125,27 +163,45 @@ class _CategorieCardState extends State<CategorieCard> {
                 itemCount: widget.categorie.subcategorieNames.length,
                 itemBuilder: (BuildContext context, int subcategorieIndex) {
                   return ListTile(
-                    title: Text(widget.categorie.subcategorieNames[subcategorieIndex]),
-                    trailing: Padding(
-                      padding: const EdgeInsets.only(right: 24.0),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          IconButton(
-                            padding: const EdgeInsets.symmetric(horizontal: 6.0),
+                    title: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          flex: 2,
+                          child: IconButton(
                             constraints: const BoxConstraints(),
-                            icon: const Icon(Icons.edit, color: Colors.white70),
-                            onPressed: () => BlocProvider.of<CategorieBloc>(context)
-                                .add(LoadSubcategorieEvent(context, widget.categorie, widget.categorie.subcategorieNames[subcategorieIndex])),
-                          ),
-                          IconButton(
-                            padding: const EdgeInsets.symmetric(horizontal: 6.0),
-                            constraints: const BoxConstraints(),
-                            icon: const Icon(Icons.remove_rounded, color: Colors.white70),
+                            icon: const Icon(Icons.remove_circle_outline_rounded, color: Colors.white),
                             onPressed: () => _showDeleteSubcategorieDialog(subcategorieIndex),
                           ),
-                        ],
-                      ),
+                        ),
+                        Expanded(
+                          flex: 7,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                widget.categorie.subcategorieNames[subcategorieIndex],
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(fontSize: 16.0),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Expanded(
+                          flex: 3,
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                constraints: const BoxConstraints(),
+                                icon: const Icon(Icons.edit, color: Colors.white),
+                                onPressed: () => BlocProvider.of<CategorieBloc>(context)
+                                    .add(LoadSubcategorieEvent(context, widget.categorie, widget.categorie.subcategorieNames[subcategorieIndex])),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
                   );
                 },
