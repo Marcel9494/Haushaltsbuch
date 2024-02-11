@@ -13,9 +13,6 @@ class OverviewAllBudgetsScreen extends StatefulWidget {
   State<OverviewAllBudgetsScreen> createState() => _OverviewAllBudgetsScreenState();
 }
 
-// TODO hier weitermachen und Budgets verwalten um Unterkategorien erweitern.
-// TODO Dabei den Benutzer auf dieser Seite auswählen lassen können, ob er eine
-// TODO Hauptkategorie oder Unterkategorie bearbeiten möchte.
 class _OverviewAllBudgetsScreenState extends State<OverviewAllBudgetsScreen> {
   List<Budget> _budgetList = [];
 
@@ -33,7 +30,7 @@ class _OverviewAllBudgetsScreenState extends State<OverviewAllBudgetsScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Padding(
-            padding: EdgeInsets.symmetric(vertical: 12.0, horizontal: 22.0),
+            padding: EdgeInsets.symmetric(vertical: 12.0, horizontal: 24.0),
             child: Text(
               'Budgetliste:',
               style: TextStyle(fontSize: 18.0),
