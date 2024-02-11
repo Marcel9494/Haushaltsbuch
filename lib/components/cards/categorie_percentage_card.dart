@@ -85,6 +85,7 @@ class _CategoriePercentageCardState extends State<CategoriePercentageCard> {
                       controlAffinity: ListTileControlAffinity.leading,
                       textColor: Colors.white,
                       iconColor: Colors.white70,
+                      shape: const Border(),
                       title: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -203,7 +204,7 @@ class _CategoriePercentageCardState extends State<CategoriePercentageCard> {
                       ],
                     );
                   default:
-                    return const Text('Unbekannter Fehler bei Kategorie Prozent Karten aufgetreten.');
+                    return const Text('Unbekannter Fehler bei Kategorie Prozent Karte aufgetreten.');
                 }
               },
             ),

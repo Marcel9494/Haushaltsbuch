@@ -102,6 +102,7 @@ class _CategorieCardState extends State<CategorieCard> {
           controlAffinity: ListTileControlAffinity.leading,
           textColor: Colors.white,
           iconColor: Colors.white,
+          shape: const Border(),
           title: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
