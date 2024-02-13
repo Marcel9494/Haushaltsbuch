@@ -122,6 +122,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
                                       onPressed: () => {
                                         bookingBloc.add(DeleteBookingEvent(context, bookingState.bookingBoxIndex, bookingState.serieEditModeType)),
                                         Navigator.pop(context),
+                                        Navigator.pop(context),
                                         Navigator.popAndPushNamed(context, bottomNavBarRoute, arguments: BottomNavBarScreenArguments(0)),
                                         Flushbar(
                                           title: bookingState.serieEditModeType == SerieEditModeType.none || bookingState.serieEditModeType == SerieEditModeType.single

@@ -92,8 +92,6 @@ class _AccountsScreenState extends State<AccountsScreen> {
   }
 
   Widget _showSelectedTabView() {
-    BookingRepository bookingRepository = BookingRepository();
-    bookingRepository.checkForNewSerieBookings();
     if (_selectedTabOption[0]) {
       return const AccountOverviewTabView();
     } else if (_selectedTabOption[1]) {

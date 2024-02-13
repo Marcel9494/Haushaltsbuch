@@ -7,7 +7,7 @@ abstract class BookingInterface {
 
   // Bearbeitungsmethoden
   void updateSingle(Booking templateBooking, Booking oldBooking, int bookingBoxIndex);
-  void updateOnlyFutureBookingsFromSerie(Booking updatedBooking, Booking oldBooking, int bookingBoxIndex);
+  void updateOnlyFutureBookingsFromSerie(Booking templateBooking, Booking oldBooking, int bookingBoxIndex);
   void updateAllBookingsFromSerie(Booking templateBooking, Booking oldBooking, int bookingBoxIndex);
   void updateCategorieName(String oldCategorieName, String newCategorieName);
   void updateSubcategorieName(String oldSubcategorieName, String newSubcategorieName);
@@ -34,6 +34,5 @@ abstract class BookingInterface {
 
   // Weitere Funktionen
   void executeAccountTransaction(Booking booking);
-  // TODO muss noch richtig implementiert werden
-  void checkForNewSerieBookings();
+  void checkForNewBookings();
 }
