@@ -92,11 +92,13 @@ class _CategoriePercentageCardState extends State<CategoriePercentageCard> {
                           Expanded(
                             flex: 3,
                             child: Padding(
-                              padding: const EdgeInsets.only(left: 6.0),
-                              child: Text(
-                                '${widget.percentageStats.percentage.abs().toStringAsFixed(1).replaceAll('.', ',')} %',
-                                overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(fontSize: 14.0),
+                              padding: const EdgeInsets.only(right: 4.0),
+                              child: Center(
+                                child: Text(
+                                  '${widget.percentageStats.percentage.abs().toStringAsFixed(1).replaceAll('.', ',')} %',
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(fontSize: 14.0),
+                                ),
                               ),
                             ),
                           ),
