@@ -463,7 +463,7 @@ class BookingRepository extends BookingInterface {
         DateTime today = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
         DateTime dateToCheck = DateTime(DateTime.parse(booking.date).year, DateTime.parse(booking.date).month, DateTime.parse(booking.date).day);
         if (DateTime.parse(booking.date).isBefore(today) || dateToCheck == today) {
-          Booking()
+          Booking updatedBooking = Booking()
             ..transactionType = booking.transactionType
             ..bookingRepeats = booking.bookingRepeats
             ..title = booking.title
@@ -475,7 +475,7 @@ class BookingRepository extends BookingInterface {
             ..toAccount = booking.toAccount
             ..serieId = booking.serieId
             ..booked = true;
-          bookingBox.putAt(i, booking);
+          bookingBox.putAt(i, updatedBooking);
         }
       }
     }
