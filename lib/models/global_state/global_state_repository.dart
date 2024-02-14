@@ -8,6 +8,9 @@ class GlobalStateRepository extends GlobalStateInterface {
   @override
   void create() async {
     var globalBox = await Hive.openBox(globalStateBox);
+    if (globalBox.isNotEmpty) {
+      return;
+    }
     var startGlobalState = GlobalState()
       ..categorieIndex = 0
       ..bookingSerieIndex = 0;
