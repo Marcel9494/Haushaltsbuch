@@ -32,7 +32,6 @@ class _IntroductionScreensState extends State<IntroductionScreens> {
     categorieRepository.createStartCategories();
     PrimaryAccountRepository primaryAccountRepository = PrimaryAccountRepository();
     primaryAccountRepository.createStartPrimaryAccounts();
-    Navigator.popAndPushNamed(context, bottomNavBarRoute, arguments: BottomNavBarScreenArguments(0));
   }
 
   @override
@@ -75,8 +74,13 @@ class _IntroductionScreensState extends State<IntroductionScreens> {
       doneStyle: const ButtonStyle(
         foregroundColor: MaterialStatePropertyAll<Color>(Colors.black),
       ),
-      onDone: () {
+      onChange: (_) {
+        // Muss in onChange aufgerufen werden.
+        // Wenn dies erst bei onDone aufgerufen wird werden die Startkonten beim ersten Start der App nicht richtig angezeigt.
         _createStartCategoriesAndAccounts();
+      },
+      onDone: () {
+        Navigator.popAndPushNamed(context, bottomNavBarRoute, arguments: BottomNavBarScreenArguments(0));
       },
       dotsDecorator: DotsDecorator(
         size: const Size.square(10.0),

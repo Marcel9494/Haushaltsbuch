@@ -24,7 +24,7 @@ class TextInputField extends StatelessWidget {
       key: fieldKey,
       focusNode: focusNode,
       initialValue: textCubit.state.text,
-      textCapitalization: TextCapitalization.words,
+      textCapitalization: TextCapitalization.sentences,
       maxLength: maxLength,
       autofocus: autofocus,
       textAlignVertical: TextAlignVertical.center,
