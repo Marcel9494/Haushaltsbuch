@@ -83,6 +83,11 @@ class _CategorieInputFieldState extends State<CategorieInputField> {
                                       BlocProvider.of<SubcategorieInputFieldCubit>(context).resetValue(),
                                       Navigator.pop(context),
                                     },
+                                    style: OutlinedButton.styleFrom(
+                                      side: BorderSide(
+                                          width: widget.cubit.state.categorie == _categorieNames[i] ? 1.5 : 1.0,
+                                          color: widget.cubit.state.categorie == _categorieNames[i] ? Colors.cyanAccent : Colors.grey.shade800),
+                                    ),
                                     child: Text(
                                       _categorieNames[i],
                                       textAlign: TextAlign.center,
@@ -91,6 +96,24 @@ class _CategorieInputFieldState extends State<CategorieInputField> {
                                       ),
                                     ),
                                   ),
+                                OutlinedButton(
+                                  onPressed: () => {
+                                    widget.cubit.updateValue(''),
+                                    Navigator.pop(context),
+                                  },
+                                  style: OutlinedButton.styleFrom(
+                                    side: BorderSide(
+                                        width: widget.cubit.state.categorie == '' ? 1.5 : 1.0,
+                                        color: widget.cubit.state.categorie == '' ? Colors.cyanAccent : Colors.grey.shade800),
+                                  ),
+                                  child: const Text(
+                                    'X',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      color: Colors.white70,
+                                    ),
+                                  ),
+                                ),
                               ],
                             ),
                           );

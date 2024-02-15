@@ -27,13 +27,13 @@ class MoneyInputField extends StatelessWidget {
       builder: (BuildContext context) {
         return Material(
           child: SizedBox(
-            height: 430.0,
+            height: 430.0, // TODO dynamisch machen
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const BottomSheetLine(),
                 Padding(
-                  padding: const EdgeInsets.only(top: 16.0, left: 20.0),
+                  padding: const EdgeInsets.only(top: 16.0, left: 28.0),
                   child: Text(bottomSheetTitle, style: const TextStyle(fontSize: 18.0)),
                 ),
                 Center(
