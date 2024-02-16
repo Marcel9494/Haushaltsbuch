@@ -1,3 +1,4 @@
+import 'package:haushaltsbuch/models/global_state/global_state_repository.dart';
 import 'package:hive/hive.dart';
 
 import '/utils/consts/hive_consts.dart';
@@ -55,7 +56,9 @@ class SubbudgetRepository extends SubbudgetInterface {
         subbudgetBox.add(subbudget);
       }
 
+      GlobalStateRepository globalStateRepository = GlobalStateRepository();
       DefaultBudget newDefaultSubcategoriebudget = DefaultBudget()
+        ..index = await globalStateRepository.getDefaultBudgetIndex()
         ..categorie = subcategorieNames[i]
         ..defaultBudget = 0.0;
       DefaultBudgetRepository defaultBudgetRepository = DefaultBudgetRepository();

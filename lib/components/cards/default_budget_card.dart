@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '/models/enums/budget_mode_types.dart';
+import '/blocs/default_budget_bloc/default_budget_bloc.dart';
+
 import '/models/default_budget/default_budget_model.dart';
-import '/models/screen_arguments/create_or_edit_budget_screen_arguments.dart';
 
-import '/utils/consts/route_consts.dart';
 import '/utils/number_formatters/number_formatter.dart';
 
 class DefaultBudgetCard extends StatelessWidget {
@@ -17,10 +17,8 @@ class DefaultBudgetCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // TODO hier weitermachen und Default Budget nach Bloc umziehen
     return GestureDetector(
-      onTap: () =>
-          Navigator.pushNamed(context, createBudgetRoute, arguments: CreateOrEditBudgetScreenArguments(BudgetModeType.updateDefaultBudgetMode, -1, defaultBudget.categorie)),
+      onTap: () => BlocProvider.of<DefaultBudgetBloc>(context).add(LoadDefaultBudgetEvent(context, defaultBudget.categorie)),
       child: Card(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(14.0),

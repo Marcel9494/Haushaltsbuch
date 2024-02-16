@@ -1,5 +1,6 @@
 import 'package:hive/hive.dart';
 
+import '../global_state/global_state_repository.dart';
 import '/utils/consts/hive_consts.dart';
 
 import 'default_budget_interface.dart';
@@ -10,6 +11,8 @@ class DefaultBudgetRepository extends DefaultBudgetInterface {
   void create(DefaultBudget newDefaultBudget) async {
     var defaultBudgetBox = await Hive.openBox(defaultBudgetsBox);
     defaultBudgetBox.add(newDefaultBudget);
+    GlobalStateRepository globalStateRepository = GlobalStateRepository();
+    globalStateRepository.increaseDefaultBudgetIndex();
   }
 
   @override
@@ -38,9 +41,7 @@ class DefaultBudgetRepository extends DefaultBudgetInterface {
   @override
   Future<DefaultBudget> load(String defaultBudgetCategorie) async {
     var defaultBudgetBox = await Hive.openBox(defaultBudgetsBox);
-    DefaultBudget defaultBudget = DefaultBudget()
-      ..categorie = ''
-      ..defaultBudget = 0.0;
+    DefaultBudget defaultBudget = DefaultBudget();
     for (int i = 0; i < defaultBudgetBox.length; i++) {
       defaultBudget = await defaultBudgetBox.getAt(i);
       if (defaultBudget.categorie == defaultBudgetCategorie) {

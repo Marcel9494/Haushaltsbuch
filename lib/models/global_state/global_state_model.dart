@@ -8,6 +8,8 @@ class GlobalState extends HiveObject {
   late int bookingSerieIndex;
   @HiveField(1)
   late int categorieIndex;
+  @HiveField(2)
+  late int defaultBudgetIndex;
 }
 
 class GlobalStateAdapter extends TypeAdapter<GlobalState> {
@@ -18,12 +20,14 @@ class GlobalStateAdapter extends TypeAdapter<GlobalState> {
   GlobalState read(BinaryReader reader) {
     return GlobalState()
       ..bookingSerieIndex = reader.read()
-      ..categorieIndex = reader.read();
+      ..categorieIndex = reader.read()
+      ..defaultBudgetIndex = reader.read();
   }
 
   @override
   void write(BinaryWriter writer, GlobalState obj) {
     writer.write(obj.bookingSerieIndex);
     writer.write(obj.categorieIndex);
+    writer.write(obj.defaultBudgetIndex);
   }
 }
