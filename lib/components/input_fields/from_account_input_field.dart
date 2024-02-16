@@ -25,7 +25,7 @@ class FromAccountInputField extends StatefulWidget {
 }
 
 class _FromAccountInputFieldState extends State<FromAccountInputField> {
-  List<String> accountNames = [];
+  List<String> _accountNames = [];
 
   void _openBottomSheetWithAccountList(BuildContext context) {
     showCupertinoModalBottomSheet<void>(
@@ -45,7 +45,7 @@ class _FromAccountInputFieldState extends State<FromAccountInputField> {
                       case ConnectionState.waiting:
                         return const SizedBox();
                       case ConnectionState.done:
-                        if (accountNames.isEmpty) {
+                        if (_accountNames.isEmpty) {
                           return const BottomSheetEmptyList(text: 'Erstelle zuerst ein Konto.');
                         } else {
                           return Center(
@@ -57,20 +57,43 @@ class _FromAccountInputFieldState extends State<FromAccountInputField> {
                               crossAxisSpacing: 5,
                               shrinkWrap: true,
                               children: <Widget>[
-                                for (int i = 0; i < accountNames.length; i++)
+                                for (int i = 0; i < _accountNames.length; i++)
                                   OutlinedButton(
                                     onPressed: () => {
-                                      widget.cubit.updateValue(accountNames[i]),
+                                      widget.cubit.updateValue(_accountNames[i]),
                                       Navigator.pop(context),
                                     },
+                                    style: OutlinedButton.styleFrom(
+                                      side: BorderSide(
+                                          width: widget.cubit.state.fromAccount == _accountNames[i] ? 1.5 : 1.0,
+                                          color: widget.cubit.state.fromAccount == _accountNames[i] ? Colors.cyanAccent : Colors.grey.shade800),
+                                    ),
                                     child: Text(
-                                      accountNames[i],
+                                      _accountNames[i],
                                       textAlign: TextAlign.center,
                                       style: const TextStyle(
                                         color: Colors.white70,
                                       ),
                                     ),
                                   ),
+                                OutlinedButton(
+                                  onPressed: () => {
+                                    widget.cubit.updateValue(''),
+                                    Navigator.pop(context),
+                                  },
+                                  style: OutlinedButton.styleFrom(
+                                    side: BorderSide(
+                                        width: widget.cubit.state.fromAccount == '' ? 1.5 : 1.0,
+                                        color: widget.cubit.state.fromAccount == '' ? Colors.cyanAccent : Colors.grey.shade800),
+                                  ),
+                                  child: const Text(
+                                    'X',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      color: Colors.white70,
+                                    ),
+                                  ),
+                                ),
                               ],
                             ),
                           );
@@ -90,8 +113,8 @@ class _FromAccountInputFieldState extends State<FromAccountInputField> {
 
   Future<List<String>> _loadAccountNameList() async {
     AccountRepository accountRepository = AccountRepository();
-    accountNames = await accountRepository.loadAccountNameList();
-    return accountNames;
+    _accountNames = await accountRepository.loadAccountNameList();
+    return _accountNames;
   }
 
   @override

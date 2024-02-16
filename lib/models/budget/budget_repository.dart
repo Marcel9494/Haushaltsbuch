@@ -5,6 +5,8 @@ import '../booking/booking_repository.dart';
 import '../default_budget/default_budget_model.dart';
 import '../default_budget/default_budget_repository.dart';
 
+import '../global_state/global_state_repository.dart';
+
 import 'budget_interface.dart';
 import 'budget_model.dart';
 
@@ -31,6 +33,14 @@ class BudgetRepository extends BudgetInterface {
       nextBudget.budgetDate = DateTime(DateTime.now().year, DateTime.now().month + i + 1, 1).toString(); // TODO Jahr dynamisch implementieren
       budgetBox.add(nextBudget);
     }
+
+    GlobalStateRepository globalStateRepository = GlobalStateRepository();
+    DefaultBudget newDefaultCategorieBudget = DefaultBudget()
+      ..index = await globalStateRepository.getDefaultBudgetIndex()
+      ..categorie = newBudget.categorie
+      ..defaultBudget = newBudget.budget;
+    DefaultBudgetRepository defaultBudgetRepository = DefaultBudgetRepository();
+    defaultBudgetRepository.create(newDefaultCategorieBudget);
   }
 
   @override
@@ -59,7 +69,7 @@ class BudgetRepository extends BudgetInterface {
       Budget budget = await budgetBox.getAt(i);
       if (budget.categorie == defaultBudget.categorie) {
         budget.budget = defaultBudget.defaultBudget;
-        // TODO mit putAt updaten?
+        budgetBox.putAt(i, budget);
       }
     }
   }

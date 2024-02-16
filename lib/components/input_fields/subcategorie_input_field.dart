@@ -65,6 +65,11 @@ class _SubcategorieInputFieldState extends State<SubcategorieInputField> {
                                       widget.cubit.updateValue(_subcategorieNames[i]),
                                       Navigator.pop(context),
                                     },
+                                    style: OutlinedButton.styleFrom(
+                                      side: BorderSide(
+                                          width: widget.cubit.state == _subcategorieNames[i] ? 1.5 : 1.0,
+                                          color: widget.cubit.state == _subcategorieNames[i] ? Colors.cyanAccent : Colors.grey.shade800),
+                                    ),
                                     child: Text(
                                       _subcategorieNames[i],
                                       textAlign: TextAlign.center,
@@ -73,6 +78,22 @@ class _SubcategorieInputFieldState extends State<SubcategorieInputField> {
                                       ),
                                     ),
                                   ),
+                                OutlinedButton(
+                                  onPressed: () => {
+                                    widget.cubit.updateValue(''),
+                                    Navigator.pop(context),
+                                  },
+                                  style: OutlinedButton.styleFrom(
+                                    side: BorderSide(width: widget.cubit.state == '' ? 1.5 : 1.0, color: widget.cubit.state == '' ? Colors.cyanAccent : Colors.grey.shade800),
+                                  ),
+                                  child: const Text(
+                                    'X',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      color: Colors.white70,
+                                    ),
+                                  ),
+                                ),
                               ],
                             ),
                           );

@@ -27,6 +27,7 @@ import 'blocs/booking_bloc/booking_bloc.dart';
 import 'blocs/account_bloc/account_bloc.dart';
 import 'blocs/categorie_bloc/categorie_bloc.dart';
 import 'blocs/subbudget_bloc/subbudget_bloc.dart';
+import 'blocs/default_budget_bloc/default_budget_bloc.dart';
 import 'blocs/primary_account_bloc/primary_account_bloc.dart';
 import 'blocs/input_field_blocs/text_input_field_bloc/text_input_field_cubit.dart';
 import 'blocs/input_field_blocs/money_input_field_bloc/money_input_field_cubit.dart';
@@ -42,8 +43,9 @@ import 'blocs/input_field_blocs/preselect_account_input_field_bloc/preselect_acc
 
 import '/components/bottom_nav_bar/bottom_nav_bar.dart';
 
-import 'screens/budget_screens/edit_subbudget_screen.dart';
 import 'screens/budget_screens/edit_budget_screen.dart';
+import 'screens/budget_screens/edit_subbudget_screen.dart';
+import 'screens/budget_screens/edit_default_budget_screen.dart';
 import 'screens/budget_screens/overview_all_budgets_screen.dart';
 import 'screens/booking_screens/create_or_edit_booking_screen.dart';
 import 'screens/account_screens/create_or_edit_account_screen.dart';
@@ -88,6 +90,9 @@ void main() async {
         ),
         BlocProvider<BudgetBloc>(
           create: (context) => BudgetBloc(),
+        ),
+        BlocProvider<DefaultBudgetBloc>(
+          create: (context) => DefaultBudgetBloc(),
         ),
         BlocProvider<SubbudgetBloc>(
           create: (context) => SubbudgetBloc(),
@@ -172,6 +177,7 @@ class BudgetBookApp extends StatelessWidget {
         overviewOneSubbudgetRoute: (context) => const OverviewOneSubbudgetScreen(),
         createBudgetRoute: (context) => const CreateBudgetScreen(),
         editBudgetRoute: (context) => const EditBudgetScreen(),
+        editDefaultBudgetRoute: (context) => const EditDefaultBudgetScreen(),
         editSubbudgetRoute: (context) => const EditSubbudgetScreen(),
         createOrEditAccountRoute: (context) => const CreateOrEditAccountScreen(),
         createOrEditCategorieRoute: (context) => const CreateOrEditCategorieScreen(),
