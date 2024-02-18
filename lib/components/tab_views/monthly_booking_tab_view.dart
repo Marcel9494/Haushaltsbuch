@@ -124,20 +124,25 @@ class _MonthlyBookingTabViewState extends State<MonthlyBookingTabView> {
                         )
                       : const SizedBox(),
                   widget.showBarChart
-                      ? Row(
-                          children: <Widget>[
-                            Expanded(
-                              flex: 2,
-                              child: MonthPickerButtons(
-                                selectedDate: widget.selectedDate,
-                                selectedDateCallback: (DateTime selectedDate) {
-                                  setState(() {
-                                    widget.selectedDate = selectedDate;
-                                  });
-                                },
-                              ),
+                      ? Column(
+                          children: [
+                            Row(
+                              children: <Widget>[
+                                Expanded(
+                                  flex: 2,
+                                  child: MonthPickerButtons(
+                                    selectedDate: widget.selectedDate,
+                                    selectedDateCallback: (DateTime selectedDate) {
+                                      setState(() {
+                                        widget.selectedDate = selectedDate;
+                                      });
+                                    },
+                                  ),
+                                ),
+                                const TotalText(total: '0,0 €'),
+                              ],
                             ),
-                            const TotalText(total: '0,0 €'),
+                            MonthlyBarChart(selectedDate: widget.selectedDate, categorie: widget.categorie),
                           ],
                         )
                       : const SizedBox(),
