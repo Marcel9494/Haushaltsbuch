@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 
+import '/utils/consts/global_consts.dart';
 import '/utils/number_formatters/number_formatter.dart';
 
 class OverviewTileCard extends StatelessWidget {
@@ -44,6 +46,6 @@ class OverviewTileCard extends StatelessWidget {
           ),
         ),
       ),
-    );
+    ).animate().fade(duration: fadeAnimationInMs.ms);
   }
 }

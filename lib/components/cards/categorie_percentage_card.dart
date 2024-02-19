@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 
 import '/models/booking/booking_model.dart';
 import '/models/booking/booking_repository.dart';
@@ -7,6 +8,7 @@ import '/models/percentage_stats/percentage_stats_model.dart';
 import '/models/screen_arguments/categorie_amount_list_screen_arguments.dart';
 
 import '/utils/consts/route_consts.dart';
+import '/utils/consts/global_consts.dart';
 import '/utils/number_formatters/number_formatter.dart';
 
 class CategoriePercentageCard extends StatefulWidget {
@@ -213,6 +215,6 @@ class _CategoriePercentageCardState extends State<CategoriePercentageCard> {
           ),
         ),
       ),
-    );
+    ).animate().fade(duration: fadeAnimationInMs.ms);
   }
 }

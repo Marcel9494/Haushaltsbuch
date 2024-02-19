@@ -1,5 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'package:haushaltsbuch/utils/consts/global_consts.dart';
 
 import '../buttons/transaction_stats_toggle_buttons.dart';
 
@@ -124,7 +126,7 @@ class _YearlyStatisticsTabViewState extends State<YearlyStatisticsTabView> {
                           centerSpaceRadius: 32.0,
                           sections: _showingEmptyDiagram(),
                         ),
-                      ),
+                      ).animate().flip(duration: flipAnimationInMs.ms, direction: Axis.horizontal).scale(duration: scaleAnimationInMs.ms),
                     ),
                   ),
                   Row(
@@ -156,7 +158,7 @@ class _YearlyStatisticsTabViewState extends State<YearlyStatisticsTabView> {
                           centerSpaceRadius: 32.0,
                           sections: _showingSections(),
                         ),
-                      ),
+                      ).animate().flip(duration: flipAnimationInMs.ms, direction: Axis.horizontal).scale(duration: scaleAnimationInMs.ms),
                     ),
                   ),
                   Row(

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '/blocs/budget_bloc/budget_bloc.dart';
 import '/blocs/subbudget_bloc/subbudget_bloc.dart';
 
+import '/utils/consts/global_consts.dart';
 import '/utils/number_formatters/number_formatter.dart';
 
 import '/models/budget/budget_model.dart';
@@ -174,6 +176,6 @@ class _EditBudgetCardState extends State<EditBudgetCard> {
           },
         ),
       ),
-    );
+    ).animate().fade(duration: fadeAnimationInMs.ms);
   }
 }

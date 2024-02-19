@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
@@ -8,6 +9,8 @@ import '/models/booking/booking_model.dart';
 import '/models/enums/repeat_types.dart';
 import '/models/enums/serie_edit_modes.dart';
 import '/models/enums/transaction_types.dart';
+
+import '/utils/consts/global_consts.dart';
 
 import '../deco/bottom_sheet_line.dart';
 
@@ -172,7 +175,7 @@ class BookingCard extends StatelessWidget {
             ),
           ),
         ),
-      ),
+      ).animate().fade(duration: fadeAnimationInMs.ms),
     );
   }
 }

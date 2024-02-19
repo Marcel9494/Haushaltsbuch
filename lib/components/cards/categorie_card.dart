@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '/blocs/categorie_bloc/categorie_bloc.dart';
 
 import '/models/categorie/categorie_model.dart';
+
+import '/utils/consts/global_consts.dart';
 
 class CategorieCard extends StatefulWidget {
   final Categorie categorie;
@@ -211,6 +214,6 @@ class _CategorieCardState extends State<CategorieCard> {
           ],
         ),
       ),
-    );
+    ).animate().fade(duration: fadeAnimationInMs.ms);
   }
 }
