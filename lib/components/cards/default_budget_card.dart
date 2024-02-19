@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '/blocs/default_budget_bloc/default_budget_bloc.dart';
 
 import '/models/default_budget/default_budget_model.dart';
 
+import '/utils/consts/global_consts.dart';
 import '/utils/number_formatters/number_formatter.dart';
 
 class DefaultBudgetCard extends StatelessWidget {
@@ -56,7 +58,7 @@ class DefaultBudgetCard extends StatelessWidget {
             ],
           ),
         ),
-      ),
+      ).animate().fade(duration: fadeAnimationInMs.ms),
     );
   }
 }

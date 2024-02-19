@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 
 import '/models/booking/booking_model.dart';
 import '/models/booking/booking_repository.dart';
@@ -16,6 +17,8 @@ import '../deco/date_text.dart';
 import '../deco/total_text.dart';
 import '../deco/overview_tile.dart';
 import '../deco/loading_indicator.dart';
+
+import '/utils/consts/global_consts.dart';
 
 class MonthlyBookingTabView extends StatefulWidget {
   DateTime selectedDate;
@@ -121,7 +124,7 @@ class _MonthlyBookingTabViewState extends State<MonthlyBookingTabView> {
                           availableText: 'Verfügbar',
                           showInvestments: true,
                           showAvailable: true,
-                        )
+                        ).animate().fade(duration: fadeAnimationInMs.ms)
                       : const SizedBox(),
                   widget.showBarChart
                       ? Column(
@@ -169,7 +172,7 @@ class _MonthlyBookingTabViewState extends State<MonthlyBookingTabView> {
                           availableText: 'Verfügbar',
                           showAvailable: true,
                           showInvestments: true,
-                        )
+                        ).animate().fade(duration: fadeAnimationInMs.ms)
                       : const SizedBox(),
                   widget.showBarChart
                       ? Column(
@@ -236,7 +239,7 @@ class _MonthlyBookingTabViewState extends State<MonthlyBookingTabView> {
                                                 .toString()),
                                             style: const TextStyle(color: Color(0xfff4634f))),
                                       ),
-                                    ],
+                                    ].animate().fade(duration: fadeAnimationInMs.ms),
                                   ),
                                 ),
                                 BookingCard(booking: _bookingList[index]),

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 
+import '/utils/consts/global_consts.dart';
 import '/utils/number_formatters/number_formatter.dart';
 
 import '/models/account/account_model.dart';
@@ -79,7 +81,7 @@ class _AccountOverviewTabViewState extends State<AccountOverviewTabView> {
                       }
                       return const SizedBox();
                     },
-                  ),
+                  ).animate().fade(duration: fadeAnimationInMs.ms),
                 ),
               );
             }

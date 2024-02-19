@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 
 import '/models/budget/budget_model.dart';
@@ -7,6 +8,7 @@ import '/models/subbudget/subbudget_repository.dart';
 import '/models/categorie/categorie_repository.dart';
 import '/models/screen_arguments/categorie_amount_list_screen_arguments.dart';
 
+import '/utils/consts/global_consts.dart';
 import '/utils/consts/route_consts.dart';
 import '/utils/number_formatters/number_formatter.dart';
 
@@ -219,7 +221,7 @@ class _BudgetCardState extends State<BudgetCard> {
             ),
           ),
         ),
-      ),
+      ).animate().fade(duration: fadeAnimationInMs.ms),
     );
   }
 }

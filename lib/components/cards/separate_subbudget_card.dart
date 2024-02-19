@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '/blocs/subbudget_bloc/subbudget_bloc.dart';
 
 import '/models/subbudget/subbudget_model.dart';
 
+import '/utils/consts/global_consts.dart';
 import '/utils/date_formatters/date_formatter.dart';
 import '/utils/number_formatters/number_formatter.dart';
 
@@ -64,7 +66,7 @@ class SeparateSubbudgetCard extends StatelessWidget {
             ),
           ),
         ),
-      ),
+      ).animate().fade(duration: fadeAnimationInMs.ms),
     );
   }
 }

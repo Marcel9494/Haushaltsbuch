@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 
 import '/utils/consts/route_consts.dart';
+import '/utils/consts/global_consts.dart';
 
 import '/models/account/account_model.dart';
 import '/models/screen_arguments/account_details_screen_arguments.dart';
@@ -56,7 +58,7 @@ class AccountCard extends StatelessWidget {
               ),
             ),
           ),
-        ),
+        ).animate().fade(duration: fadeAnimationInMs.ms),
       ),
     );
   }

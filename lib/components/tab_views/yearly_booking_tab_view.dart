@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 
+import '../../utils/consts/global_consts.dart';
 import '/models/monthly_stats.dart';
 import '/models/booking/booking_model.dart';
 import '/models/booking/booking_repository.dart';
@@ -79,8 +81,8 @@ class _YearlyBookingTabViewState extends State<YearlyBookingTabView> {
           case ConnectionState.done:
             if (_monthList.isEmpty) {
               return Column(
-                children: const [
-                  OverviewTile(
+                children: [
+                  const OverviewTile(
                     shouldText: 'Einnahmen',
                     should: 0.0,
                     haveText: 'Ausgaben',
@@ -90,8 +92,8 @@ class _YearlyBookingTabViewState extends State<YearlyBookingTabView> {
                     availableText: 'Verfügbar',
                     showInvestments: true,
                     showAvailable: true,
-                  ),
-                  Expanded(
+                  ).animate().fade(duration: fadeAnimationInMs.ms),
+                  const Expanded(
                     child: Center(
                       child: Text('Noch keine Buchungen vorhanden.'),
                     ),
@@ -112,7 +114,7 @@ class _YearlyBookingTabViewState extends State<YearlyBookingTabView> {
                     investmentAmount: _getYearlyInvestments(),
                     showInvestments: true,
                     showAvailable: true,
-                  ),
+                  ).animate().fade(duration: fadeAnimationInMs.ms),
                   Expanded(
                     child: RefreshIndicator(
                       onRefresh: () async {

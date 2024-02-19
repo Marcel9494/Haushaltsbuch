@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 
 import '/models/percentage_stats/percentage_stats_model.dart';
 
+import '/utils/consts/global_consts.dart';
 import '/utils/number_formatters/number_formatter.dart';
 
 class AccountPercentageCard extends StatelessWidget {
@@ -54,6 +56,6 @@ class AccountPercentageCard extends StatelessWidget {
           ),
         ),
       ),
-    );
+    ).animate().fade(duration: fadeAnimationInMs.ms);
   }
 }

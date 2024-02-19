@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:month_picker_dialog/month_picker_dialog.dart';
 
 import '/utils/date_formatters/date_formatter.dart';
@@ -20,10 +21,13 @@ class MonthPickerButtons extends StatefulWidget {
 }
 
 class _MonthPickerButtonsState extends State<MonthPickerButtons> {
+  bool _animate = false;
+
   void _nextMonth() {
     setState(() {
       widget.selectedDate = DateTime(widget.selectedDate.year, widget.selectedDate.month + 1, widget.selectedDate.day);
       widget.selectedDateCallback(widget.selectedDate);
+      _animate = !_animate;
     });
   }
 
@@ -31,6 +35,7 @@ class _MonthPickerButtonsState extends State<MonthPickerButtons> {
     setState(() {
       widget.selectedDate = DateTime(widget.selectedDate.year, widget.selectedDate.month - 1, widget.selectedDate.day);
       widget.selectedDateCallback(widget.selectedDate);
+      _animate = !_animate;
     });
   }
 
@@ -82,7 +87,7 @@ class _MonthPickerButtonsState extends State<MonthPickerButtons> {
           padding: const EdgeInsets.only(left: 2.0),
           constraints: const BoxConstraints(),
           splashColor: Colors.transparent,
-        ),
+        )
       ],
     );
   }
