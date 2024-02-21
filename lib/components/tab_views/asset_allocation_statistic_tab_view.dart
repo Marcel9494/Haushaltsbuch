@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 
-import '../../models/percentage_stats/percentage_stats_repository.dart';
 import '../dialogs/info_dialog.dart';
 
 import '../cards/account_percentage_card.dart';
@@ -14,7 +14,9 @@ import '/models/account/account_model.dart';
 import '/models/account/account_repository.dart';
 import '/models/enums/asset_allocation_statistic_types.dart';
 import '/models/percentage_stats/percentage_stats_model.dart';
+import '/models/percentage_stats/percentage_stats_repository.dart';
 
+import '/utils/consts/global_consts.dart';
 import '/utils/number_formatters/number_formatter.dart';
 
 class AssetAllocationStatisticTabView extends StatefulWidget {
@@ -118,7 +120,7 @@ class _AssetAllocationStatisticTabViewState extends State<AssetAllocationStatist
                           centerSpaceRadius: 30.0,
                           sections: _showingEmptyDiagram(),
                         ),
-                      ),
+                      ).animate().flip(duration: flipAnimationInMs.ms, direction: Axis.horizontal).scale(duration: scaleAnimationInMs.ms),
                     ),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 12.0),
@@ -169,7 +171,7 @@ class _AssetAllocationStatisticTabViewState extends State<AssetAllocationStatist
                           centerSpaceRadius: 30.0,
                           sections: _showingSections(),
                         ),
-                      ),
+                      ).animate().flip(duration: flipAnimationInMs.ms, direction: Axis.horizontal).scale(duration: scaleAnimationInMs.ms),
                     ),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 12.0),

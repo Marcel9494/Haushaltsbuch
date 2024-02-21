@@ -182,18 +182,40 @@ class CategorieRepository extends CategorieInterface {
     List<String> outcomeCategorieNames = [
       'Lebensmittel',
       'Haushaltswaren',
-      'Transport',
-      'Wohnen + Nebenkosten',
+      'Auto-/Fahrkosten',
+      'Wohnen / Nebenkosten',
       'Restaurant / Lieferdienst',
+      'Mode / Kleidung',
       'Unterhaltung',
       'Kultur',
-      'Mode / Schönheitspflege',
       'Gesundheit',
       'Bildung',
       'Geschenke',
+      'Möbel',
       'Technik',
+      'Reisen / Urlaub',
+      'Spenden',
       'Finanzverluste',
       'Sonstiges'
+    ];
+    List<List<String>> outcomeSubcategorieNames = [
+      ['Getränke', 'Obst', 'Gemüse', 'Fleisch', 'Süßigkeiten', 'Sonstiges'],
+      ['Reinigungsmittel', 'Waschmittel', 'Klopapier'],
+      ['Versicherung', 'Tanken', 'Reparatur', 'Auto mieten', 'Fahrkarte'],
+      ['Miete', 'Strom', 'Wasser', 'Heizung', 'Müllentsorgung', 'Immobilienkredit'],
+      ['Restaurant', 'Bar', 'Kneipe'],
+      ['Schuhe', 'Hose', 'T-Shirt', 'Pullover', 'Accessoire', 'Sonstiges'],
+      ['Streaming Abo', 'Kino', 'Konzert'],
+      ['Museum', 'Theater'],
+      ['Fitnessstudio', 'Medikamente'],
+      ['Buch', 'Weiterbildung', 'Studiengebühren'],
+      ['Weihnachten', 'Geburtstag', 'Ostern', 'Hochzeit'],
+      ['Schrank', 'Utensilien', 'Deko'],
+      ['Handy', 'Laptop / PC', 'Zubehör'],
+      ['Unterkunft', 'Flug', 'Ausflug'],
+      [],
+      ['ETF', 'Aktie', 'Optionshandel', 'Krypto', 'P2P'],
+      [],
     ];
     for (int i = 0; i < outcomeCategorieNames.length; i++) {
       categorieIndex = await globalStateRepository.getCategorieIndex();
@@ -201,33 +223,53 @@ class CategorieRepository extends CategorieInterface {
         ..index = categorieIndex
         ..type = CategorieType.outcome.name
         ..name = outcomeCategorieNames[i]
-        ..subcategorieNames = [];
+        ..subcategorieNames = outcomeSubcategorieNames[i];
       categorieBox.add(categorie);
       globalStateRepository.increaseCategorieIndex();
     }
 
     // Start Einnahme Kategorien erstellen
-    List<String> incomeCategorieNames = ['Gehalt', 'Bonuszahlung', 'Bargeld Geschenk', 'Dividende', 'Zinsen', 'Mieteinkommen', 'Finanzgewinne', 'Sonstiges'];
+    List<String> incomeCategorieNames = ['Gehalt', 'Bonuszahlung', 'Dividende', 'Zinsen', 'Mieteinkommen', 'Finanzgewinne', 'Bargeld Geschenk', 'Sonstiges'];
+    List<List<String>> incomeSubcategorieNames = [
+      [],
+      ['Weihnachtsgeld', 'Urlaubsgeld', 'Prämie'],
+      ['ETF', 'Aktie'],
+      ['Tagesgeld', 'P2P'],
+      [],
+      ['ETF', 'Aktie', 'Optionshandel', 'Krypto'],
+      [],
+      [],
+    ];
     for (int i = 0; i < incomeCategorieNames.length; i++) {
       categorieIndex = await globalStateRepository.getCategorieIndex();
       Categorie categorie = Categorie()
         ..index = categorieIndex
         ..type = CategorieType.income.name
         ..name = incomeCategorieNames[i]
-        ..subcategorieNames = [];
+        ..subcategorieNames = incomeSubcategorieNames[i];
       categorieBox.add(categorie);
       globalStateRepository.increaseCategorieIndex();
     }
 
     // Start Investment Kategorien erstellen
-    List<String> investmentCategorieNames = ['ETF', 'Aktie', 'Fond', 'Krypto', 'Rohstoff', 'P2P', 'Sonstiges'];
+    List<String> investmentCategorieNames = ['ETF', 'Aktie', 'Fond', 'Krypto', 'Rohstoff', 'P2P', 'Immobilie', 'Sonstiges'];
+    List<List<String>> investmentSubcategorieNames = [
+      ['World', 'Emerging Markets', 'Europa', 'Asien', 'Branche'],
+      [],
+      ['World', 'Emerging Markets', 'Europa', 'Asien', 'Branche'],
+      ['Bitcoin', 'Ethereum', 'Solana', 'Ripple', 'Cardano', 'Dogecoin'],
+      ['Gold', 'Silber', 'Nickel', 'Kupfer', 'Rohöl', 'Sonstiges'],
+      [],
+      [],
+      [],
+    ];
     for (int i = 0; i < investmentCategorieNames.length; i++) {
       categorieIndex = await globalStateRepository.getCategorieIndex();
       Categorie categorie = Categorie()
         ..index = categorieIndex
         ..type = CategorieType.investment.name
         ..name = investmentCategorieNames[i]
-        ..subcategorieNames = [];
+        ..subcategorieNames = investmentSubcategorieNames[i];
       categorieBox.add(categorie);
       globalStateRepository.increaseCategorieIndex();
     }
