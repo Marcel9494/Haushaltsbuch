@@ -266,7 +266,7 @@ class AccountRepository extends AccountInterface {
       ..accountType = AccountType.account.name;
     create(giroAccount);
     Account billingAccount = Account()
-      ..name = 'Verechnungskonto'
+      ..name = 'Verrechnungskonto'
       ..bankBalance = '0 €'
       ..accountType = AccountType.account.name;
     create(billingAccount);
