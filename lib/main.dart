@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:haushaltsbuch/screens/other_screens/introduction_screens.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -172,6 +173,7 @@ class BudgetBookApp extends StatelessWidget {
       ],
       home: const SplashScreen(),
       routes: {
+        introductionRoute: (context) => const IntroductionScreens(),
         createOrEditBookingRoute: (context) => const CreateOrEditBookingScreen(),
         overviewOneBudgetRoute: (context) => const OverviewOneBudgetScreen(),
         overviewOneSubbudgetRoute: (context) => const OverviewOneSubbudgetScreen(),

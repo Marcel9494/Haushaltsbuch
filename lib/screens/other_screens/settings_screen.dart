@@ -1,7 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 import 'package:settings_ui/settings_ui.dart';
 
+import '/models/global_state/global_state_repository.dart';
 import '/models/intro_screen_state/intro_screen_state_repository.dart';
 import '/models/screen_arguments/bottom_nav_bar_screen_arguments.dart';
 
@@ -17,6 +19,31 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
+  void deleteAllData() async {
+    var bookingBox = await Hive.openBox(bookingsBox);
+    var accountBox = await Hive.openBox(accountsBox);
+    var primaryAccountBox = await Hive.openBox(primaryAccountsBox);
+    var categorieBox = await Hive.openBox(categoriesBox);
+    var budgetBox = await Hive.openBox(budgetsBox);
+    var subbudgetBox = await Hive.openBox(subbudgetsBox);
+    var defaultBudgetBox = await Hive.openBox(defaultBudgetsBox);
+    var globalState = await Hive.openBox(globalStateBox);
+    var introScreen = await Hive.openBox(introScreenBox);
+
+    bookingBox.deleteFromDisk();
+    accountBox.deleteFromDisk();
+    primaryAccountBox.deleteFromDisk();
+    categorieBox.deleteFromDisk();
+    budgetBox.deleteFromDisk();
+    subbudgetBox.deleteFromDisk();
+    defaultBudgetBox.deleteFromDisk();
+    globalState.deleteFromDisk();
+    introScreen.deleteFromDisk();
+
+    GlobalStateRepository globalStateRepository = GlobalStateRepository();
+    globalStateRepository.create();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -32,12 +59,67 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 leading: const Icon(Icons.delete_forever_rounded),
                 title: const Text('Alle Daten löschen'),
                 description: const Text('Es werden alle Buchungen, Budgets, Konten und Kategorien gelöscht.\nDie gelöschten Daten können nicht wiederhergestellt werden.'),
+                onPressed: (_) => {
+                  showCupertinoDialog(
+                    context: context,
+                    builder: (context) {
+                      return CupertinoAlertDialog(
+                        content: const Text("Wollen Sie wirklich alle Daten unwiderruflich löschen?\nDie gelöschten Daten können nicht wiederhergestellt werden!"),
+                        title: const Text("Warnung"),
+                        actions: [
+                          TextButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            child: const Text("Nein", style: TextStyle(color: Colors.cyanAccent)),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              deleteAllData();
+                              Navigator.pop(context);
+                              Navigator.popAndPushNamed(context, bottomNavBarRoute, arguments: BottomNavBarScreenArguments(0));
+                            },
+                            child: const Text("Ja", style: TextStyle(color: Colors.cyanAccent)),
+                          ),
+                        ],
+                      );
+                    },
+                  ),
+                },
               ),
               SettingsTile.navigation(
                 leading: const Icon(Icons.replay_rounded),
                 title: const Text('Startzustand wiederherstellen'),
                 description: const Text(
                     'Es werden alle Buchungen, Budgets, Konten und Kategorien gelöscht. Anschließend werden die Start Kategorien und Konten angelegt.\nDie gelöschten Daten können nicht wiederhergestellt werden.'),
+                onPressed: (_) => {
+                  showCupertinoDialog(
+                    context: context,
+                    builder: (context) {
+                      return CupertinoAlertDialog(
+                        content: const Text(
+                            "Wollen Sie wirklich alle Daten unwiderruflich löschen? Die Kategorien und Konten werden auf den Startzustand zurückgesetzt.\nDie gelöschten Daten können nicht wiederhergestellt werden!"),
+                        title: const Text("Warnung"),
+                        actions: [
+                          TextButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            child: const Text("Nein", style: TextStyle(color: Colors.cyanAccent)),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              deleteAllData();
+                              Navigator.pop(context);
+                              Navigator.popAndPushNamed(context, introductionRoute);
+                            },
+                            child: const Text("Ja", style: TextStyle(color: Colors.cyanAccent)),
+                          ),
+                        ],
+                      );
+                    },
+                  ),
+                },
               ),
             ],
           ),
