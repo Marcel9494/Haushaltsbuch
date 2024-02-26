@@ -18,20 +18,20 @@ class IntroductionScreens extends StatefulWidget {
 }
 
 class _IntroductionScreensState extends State<IntroductionScreens> {
-  @override
-  void initState() {
-    super.initState();
-  }
+  bool _startValuesCreated = false;
 
   void _createStartCategoriesAndAccounts() {
-    GlobalStateRepository globalStateRepository = GlobalStateRepository();
-    globalStateRepository.create();
-    AccountRepository accountRepository = AccountRepository();
-    accountRepository.createStartAccounts();
-    CategorieRepository categorieRepository = CategorieRepository();
-    categorieRepository.createStartCategories();
-    PrimaryAccountRepository primaryAccountRepository = PrimaryAccountRepository();
-    primaryAccountRepository.createStartPrimaryAccounts();
+    if (_startValuesCreated == false) {
+      GlobalStateRepository globalStateRepository = GlobalStateRepository();
+      globalStateRepository.create();
+      AccountRepository accountRepository = AccountRepository();
+      accountRepository.createStartAccounts();
+      CategorieRepository categorieRepository = CategorieRepository();
+      categorieRepository.createStartCategories();
+      PrimaryAccountRepository primaryAccountRepository = PrimaryAccountRepository();
+      primaryAccountRepository.createStartPrimaryAccounts();
+      _startValuesCreated = true;
+    }
   }
 
   @override
