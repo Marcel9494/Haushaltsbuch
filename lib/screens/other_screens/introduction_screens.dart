@@ -37,26 +37,71 @@ class _IntroductionScreensState extends State<IntroductionScreens> {
   @override
   Widget build(BuildContext context) {
     return IntroductionScreen(
+      globalBackgroundColor: Colors.white,
+      isTopSafeArea: true,
       pages: [
         PageViewModel(
-          title: 'Einnahmen, Ausgaben & Investitionen',
-          body: 'Alle Einnahmen, Ausgaben & Investitionen im Blick.',
+          titleWidget: const Padding(
+            padding: EdgeInsets.only(top: 48.0),
+            child: Text(
+              'Einnahmen, Ausgaben & Investitionen',
+              style: TextStyle(color: Colors.black87, fontWeight: FontWeight.bold, fontSize: 24.0),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          bodyWidget: const Text(
+            'Behalte alle deine Einnahmen, Ausgaben & Investitionen im Blick.',
+            style: TextStyle(color: Colors.black87, fontSize: 18.0),
+            textAlign: TextAlign.center,
+          ),
           image: Image.asset('assets/images/introduction_screen_image1.jpg'),
         ),
         PageViewModel(
-          title: 'Budgets festlegen',
-          body: 'Budgets erstellen, Monat für Monat anpassen & Ausgaben verfolgen.',
+          titleWidget: const Padding(
+            padding: EdgeInsets.only(top: 48.0),
+            child: Text(
+              'Budgets',
+              style: TextStyle(color: Colors.black87, fontWeight: FontWeight.bold, fontSize: 24.0),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          bodyWidget: const Text(
+            'Setze dir feste monatliche Budgets und behalte diese immer im Überblick.',
+            style: TextStyle(color: Colors.black87, fontSize: 18.0),
+            textAlign: TextAlign.center,
+          ),
           image: Image.asset('assets/images/introduction_screen_image2.jpg'),
         ),
         PageViewModel(
-          title: 'Konten und Vermögen verwalten',
-          body: 'Verwalte deine Konten & dein Vermögen & behalte stets den Überblick.',
+          titleWidget: const Padding(
+            padding: EdgeInsets.only(top: 48.0),
+            child: Text(
+              'Konten',
+              style: TextStyle(color: Colors.black87, fontWeight: FontWeight.bold, fontSize: 24.0),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          bodyWidget: const Text(
+            'Behalte alle deine Konten und Investments im Blick.',
+            style: TextStyle(color: Colors.black87, fontSize: 18.0),
+            textAlign: TextAlign.center,
+          ),
           image: Image.asset('assets/images/introduction_screen_image3.jpg'),
-          //image: _buildImage('img2.jpg'),
         ),
         PageViewModel(
-          title: 'Statistiken',
-          body: 'Statistische Auswertungen deiner Einnahmen & Ausgaben, sowie deiner Vermögensentwicklungen.',
+          titleWidget: const Padding(
+            padding: EdgeInsets.only(top: 48.0),
+            child: Text(
+              'Updates',
+              style: TextStyle(color: Colors.black87, fontWeight: FontWeight.bold, fontSize: 24.0),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          bodyWidget: const Text(
+            'Die App wird stetig weiter entwickelt und verbessert.\nFreue dich auf viele weitere Features.',
+            style: TextStyle(color: Colors.black87, fontSize: 18.0),
+            textAlign: TextAlign.center,
+          ),
           image: Image.asset('assets/images/introduction_screen_image4.jpg'),
         ),
       ],
@@ -64,15 +109,15 @@ class _IntroductionScreensState extends State<IntroductionScreens> {
       showSkipButton: true,
       skip: const Text('Überspringen'),
       skipStyle: const ButtonStyle(
-        foregroundColor: MaterialStatePropertyAll<Color>(Colors.black),
+        foregroundColor: MaterialStatePropertyAll<Color>(Colors.black87),
       ),
       next: const Text('Weiter'),
       nextStyle: const ButtonStyle(
-        foregroundColor: MaterialStatePropertyAll<Color>(Colors.black),
+        foregroundColor: MaterialStatePropertyAll<Color>(Colors.black87),
       ),
       done: const Text('Fertig'),
       doneStyle: const ButtonStyle(
-        foregroundColor: MaterialStatePropertyAll<Color>(Colors.black),
+        foregroundColor: MaterialStatePropertyAll<Color>(Colors.black87),
       ),
       onChange: (_) {
         // Muss in onChange aufgerufen werden.
@@ -86,7 +131,6 @@ class _IntroductionScreensState extends State<IntroductionScreens> {
         size: const Size.square(10.0),
         activeSize: const Size(20.0, 10.0),
         activeColor: Theme.of(context).colorScheme.secondary,
-        color: Colors.white,
         spacing: const EdgeInsets.symmetric(horizontal: 3.0),
         activeShape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25.0)),
       ),
