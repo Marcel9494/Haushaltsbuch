@@ -51,6 +51,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         title: const Text('Einstellungen'),
       ),
       body: SettingsList(
+        darkTheme: const SettingsThemeData(settingsListBackground: Color(0xff112025)),
         sections: [
           SettingsSection(
             title: const Text('Gefahrenzone', style: TextStyle(color: Colors.redAccent)),

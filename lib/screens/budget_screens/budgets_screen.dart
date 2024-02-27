@@ -82,9 +82,58 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
                     return const LoadingIndicator();
                   case ConnectionState.done:
                     if (_budgetList.isEmpty) {
-                      return const Expanded(
-                        child: Center(
-                          child: Text('Noch keine Budgets erstellt.'),
+                      return Expanded(
+                        child: Column(
+                          children: [
+                            SizedBox(
+                              height: 160.0,
+                              width: MediaQuery.of(context).size.width,
+                              child: Card(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(14.0),
+                                ),
+                                child: SingleChildScrollView(
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  child: Column(
+                                    children: [
+                                      CircularPercentIndicator(
+                                        radius: 84.0,
+                                        lineWidth: 12.0,
+                                        percent: 0.0,
+                                        center: const Text('0 %', style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold)),
+                                        header: const Padding(
+                                          padding: EdgeInsets.symmetric(vertical: 12.0),
+                                          child: Text('Gesamt: 0,0 / 0,0 €', style: TextStyle(fontSize: 16.0)),
+                                        ),
+                                        arcType: ArcType.HALF,
+                                        circularStrokeCap: CircularStrokeCap.round,
+                                        arcBackgroundColor: Colors.grey,
+                                        animation: true,
+                                        animateFromLastPercent: true,
+                                        animationDuration: 1000,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const Padding(
+                              padding: EdgeInsets.only(top: 6.0, left: 8.0, right: 8.0),
+                              child: Text(
+                                'Du kannst über alle Budgets noch 0,0 € / Tag ausgeben',
+                                style: TextStyle(fontSize: 12.0, color: Colors.grey),
+                              ),
+                            ),
+                            const Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 12.0, vertical: 4.0),
+                              child: Divider(),
+                            ),
+                            const Expanded(
+                              child: Center(
+                                child: Text('Noch keine Budgets erstellt.'),
+                              ),
+                            ),
+                          ],
                         ),
                       );
                     } else {
