@@ -142,6 +142,11 @@ class DateInputField extends StatelessWidget {
             );
             if (parsedDate != null) {
               cubit.updateBookingDate(parsedDate.toString());
+              if (cubit.state.bookingRepeat == RepeatType.beginningOfMonth.name && parsedDate.day != 1) {
+                cubit.updateBookingRepeat(RepeatType.noRepetition.name);
+              } else if (cubit.state.bookingRepeat == RepeatType.endOfMonth.name && parsedDate.day == 0) {
+                cubit.updateBookingRepeat(RepeatType.noRepetition.name);
+              }
             }
           },
         ),
