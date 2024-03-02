@@ -3,11 +3,13 @@ import 'package:hive/hive.dart';
 import '/utils/consts/hive_consts.dart';
 
 @HiveType(typeId: transactionTypeId)
-enum TransactionType { income, outcome, transfer, transferFrom, transferTo, investment, investmentFrom, investmentTo }
+enum TransactionType { none, income, outcome, transfer, transferFrom, transferTo, investment, investmentFrom, investmentTo }
 
 extension TransactionTypeExtension on TransactionType {
   String get name {
     switch (this) {
+      case TransactionType.none:
+        return '';
       case TransactionType.income:
         return 'Einnahme';
       case TransactionType.outcome:
@@ -31,6 +33,8 @@ extension TransactionTypeExtension on TransactionType {
 
   String get pluralName {
     switch (this) {
+      case TransactionType.none:
+        return '';
       case TransactionType.income:
         return 'Einnahmen';
       case TransactionType.outcome:
@@ -52,7 +56,7 @@ extension TransactionTypeExtension on TransactionType {
     }
   }
 
-  TransactionType getTransactionType(String transaction) {
+  static TransactionType getTransactionType(String transaction) {
     try {
       if (transaction == TransactionType.income.name) {
         return TransactionType.income;

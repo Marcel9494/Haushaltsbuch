@@ -80,7 +80,7 @@ class BudgetBloc extends Bloc<BudgetEvents, BudgetState> {
         MoneyInputFieldCubit moneyInputFieldCubit = BlocProvider.of<MoneyInputFieldCubit>(event.context);
         Budget loadedBudget = await budgetRepository.load(event.budgetBoxIndex);
         categorieInputFieldCubit.updateValue(loadedBudget.categorie);
-        moneyInputFieldCubit.updateValue(formatToMoneyAmount(loadedBudget.budget.toString()));
+        moneyInputFieldCubit.updateAmount(formatToMoneyAmount(loadedBudget.budget.toString()));
         if (event.pushNewScreen) {
           Navigator.pushNamed(event.context, editBudgetRoute);
         }

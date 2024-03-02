@@ -59,7 +59,8 @@ class BookingBloc extends Bloc<BookingEvents, BookingState> {
         dateInputFieldCubit.updateBookingDate(loadedBooking.date);
         dateInputFieldCubit.updateBookingRepeat(loadedBooking.bookingRepeats);
         titleInputFieldCubit.updateValue(loadedBooking.title);
-        moneyInputFieldCubit.updateValue(loadedBooking.amount);
+        moneyInputFieldCubit.updateAmount(loadedBooking.amount);
+        moneyInputFieldCubit.updateAmountType(loadedBooking.amountType);
         categorieInputFieldCubit.updateValue(loadedBooking.categorie);
         fromAccountInputFieldCubit.updateValue(loadedBooking.fromAccount);
         toAccountInputFieldCubit.updateValue(loadedBooking.toAccount);
@@ -76,6 +77,7 @@ class BookingBloc extends Bloc<BookingEvents, BookingState> {
         savedBooking.categorie = loadedBooking.categorie;
         savedBooking.subcategorie = loadedBooking.subcategorie;
         savedBooking.amount = loadedBooking.amount;
+        savedBooking.amountType = loadedBooking.amountType;
         savedBooking.booked = loadedBooking.booked;
         savedBooking.serieId = loadedBooking.serieId;
       }
@@ -137,6 +139,7 @@ class BookingBloc extends Bloc<BookingEvents, BookingState> {
           ..title = titleInputFieldCubit.state.text
           ..date = dateInputFieldCubit.state.bookingDate
           ..amount = moneyInputFieldCubit.state.amount
+          ..amountType = moneyInputFieldCubit.state.amountType
           ..categorie = categorieInputFieldCubit.state.categorie
           ..subcategorie = subcategorieInputFieldCubit.state
           ..fromAccount = fromAccountInputFieldCubit.state.fromAccount
@@ -157,6 +160,7 @@ class BookingBloc extends Bloc<BookingEvents, BookingState> {
           ..title = savedBooking.title
           ..date = savedBooking.date
           ..amount = savedBooking.amount
+          ..amountType = savedBooking.amountType
           ..categorie = savedBooking.categorie
           ..subcategorie = savedBooking.subcategorie
           ..fromAccount = savedBooking.fromAccount
@@ -170,6 +174,7 @@ class BookingBloc extends Bloc<BookingEvents, BookingState> {
           ..title = titleInputFieldCubit.state.text
           ..date = dateInputFieldCubit.state.bookingDate
           ..amount = moneyInputFieldCubit.state.amount
+          ..amountType = moneyInputFieldCubit.state.amountType
           ..categorie = categorieInputFieldCubit.state.categorie
           ..subcategorie = subcategorieInputFieldCubit.state
           ..fromAccount = fromAccountInputFieldCubit.state.fromAccount

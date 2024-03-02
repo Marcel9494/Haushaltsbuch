@@ -175,7 +175,13 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
                           ),
                           BlocBuilder<MoneyInputFieldCubit, MoneyInputFieldModel>(
                             builder: (context, state) {
-                              return MoneyInputField(cubit: moneyInputFieldCubit, focusNode: amountFocusNode, hintText: 'Betrag', bottomSheetTitle: 'Betrag eingeben:');
+                              return MoneyInputField(
+                                cubit: moneyInputFieldCubit,
+                                focusNode: amountFocusNode,
+                                hintText: 'Betrag',
+                                bottomSheetTitle: 'Betrag eingeben:',
+                                transactionType: TransactionTypeExtension.getTransactionType(transactionStatsToggleButtonsCubit.state.transactionName),
+                              );
                             },
                           ),
                           Column(

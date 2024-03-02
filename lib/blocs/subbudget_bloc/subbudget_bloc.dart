@@ -78,7 +78,7 @@ class SubbudgetBloc extends Bloc<SubbudgetEvent, SubbudgetState> {
         MoneyInputFieldCubit moneyInputFieldCubit = BlocProvider.of<MoneyInputFieldCubit>(event.context);
         Subbudget loadedSubbudget = await subbudgetRepository.load(event.subbudgetBoxIndex);
         subcategorieInputFieldCubit.updateValue(loadedSubbudget.subcategorieName);
-        moneyInputFieldCubit.updateValue(formatToMoneyAmount(loadedSubbudget.subcategorieBudget.toString()));
+        moneyInputFieldCubit.updateAmount(formatToMoneyAmount(loadedSubbudget.subcategorieBudget.toString()));
         if (event.pushNewScreen) {
           Navigator.pushNamed(event.context, editSubbudgetRoute);
         }

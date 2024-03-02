@@ -93,7 +93,7 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
         Account loadedAccount = await accountRepository.load(event.accountBoxIndex);
         accountTypeInputFieldCubit.updateValue(loadedAccount.accountType);
         accountNameInputFieldCubit.updateValue(loadedAccount.name);
-        accountBalanceInputFieldCubit.updateValue(loadedAccount.bankBalance);
+        accountBalanceInputFieldCubit.updateAmount(loadedAccount.bankBalance);
         // TODO preselectAccountInputFieldCubit.updateValue(loadedAccount.)
 
         savedAccount.boxIndex = event.accountBoxIndex;
