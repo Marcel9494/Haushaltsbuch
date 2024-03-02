@@ -30,7 +30,7 @@ class DefaultBudgetBloc extends Bloc<DefaultBudgetEvents, DefaultBudgetState> {
 
       DefaultBudget loadedDefaultBudget = await defaultBudgetRepository.load(event.budgetCategorie);
       categorieInputFieldCubit.updateValue(loadedDefaultBudget.categorie);
-      moneyInputFieldCubit.updateValue(formatToMoneyAmount(loadedDefaultBudget.defaultBudget.toString()));
+      moneyInputFieldCubit.updateAmount(formatToMoneyAmount(loadedDefaultBudget.defaultBudget.toString()));
 
       Navigator.pushNamed(event.context, editDefaultBudgetRoute);
       emit(DefaultBudgetLoadedState(event.context, event.budgetCategorie));

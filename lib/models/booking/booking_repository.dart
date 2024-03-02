@@ -21,8 +21,8 @@ class BookingRepository extends BookingInterface {
     executeAccountTransaction(newBooking);
   }
 
-  void _createInstance(String title, String transactionType, String date, String bookingRepeats, String amount, String categorie, String subcategorie, String fromAccount,
-      String toAccount, bool isSerieBooking) async {
+  void _createInstance(String title, String transactionType, String date, String bookingRepeats, String amount, String amountType, String categorie, String subcategorie,
+      String fromAccount, String toAccount, bool isSerieBooking) async {
     var bookingBox = await Hive.openBox(bookingsBox);
     GlobalStateRepository globalStateRepository = GlobalStateRepository();
     Booking bookingInstance = Booking()
@@ -31,6 +31,7 @@ class BookingRepository extends BookingInterface {
       ..title = title
       ..date = date
       ..amount = amount
+      ..amountType = amountType
       ..categorie = categorie
       ..subcategorie = subcategorie
       ..fromAccount = fromAccount
@@ -55,59 +56,59 @@ class BookingRepository extends BookingInterface {
       for (int i = 0; i < 3650; i++) {
         DateTime nextBookingDate = DateTime(DateTime.parse(templateBooking.date).year, DateTime.parse(templateBooking.date).month, DateTime.parse(templateBooking.date).day + i);
         _createInstance(templateBooking.title, templateBooking.transactionType, nextBookingDate.toString(), templateBooking.bookingRepeats, templateBooking.amount,
-            templateBooking.categorie, templateBooking.subcategorie, templateBooking.fromAccount, templateBooking.toAccount, true);
+            templateBooking.amountType, templateBooking.categorie, templateBooking.subcategorie, templateBooking.fromAccount, templateBooking.toAccount, true);
       }
     } else if (templateBooking.bookingRepeats == RepeatType.everyWeek.name) {
       for (int i = 0; i < 522; i++) {
         DateTime nextBookingDate =
             DateTime(DateTime.parse(templateBooking.date).year, DateTime.parse(templateBooking.date).month, DateTime.parse(templateBooking.date).day + i * 7);
         _createInstance(templateBooking.title, templateBooking.transactionType, nextBookingDate.toString(), templateBooking.bookingRepeats, templateBooking.amount,
-            templateBooking.categorie, templateBooking.subcategorie, templateBooking.fromAccount, templateBooking.toAccount, true);
+            templateBooking.amountType, templateBooking.categorie, templateBooking.subcategorie, templateBooking.fromAccount, templateBooking.toAccount, true);
       }
     } else if (templateBooking.bookingRepeats == RepeatType.everyTwoWeeks.name) {
       for (int i = 0; i < 261; i++) {
         DateTime nextBookingDate =
             DateTime(DateTime.parse(templateBooking.date).year, DateTime.parse(templateBooking.date).month, DateTime.parse(templateBooking.date).day + i * 14);
         _createInstance(templateBooking.title, templateBooking.transactionType, nextBookingDate.toString(), templateBooking.bookingRepeats, templateBooking.amount,
-            templateBooking.categorie, templateBooking.subcategorie, templateBooking.fromAccount, templateBooking.toAccount, true);
+            templateBooking.amountType, templateBooking.categorie, templateBooking.subcategorie, templateBooking.fromAccount, templateBooking.toAccount, true);
       }
     } else if (templateBooking.bookingRepeats == RepeatType.beginningOfMonth.name) {
       for (int i = 0; i < 120; i++) {
         DateTime nextBookingDate = DateTime(DateTime.parse(templateBooking.date).year, DateTime.parse(templateBooking.date).month + i, 1);
         _createInstance(templateBooking.title, templateBooking.transactionType, nextBookingDate.toString(), templateBooking.bookingRepeats, templateBooking.amount,
-            templateBooking.categorie, templateBooking.subcategorie, templateBooking.fromAccount, templateBooking.toAccount, true);
+            templateBooking.amountType, templateBooking.categorie, templateBooking.subcategorie, templateBooking.fromAccount, templateBooking.toAccount, true);
       }
     } else if (templateBooking.bookingRepeats == RepeatType.endOfMonth.name) {
       for (int i = 0; i < 120; i++) {
         DateTime nextBookingDate = DateTime(DateTime.parse(templateBooking.date).year, DateTime.parse(templateBooking.date).month + i, 0);
         _createInstance(templateBooking.title, templateBooking.transactionType, nextBookingDate.toString(), templateBooking.bookingRepeats, templateBooking.amount,
-            templateBooking.categorie, templateBooking.subcategorie, templateBooking.fromAccount, templateBooking.toAccount, true);
+            templateBooking.amountType, templateBooking.categorie, templateBooking.subcategorie, templateBooking.fromAccount, templateBooking.toAccount, true);
       }
     } else if (templateBooking.bookingRepeats == RepeatType.everyMonth.name) {
       for (int i = 0; i < 120; i++) {
         DateTime nextBookingDate = DateTime(DateTime.parse(templateBooking.date).year, DateTime.parse(templateBooking.date).month + i, DateTime.parse(templateBooking.date).day);
         _createInstance(templateBooking.title, templateBooking.transactionType, nextBookingDate.toString(), templateBooking.bookingRepeats, templateBooking.amount,
-            templateBooking.categorie, templateBooking.subcategorie, templateBooking.fromAccount, templateBooking.toAccount, true);
+            templateBooking.amountType, templateBooking.categorie, templateBooking.subcategorie, templateBooking.fromAccount, templateBooking.toAccount, true);
       }
     } else if (templateBooking.bookingRepeats == RepeatType.everyThreeMonths.name) {
       for (int i = 0; i < 40; i++) {
         DateTime nextBookingDate =
             DateTime(DateTime.parse(templateBooking.date).year, DateTime.parse(templateBooking.date).month + i * 3, DateTime.parse(templateBooking.date).day);
         _createInstance(templateBooking.title, templateBooking.transactionType, nextBookingDate.toString(), templateBooking.bookingRepeats, templateBooking.amount,
-            templateBooking.categorie, templateBooking.subcategorie, templateBooking.fromAccount, templateBooking.toAccount, true);
+            templateBooking.amountType, templateBooking.categorie, templateBooking.subcategorie, templateBooking.fromAccount, templateBooking.toAccount, true);
       }
     } else if (templateBooking.bookingRepeats == RepeatType.everySixMonths.name) {
       for (int i = 0; i < 20; i++) {
         DateTime nextBookingDate =
             DateTime(DateTime.parse(templateBooking.date).year, DateTime.parse(templateBooking.date).month + i * 6, DateTime.parse(templateBooking.date).day);
         _createInstance(templateBooking.title, templateBooking.transactionType, nextBookingDate.toString(), templateBooking.bookingRepeats, templateBooking.amount,
-            templateBooking.categorie, templateBooking.subcategorie, templateBooking.fromAccount, templateBooking.toAccount, true);
+            templateBooking.amountType, templateBooking.categorie, templateBooking.subcategorie, templateBooking.fromAccount, templateBooking.toAccount, true);
       }
     } else if (templateBooking.bookingRepeats == RepeatType.everyYear.name) {
       for (int i = 0; i < 10; i++) {
         DateTime nextBookingDate = DateTime(DateTime.parse(templateBooking.date).year + i, DateTime.parse(templateBooking.date).month, DateTime.parse(templateBooking.date).day);
         _createInstance(templateBooking.title, templateBooking.transactionType, nextBookingDate.toString(), templateBooking.bookingRepeats, templateBooking.amount,
-            templateBooking.categorie, templateBooking.subcategorie, templateBooking.fromAccount, templateBooking.toAccount, true);
+            templateBooking.amountType, templateBooking.categorie, templateBooking.subcategorie, templateBooking.fromAccount, templateBooking.toAccount, true);
       }
     }
   }
@@ -161,6 +162,7 @@ class BookingRepository extends BookingInterface {
           ..title = templateBooking.title
           ..date = booking.date
           ..amount = templateBooking.amount
+          ..amountType = templateBooking.amountType
           ..categorie = templateBooking.categorie
           ..subcategorie = templateBooking.subcategorie
           ..fromAccount = templateBooking.fromAccount
@@ -198,6 +200,7 @@ class BookingRepository extends BookingInterface {
           ..title = templateBooking.title
           ..date = booking.date
           ..amount = templateBooking.amount
+          ..amountType = templateBooking.amountType
           ..categorie = templateBooking.categorie
           ..subcategorie = templateBooking.subcategorie
           ..fromAccount = templateBooking.fromAccount
@@ -223,6 +226,7 @@ class BookingRepository extends BookingInterface {
           ..title = booking.title
           ..date = booking.date
           ..amount = booking.amount
+          ..amountType = booking.amountType
           ..categorie = newCategorieName
           ..subcategorie = booking.subcategorie
           ..fromAccount = booking.fromAccount
@@ -247,6 +251,7 @@ class BookingRepository extends BookingInterface {
           ..title = booking.title
           ..date = booking.date
           ..amount = booking.amount
+          ..amountType = booking.amountType
           ..categorie = booking.categorie
           ..subcategorie = newSubcategorieName
           ..fromAccount = booking.fromAccount
@@ -271,6 +276,7 @@ class BookingRepository extends BookingInterface {
           ..title = booking.title
           ..date = booking.date
           ..amount = booking.amount
+          ..amountType = booking.amountType
           ..categorie = booking.categorie
           ..subcategorie = booking.subcategorie
           ..fromAccount = booking.fromAccount == oldAccountName ? newAccountName : oldAccountName
@@ -469,6 +475,7 @@ class BookingRepository extends BookingInterface {
             ..title = booking.title
             ..date = booking.date
             ..amount = booking.amount
+            ..amountType = booking.amountType
             ..categorie = booking.categorie
             ..subcategorie = booking.subcategorie
             ..fromAccount = booking.fromAccount

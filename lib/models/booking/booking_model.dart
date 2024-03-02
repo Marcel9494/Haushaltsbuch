@@ -27,6 +27,8 @@ class Booking extends HiveObject {
   late int serieId;
   @HiveField(10)
   late bool booked;
+  @HiveField(11)
+  late String amountType;
 }
 
 class BookingAdapter extends TypeAdapter<Booking> {
@@ -46,7 +48,8 @@ class BookingAdapter extends TypeAdapter<Booking> {
       ..fromAccount = reader.read()
       ..toAccount = reader.read()
       ..serieId = reader.read()
-      ..booked = reader.read();
+      ..booked = reader.read()
+      ..amountType = reader.read();
   }
 
   @override
@@ -62,5 +65,6 @@ class BookingAdapter extends TypeAdapter<Booking> {
     writer.write(obj.toAccount);
     writer.write(obj.serieId);
     writer.write(obj.booked);
+    writer.write(obj.amountType);
   }
 }
