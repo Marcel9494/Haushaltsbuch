@@ -65,14 +65,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     context: context,
                     builder: (context) {
                       return CupertinoAlertDialog(
-                        content: const Text("Wollen Sie wirklich alle Daten unwiderruflich löschen?\nDie gelöschten Daten können nicht wiederhergestellt werden!"),
-                        title: const Text("Warnung"),
+                        content: const Text('Wollen Sie wirklich alle Daten unwiderruflich löschen?\nDie gelöschten Daten können nicht wiederhergestellt werden!'),
+                        title: const Text('Warnung'),
                         actions: [
                           TextButton(
                             onPressed: () {
                               Navigator.pop(context);
                             },
-                            child: const Text("Nein", style: TextStyle(color: Colors.cyanAccent)),
+                            child: const Text('Nein', style: TextStyle(color: Colors.cyanAccent)),
                           ),
                           TextButton(
                             onPressed: () {
@@ -80,7 +80,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               Navigator.pop(context);
                               Navigator.popAndPushNamed(context, bottomNavBarRoute, arguments: BottomNavBarScreenArguments(0));
                             },
-                            child: const Text("Ja", style: TextStyle(color: Colors.cyanAccent)),
+                            child: const Text('Ja', style: TextStyle(color: Colors.cyanAccent)),
                           ),
                         ],
                       );

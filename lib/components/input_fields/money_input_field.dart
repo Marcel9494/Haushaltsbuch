@@ -1,7 +1,8 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
-import '../../models/enums/transaction_types.dart';
+import '/models/enums/transaction_types.dart';
 import '/models/enums/amount_types.dart';
 
 import '/components/deco/bottom_sheet_line.dart';
@@ -156,18 +157,47 @@ class MoneyInputField extends StatelessWidget {
       builder: (BuildContext context) {
         return Material(
           child: SizedBox(
-            height: 250.0,
+            height: 280.0,
             child: ListView(
               children: [
                 const BottomSheetLine(),
-                const Padding(
-                  padding: EdgeInsets.only(top: 16.0, left: 30.0),
-                  child: Text('Betragstyp auswählen:', style: TextStyle(fontSize: 18.0)),
+                Padding(
+                  padding: const EdgeInsets.only(top: 16.0, left: 30.0, right: 24.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text('Betragstyp auswählen:', style: TextStyle(fontSize: 18.0)),
+                      IconButton(
+                          onPressed: () {
+                            showCupertinoDialog(
+                              context: context,
+                              builder: (context) {
+                                return CupertinoAlertDialog(
+                                  title: const Text('Betragstyp Hilfe:'),
+                                  content: Text(
+                                    _getAmountTypeHelpText(),
+                                    textAlign: TextAlign.left,
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                      },
+                                      child: const Text('OK', style: TextStyle(color: Colors.cyanAccent)),
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          },
+                          icon: const Icon(Icons.help_outline_rounded)),
+                    ],
+                  ),
                 ),
                 Padding(
                   padding: const EdgeInsets.only(top: 16.0),
                   child: SizedBox(
-                    height: 250.0, // TODO dynamisch machen
+                    height: 280.0, // TODO dynamisch machen
                     child: ListView.builder(
                       itemCount: 3,
                       itemBuilder: (BuildContext context, int index) {
@@ -225,6 +255,18 @@ class MoneyInputField extends StatelessWidget {
         cubit.updateAmountType(AmountType.values[index + 2].name);
       }
     }
+  }
+
+  String _getAmountTypeHelpText() {
+    String amountTypeHelpText = '';
+    if (transactionType.name == TransactionType.outcome.name) {
+      amountTypeHelpText =
+          '\nFix:\nSind Ausgaben die regelmäßig und in konstanter Höhe anfallen hierzu zählen beispielsweise: Miete, Strom, Abonnements, Kreditraten, etc. .\n\nVariabel:\nSind Ausgaben die jeden Monat unterschiedlich anfallen hierzu zählen beispielsweise: Lebensmittel, Kleidung, Unterhaltung, Urlaub, etc. .';
+    } else if (transactionType.name == TransactionType.income.name) {
+      amountTypeHelpText =
+          '\nAktiv:\nSind Einnahmen die aktive Arbeit erfordern hierzu zählen beispielsweise: Gehalt, Bonuszahlungen, Projektvergütungen, etc. .\n\nPassiv:\nSind Einnahmen die ohne oder mit nur wenig Aufwand generiert werden hierzu zählen beispielsweise: Dividenden, Zinsen, etc. .';
+    }
+    return amountTypeHelpText;
   }
 
   @override
