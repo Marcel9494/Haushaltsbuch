@@ -29,6 +29,25 @@ class Booking extends HiveObject {
   late bool booked;
   @HiveField(11)
   late String amountType;
+
+  // TODO hier weitermachen siehe: https://www.dhiwise.com/post/mastering-the-dart-copywith-method-a-comprehensive-guide
+  // Variablen final machen nicht vergessen
+  // Anschließend: https://stackoverflow.com/questions/72548100/iam-having-a-problem-with-adding-fields-in-a-hive-model-in-flutter
+  //Booking({required this.boxIndex, this.title, this.transactionType});
+
+  /*Booking copyWith({int? boxIndex, String? title, String? transactionType}) => Booking(
+        boxIndex: boxIndex ?? this.boxIndex,
+        title: title ?? this.title,
+        transactionType: transactionType ?? this.transactionType,
+      );*/
+
+  /*Booking copyWith({
+    final int? boxIndex,
+  }) {
+    return Booking(
+      boxIndex: boxIndex ?? this.boxIndex,
+    );
+  }*/
 }
 
 class BookingAdapter extends TypeAdapter<Booking> {
