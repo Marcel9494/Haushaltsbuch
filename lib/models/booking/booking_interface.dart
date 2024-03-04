@@ -27,6 +27,7 @@ abstract class BookingInterface {
   Future<List<Booking>> loadSubcategorieBookings(List<Booking> bookingList, String subcategorie);
 
   // Getter Funktionen
+  double getCategorieAmount(List<Booking> bookingList, String categorie, String transactionType);
   double getRevenues(List<Booking> bookingList);
   double getExpenditures(List<Booking> bookingList, [String categorie = '']);
   double getSubcategorieExpenditures(List<Booking> bookingList, String categorie, String subcategorie);
