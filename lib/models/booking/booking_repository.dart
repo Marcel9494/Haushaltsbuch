@@ -391,6 +391,10 @@ class BookingRepository extends BookingInterface {
         transactionType = TransactionType.income.name;
       } else if (transactionType == TransactionType.outcome.pluralName) {
         transactionType = TransactionType.outcome.name;
+      } else if (transactionType == TransactionType.investment.pluralName) {
+        transactionType = TransactionType.investment.name;
+      } else if (transactionType == TransactionType.transfer.pluralName) {
+        transactionType = TransactionType.transfer.name;
       }
       if (DateTime.parse(booking.date).month == selectedMonth &&
           DateTime.parse(booking.date).year == selectedYear &&
@@ -424,6 +428,17 @@ class BookingRepository extends BookingInterface {
       }
     }
     return revenues;
+  }
+
+  @override
+  double getCategorieAmount(List<Booking> bookingList, String categorie, String transactionType) {
+    double amount = 0.0;
+    for (int i = 0; i < bookingList.length; i++) {
+      if (bookingList[i].categorie == categorie && TransactionTypeExtension.getTransactionType(bookingList[i].transactionType).pluralName == transactionType) {
+        amount += formatMoneyAmountToDouble(bookingList[i].amount);
+      }
+    }
+    return amount;
   }
 
   @override

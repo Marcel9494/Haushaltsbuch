@@ -12,11 +12,13 @@ import '/utils/number_formatters/number_formatter.dart';
 class MonthlyBarChart extends StatefulWidget {
   final DateTime selectedDate;
   final String categorie;
+  final String transactionType;
 
   const MonthlyBarChart({
     Key? key,
     required this.selectedDate,
     this.categorie = '',
+    this.transactionType = '',
   }) : super(key: key);
 
   @override
@@ -56,7 +58,7 @@ class MonthlyBarChartState extends State<MonthlyBarChart> {
         _monthlyExpenditures.insert(i, 0.0);
         _monthlyExpendituresBarGroups.add(makeGroupData(i, _monthlyExpenditures[i]));
       } else {
-        _monthlyExpenditures.insert(i, bookingRepository.getExpenditures(_bookingList, widget.categorie));
+        _monthlyExpenditures.insert(i, bookingRepository.getCategorieAmount(_bookingList, widget.categorie, widget.transactionType));
         _monthlyExpendituresBarGroups.add(makeGroupData(i, _monthlyExpenditures[i]));
       }
     }
@@ -191,7 +193,7 @@ class MonthlyBarChartState extends State<MonthlyBarChart> {
     );
     String text = '';
     if (value == 0) {
-      text = '0 €';
+      text = '0,00 €';
     } else if (value == (_monthlyExpenditures.reduce(max) / 2).round()) {
       text = formatToMoneyAmount((_monthlyExpenditures.reduce(max) / 2).toString());
     } else if (value == _monthlyExpenditures.reduce(max)) {
