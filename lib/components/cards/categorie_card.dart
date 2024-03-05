@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -21,10 +22,11 @@ class _CategorieCardState extends State<CategorieCard> {
   String allSubcategorieNames = "";
 
   void _showDeleteCategorieDialog() {
-    showDialog(
+    showCupertinoDialog(
       context: context,
+      barrierDismissible: true,
       builder: (context) {
-        return AlertDialog(
+        return CupertinoAlertDialog(
           title: Text('Kategorie ${widget.categorie.name} löschen?'),
           actions: <Widget>[
             TextButton(
@@ -36,13 +38,14 @@ class _CategorieCardState extends State<CategorieCard> {
               ),
               onPressed: () => Navigator.pop(context),
             ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                foregroundColor: Colors.black87,
-                backgroundColor: Colors.cyanAccent,
+            TextButton(
+              child: const Text(
+                'Ja',
+                style: TextStyle(
+                  color: Colors.cyanAccent,
+                ),
               ),
               onPressed: () => BlocProvider.of<CategorieBloc>(context).add(DeleteCategorieEvent(context, widget.categorie)),
-              child: const Text('Ja'),
             ),
           ],
         );

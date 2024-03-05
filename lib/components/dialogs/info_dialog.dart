@@ -1,22 +1,23 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 void showInfoDialog(BuildContext context, String title, Function yesPressed, [String content = '']) {
-  showDialog(
+  showCupertinoDialog(
     context: context,
+    barrierDismissible: true,
     builder: (context) {
-      return AlertDialog(
+      return CupertinoAlertDialog(
         title: Text(title),
-        content: content == '' ? null : Text(content),
+        content: content == '' ? null : Text(content, textAlign: TextAlign.left),
         actions: <Widget>[
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              foregroundColor: Colors.black87,
-              backgroundColor: Colors.cyanAccent,
-            ),
+          TextButton(
             onPressed: () => {
               yesPressed(),
             },
-            child: const Text('OK'),
+            child: const Text(
+              'OK',
+              style: TextStyle(color: Colors.cyanAccent),
+            ),
           ),
         ],
       );

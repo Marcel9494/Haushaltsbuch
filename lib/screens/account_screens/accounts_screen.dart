@@ -38,9 +38,10 @@ class _AccountsScreenState extends State<AccountsScreen> {
             children: [
               const BottomSheetLine(),
               const Padding(
-                padding: EdgeInsets.only(top: 16.0, left: 20.0),
+                padding: EdgeInsets.only(top: 16.0, left: 20.0, bottom: 10.0),
                 child: Text('Auswählen:', style: TextStyle(fontSize: 18.0)),
               ),
+              const Divider(),
               Column(
                 children: [
                   ListTile(
