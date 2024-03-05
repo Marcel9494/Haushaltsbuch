@@ -257,22 +257,22 @@ class AccountRepository extends AccountInterface {
     }
     Account cashAccount = Account()
       ..name = 'Geldbeutel'
-      ..bankBalance = '0 €'
+      ..bankBalance = '0,00 €'
       ..accountType = AccountType.cash.name;
     create(cashAccount);
     Account giroAccount = Account()
       ..name = 'Girokonto'
-      ..bankBalance = '0 €'
+      ..bankBalance = '0,00 €'
       ..accountType = AccountType.account.name;
     create(giroAccount);
     Account billingAccount = Account()
       ..name = 'Verrechnungskonto'
-      ..bankBalance = '0 €'
+      ..bankBalance = '0,00 €'
       ..accountType = AccountType.account.name;
     create(billingAccount);
     Account capitalInvestmentAccount = Account()
       ..name = 'Aktiendepot'
-      ..bankBalance = '0 €'
+      ..bankBalance = '0,00 €'
       ..accountType = AccountType.capitalInvestments.name;
     create(capitalInvestmentAccount);
   }

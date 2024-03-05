@@ -103,7 +103,7 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
                                         center: const Text('0 %', style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold)),
                                         header: const Padding(
                                           padding: EdgeInsets.symmetric(vertical: 12.0),
-                                          child: Text('Gesamt: 0,0 / 0,0 €', style: TextStyle(fontSize: 16.0)),
+                                          child: Text('Gesamt: 0,00 / 0,00 €', style: TextStyle(fontSize: 16.0)),
                                         ),
                                         arcType: ArcType.HALF,
                                         circularStrokeCap: CircularStrokeCap.round,
@@ -120,7 +120,7 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
                             const Padding(
                               padding: EdgeInsets.only(top: 6.0, left: 8.0, right: 8.0),
                               child: Text(
-                                'Du kannst über alle Budgets noch 0,0 € / Tag ausgeben',
+                                'Du kannst über alle Budgets noch 0,00 € / Tag ausgeben',
                                 style: TextStyle(fontSize: 12.0, color: Colors.grey),
                               ),
                             ),

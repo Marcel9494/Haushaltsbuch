@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:month_picker_dialog/month_picker_dialog.dart';
 
 import '/utils/date_formatters/date_formatter.dart';

@@ -9,8 +9,6 @@ import '../buttons/month_picker_buttons.dart';
 
 import '../cards/booking_card.dart';
 
-import '/utils/number_formatters/number_formatter.dart';
-
 import '../charts/monthly_bar_chart.dart';
 
 import '../deco/date_text.dart';
@@ -19,6 +17,7 @@ import '../deco/overview_tile.dart';
 import '../deco/loading_indicator.dart';
 
 import '/utils/consts/global_consts.dart';
+import '/utils/number_formatters/number_formatter.dart';
 
 class MonthlyBookingTabView extends StatefulWidget {
   DateTime selectedDate;
@@ -145,7 +144,7 @@ class _MonthlyBookingTabViewState extends State<MonthlyBookingTabView> {
                                 const TotalText(total: '0,00 €'),
                               ],
                             ),
-                            MonthlyBarChart(selectedDate: widget.selectedDate, categorie: widget.categorie),
+                            MonthlyBarChart(selectedDate: widget.selectedDate, categorie: widget.categorie, transactionType: widget.transactionType),
                           ],
                         )
                       : const SizedBox(),
@@ -190,7 +189,9 @@ class _MonthlyBookingTabViewState extends State<MonthlyBookingTabView> {
                                     },
                                   ),
                                 ),
-                                TotalText(total: formatToMoneyAmount(bookingRepository.getCategorieAmount(_bookingList, widget.categorie, widget.transactionType).toString())),
+                                TotalText(
+                                  total: formatToMoneyAmount(bookingRepository.getCategorieAmount(_bookingList, widget.categorie, widget.transactionType).toString()),
+                                ),
                               ],
                             ),
                             MonthlyBarChart(selectedDate: widget.selectedDate, categorie: widget.categorie, transactionType: widget.transactionType),
