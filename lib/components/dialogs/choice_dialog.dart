@@ -1,13 +1,15 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'package:another_flushbar/flushbar.dart';
 
 void showChoiceDialog(BuildContext context, String title, Function yesPressed, Function noPressed, String flushbarTitle, String flushbarMessage, IconData flushbarIcon,
     [String content = '']) {
-  showDialog(
+  showCupertinoDialog(
     context: context,
+    barrierDismissible: true,
     builder: (context) {
-      return AlertDialog(
+      return CupertinoAlertDialog(
         title: Text(title),
         content: content == '' ? null : Text(content),
         actions: <Widget>[
@@ -20,11 +22,7 @@ void showChoiceDialog(BuildContext context, String title, Function yesPressed, F
             ),
             onPressed: () => noPressed(),
           ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              foregroundColor: Colors.black87,
-              backgroundColor: Colors.cyanAccent,
-            ),
+          TextButton(
             onPressed: () => {
               yesPressed(),
               Flushbar(
@@ -40,7 +38,12 @@ void showChoiceDialog(BuildContext context, String title, Function yesPressed, F
                 leftBarIndicatorColor: Colors.cyanAccent,
               )..show(context),
             },
-            child: const Text('Ja'),
+            child: const Text(
+              'Ja',
+              style: TextStyle(
+                color: Colors.cyanAccent,
+              ),
+            ),
           ),
         ],
       );

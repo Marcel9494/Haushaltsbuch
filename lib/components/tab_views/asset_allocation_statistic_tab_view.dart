@@ -145,7 +145,7 @@ class _AssetAllocationStatisticTabViewState extends State<AssetAllocationStatist
                                 )
                               : IconButton(
                                   onPressed: () => showInfoDialog(context, 'Kapitalanlagen & risikolose Anlagen', () => Navigator.pop(context),
-                                      'Unter Kapitalanlagen werden alle Konten vom Typ Kapitalanlage verrechnet, diese sind risikobehaftet.\n\nUnter risikolose Anlagen werden Sparguthaben, Girokonten, Tagesgeldkonten, etc. gezählt die risikoarm sind.'),
+                                      '\nKapitalanlagen:\nUnter Kapitalanlagen werden alle Konten vom Typ Kapitalanlage verrechnet, diese sind risikobehaftet.\n\nRisikolose Anlagen:\nUnter risikolose Anlagen werden Sparguthaben, Girokonten, Tagesgeldkonten, etc. gezählt die risikoarm sind.'),
                                   icon: const Icon(Icons.help_outline_rounded, color: Colors.grey)),
                         ],
                       ),

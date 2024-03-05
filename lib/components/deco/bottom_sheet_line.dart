@@ -9,8 +9,8 @@ class BottomSheetLine extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.only(top: 20.0, bottom: 4.0),
         child: Container(
-          width: 75,
-          height: 2,
+          width: 50,
+          height: 3,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(20.0),
             color: Colors.white70,
