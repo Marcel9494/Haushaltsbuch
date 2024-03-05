@@ -17,11 +17,11 @@ class TotalText extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Gesamtsumme:'),
             Text(
               total,
-              style: const TextStyle(fontSize: 22.0),
-            )
+              style: const TextStyle(fontSize: 20.0),
+            ),
+            const Text('Gesamtsumme', style: TextStyle(color: Colors.grey)),
           ],
         ),
       ),

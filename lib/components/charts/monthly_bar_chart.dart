@@ -78,9 +78,7 @@ class MonthlyBarChartState extends State<MonthlyBarChart> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            const SizedBox(
-              height: 14.0,
-            ),
+            const SizedBox(height: 14.0),
             Expanded(
               child: BarChart(
                 BarChartData(
@@ -107,9 +105,7 @@ class MonthlyBarChartState extends State<MonthlyBarChart> {
                         });
                         return;
                       }
-
                       _touchedGroupIndex = response.spot!.touchedBarGroupIndex;
-
                       setState(() {
                         if (!event.isInterestedForInteractions) {
                           _touchedGroupIndex = -1;
@@ -193,11 +189,11 @@ class MonthlyBarChartState extends State<MonthlyBarChart> {
     );
     String text = '';
     if (value == 0) {
-      text = '0,00 €';
+      text = '0 €';
     } else if (value == (_monthlyExpenditures.reduce(max) / 2).round()) {
-      text = formatToMoneyAmount((_monthlyExpenditures.reduce(max) / 2).toString());
+      text = formatToMoneyAmountWithoutCent((_monthlyExpenditures.reduce(max) / 2).toString());
     } else if (value == _monthlyExpenditures.reduce(max)) {
-      text = formatToMoneyAmount(_monthlyExpenditures.reduce(max).toString());
+      text = formatToMoneyAmountWithoutCent(_monthlyExpenditures.reduce(max).toString());
     } else {
       return Container();
     }

@@ -22,7 +22,7 @@ class _CategorieAmountListScreenState extends State<CategorieAmountListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(widget.categorie)),
+      appBar: AppBar(title: Text(widget.categorie + ' - ' + widget.transactionType, overflow: TextOverflow.ellipsis)),
       body: Column(
         children: [
           Expanded(
