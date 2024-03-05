@@ -3,6 +3,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 
 import '/models/budget/budget_model.dart';
+import '/models/enums/transaction_types.dart';
 import '/models/subbudget/subbudget_model.dart';
 import '/models/subbudget/subbudget_repository.dart';
 import '/models/categorie/categorie_repository.dart';
@@ -42,7 +43,8 @@ class _BudgetCardState extends State<BudgetCard> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => Navigator.pushNamed(context, categorieAmountListRoute, arguments: CategorieAmountListScreenArguments(widget.selectedDate, widget.budget.categorie, '')),
+      onTap: () => Navigator.pushNamed(context, categorieAmountListRoute,
+          arguments: CategorieAmountListScreenArguments(widget.selectedDate, widget.budget.categorie, TransactionType.outcome.pluralName)),
       child: Card(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(14.0),
@@ -131,7 +133,7 @@ class _BudgetCardState extends State<BudgetCard> {
                             size: 28.0,
                           ),
                           onPressed: () => Navigator.pushNamed(context, categorieAmountListRoute,
-                              arguments: CategorieAmountListScreenArguments(widget.selectedDate, widget.budget.categorie, '')),
+                              arguments: CategorieAmountListScreenArguments(widget.selectedDate, widget.budget.categorie, TransactionType.outcome.pluralName)),
                         ),
                       ),
                     ),
