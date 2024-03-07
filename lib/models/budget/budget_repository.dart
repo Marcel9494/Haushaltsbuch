@@ -27,10 +27,9 @@ class BudgetRepository extends BudgetInterface {
   void create(Budget newBudget) async {
     var budgetBox = await Hive.openBox(budgetsBox);
     budgetBox.add(newBudget);
-    // TODO Anzahl der Budgets erhöhen, damit für die nächsten 10 Jahre Budgets erstellt werden. 3 nur als Test.
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < 120; i++) {
       Budget nextBudget = createInstance(newBudget);
-      nextBudget.budgetDate = DateTime(DateTime.now().year, DateTime.now().month + i + 1, 1).toString(); // TODO Jahr dynamisch implementieren
+      nextBudget.budgetDate = DateTime(DateTime.now().year, DateTime.now().month + i + 1, 1).toString();
       budgetBox.add(nextBudget);
     }
 

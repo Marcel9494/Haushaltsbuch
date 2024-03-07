@@ -68,7 +68,7 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
                 ),
                 Padding(
                   padding: const EdgeInsets.only(right: 12.0),
-                  child: DateTime.now().month == _selectedDate.month
+                  child: DateTime.now().month == _selectedDate.month && DateTime.now().year == _selectedDate.year
                       ? Text('Restliche Tage: ${DateTime(_selectedDate.year, _selectedDate.month + 1, 0).day - DateTime.now().day + 1}')
                       : const SizedBox(),
                 ),

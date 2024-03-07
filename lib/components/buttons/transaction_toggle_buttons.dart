@@ -24,16 +24,40 @@ class TransactionToggleButtons extends StatelessWidget {
       fillColor: cubit.state.fillColor,
       selectedColor: Colors.white,
       color: Colors.white60,
-      constraints: const BoxConstraints(
-        minHeight: 45.0,
-        minWidth: 80.0,
-      ),
       isSelected: cubit.state.selectedTransaction,
       children: [
-        Text(TransactionType.income.name, style: const TextStyle(fontSize: 12.0)),
-        Text(TransactionType.outcome.name, style: const TextStyle(fontSize: 12.0)),
-        Text(TransactionType.transfer.name, style: const TextStyle(fontSize: 12.0)),
-        Text(TransactionType.investment.name, style: const TextStyle(fontSize: 12.0)),
+        SizedBox(
+          width: (MediaQuery.of(context).size.width - 37.0) / 4,
+          child: Text(
+            TransactionType.income.name,
+            style: const TextStyle(fontSize: 12.0),
+            textAlign: TextAlign.center,
+          ),
+        ),
+        SizedBox(
+          width: (MediaQuery.of(context).size.width - 37.0) / 4,
+          child: Text(
+            TransactionType.outcome.name,
+            style: const TextStyle(fontSize: 12.0),
+            textAlign: TextAlign.center,
+          ),
+        ),
+        SizedBox(
+          width: (MediaQuery.of(context).size.width - 37.0) / 4,
+          child: Text(
+            TransactionType.transfer.name,
+            style: const TextStyle(fontSize: 12.0),
+            textAlign: TextAlign.center,
+          ),
+        ),
+        SizedBox(
+          width: (MediaQuery.of(context).size.width - 37.0) / 4,
+          child: Text(
+            TransactionType.investment.name,
+            style: const TextStyle(fontSize: 12.0),
+            textAlign: TextAlign.center,
+          ),
+        ),
       ],
     );
   }
