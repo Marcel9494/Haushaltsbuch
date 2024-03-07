@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -59,10 +57,6 @@ class _CreateBudgetScreenState extends State<CreateBudgetScreen> {
   final RoundedLoadingButtonController _saveButtonController = RoundedLoadingButtonController();
   final BudgetRepository budgetRepository = BudgetRepository();
   final DefaultBudgetRepository defaultBudgetRepository = DefaultBudgetRepository();
-  late DefaultBudget _loadedDefaultBudget;
-  late Budget _loadedBudget;
-  String _categorieErrorText = '';
-  String _budgetErrorText = '';
   bool _budgetExistsAlready = false;
   bool _subbudgetExistsAlready = false;
 
@@ -76,6 +70,7 @@ class _CreateBudgetScreenState extends State<CreateBudgetScreen> {
     moneyInputFieldCubit = BlocProvider.of<MoneyInputFieldCubit>(context);
   }
 
+  // TODO nicht mehr benutzte Funktion entfernen?
   void _createBudget() async {
     _budgetExistsAlready = await budgetRepository.existsBudgetForCategorie(_categorieTextController.text);
     if (_budgetExistsAlready) {

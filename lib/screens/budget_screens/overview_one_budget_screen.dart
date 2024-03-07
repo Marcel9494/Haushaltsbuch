@@ -95,18 +95,18 @@ class _OverviewOneBudgetScreenState extends State<OverviewOneBudgetScreen> {
                       padding: EdgeInsets.symmetric(horizontal: 12.0),
                       child: Divider(),
                     ),
-                    RefreshIndicator(
-                      onRefresh: () async {
-                        BlocProvider.of<BudgetBloc>(context).add(LoadBudgetListFromOneCategorieEvent(context, -1, budgetState.categorie, _selectedYear.year, false));
-                      },
-                      color: Colors.cyanAccent,
-                      child: ListView.builder(
-                        scrollDirection: Axis.vertical,
-                        shrinkWrap: true,
-                        itemCount: budgetState.budgetList.length,
-                        itemBuilder: (BuildContext context, int index) {
-                          return SeparateBudgetCard(budget: budgetState.budgetList[index]);
+                    Expanded(
+                      child: RefreshIndicator(
+                        onRefresh: () async {
+                          BlocProvider.of<BudgetBloc>(context).add(LoadBudgetListFromOneCategorieEvent(context, -1, budgetState.categorie, _selectedYear.year, false));
                         },
+                        color: Colors.cyanAccent,
+                        child: ListView.builder(
+                          itemCount: budgetState.budgetList.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            return SeparateBudgetCard(budget: budgetState.budgetList[index]);
+                          },
+                        ),
                       ),
                     ),
                   ],
