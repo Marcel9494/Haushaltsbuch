@@ -441,6 +441,9 @@ class BookingRepository extends BookingInterface {
     return amount;
   }
 
+  // TODO hier weitermachen und ausstehende Buchungen erfassen und in der GUI anzeigen lassen.
+  // TODO undoneAccountBookings kontrollieren, ob dies immer korrekt gemacht wird.
+  // TODO können die Funktionen getExpenditures vereinfacht werden siehe auch getCategorieAmount als Beispiel.
   @override
   double getExpenditures(List<Booking> bookingList, [String categorie = '']) {
     double expenditures = 0.0;

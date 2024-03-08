@@ -94,6 +94,7 @@ class BookingBloc extends Bloc<BookingEvents, BookingState> {
       FromAccountInputFieldCubit fromAccountInputFieldCubit = BlocProvider.of<FromAccountInputFieldCubit>(event.context);
       ToAccountInputFieldCubit toAccountInputFieldCubit = BlocProvider.of<ToAccountInputFieldCubit>(event.context);
       SubcategorieInputFieldCubit subcategorieInputFieldCubit = BlocProvider.of<SubcategorieInputFieldCubit>(event.context);
+      GlobalStateRepository globalStateRepository = GlobalStateRepository();
 
       if ((transactionStatsToggleButtonsCubit.state.transactionName == TransactionType.income.name ||
           transactionStatsToggleButtonsCubit.state.transactionName == TransactionType.outcome.name)) {
@@ -132,7 +133,6 @@ class BookingBloc extends Bloc<BookingEvents, BookingState> {
         }
       }
       if (event.bookingBoxIndex == -1) {
-        GlobalStateRepository globalStateRepository = GlobalStateRepository();
         Booking newBooking = Booking()
           ..transactionType = transactionStatsToggleButtonsCubit.state.transactionName
           ..bookingRepeats = dateInputFieldCubit.state.bookingRepeat
@@ -179,14 +179,32 @@ class BookingBloc extends Bloc<BookingEvents, BookingState> {
           ..subcategorie = subcategorieInputFieldCubit.state
           ..fromAccount = fromAccountInputFieldCubit.state.fromAccount
           ..toAccount = toAccountInputFieldCubit.state.toAccount
-          ..serieId = savedBooking.serieId
+          ..serieId = dateInputFieldCubit.state.bookingRepeat == RepeatType.noRepetition.name ? -1 : await globalStateRepository.getBookingSerieIndex()
           ..booked = DateTime.parse(dateInputFieldCubit.state.bookingDate).isAfter(DateTime.now()) ? false : true;
+        // Wird benötigt falls der Benutzer eine Einzelbuchung zu einer Serienbuchung ändert.
+        if (savedBooking.bookingRepeats == RepeatType.noRepetition.name && dateInputFieldCubit.state.bookingRepeat != RepeatType.noRepetition.name) {
+          bookingRepository.deleteSingle(savedBooking.boxIndex);
+          bookingRepository.createSerie(updatedBooking);
+          globalStateRepository.increaseBookingSerieIndex();
+        }
         if (event.serieEditModeType == SerieEditModeType.none || event.serieEditModeType == SerieEditModeType.single) {
-          bookingRepository.updateSingle(updatedBooking, oldBooking, event.bookingBoxIndex);
+          bookingRepository.updateSingle(updatedBooking, oldBooking, savedBooking.boxIndex);
         } else if (event.serieEditModeType == SerieEditModeType.onlyFuture) {
-          bookingRepository.updateOnlyFutureBookingsFromSerie(updatedBooking, oldBooking, event.bookingBoxIndex);
+          bookingRepository.updateOnlyFutureBookingsFromSerie(updatedBooking, oldBooking, savedBooking.boxIndex);
+          // Wird benötigt falls der Benutzer die Wiederholungsart ändert z.B. Monatsanfang zu Monatsende
+          if (savedBooking.bookingRepeats != RepeatType.noRepetition.name && dateInputFieldCubit.state.bookingRepeat != RepeatType.noRepetition.name) {
+            bookingRepository.deleteOnlyFutureBookingsFromSerie(updatedBooking, savedBooking.boxIndex);
+            bookingRepository.createSerie(updatedBooking);
+            globalStateRepository.increaseBookingSerieIndex();
+          }
         } else if (event.serieEditModeType == SerieEditModeType.all) {
-          bookingRepository.updateAllBookingsFromSerie(updatedBooking, oldBooking, event.bookingBoxIndex);
+          bookingRepository.updateAllBookingsFromSerie(updatedBooking, oldBooking, savedBooking.boxIndex);
+          // Wird benötigt falls der Benutzer die Wiederholungsart ändert z.B. Monatsanfang zu Monatsende
+          if (savedBooking.bookingRepeats != RepeatType.noRepetition.name && dateInputFieldCubit.state.bookingRepeat != RepeatType.noRepetition.name) {
+            bookingRepository.deleteAllBookingsFromSerie(updatedBooking, savedBooking.boxIndex);
+            bookingRepository.createSerie(updatedBooking);
+            globalStateRepository.increaseBookingSerieIndex();
+          }
         }
       }
       event.saveButtonController.success();
