@@ -84,7 +84,7 @@ class MoneyInputField extends StatelessWidget {
                       OutlinedButton(
                         onPressed: () {
                           if (cubit.state.amount.isNotEmpty) {
-                            cubit.updateValue(cubit.state.amount.substring(0, cubit.state.amount.length - 1));
+                            cubit.updateAmount(cubit.state.amount.substring(0, cubit.state.amount.length - 1));
                           }
                         },
                         child: const Icon(Icons.backspace_rounded, color: Colors.cyanAccent),
