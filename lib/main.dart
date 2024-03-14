@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:haushaltsbuch/screens/other_screens/introduction_screens.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -44,6 +43,7 @@ import 'blocs/input_field_blocs/preselect_account_input_field_bloc/preselect_acc
 
 import '/components/bottom_nav_bar/bottom_nav_bar.dart';
 
+import 'screens/other_screens/introduction_screens.dart';
 import 'screens/budget_screens/edit_budget_screen.dart';
 import 'screens/budget_screens/edit_subbudget_screen.dart';
 import 'screens/budget_screens/edit_default_budget_screen.dart';
@@ -60,8 +60,11 @@ import 'screens/budget_screens/overview_one_budget_screen.dart';
 import 'screens/budget_screens/overview_one_subbudget_screen.dart';
 import 'screens/other_screens/settings_screen.dart';
 import 'screens/other_screens/splash_screen.dart';
+import 'package:path_provider/path_provider.dart' as path_rovider;
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  var appDocumentDirectory = await path_rovider.getApplicationDocumentsDirectory();
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
     systemNavigationBarColor: Color(0xFF171717),
   ));

@@ -7,8 +7,8 @@ abstract class BookingInterface {
 
   // Bearbeitungsmethoden
   void updateSingle(Booking templateBooking, Booking oldBooking, int bookingBoxIndex);
-  void updateOnlyFutureBookingsFromSerie(Booking templateBooking, Booking oldBooking, int bookingBoxIndex);
-  void updateAllBookingsFromSerie(Booking templateBooking, Booking oldBooking, int bookingBoxIndex);
+  void updateOnlyFutureBookingsFromSerie(Booking templateBooking);
+  void updateAllBookingsFromSerie(Booking templateBooking);
   void updateCategorieName(String oldCategorieName, String newCategorieName);
   void updateSubcategorieName(String oldSubcategorieName, String newSubcategorieName);
   void updateAccountName(String oldAccountName, String newAccountName);

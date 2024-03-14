@@ -190,21 +190,9 @@ class BookingBloc extends Bloc<BookingEvents, BookingState> {
         if (event.serieEditModeType == SerieEditModeType.none || event.serieEditModeType == SerieEditModeType.single) {
           bookingRepository.updateSingle(updatedBooking, oldBooking, savedBooking.boxIndex);
         } else if (event.serieEditModeType == SerieEditModeType.onlyFuture) {
-          bookingRepository.updateOnlyFutureBookingsFromSerie(updatedBooking, oldBooking, savedBooking.boxIndex);
-          // Wird benötigt falls der Benutzer die Wiederholungsart ändert z.B. Monatsanfang zu Monatsende
-          if (savedBooking.bookingRepeats != RepeatType.noRepetition.name && dateInputFieldCubit.state.bookingRepeat != RepeatType.noRepetition.name) {
-            bookingRepository.deleteOnlyFutureBookingsFromSerie(updatedBooking, savedBooking.boxIndex);
-            bookingRepository.createSerie(updatedBooking);
-            globalStateRepository.increaseBookingSerieIndex();
-          }
+          bookingRepository.updateOnlyFutureBookingsFromSerie(updatedBooking);
         } else if (event.serieEditModeType == SerieEditModeType.all) {
-          bookingRepository.updateAllBookingsFromSerie(updatedBooking, oldBooking, savedBooking.boxIndex);
-          // Wird benötigt falls der Benutzer die Wiederholungsart ändert z.B. Monatsanfang zu Monatsende
-          if (savedBooking.bookingRepeats != RepeatType.noRepetition.name && dateInputFieldCubit.state.bookingRepeat != RepeatType.noRepetition.name) {
-            bookingRepository.deleteAllBookingsFromSerie(updatedBooking, savedBooking.boxIndex);
-            bookingRepository.createSerie(updatedBooking);
-            globalStateRepository.increaseBookingSerieIndex();
-          }
+          bookingRepository.updateAllBookingsFromSerie(updatedBooking);
         }
       }
       event.saveButtonController.success();

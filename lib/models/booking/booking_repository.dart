@@ -48,7 +48,7 @@ class BookingRepository extends BookingInterface {
   * als noch nicht gebucht angezeigt und erst wenn das Buchungsdatum erreicht ist als gebucht
   * vermerkt und von dem ausgewählten Konto abgezogen.
   * Beispiel: Buchungswiederholung Am Monatsanfang es werden wiederholt Buchungen erstellt
-  * zum Monatsanfang 01.10.23, 01.11.23, 01.12.23,...
+  * zum Monatsanfang 01.10.23, 01.11.23, 01.12.23, 01.01.24,...
   */
   @override
   void createSerie(Booking templateBooking) async {
@@ -131,32 +131,19 @@ class BookingRepository extends BookingInterface {
   void updateSingle(Booking templateBooking, Booking oldBooking, int bookingBoxIndex) async {
     var bookingBox = await Hive.openBox(bookingsBox);
     bookingBox.putAt(bookingBoxIndex, templateBooking);
-    if (templateBooking.booked) {
-      accountRepository.undoneAccountBooking(oldBooking);
-      executeAccountTransaction(templateBooking);
-    }
+    accountRepository.undoneAccountBooking(oldBooking);
+    executeAccountTransaction(templateBooking);
   }
 
   @override
-  void updateOnlyFutureBookingsFromSerie(Booking templateBooking, Booking oldBooking, int bookingBoxIndex) async {
+  void updateOnlyFutureBookingsFromSerie(Booking templateBooking) async {
     var bookingBox = await Hive.openBox(bookingsBox);
     for (int i = 0; i < bookingBox.length; i++) {
       Booking booking = await bookingBox.getAt(i);
-      if (booking.serieId == templateBooking.serieId && booking.boxIndex == bookingBoxIndex) {
-        bookingBox.putAt(bookingBoxIndex, templateBooking);
-        if (booking.booked) {
-          accountRepository.undoneAccountBooking(oldBooking);
-          executeAccountTransaction(templateBooking);
-        }
-      } else if (booking.serieId == templateBooking.serieId && DateTime.parse(booking.date).isAfter(DateTime.parse(templateBooking.date))) {
-        if (booking.booked) {
-          accountRepository.undoneAccountBooking(booking);
-        }
-        bool booked = true;
-        if (DateTime.parse(booking.date).isAfter(DateTime.now())) {
-          booked = false;
-        }
-        Booking newBooking = Booking()
+      if (booking.serieId == templateBooking.serieId && (DateTime.parse(booking.date).isAfter(DateTime.parse(templateBooking.date)) || DateTime.parse(booking.date).isAtSameMomentAs(DateTime.parse(templateBooking.date)))) {
+        accountRepository.undoneAccountBooking(booking);
+        Booking updatedBooking = Booking()
+          ..boxIndex = i
           ..transactionType = templateBooking.transactionType
           ..bookingRepeats = templateBooking.bookingRepeats
           ..title = templateBooking.title
@@ -168,33 +155,22 @@ class BookingRepository extends BookingInterface {
           ..fromAccount = templateBooking.fromAccount
           ..toAccount = templateBooking.toAccount
           ..serieId = templateBooking.serieId
-          ..booked = booked;
-        bookingBox.putAt(booking.boxIndex, newBooking);
-        executeAccountTransaction(newBooking);
+          ..booked = DateTime.parse(booking.date).isAfter(DateTime.now()) ? false : true;
+        bookingBox.putAt(updatedBooking.boxIndex, updatedBooking);
+        executeAccountTransaction(updatedBooking);
       }
     }
   }
 
   @override
-  void updateAllBookingsFromSerie(Booking templateBooking, Booking oldBooking, int bookingBoxIndex) async {
+  void updateAllBookingsFromSerie(Booking templateBooking) async {
     var bookingBox = await Hive.openBox(bookingsBox);
     for (int i = 0; i < bookingBox.length; i++) {
       Booking booking = await bookingBox.getAt(i);
-      if (booking.serieId == templateBooking.serieId && booking.boxIndex == bookingBoxIndex) {
-        bookingBox.putAt(bookingBoxIndex, templateBooking);
-        if (booking.booked) {
-          accountRepository.undoneAccountBooking(oldBooking);
-          executeAccountTransaction(templateBooking);
-        }
-      } else if (booking.serieId == templateBooking.serieId) {
-        if (booking.booked) {
-          accountRepository.undoneAccountBooking(booking);
-        }
-        bool booked = true;
-        if (DateTime.parse(booking.date).isAfter(DateTime.now())) {
-          booked = false;
-        }
-        Booking newBooking = Booking()
+      if (booking.serieId == templateBooking.serieId) {
+        accountRepository.undoneAccountBooking(booking);
+        Booking updatedBooking = Booking()
+          ..boxIndex = i
           ..transactionType = templateBooking.transactionType
           ..bookingRepeats = templateBooking.bookingRepeats
           ..title = templateBooking.title
@@ -206,9 +182,9 @@ class BookingRepository extends BookingInterface {
           ..fromAccount = templateBooking.fromAccount
           ..toAccount = templateBooking.toAccount
           ..serieId = templateBooking.serieId
-          ..booked = booked;
-        bookingBox.putAt(booking.boxIndex, newBooking);
-        executeAccountTransaction(newBooking);
+          ..booked = DateTime.parse(booking.date).isAfter(DateTime.now()) ? false : true;
+        bookingBox.putAt(updatedBooking.boxIndex, updatedBooking);
+        executeAccountTransaction(updatedBooking);
       }
     }
   }
@@ -292,9 +268,7 @@ class BookingRepository extends BookingInterface {
   void deleteSingle(int bookingBoxIndex) async {
     var bookingBox = await Hive.openBox(bookingsBox);
     Booking booking = await bookingBox.getAt(bookingBoxIndex);
-    if (booking.booked) {
-      accountRepository.undoneAccountBooking(booking);
-    }
+    accountRepository.undoneAccountBooking(booking);
     bookingBox.deleteAt(bookingBoxIndex);
   }
 
@@ -303,7 +277,7 @@ class BookingRepository extends BookingInterface {
     var bookingBox = await Hive.openBox(bookingsBox);
     for (int i = bookingBox.length - 1; i >= 0; i--) {
       Booking booking = await bookingBox.getAt(i);
-      if (booking.serieId == templateBooking.serieId && booking.booked) {
+      if (booking.serieId == templateBooking.serieId) {
         accountRepository.undoneAccountBooking(booking);
       }
       if (i == bookingBoxIndex) {
@@ -319,7 +293,8 @@ class BookingRepository extends BookingInterface {
     var bookingBox = await Hive.openBox(bookingsBox);
     for (int i = bookingBox.length - 1; i >= 0; i--) {
       Booking booking = await bookingBox.getAt(i);
-      if (booking.serieId == templateBooking.serieId && booking.booked) {
+      // TODO Code verbessern?
+      if (booking.serieId == templateBooking.serieId) {
         accountRepository.undoneAccountBooking(booking);
       }
       if (booking.serieId == templateBooking.serieId) {

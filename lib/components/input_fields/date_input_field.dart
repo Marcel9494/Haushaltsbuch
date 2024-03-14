@@ -10,11 +10,13 @@ import '/utils/date_formatters/date_formatter.dart';
 class DateInputField extends StatelessWidget {
   final dynamic cubit;
   final FocusNode focusNode;
+  final bool enabled;
 
   const DateInputField({
     Key? key,
     required this.cubit,
     required this.focusNode,
+    this.enabled = true,
   }) : super(key: key);
 
   void _openBottomSheetWithRepeatList(BuildContext context) {
@@ -83,11 +85,13 @@ class DateInputField extends StatelessWidget {
       children: [
         TextFormField(
           key: UniqueKey(),
+          enabled: enabled,
           focusNode: focusNode,
           initialValue: dateFormatterDDMMYYYYEE.format(DateTime.parse(cubit.state.bookingDate)),
           maxLength: 10,
           readOnly: true,
           textAlignVertical: TextAlignVertical.center,
+          style: TextStyle(color: enabled ? Colors.white : Colors.grey),
           decoration: InputDecoration(
             hintText: 'Datum',
             counterText: '',
@@ -101,7 +105,7 @@ class DateInputField extends StatelessWidget {
                   data: IconThemeData(color: cubit.state.bookingRepeat == RepeatType.noRepetition.name ? Colors.grey : Colors.cyanAccent),
                   child: IconButton(
                     onPressed: () => _openBottomSheetWithRepeatList(context),
-                    icon: const Icon(Icons.repeat_rounded),
+                    icon: Icon(Icons.repeat_rounded, color: enabled ? Colors.cyanAccent : Colors.grey),
                     padding: cubit.state.bookingRepeat == RepeatType.noRepetition.name ? null : const EdgeInsets.only(top: 6.0),
                     constraints: cubit.state.bookingRepeat == RepeatType.noRepetition.name ? null : const BoxConstraints(),
                   ),
@@ -110,7 +114,7 @@ class DateInputField extends StatelessWidget {
                     ? const SizedBox()
                     : Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 6.0),
-                        child: Text(cubit.state.bookingRepeat, style: const TextStyle(fontSize: 10.0)),
+                        child: Text(cubit.state.bookingRepeat, style: TextStyle(fontSize: 10.0, color: enabled ? Colors.white : Colors.grey)),
                       ),
               ],
             ),
@@ -123,7 +127,7 @@ class DateInputField extends StatelessWidget {
               context: context,
               locale: const Locale('de', 'DE'),
               initialDate: DateTime.parse(cubit.state.bookingDate),
-              firstDate: DateTime(1900),
+              firstDate: DateTime(2000),
               lastDate: DateTime(2100),
               builder: (context, child) {
                 return Theme(

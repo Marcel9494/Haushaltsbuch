@@ -92,7 +92,7 @@ class AccountRepository extends AccountInterface {
     var accountBox = await Hive.openBox(accountsBox);
     for (int i = 0; i < accountBox.length; i++) {
       Account fromAccount = await accountBox.getAt(i);
-      if (loadedBooking.fromAccount == fromAccount.name) {
+      if (loadedBooking.fromAccount == fromAccount.name && loadedBooking.booked) {
         double amount = formatMoneyAmountToDouble(loadedBooking.amount);
         double bankBalance = formatMoneyAmountToDouble(fromAccount.bankBalance);
         if (loadedBooking.transactionType == TransactionType.outcome.name) {
