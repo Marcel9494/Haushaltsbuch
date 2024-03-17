@@ -10,11 +10,13 @@ import '/utils/date_formatters/date_formatter.dart';
 class DateInputField extends StatelessWidget {
   final dynamic cubit;
   final FocusNode focusNode;
+  final bool enabled;
 
   const DateInputField({
     Key? key,
     required this.cubit,
     required this.focusNode,
+    this.enabled = true,
   }) : super(key: key);
 
   void _openBottomSheetWithRepeatList(BuildContext context) {
@@ -83,6 +85,7 @@ class DateInputField extends StatelessWidget {
       children: [
         TextFormField(
           key: UniqueKey(),
+          enabled: enabled,
           focusNode: focusNode,
           initialValue: dateFormatterDDMMYYYYEE.format(DateTime.parse(cubit.state.bookingDate)),
           maxLength: 10,
@@ -101,7 +104,7 @@ class DateInputField extends StatelessWidget {
                   data: IconThemeData(color: cubit.state.bookingRepeat == RepeatType.noRepetition.name ? Colors.grey : Colors.cyanAccent),
                   child: IconButton(
                     onPressed: () => _openBottomSheetWithRepeatList(context),
-                    icon: const Icon(Icons.repeat_rounded),
+                    icon: Icon(Icons.repeat_rounded, color: enabled ? cubit.state.bookingRepeat == RepeatType.noRepetition.name ? Colors.grey : Colors.cyanAccent : Colors.grey),
                     padding: cubit.state.bookingRepeat == RepeatType.noRepetition.name ? null : const EdgeInsets.only(top: 6.0),
                     constraints: cubit.state.bookingRepeat == RepeatType.noRepetition.name ? null : const BoxConstraints(),
                   ),

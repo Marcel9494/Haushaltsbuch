@@ -1,4 +1,5 @@
 import 'package:another_flushbar/flushbar.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
@@ -97,7 +98,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
                             showDialog(
                               context: context,
                               builder: (context) {
-                                return AlertDialog(
+                                return CupertinoAlertDialog(
                                   title: Text(bookingState.serieEditModeType == SerieEditModeType.none || bookingState.serieEditModeType == SerieEditModeType.single
                                       ? 'Buchung löschen?'
                                       : 'Buchungen löschen?'),
@@ -114,11 +115,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
                                         FocusScope.of(context).unfocus(),
                                       },
                                     ),
-                                    ElevatedButton(
-                                      style: ElevatedButton.styleFrom(
-                                        foregroundColor: Colors.black87,
-                                        backgroundColor: Colors.cyanAccent,
-                                      ),
+                                    TextButton(
                                       onPressed: () => {
                                         bookingBloc.add(DeleteBookingEvent(context, bookingState.bookingBoxIndex, bookingState.serieEditModeType)),
                                         Navigator.pop(context),
@@ -140,7 +137,12 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
                                           leftBarIndicatorColor: Colors.cyanAccent,
                                         )..show(context),
                                       },
-                                      child: const Text('Ja'),
+                                      child: const Text(
+                                        'Ja',
+                                        style: TextStyle(
+                                          color: Colors.cyanAccent,
+                                        ),
+                                      ),
                                     ),
                                   ],
                                 );
