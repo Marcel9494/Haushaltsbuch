@@ -27,13 +27,17 @@ class MoneyInputField extends StatelessWidget {
   }) : super(key: key);
 
   void _openBottomSheetForNumberInput(BuildContext context) {
+    double screenHeight = MediaQuery.of(context).size.height;
+    const double totalScale = 0.75;
+    double totalHeight = totalScale * screenHeight;
+
     _clearedInputField = cubit.state.amount.isEmpty ? true : false;
     showCupertinoModalBottomSheet<void>(
       context: context,
       builder: (BuildContext context) {
         return Material(
           child: SizedBox(
-            height: 430.0, // TODO dynamisch machen
+            height: totalHeight,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
