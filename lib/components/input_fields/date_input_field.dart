@@ -26,7 +26,7 @@ class DateInputField extends StatelessWidget {
       builder: (BuildContext context) {
         return Material(
           child: SizedBox(
-            height: MediaQuery.of(context).size.height / 2,
+            height: MediaQuery.of(context).size.height / 1.5,
             child: ListView(
               children: [
                 const BottomSheetLine(),
@@ -36,72 +36,46 @@ class DateInputField extends StatelessWidget {
                   primary: false,
                   padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
                   crossAxisCount: 1,
-                  // TODO hier weitermachen und Style wiederherstellen
-                  childAspectRatio: (1 / 0.1),
-                  //mainAxisSpacing: 5,
-                  //crossAxisSpacing: 5,
+                  childAspectRatio: (1 / 0.14),
                   shrinkWrap: true,
                   children: <Widget>[
                     for (int i = 0; i < RepeatType.values.length; i++)
-                      ButtonTheme(
-                        height: 20.0,
-                        child: OutlinedButton(
-                        onPressed: () => {
-                            cubit.updateBookingRepeat(RepeatType.values[i].name),
-                            if (RepeatType.values[i].name == RepeatType.beginningOfMonth.name)
-                              {
-                                cubit.updateBookingDate(DateTime(DateTime.now().year, DateTime.now().month + 1, 1).toString()),
-                              }
-                            else if (RepeatType.values[i].name == RepeatType.endOfMonth.name)
-                              {
-                                cubit.updateBookingDate(
-                                    DateTime(DateTime.now().year, DateTime.now().month, DateTime(DateTime.now().year, DateTime.now().month + 1, 0).day).toString()),
-                              },
-                            Navigator.pop(context),
-                          }, child: Text(RepeatType.values[i].name, textAlign: TextAlign.center),
-                    ),
-                      ),
-                  ],
-                ),
-              ),
-                /*Padding(
-                  padding: const EdgeInsets.only(top: 16.0),
-                  child: SizedBox(
-                    height: 300.0,
-                    child: ListView.builder(
-                      itemCount: RepeatType.values.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 30.0, vertical: 4.0),
-                          child: ListTile(
-                            title: Text(RepeatType.values[index].name, textAlign: TextAlign.center),
-                            onTap: () => {
-                              cubit.updateBookingRepeat(RepeatType.values[index].name),
-                              if (RepeatType.values[index].name == RepeatType.beginningOfMonth.name)
-                                {
-                                  cubit.updateBookingDate(DateTime(DateTime.now().year, DateTime.now().month + 1, 1).toString()),
-                                }
-                              else if (RepeatType.values[index].name == RepeatType.endOfMonth.name)
-                                {
-                                  cubit.updateBookingDate(
-                                      DateTime(DateTime.now().year, DateTime.now().month, DateTime(DateTime.now().year, DateTime.now().month + 1, 0).day).toString()),
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 12.0),
+                          child: ButtonTheme(
+                            height: 30.0,
+                              child: OutlinedButton(
+                              onPressed: () => {
+                                  cubit.updateBookingRepeat(RepeatType.values[i].name),
+                                  if (RepeatType.values[i].name == RepeatType.beginningOfMonth.name)
+                                    {
+                                      cubit.updateBookingDate(DateTime(DateTime.now().year, DateTime.now().month + 1, 1).toString()),
+                                    }
+                                  else if (RepeatType.values[i].name == RepeatType.endOfMonth.name)
+                                    {
+                                      cubit.updateBookingDate(
+                                          DateTime(DateTime.now().year, DateTime.now().month, DateTime(DateTime.now().year, DateTime.now().month + 1, 0).day).toString()),
+                                    },
+                                  Navigator.pop(context),
                                 },
-                              Navigator.pop(context),
-                            },
-                            visualDensity: const VisualDensity(vertical: -4.0),
-                            shape: RoundedRectangleBorder(
-                              side: BorderSide(
-                                  color: cubit.state.bookingRepeat == RepeatType.values[index].name ? Colors.cyanAccent.shade400 : Colors.grey,
-                                  width: cubit.state.bookingRepeat == RepeatType.values[index].name ? 1.2 : 0.4),
-                              borderRadius: BorderRadius.circular(8.0),
+                                child: Text(RepeatType.values[i].name, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white, fontSize: 16.0)),
+                                style: ButtonStyle(
+                                  backgroundColor: MaterialStateProperty.resolveWith<Color>((_) {
+                                    return Colors.grey.shade800;
+                                  }),
+                                  side: MaterialStateProperty.resolveWith((states) {
+                                    return BorderSide(color: cubit.state.bookingRepeat == RepeatType.values[i].name ? Colors.cyanAccent.shade400 : Colors.grey, width: cubit.state.bookingRepeat == RepeatType.values[i].name ? 1.2 : 0.4);
+                                  }),
+                                  shape: MaterialStateProperty.resolveWith<OutlinedBorder>((_) {
+                                    return RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0));
+                                  }),
+                                ),
                             ),
-                            tileColor: Colors.grey.shade800,
                           ),
-                        );
-                      },
-                    ),
+                        ),
+                    ],
                   ),
-                ),*/
+                ),
               ],
             ),
           ),
