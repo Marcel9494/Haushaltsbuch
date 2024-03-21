@@ -2,16 +2,18 @@ import 'package:flutter/material.dart';
 
 class BottomSheetHeader extends StatelessWidget {
   final String title;
+  final double leftPadding;
 
   const BottomSheetHeader({
     Key? key,
     required this.title,
+    this.leftPadding = 20.0,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(top: 16.0, left: 20.0),
+      padding: EdgeInsets.only(top: 16.0, left: leftPadding),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

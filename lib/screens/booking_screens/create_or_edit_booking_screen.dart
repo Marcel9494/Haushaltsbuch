@@ -167,7 +167,7 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
                           TransactionToggleButtons(cubit: transactionStatsToggleButtonsCubit),
                           BlocBuilder<DateInputFieldCubit, DateInputFieldModel>(
                             builder: (context, state) {
-                              return DateInputField(cubit: dateInputFieldCubit, focusNode: dateFocusNode);
+                              return DateInputField(cubit: dateInputFieldCubit, focusNode: dateFocusNode, enabled: bookingState.serieEditModeType == SerieEditModeType.onlyFuture || bookingState.serieEditModeType == SerieEditModeType.all ? false : true);
                             },
                           ),
                           BlocBuilder<TextInputFieldCubit, TextInputFieldModel>(
