@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '/blocs/budget_bloc/budget_bloc.dart';
 
-import '/components/dialogs/choice_dialog.dart';
+import '/components/dialogs/choice_dialog_with_flushbar.dart';
 import '/components/deco/loading_indicator.dart';
 import '/components/cards/default_budget_card.dart';
 import '/components/cards/separate_budget_card.dart';
@@ -34,7 +34,7 @@ class _OverviewOneBudgetScreenState extends State<OverviewOneBudgetScreen> {
                   title: Text(budgetState.categorie + ' Budgets'),
                   actions: <Widget>[
                     IconButton(
-                      onPressed: () => showChoiceDialog(
+                      onPressed: () => showChoiceDialogWithFlushbar(
                           context,
                           'Budget löschen?',
                           () => SchedulerBinding.instance.addPostFrameCallback((_) {
@@ -69,7 +69,7 @@ class _OverviewOneBudgetScreenState extends State<OverviewOneBudgetScreen> {
                   title: Text(budgetState.categorie + ' Budgets'),
                   actions: <Widget>[
                     IconButton(
-                      onPressed: () => showChoiceDialog(
+                      onPressed: () => showChoiceDialogWithFlushbar(
                           context,
                           'Budget löschen?',
                           () => SchedulerBinding.instance.addPostFrameCallback((_) {

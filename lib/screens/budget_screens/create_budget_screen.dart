@@ -15,7 +15,7 @@ import '/utils/consts/route_consts.dart';
 import '/utils/number_formatters/number_formatter.dart';
 
 import '/components/deco/loading_indicator.dart';
-import '/components/dialogs/choice_dialog.dart';
+import '/components/dialogs/choice_dialog_with_flushbar.dart';
 import '/components/input_fields/categorie_input_field.dart';
 import '/components/input_fields/subcategorie_input_field.dart';
 import '/components/input_fields/money_input_field.dart';
@@ -74,7 +74,7 @@ class _CreateBudgetScreenState extends State<CreateBudgetScreen> {
   void _createBudget() async {
     _budgetExistsAlready = await budgetRepository.existsBudgetForCategorie(_categorieTextController.text);
     if (_budgetExistsAlready) {
-      showChoiceDialog(
+      showChoiceDialogWithFlushbar(
           context,
           'Budget aktualisieren?',
           _yesPressed,

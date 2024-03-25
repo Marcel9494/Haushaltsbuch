@@ -9,7 +9,8 @@ abstract class AccountInterface {
   Future<Account> load(int accountBoxIndex);
   Future<bool> existsAccountName(String accountName);
   void calculateNewAccountBalance(String accountName, String amount, String transaction);
-  void transferMoney(String fromAccountName, String toAccountName, String amount);
+  void transferMoney(String sourceAccountName, String targetAccountName, String amount);
+  void transferMoneyAndDeleteSourceAccount(String sourceAccountName, String targetAccountName, String amount);
   void undoneAccountBooking(Booking loadedBooking);
   void undoneSerieAccountBooking(Booking oldBooking);
   Future<double> getAssetValue();
