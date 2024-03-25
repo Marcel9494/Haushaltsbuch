@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:haushaltsbuch/models/booking/booking_repository.dart';
 import 'package:hive/hive.dart';
 
@@ -69,22 +71,44 @@ class AccountRepository extends AccountInterface {
   }
 
   @override
-  void transferMoney(String fromAccountName, String toAccountName, String amount) async {
+  void transferMoney(String sourceAccountName, String targetAccountName, String amount) async {
     var accountBox = await Hive.openBox(accountsBox);
     for (int i = 0; i < accountBox.length; i++) {
       Account account = await accountBox.getAt(i);
-      if (fromAccountName == account.name) {
+      if (sourceAccountName == account.name) {
         double bankBalance = formatMoneyAmountToDouble(account.bankBalance);
         bankBalance -= formatMoneyAmountToDouble(amount);
         account.bankBalance = formatToMoneyAmount(bankBalance.toString());
         accountBox.putAt(i, account);
-      } else if (toAccountName == account.name) {
+      } else if (targetAccountName == account.name) {
         double bankBalance = formatMoneyAmountToDouble(account.bankBalance);
         bankBalance += formatMoneyAmountToDouble(amount);
         account.bankBalance = formatToMoneyAmount(bankBalance.toString());
         accountBox.putAt(i, account);
       }
     }
+  }
+
+  @override
+  void transferMoneyAndDeleteSourceAccount(String sourceAccountName, String targetAccountName, String amount) async {
+    late final Account deleteAccount;
+    var accountBox = await Hive.openBox(accountsBox);
+    for (int i = 0; i < accountBox.length; i++) {
+      Account account = await accountBox.getAt(i);
+      if (sourceAccountName == account.name) {
+        deleteAccount = account;
+        double bankBalance = formatMoneyAmountToDouble(account.bankBalance);
+        bankBalance -= formatMoneyAmountToDouble(amount);
+        account.bankBalance = formatToMoneyAmount(bankBalance.toString());
+        accountBox.putAt(i, account);
+      } else if (targetAccountName == account.name) {
+        double bankBalance = formatMoneyAmountToDouble(account.bankBalance);
+        bankBalance += formatMoneyAmountToDouble(amount);
+        account.bankBalance = formatToMoneyAmount(bankBalance.toString());
+        accountBox.putAt(i, account);
+      }
+    }
+    delete(deleteAccount);
   }
 
   @override

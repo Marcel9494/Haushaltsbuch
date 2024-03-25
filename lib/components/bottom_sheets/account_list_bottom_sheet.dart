@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
-import '../../models/account/account_repository.dart';
+import '/models/account/account_repository.dart';
+
 import '../deco/bottom_sheet_empty_list.dart';
 import '../deco/bottom_sheet_header.dart';
 import '../deco/bottom_sheet_line.dart';
 
 List<String> _accountNames = [];
 
-void openBottomSheetWithAccountList(BuildContext context, dynamic cubit) {
+void openBottomSheetWithAccountList(BuildContext context, dynamic cubit, Function yesPressed) {
   showCupertinoModalBottomSheet<void>(
     context: context,
     builder: (BuildContext context) {
@@ -42,12 +43,12 @@ void openBottomSheetWithAccountList(BuildContext context, dynamic cubit) {
                                 OutlinedButton(
                                   onPressed: () => {
                                     cubit.updateValue(_accountNames[i]),
-                                    Navigator.pop(context),
+                                    yesPressed(),
                                   },
                                   style: OutlinedButton.styleFrom(
                                     side: BorderSide(
-                                        width: cubit.state.fromAccount == _accountNames[i] ? 1.5 : 1.0,
-                                        color: cubit.state.fromAccount == _accountNames[i] ? Colors.cyanAccent : Colors.grey.shade800),
+                                        width: cubit.state.toAccount == _accountNames[i] ? 1.5 : 1.0,
+                                        color: cubit.state.toAccount == _accountNames[i] ? Colors.cyanAccent : Colors.grey.shade800),
                                   ),
                                   child: Text(
                                     _accountNames[i],
@@ -64,8 +65,8 @@ void openBottomSheetWithAccountList(BuildContext context, dynamic cubit) {
                                 },
                                 style: OutlinedButton.styleFrom(
                                   side: BorderSide(
-                                      width: cubit.state.fromAccount == '' ? 1.5 : 1.0,
-                                      color: cubit.state.fromAccount == '' ? Colors.cyanAccent : Colors.grey.shade800),
+                                      width: cubit.state.toAccount == '' ? 1.5 : 1.0,
+                                      color: cubit.state.toAccount == '' ? Colors.cyanAccent : Colors.grey.shade800),
                                 ),
                                 child: const Text(
                                   'X',

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '/blocs/account_bloc/account_bloc.dart';
-import '/blocs/input_field_blocs/account_input_field_bloc/from_account_input_field_cubit.dart';
+import '/blocs/input_field_blocs/account_input_field_bloc/to_account_input_field_cubit.dart';
 
 import '/components/buttons/month_picker_buttons.dart';
 import '/components/tab_views/monthly_booking_tab_view.dart';
@@ -30,15 +30,29 @@ class AccountDetailsScreen extends StatefulWidget {
 }
 
 class _AccountDetailsScreenState extends State<AccountDetailsScreen> {
-  late final FromAccountInputFieldCubit fromAccountInputFieldCubit;
+  late final ToAccountInputFieldCubit toAccountInputFieldCubit;
 
-  FocusNode fromAccountFocusNode = FocusNode();
+  FocusNode toAccountFocusNode = FocusNode();
 
   DateTime _selectedDate = DateTime.now();
 
-  void _deleteAccount() {
-    // TODO hier weitermachen und https://github.com/Marcel9494/Haushaltsbuch/issues/14 implementieren
-    showChoiceDialog(context, '${widget.account.name} löschen?', _yesPressed, _noPressed);
+  void _showDeleteAccountDialog() {
+    if (formatMoneyAmountToDouble(widget.account.bankBalance) == 0) {
+      showChoiceDialog(context, '${widget.account.name} löschen?', _yesPressed, _noPressed);
+    } else {
+      showChoiceDialog(context, 'Restlichen Kontostand übertragen und anschließend ${widget.account.name} löschen?', _yesPressed, _noPressed);
+    }
+  }
+
+  void _transferMoneyAndDeleteSourceAccount() {
+    AccountRepository accountRepository = AccountRepository();
+    setState(() {
+      accountRepository.transferMoneyAndDeleteSourceAccount(widget.account.name, toAccountInputFieldCubit.state.toAccount, widget.account.bankBalance);
+    });
+    Navigator.pop(context);
+    Navigator.pop(context);
+    Navigator.popAndPushNamed(context, bottomNavBarRoute, arguments: BottomNavBarScreenArguments(2));
+    FocusScope.of(context).unfocus();
   }
 
   void _yesPressed() {
@@ -53,12 +67,16 @@ class _AccountDetailsScreenState extends State<AccountDetailsScreen> {
       FocusScope.of(context).unfocus();
     } else {
       Navigator.pop(context);
-      // TODO hier weitermachen mit Ablauf von: https://github.com/Marcel9494/Haushaltsbuch/issues/14
       showInfoDialog(context, 'Konto auswählen', () => {
         Navigator.pop(context),
-        openBottomSheetWithAccountList(context, fromAccountInputFieldCubit),
+        openBottomSheetWithAccountList(context, toAccountInputFieldCubit, _showTransferChoiceDialog),
       }, 'Bitte wähle im nächsten Schritt das Konto aus auf das du den restlichen Betrag von: ${widget.account.bankBalance} übertragen möchtest.');
     }
+  }
+
+  void _showTransferChoiceDialog() {
+    Navigator.pop(context);
+    showChoiceDialog(context, 'Betrag überweisen und Konto löschen?', _transferMoneyAndDeleteSourceAccount, _noPressed, 'Soll der restliche Betrag von: ${widget.account.bankBalance} auf das Konto: ${toAccountInputFieldCubit.state.toAccount} übertragen werden und anschließend das Konto ${widget.account.name} gelöscht werden?');
   }
 
   void _noPressed() {
@@ -69,7 +87,7 @@ class _AccountDetailsScreenState extends State<AccountDetailsScreen> {
   @override
   void initState() {
     super.initState();
-    fromAccountInputFieldCubit = BlocProvider.of<FromAccountInputFieldCubit>(context);
+    toAccountInputFieldCubit = BlocProvider.of<ToAccountInputFieldCubit>(context);
   }
 
   @override
@@ -83,7 +101,7 @@ class _AccountDetailsScreenState extends State<AccountDetailsScreen> {
             icon: const Icon(Icons.edit_rounded),
           ),
           IconButton(
-            onPressed: () => _deleteAccount(),
+            onPressed: () => _showDeleteAccountDialog(),
             icon: const Icon(Icons.delete_forever_rounded),
           ),
         ],
