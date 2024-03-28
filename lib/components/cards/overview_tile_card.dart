@@ -33,7 +33,7 @@ class OverviewTileCard extends StatelessWidget {
             text: TextSpan(children: [
               TextSpan(text: '$text\n'),
               TextSpan(
-                text: formatToMoneyAmount(amount.toString()) + '\n',
+                text: amount.ceil().toString().length <= 5 ? formatToMoneyAmount(amount.toString()) + '\n' : amount.ceil().toString().length <= 8 ? formatToMoneyAmountWithoutCent(amount.toString()) : formatToMoneyAmountWithoutCentAndSymbol(amount.toString()),
                 style: TextStyle(height: 1.5, color: color, fontSize: 15.0, overflow: TextOverflow.ellipsis),
               ),
               showAverageValuesPerDay
