@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+// TODO
+// Für später: Ist in der aktuellen App Version nicht freigeschalten
+// wird in einer späteren App Version implementiert und freigeschalten.
 class AssetFutureDevelopmentStatisticTabView extends StatefulWidget {
   const AssetFutureDevelopmentStatisticTabView({Key? key}) : super(key: key);
 

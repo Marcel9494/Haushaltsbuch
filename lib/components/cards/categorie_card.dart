@@ -166,6 +166,7 @@ class _CategorieCardState extends State<CategorieCard> {
               height: widget.categorie.subcategorieNames.length * 58.0,
               child: ListView.builder(
                 itemCount: widget.categorie.subcategorieNames.length,
+                physics: const NeverScrollableScrollPhysics(),
                 itemBuilder: (BuildContext context, int subcategorieIndex) {
                   return ListTile(
                     title: Row(
