@@ -85,6 +85,7 @@ class _CreateOrEditAccountScreenState extends State<CreateOrEditAccountScreen> {
                       ),
                       BlocBuilder<MoneyInputFieldCubit, MoneyInputFieldModel>(
                         builder: (context, state) {
+                          if (accountState.accountBoxIndex == -1) accountBalanceInputFieldCubit.state.amount = '0,00 €';
                           return MoneyInputField(
                               focusNode: accountBalanceFocusNode, cubit: accountBalanceInputFieldCubit, hintText: 'Kontostand', bottomSheetTitle: 'Kontostand eingeben:');
                         },

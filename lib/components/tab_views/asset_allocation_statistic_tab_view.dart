@@ -70,7 +70,7 @@ class _AssetAllocationStatisticTabViewState extends State<AssetAllocationStatist
 
   void checkIfCapitalOrRiskFreeInvestmentsAreEmpty() {
     for (int i = 0; i < _percentageStats.length; i++) {
-      if (_percentageStats[i].amount != "0.0") {
+      if (_percentageStats[i].amount == '0.0') {
         _emptyCapitalOrRiskFreeInvestments = true;
       }
     }
@@ -194,7 +194,10 @@ class _AssetAllocationStatisticTabViewState extends State<AssetAllocationStatist
                                     style: const TextStyle(color: Colors.cyanAccent),
                                   ),
                                 )
-                              : const SizedBox(),
+                              : IconButton(
+                              onPressed: () => showInfoDialog(context, 'Kapitalanlagen & risikolose Anlagen', () => Navigator.pop(context),
+                                  '\nKapitalanlagen:\nUnter Kapitalanlagen werden alle Konten vom Typ Kapitalanlage verrechnet, diese sind risikobehaftet.\n\nRisikolose Anlagen:\nUnter risikolose Anlagen werden Sparguthaben, Girokonten, Tagesgeldkonten, etc. gezählt die risikoarm sind.'),
+                              icon: const Icon(Icons.help_outline_rounded, color: Colors.grey)),
                         ],
                       ),
                     ),

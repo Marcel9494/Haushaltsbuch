@@ -19,7 +19,7 @@ class CategorieCard extends StatefulWidget {
 }
 
 class _CategorieCardState extends State<CategorieCard> {
-  String allSubcategorieNames = "";
+  String allSubcategorieNames = '';
 
   void _showDeleteCategorieDialog() {
     showCupertinoDialog(
@@ -54,10 +54,10 @@ class _CategorieCardState extends State<CategorieCard> {
   }
 
   void _showDeleteSubcategorieDialog(int index) {
-    showDialog(
+    showCupertinoDialog(
       context: context,
       builder: (context) {
-        return AlertDialog(
+        return CupertinoAlertDialog(
           title: Text('Unterkategorie ${widget.categorie.subcategorieNames[index]} löschen?'),
           actions: <Widget>[
             TextButton(
@@ -69,13 +69,14 @@ class _CategorieCardState extends State<CategorieCard> {
               ),
               onPressed: () => Navigator.pop(context),
             ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                foregroundColor: Colors.black87,
-                backgroundColor: Colors.cyanAccent,
+            TextButton(
+              child: const Text(
+                'Ja',
+                style: TextStyle(
+                  color: Colors.cyanAccent,
+                ),
               ),
               onPressed: () => BlocProvider.of<CategorieBloc>(context).add(DeleteSubcategorieEvent(context, widget.categorie, widget.categorie.subcategorieNames[index])),
-              child: const Text('Ja'),
             ),
           ],
         );
@@ -165,6 +166,7 @@ class _CategorieCardState extends State<CategorieCard> {
               height: widget.categorie.subcategorieNames.length * 58.0,
               child: ListView.builder(
                 itemCount: widget.categorie.subcategorieNames.length,
+                physics: const NeverScrollableScrollPhysics(),
                 itemBuilder: (BuildContext context, int subcategorieIndex) {
                   return ListTile(
                     title: Row(

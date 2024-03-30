@@ -27,10 +27,9 @@ class SubbudgetRepository extends SubbudgetInterface {
   void create(Subbudget newSubbudget) async {
     var subbudgetBox = await Hive.openBox(subbudgetsBox);
     subbudgetBox.add(newSubbudget);
-    // TODO Anzahl der Budgets erhöhen, damit für die nächsten 10 Jahre Subbudgets erstellt werden. 3 nur als Test.
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < 120; i++) {
       Subbudget nextSubbudget = createInstance(newSubbudget);
-      nextSubbudget.budgetDate = DateTime(DateTime.now().year, DateTime.now().month + i + 1, 1).toString(); // TODO Jahr dynamisch implementieren
+      nextSubbudget.budgetDate = DateTime(DateTime.now().year, DateTime.now().month + i + 1, 1).toString();
       subbudgetBox.add(nextSubbudget);
     }
   }

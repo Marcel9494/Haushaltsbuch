@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../cards/overview_tile_card.dart';
-import '/utils/number_formatters/number_formatter.dart';
 
 class OverviewTile extends StatelessWidget {
   final String shouldText;
@@ -33,6 +32,7 @@ class OverviewTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // TODO hier weitermachen zuerst neuen Branch erstellen und Karten responsive machen siehe Emulator und anschließend https://github.com/Marcel9494/Haushaltsbuch/issues/51 implementieren
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(
