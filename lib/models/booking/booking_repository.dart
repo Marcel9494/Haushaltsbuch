@@ -501,6 +501,7 @@ class BookingRepository extends BookingInterface {
             ..serieId = booking.serieId
             ..booked = true;
           bookingBox.putAt(i, updatedBooking);
+          // TODO von entsprechendem Konto noch abbuchen!?
         }
       }
     }
