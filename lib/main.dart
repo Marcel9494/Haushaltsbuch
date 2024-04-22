@@ -157,6 +157,7 @@ class BudgetBookApp extends StatelessWidget {
       title: 'Haushaltsbuch',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
+        useMaterial3: false,
         brightness: Brightness.dark,
         scaffoldBackgroundColor: const Color(0xff112025),
         appBarTheme: const AppBarTheme(
