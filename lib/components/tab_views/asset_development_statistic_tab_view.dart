@@ -1,15 +1,12 @@
-import 'dart:math' as math;
+import 'dart:math';
 
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
 import '/models/booking/booking_model.dart';
-import '/models/wealth_development_stats.dart';
-import '/models/account/account_repository.dart';
 import '/models/booking/booking_repository.dart';
 
-import '../buttons/month_picker_buttons.dart';
+import '/components/buttons/month_picker_buttons.dart';
 
 import '/utils/date_formatters/date_formatter.dart';
 import '/utils/number_formatters/number_formatter.dart';
@@ -19,33 +16,39 @@ class AssetDevelopmentStatisticTabView extends StatefulWidget {
 
   @override
   State<AssetDevelopmentStatisticTabView> createState() => _AssetDevelopmentStatisticTabViewState();
-
-  static _AssetDevelopmentStatisticTabViewState? of(BuildContext context) => context.findAncestorStateOfType<_AssetDevelopmentStatisticTabViewState>();
 }
 
 class _AssetDevelopmentStatisticTabViewState extends State<AssetDevelopmentStatisticTabView> {
+  final double width = 7.0;
   DateTime _selectedDate = DateTime.now();
-  List<Color> revenueColors = [Colors.cyanAccent, Colors.cyan];
-  List<Color> investmentColors = [Colors.greenAccent, Colors.green];
-  double _assets = 0.0;
-  double _liabilities = 0.0;
-  double _maxWealthValue = 0.0;
-  double _minWealthValue = 0.0;
-  List<WealthDevelopmentStats> _pastWealthDevelopmentStats = [];
-  List<double> monthRevenues = [];
-  List<double> monthExpenditures = [];
-  List<double> monthInvestments = [];
-  List<double> wealthValues = [];
-  double _currentBalance = 0.0;
+  List<Booking> _bookingList = [];
+  List<double> _monthlyValues = [];
+  List<double> _monthlyRevenues = [];
+  List<double> _monthlyExpenditures = [];
+  List<BarChartGroupData> _monthlyBarGroups = [];
+  List<BarChartGroupData> _reversedMonthlyBarGroups = [];
+  List<BarChartGroupData> _showingMonthlyBarGroups = [];
 
-  Future<List<WealthDevelopmentStats>> _calculatePastWealthDevelopment() async {
+  List<Color> gradientColors = [
+    Colors.cyanAccent,
+    Colors.blueAccent,
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadMonthlyBarChartData();
+  }
+
+  Future<List<double>> _loadMonthlyBarChartData() async {
     BookingRepository bookingRepository = BookingRepository();
-    AccountRepository accountRepository = AccountRepository();
-    _pastWealthDevelopmentStats = [];
-    _assets = await accountRepository.getAssetValue();
-    _liabilities = await accountRepository.getLiabilityValue();
-    _currentBalance = _assets - _liabilities;
-    for (int i = 0; i < 12; i++) {
+    _monthlyRevenues = [];
+    _monthlyExpenditures = [];
+    _monthlyValues = [];
+    _monthlyBarGroups = [];
+    _reversedMonthlyBarGroups = [];
+    _showingMonthlyBarGroups = [];
+    for (int i = 0; i < 6; i++) {
       int currentYear = _selectedDate.year;
       int currentMonth = _selectedDate.month - i;
       // Vergangenes Jahr z.B.: 2023 => 2022 & Januar => Dezember
@@ -53,180 +56,195 @@ class _AssetDevelopmentStatisticTabViewState extends State<AssetDevelopmentStati
         currentYear = _selectedDate.year - 1;
         currentMonth = _selectedDate.month + 12 - i;
       }
-      List<Booking> bookingList = await bookingRepository.loadMonthlyBookings(currentMonth, currentYear);
-      double revenues = bookingRepository.getRevenues(bookingList);
-      double expenditures = bookingRepository.getExpenditures(bookingList);
-      WealthDevelopmentStats pastWealthDevelopmentStat = WealthDevelopmentStats();
-      pastWealthDevelopmentStat.month = currentMonth.toString();
-      _currentBalance = _currentBalance + revenues - expenditures;
-      pastWealthDevelopmentStat.wealth = _currentBalance;
-      _pastWealthDevelopmentStats.insert(i, pastWealthDevelopmentStat);
-      wealthValues.add(_pastWealthDevelopmentStats[i].wealth);
-      _maxWealthValue = wealthValues.reduce(math.max);
-      _minWealthValue = wealthValues.reduce(math.min);
+      _bookingList = await bookingRepository.loadMonthlyBookings(currentMonth, currentYear);
+      if (_bookingList.isEmpty) {
+        _monthlyRevenues.insert(i, 0.0);
+        _monthlyExpenditures.insert(i, 0.0);
+        _monthlyValues.insert(i, 0.0);
+        _monthlyValues.insert(i + 1, 0.0);
+        _monthlyBarGroups.add(makeGroupData(i, _monthlyValues[i], _monthlyValues[i + 1]));
+      } else {
+        _monthlyRevenues.insert(i, bookingRepository.getRevenues(_bookingList));
+        _monthlyExpenditures.insert(i, bookingRepository.getExpenditures(_bookingList));
+        _monthlyValues.insert(i, bookingRepository.getRevenues(_bookingList));
+        _monthlyValues.insert(i + 1, bookingRepository.getExpenditures(_bookingList));
+        _monthlyBarGroups.add(makeGroupData(i, _monthlyValues[i], _monthlyValues[i + 1]));
+      }
     }
-    return _pastWealthDevelopmentStats;
+    _reversedMonthlyBarGroups = _monthlyBarGroups.reversed.toList();
+    setState(() {
+      _showingMonthlyBarGroups = _reversedMonthlyBarGroups;
+    });
+    return _monthlyValues;
   }
 
-  LineChartBarData _getPastWealthDevelopmentChartData() {
-    List<FlSpot> spotList = [];
-    for (int i = _pastWealthDevelopmentStats.length - 1; i >= 0; i--) {
-      spotList.add(FlSpot(i.toDouble(), double.parse((_pastWealthDevelopmentStats[11 - i].wealth / 1000).toStringAsFixed(2))));
-    }
-    LineChartBarData lineChartBarData = LineChartBarData(
-      spots: _getSpotList(spotList),
-      gradient: LinearGradient(
-        colors: revenueColors,
-      ),
-      barWidth: 2.0,
-      isStrokeCapRound: true,
-      dotData: FlDotData(
-        show: true,
-      ),
-      belowBarData: BarAreaData(
-        show: true,
-        gradient: LinearGradient(
-          colors: revenueColors.map((color) => color.withOpacity(0.3)).toList(),
-        ),
-      ),
-    );
-    return lineChartBarData;
+  void _changeStartMonth(DateTime selectedDate) {
+    setState(() => {
+          _selectedDate = selectedDate,
+        });
+    _loadMonthlyBarChartData();
   }
-
-  /*LineChartBarData getLineChartData() {
-    List<FlSpot> spotList = [];
-    for (int i = 0; i < _wealthDevelopmentStats.length; i++) {
-      //print(_wealthDevelopmentStats[i].wealth);
-      spotList.add(FlSpot(i.toDouble(), double.parse((_wealthDevelopmentStats[i].wealth / 1000).toStringAsFixed(2))));
-    }
-    LineChartBarData lineChartBarData = LineChartBarData(
-      spots: _getSpotList(spotList),
-      gradient: LinearGradient(
-        colors: revenueColors,
-      ),
-      barWidth: 2.0,
-      isStrokeCapRound: true,
-      dotData: FlDotData(
-        show: true,
-      ),
-      belowBarData: BarAreaData(
-        show: true,
-        gradient: LinearGradient(
-          colors: revenueColors.map((color) => color.withOpacity(0.3)).toList(),
-        ),
-      ),
-    );
-    return lineChartBarData;
-  }
-
-  LineChartBarData getInvestmentChartData() {
-    List<FlSpot> spotList = [];
-    for (int i = 0; i < _investmentDevelopmentStats.length; i++) {
-      //print(_wealthDevelopmentStats[i].wealth);
-      spotList.add(FlSpot(i.toDouble(), double.parse((_investmentDevelopmentStats[i].wealth / 1000).toStringAsFixed(2))));
-    }
-    LineChartBarData lineChartBarData = LineChartBarData(
-      spots: _getSpotList(spotList),
-      gradient: LinearGradient(
-        colors: investmentColors,
-      ),
-      barWidth: 2.0,
-      isStrokeCapRound: true,
-      dotData: FlDotData(
-        show: true,
-      ),
-      belowBarData: BarAreaData(
-        show: true,
-        gradient: LinearGradient(
-          colors: investmentColors.map((color) => color.withOpacity(0.3)).toList(),
-        ),
-      ),
-    );
-    return lineChartBarData;
-  }*/
 
   @override
   Widget build(BuildContext context) {
     return Expanded(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          FutureBuilder(
-            future: _calculatePastWealthDevelopment(),
-            builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
-              switch (snapshot.connectionState) {
-                case ConnectionState.waiting:
-                  return const SizedBox();
-                case ConnectionState.done:
-                  if (_pastWealthDevelopmentStats.isEmpty) {
-                    return const Text('Noch keine Daten vorhanden.');
-                  } else {
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        MonthPickerButtons(
-                          selectedDate: _selectedDate,
-                          selectedDateCallback: (DateTime selectedDate) {
-                            setState(() {
-                              _selectedDate = selectedDate;
-                            });
-                          },
-                        ),
-                        Stack(
-                          children: <Widget>[
-                            AspectRatio(
-                              aspectRatio: 1.7,
-                              child: Padding(
-                                padding: const EdgeInsets.only(
-                                  right: 18.0,
-                                  left: 12.0,
-                                  top: 24.0,
-                                  bottom: 12.0,
-                                ),
-                                child: LineChart(
-                                  pastData(),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    );
-                  }
-                default:
-                  return const SizedBox();
-              }
-            },
-          ),
-          // TODO const FutureWealthDevelopmentChart(),
-        ],
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 0.0),
+        child: ListView(
+          children: <Widget>[
+            MonthPickerButtons(selectedDate: _selectedDate, selectedDateCallback: (selectedDate) => _changeStartMonth(selectedDate)),
+            const SizedBox(
+              height: 18.0,
+            ),
+            AspectRatio(
+              aspectRatio: 1.75,
+              child: BarChart(
+                BarChartData(
+                  maxY: _monthlyValues.isEmpty ? 0.0 : _monthlyValues.reduce(max),
+                  titlesData: FlTitlesData(
+                    show: true,
+                    rightTitles: AxisTitles(
+                      sideTitles: SideTitles(showTitles: false),
+                    ),
+                    topTitles: AxisTitles(
+                      sideTitles: SideTitles(showTitles: false),
+                    ),
+                    bottomTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        getTitlesWidget: bottomMonthTitles,
+                        reservedSize: 70.0,
+                      ),
+                    ),
+                    leftTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        reservedSize: 54.0,
+                        interval: 1.0,
+                        getTitlesWidget: leftTitles,
+                      ),
+                    ),
+                  ),
+                  borderData: FlBorderData(
+                    show: false,
+                  ),
+                  barGroups: _showingMonthlyBarGroups,
+                  gridData: FlGridData(show: false),
+                ),
+                swapAnimationDuration: const Duration(milliseconds: 0),
+              ),
+            ),
+            const SizedBox(
+              height: 24.0,
+            ),
+            const Text('Vermögensentwicklung'),
+            AspectRatio(
+              aspectRatio: 1.75,
+              child: Padding(
+                padding: const EdgeInsets.only(
+                  right: 18.0,
+                  left: 12.0,
+                  top: 24.0,
+                  bottom: 12.0,
+                ),
+                child: LineChart(
+                  assetDevelopmentData(),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 
+  Widget leftTitles(double value, TitleMeta meta) {
+    const style = TextStyle(
+      color: Color(0xff7589a2),
+      fontWeight: FontWeight.bold,
+      fontSize: 14.0,
+    );
+    String text = '';
+    if (value == 0) {
+      text = '0 €';
+    } else if (value == (_monthlyValues.reduce(max) / 2).round()) {
+      text = formatToMoneyAmountWithoutCent((_monthlyValues.reduce(max) / 2).toString());
+    } else if (value == _monthlyValues.reduce(max)) {
+      text = formatToMoneyAmountWithoutCent(_monthlyValues.reduce(max).toString());
+    } else {
+      return Container();
+    }
+    return SideTitleWidget(
+      axisSide: meta.axisSide,
+      space: 0.0,
+      child: Text(text, style: style),
+    );
+  }
+
+  Widget bottomMonthTitles(double value, TitleMeta meta) {
+    final months = <String>[
+      dateFormatterMMM.format(_selectedDate),
+      dateFormatterMMM.format(DateTime(_selectedDate.year, _selectedDate.month - 1)),
+      dateFormatterMMM.format(DateTime(_selectedDate.year, _selectedDate.month - 2)),
+      dateFormatterMMM.format(DateTime(_selectedDate.year, _selectedDate.month - 3)),
+      dateFormatterMMM.format(DateTime(_selectedDate.year, _selectedDate.month - 4)),
+      dateFormatterMMM.format(DateTime(_selectedDate.year, _selectedDate.month - 5)),
+    ];
+
+    final Widget text = Text(
+      '${months[value.toInt()]}\n${formatToMoneyAmountWithoutCent(_monthlyRevenues[value.toInt()].toString())}\n${formatToMoneyAmountWithoutCent(_monthlyExpenditures[value.toInt()].toString())}',
+      textAlign: TextAlign.center,
+      style: const TextStyle(
+        color: Color(0xff7589a2),
+        fontWeight: FontWeight.bold,
+        fontSize: 11.0,
+      ),
+    );
+
+    return SideTitleWidget(
+      axisSide: meta.axisSide,
+      space: 16.0, //margin top
+      child: text,
+    );
+  }
+
+  BarChartGroupData makeGroupData(int x, double y1, double y2) {
+    return BarChartGroupData(
+      barsSpace: 4.0,
+      x: x,
+      barRods: [
+        BarChartRodData(
+          toY: y1,
+          color: Colors.greenAccent,
+          width: width,
+        ),
+        BarChartRodData(
+          toY: y2,
+          color: Colors.redAccent,
+          width: width,
+        ),
+      ],
+    );
+  }
+
   Widget bottomTitleWidgets(double value, TitleMeta meta) {
+    const style = TextStyle(
+      fontWeight: FontWeight.bold,
+      fontSize: 16,
+    );
     Widget text;
     switch (value.toInt()) {
-      case 0:
-        text = Text(
-            '${DateFormat('MMMM', 'de-DE').format(DateTime(0, int.parse(_pastWealthDevelopmentStats[11].month)))}\n${_pastWealthDevelopmentStats[11].wealth.toStringAsFixed(2)}€',
-            textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 10));
+      case 2:
+        text = const Text('MAR', style: style);
         break;
       case 5:
-        text = Text(
-            '${DateFormat('MMMM', 'de-DE').format(DateTime(0, int.parse(_pastWealthDevelopmentStats[5].month)))}\n${_pastWealthDevelopmentStats[5].wealth.toStringAsFixed(2)}€',
-            textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 10));
+        text = const Text('JUN', style: style);
         break;
-      case 11:
-        text = Text(
-            '${DateFormat('MMMM', 'de-DE').format(DateTime(0, int.parse(_pastWealthDevelopmentStats[0].month)))}\n${_pastWealthDevelopmentStats[0].wealth.toStringAsFixed(2)}€',
-            textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 10));
+      case 8:
+        text = const Text('SEP', style: style);
         break;
       default:
-        text = const Text('', style: TextStyle(fontSize: 10));
+        text = const Text('', style: style);
         break;
     }
 
@@ -236,59 +254,46 @@ class _AssetDevelopmentStatisticTabViewState extends State<AssetDevelopmentStati
     );
   }
 
-  List<FlSpot> _getSpotList(List<FlSpot> spotList) {
-    for (int i = 0; i < spotList.length; i++) {
-      spotList[i];
-    }
-    return spotList;
-  }
-
   Widget leftTitleWidgets(double value, TitleMeta meta) {
-    const style = TextStyle(fontSize: 10);
-    String text = '';
-    //print("Value " + value.toInt().floor().toString());
-    //print("Max " + ((_maxWealthValue / 1000) / 2).floor().toString());
-    if (value.toInt() == 0) {
-      text = '0 €';
-    } else if (value.toInt().floor() == (_maxWealthValue / 1000).floor()) {
-      text = _maxWealthValue.toStringAsFixed(0) + ' €';
+    const style = TextStyle(
+      fontWeight: FontWeight.bold,
+      fontSize: 15,
+    );
+    String text;
+    switch (value.toInt()) {
+      case 1:
+        text = '10K';
+        break;
+      case 3:
+        text = '30k';
+        break;
+      case 5:
+        text = '50k';
+        break;
+      default:
+        return Container();
     }
+
     return Text(text, style: style, textAlign: TextAlign.left);
   }
 
-  LineChartData pastData() {
+  LineChartData assetDevelopmentData() {
     return LineChartData(
-      lineTouchData: LineTouchData(
-        touchTooltipData: LineTouchTooltipData(
-          tooltipBgColor: Colors.black45,
-          getTooltipItems: (List<LineBarSpot> touchedBarSpots) {
-            return touchedBarSpots.map((barSpot) {
-              return LineTooltipItem(
-                '${dateFormatterMMMM.format(DateTime(_selectedDate.year, int.parse(_pastWealthDevelopmentStats[barSpot.spotIndex].month)))}\n${formatToMoneyAmount((_pastWealthDevelopmentStats[barSpot.spotIndex].wealth).toString())}',
-                const TextStyle(
-                  color: Colors.cyanAccent,
-                  fontWeight: FontWeight.bold,
-                ),
-              );
-            }).toList();
-          },
-        ),
-      ),
       gridData: FlGridData(
         show: true,
         drawVerticalLine: true,
-        horizontalInterval: 1000,
+        horizontalInterval: 1,
         verticalInterval: 1,
         getDrawingHorizontalLine: (value) {
           return FlLine(
-            color: Colors.white70,
-            strokeWidth: 1,
+            color: Colors.cyanAccent,
+            strokeWidth: 1.0,
           );
         },
         getDrawingVerticalLine: (value) {
           return FlLine(
-            color: Colors.white70,
-            strokeWidth: 1,
+            color: Colors.cyanAccent,
+            strokeWidth: 1.0,
           );
         },
       ),
@@ -303,7 +308,7 @@ class _AssetDevelopmentStatisticTabViewState extends State<AssetDevelopmentStati
         bottomTitles: AxisTitles(
           sideTitles: SideTitles(
             showTitles: true,
-            reservedSize: 35,
+            reservedSize: 30,
             interval: 1,
             getTitlesWidget: bottomTitleWidgets,
           ),
@@ -321,12 +326,37 @@ class _AssetDevelopmentStatisticTabViewState extends State<AssetDevelopmentStati
         show: true,
         border: Border.all(color: const Color(0xff37434d)),
       ),
-      minX: 0.0,
-      maxX: 11.0,
-      minY: 0.0,
-      maxY: _maxWealthValue / 1000,
+      minX: 0,
+      maxX: 11,
+      minY: 0,
+      maxY: 6,
       lineBarsData: [
-        _getPastWealthDevelopmentChartData(),
+        LineChartBarData(
+          spots: const [
+            FlSpot(0, 3),
+            FlSpot(2.6, 2),
+            FlSpot(4.9, 5),
+            FlSpot(6.8, 3.1),
+            FlSpot(8, 4),
+            FlSpot(9.5, 3),
+            FlSpot(11, 4),
+          ],
+          isCurved: true,
+          gradient: LinearGradient(
+            colors: gradientColors,
+          ),
+          barWidth: 5,
+          isStrokeCapRound: true,
+          dotData: FlDotData(
+            show: false,
+          ),
+          belowBarData: BarAreaData(
+            show: true,
+            gradient: LinearGradient(
+              colors: gradientColors.map((color) => color.withOpacity(0.3)).toList(),
+            ),
+          ),
+        ),
       ],
     );
   }
