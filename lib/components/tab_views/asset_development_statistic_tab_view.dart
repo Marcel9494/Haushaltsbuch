@@ -3,11 +3,9 @@ import 'dart:math';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
+import '/components/buttons/month_picker_buttons.dart';
 import '/models/booking/booking_model.dart';
 import '/models/booking/booking_repository.dart';
-
-import '/components/buttons/month_picker_buttons.dart';
-
 import '/utils/date_formatters/date_formatter.dart';
 import '/utils/number_formatters/number_formatter.dart';
 
@@ -23,11 +21,16 @@ class _AssetDevelopmentStatisticTabViewState extends State<AssetDevelopmentStati
   DateTime _selectedDate = DateTime.now();
   List<Booking> _bookingList = [];
   List<double> _monthlyValues = [];
+  List<double> _monthlyLineChartValues = [];
   List<double> _monthlyRevenues = [];
   List<double> _monthlyExpenditures = [];
   List<BarChartGroupData> _monthlyBarGroups = [];
   List<BarChartGroupData> _reversedMonthlyBarGroups = [];
   List<BarChartGroupData> _showingMonthlyBarGroups = [];
+
+  List<FlSpot> _monthlyLineData = [];
+  List<FlSpot> _reversedMonthlyLineData = [];
+  List<FlSpot> _showingMonthlyLineData = [];
 
   List<Color> gradientColors = [
     Colors.cyanAccent,
@@ -38,6 +41,7 @@ class _AssetDevelopmentStatisticTabViewState extends State<AssetDevelopmentStati
   void initState() {
     super.initState();
     _loadMonthlyBarChartData();
+    _loadAssetDevelopmentChartData();
   }
 
   Future<List<double>> _loadMonthlyBarChartData() async {
@@ -78,11 +82,50 @@ class _AssetDevelopmentStatisticTabViewState extends State<AssetDevelopmentStati
     return _monthlyValues;
   }
 
+  Future<List<FlSpot>> _loadAssetDevelopmentChartData() async {
+    BookingRepository bookingRepository = BookingRepository();
+    _monthlyRevenues = [];
+    _monthlyExpenditures = [];
+    _monthlyLineChartValues = [];
+    _monthlyLineData = [];
+    _reversedMonthlyLineData = [];
+    _showingMonthlyBarGroups = [];
+    for (int i = 0; i < 12; i++) {
+      int currentYear = _selectedDate.year;
+      int currentMonth = _selectedDate.month - i;
+      // Vergangenes Jahr z.B.: 2023 => 2022 & Januar => Dezember
+      if (_selectedDate.month - i <= 0) {
+        currentYear = _selectedDate.year - 1;
+        currentMonth = _selectedDate.month + 12 - i;
+      }
+      _bookingList = await bookingRepository.loadMonthlyBookings(currentMonth, currentYear);
+      if (_bookingList.isEmpty) {
+        _monthlyRevenues.insert(i, 0.0);
+        _monthlyExpenditures.insert(i, 0.0);
+        _monthlyLineChartValues.insert(i, 0.0);
+      } else {
+        _monthlyRevenues.insert(i, bookingRepository.getRevenues(_bookingList));
+        _monthlyExpenditures.insert(i, bookingRepository.getExpenditures(_bookingList));
+        _monthlyLineChartValues.insert(i, bookingRepository.getRevenues(_bookingList) - bookingRepository.getExpenditures(_bookingList));
+        print(_monthlyValues);
+      }
+      // TODO hier weitermachen und Vermögensentwicklung Statistik fertig entwickeln und Werte richtig aufsummieren
+      _monthlyLineData.insert(i, FlSpot(i.toDouble(), _monthlyLineChartValues[i]));
+    }
+    print(_monthlyLineData);
+    _reversedMonthlyLineData = _monthlyLineData.reversed.toList();
+    setState(() {
+      _showingMonthlyLineData = _reversedMonthlyLineData;
+    });
+    return _monthlyLineData;
+  }
+
   void _changeStartMonth(DateTime selectedDate) {
-    setState(() => {
-          _selectedDate = selectedDate,
-        });
+    setState(() {
+      _selectedDate = selectedDate;
+    });
     _loadMonthlyBarChartData();
+    _loadAssetDevelopmentChartData();
   }
 
   @override
@@ -203,7 +246,7 @@ class _AssetDevelopmentStatisticTabViewState extends State<AssetDevelopmentStati
 
     return SideTitleWidget(
       axisSide: meta.axisSide,
-      space: 16.0, //margin top
+      space: 16.0,
       child: text,
     );
   }
@@ -228,53 +271,49 @@ class _AssetDevelopmentStatisticTabViewState extends State<AssetDevelopmentStati
   }
 
   Widget bottomTitleWidgets(double value, TitleMeta meta) {
-    const style = TextStyle(
-      fontWeight: FontWeight.bold,
-      fontSize: 16,
-    );
-    Widget text;
-    switch (value.toInt()) {
-      case 2:
-        text = const Text('MAR', style: style);
-        break;
-      case 5:
-        text = const Text('JUN', style: style);
-        break;
-      case 8:
-        text = const Text('SEP', style: style);
-        break;
-      default:
-        text = const Text('', style: style);
-        break;
+    final months = <String>[];
+    for (int i = 0; i < 12; i++) {
+      months.add(dateFormatterMMM.format(DateTime(_selectedDate.year, _selectedDate.month - i)));
     }
+
+    final Widget text = Text(
+      '${months[value.toInt()]}\n',
+      textAlign: TextAlign.center,
+      style: const TextStyle(
+        color: Color(0xff7589a2),
+        fontWeight: FontWeight.bold,
+        fontSize: 11.0,
+      ),
+    );
 
     return SideTitleWidget(
       axisSide: meta.axisSide,
+      space: 16.0,
       child: text,
     );
   }
 
   Widget leftTitleWidgets(double value, TitleMeta meta) {
     const style = TextStyle(
+      color: Color(0xff7589a2),
       fontWeight: FontWeight.bold,
-      fontSize: 15,
+      fontSize: 14.0,
     );
-    String text;
-    switch (value.toInt()) {
-      case 1:
-        text = '10K';
-        break;
-      case 3:
-        text = '30k';
-        break;
-      case 5:
-        text = '50k';
-        break;
-      default:
-        return Container();
+    String text = '';
+    if (value == _monthlyLineChartValues.reduce(min)) {
+      text = formatToMoneyAmountWithoutCent(_monthlyLineChartValues.reduce(min).toString());
+    } else if (value == (_monthlyLineChartValues.reduce(max) / 2).round()) {
+      text = formatToMoneyAmountWithoutCent((_monthlyLineChartValues.reduce(max) / 2).toString());
+    } else if (value == _monthlyLineChartValues.reduce(max)) {
+      text = formatToMoneyAmountWithoutCent(_monthlyLineChartValues.reduce(max).toString());
+    } else {
+      return Container();
     }
-
-    return Text(text, style: style, textAlign: TextAlign.left);
+    return SideTitleWidget(
+      axisSide: meta.axisSide,
+      space: 0.0,
+      child: Text(text, style: style),
+    );
   }
 
   LineChartData assetDevelopmentData() {
@@ -328,19 +367,11 @@ class _AssetDevelopmentStatisticTabViewState extends State<AssetDevelopmentStati
       ),
       minX: 0,
       maxX: 11,
-      minY: 0,
-      maxY: 6,
+      minY: _monthlyLineChartValues.isEmpty ? 0.0 : _monthlyLineChartValues.reduce(min),
+      maxY: _monthlyLineChartValues.isEmpty ? 0.0 : _monthlyLineChartValues.reduce(max),
       lineBarsData: [
         LineChartBarData(
-          spots: const [
-            FlSpot(0, 3),
-            FlSpot(2.6, 2),
-            FlSpot(4.9, 5),
-            FlSpot(6.8, 3.1),
-            FlSpot(8, 4),
-            FlSpot(9.5, 3),
-            FlSpot(11, 4),
-          ],
+          spots: _showingMonthlyLineData,
           isCurved: true,
           gradient: LinearGradient(
             colors: gradientColors,
