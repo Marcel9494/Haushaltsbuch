@@ -4,7 +4,6 @@ import 'package:rounded_loading_button/rounded_loading_button.dart';
 
 import '/blocs/categorie_bloc/categorie_bloc.dart';
 import '/blocs/input_field_blocs/text_input_field_bloc/text_input_field_cubit.dart';
-
 import '/components/buttons/save_button.dart';
 import '/components/deco/loading_indicator.dart';
 import '/components/input_fields/text_input_field.dart';
@@ -22,8 +21,6 @@ class _CreateOrEditSubcategorieScreenState extends State<CreateOrEditSubcategori
   late final CategorieBloc categorieBloc;
   late final TextInputFieldCubit subcategorieNameInputFieldCubit;
   final RoundedLoadingButtonController _saveButtonController = RoundedLoadingButtonController();
-
-  UniqueKey subcategorieNameUniqueKey = UniqueKey();
 
   FocusNode subcategorieNameFocusNode = FocusNode();
 
@@ -60,11 +57,10 @@ class _CreateOrEditSubcategorieScreenState extends State<CreateOrEditSubcategori
                       BlocBuilder<TextInputFieldCubit, TextInputFieldModel>(
                         builder: (context, state) {
                           return TextInputField(
-                              fieldKey: subcategorieNameUniqueKey,
-                              focusNode: subcategorieNameFocusNode,
-                              textCubit: subcategorieNameInputFieldCubit,
-                              hintText: 'Unterkategoriename',
-                              maxLength: 60,
+                            focusNode: subcategorieNameFocusNode,
+                            textCubit: subcategorieNameInputFieldCubit,
+                            hintText: 'Unterkategoriename',
+                            maxLength: 60,
                           );
                         },
                       ),

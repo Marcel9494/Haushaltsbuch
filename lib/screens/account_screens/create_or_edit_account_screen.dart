@@ -1,20 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 
 import '/blocs/account_bloc/account_bloc.dart';
-import '/blocs/primary_account_bloc/primary_account_bloc.dart';
-import '/blocs/input_field_blocs/text_input_field_bloc/text_input_field_cubit.dart';
-import '/blocs/input_field_blocs/money_input_field_bloc/money_input_field_cubit.dart';
 import '/blocs/input_field_blocs/account_type_input_field_bloc/account_type_input_field_cubit.dart';
+import '/blocs/input_field_blocs/money_input_field_bloc/money_input_field_cubit.dart';
 import '/blocs/input_field_blocs/preselect_account_input_field_bloc/preselect_account_input_field_cubit.dart';
-
+import '/blocs/input_field_blocs/text_input_field_bloc/text_input_field_cubit.dart';
+import '/blocs/primary_account_bloc/primary_account_bloc.dart';
+import '/components/buttons/save_button.dart';
 import '/components/deco/loading_indicator.dart';
 import '/components/input_fields/account_type_input_field.dart';
 import '/components/input_fields/money_input_field.dart';
 import '/components/input_fields/text_input_field.dart';
-import '/components/buttons/save_button.dart';
 
 class CreateOrEditAccountScreen extends StatefulWidget {
   const CreateOrEditAccountScreen({Key? key}) : super(key: key);
@@ -31,8 +29,6 @@ class _CreateOrEditAccountScreenState extends State<CreateOrEditAccountScreen> {
   late final MoneyInputFieldCubit accountBalanceInputFieldCubit;
   late final PreselectAccountInputFieldCubit preselectedAccountInputFieldCubit;
   final RoundedLoadingButtonController _saveButtonController = RoundedLoadingButtonController();
-
-  UniqueKey accountNameFieldUniqueKey = UniqueKey();
 
   FocusNode accountTypeFocusNode = FocusNode();
   FocusNode accountNameFocusNode = FocusNode();
@@ -80,14 +76,17 @@ class _CreateOrEditAccountScreenState extends State<CreateOrEditAccountScreen> {
                       ),
                       BlocBuilder<TextInputFieldCubit, TextInputFieldModel>(
                         builder: (context, state) {
-                          return TextInputField(fieldKey: accountNameFieldUniqueKey, focusNode: accountNameFocusNode, textCubit: accountNameInputFieldCubit, hintText: 'Name');
+                          return TextInputField(focusNode: accountNameFocusNode, textCubit: accountNameInputFieldCubit, hintText: 'Name');
                         },
                       ),
                       BlocBuilder<MoneyInputFieldCubit, MoneyInputFieldModel>(
                         builder: (context, state) {
                           if (accountState.accountBoxIndex == -1) accountBalanceInputFieldCubit.state.amount = '0,00 €';
                           return MoneyInputField(
-                              focusNode: accountBalanceFocusNode, cubit: accountBalanceInputFieldCubit, hintText: 'Kontostand', bottomSheetTitle: 'Kontostand eingeben:');
+                              focusNode: accountBalanceFocusNode,
+                              cubit: accountBalanceInputFieldCubit,
+                              hintText: 'Kontostand',
+                              bottomSheetTitle: 'Kontostand eingeben:');
                         },
                       ),
                       /* TODO muss noch implementiert werden BlocBuilder<PreselectAccountInputFieldCubit, PreselectAccountInputFieldModel>(
@@ -96,7 +95,8 @@ class _CreateOrEditAccountScreenState extends State<CreateOrEditAccountScreen> {
                         },
                       ),*/
                       SaveButton(
-                          saveFunction: () => accountBloc.add(CreateOrUpdateAccountEvent(context, accountState.accountBoxIndex, _saveButtonController)),
+                          saveFunction: () =>
+                              accountBloc.add(CreateOrUpdateAccountEvent(context, accountState.accountBoxIndex, _saveButtonController)),
                           buttonController: _saveButtonController),
                     ],
                   ),

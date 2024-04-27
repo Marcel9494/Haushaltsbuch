@@ -18,19 +18,21 @@ class AssetDevelopmentStatisticTabView extends StatefulWidget {
 
 class _AssetDevelopmentStatisticTabViewState extends State<AssetDevelopmentStatisticTabView> {
   final double width = 7.0;
+  //double _assetValue = 0.0;
+  //double _liabilityValue = 0.0;
   DateTime _selectedDate = DateTime.now();
   List<Booking> _bookingList = [];
   List<double> _monthlyValues = [];
-  List<double> _monthlyLineChartValues = [];
+  //List<double> _monthlyLineChartValues = [];
   List<double> _monthlyRevenues = [];
   List<double> _monthlyExpenditures = [];
   List<BarChartGroupData> _monthlyBarGroups = [];
   List<BarChartGroupData> _reversedMonthlyBarGroups = [];
   List<BarChartGroupData> _showingMonthlyBarGroups = [];
 
-  List<FlSpot> _monthlyLineData = [];
+  /*List<FlSpot> _monthlyLineData = [];
   List<FlSpot> _reversedMonthlyLineData = [];
-  List<FlSpot> _showingMonthlyLineData = [];
+  List<FlSpot> _showingMonthlyLineData = [];*/
 
   List<Color> gradientColors = [
     Colors.cyanAccent,
@@ -41,7 +43,7 @@ class _AssetDevelopmentStatisticTabViewState extends State<AssetDevelopmentStati
   void initState() {
     super.initState();
     _loadMonthlyBarChartData();
-    _loadAssetDevelopmentChartData();
+    //_loadAssetDevelopmentChartData();
   }
 
   Future<List<double>> _loadMonthlyBarChartData() async {
@@ -82,14 +84,19 @@ class _AssetDevelopmentStatisticTabViewState extends State<AssetDevelopmentStati
     return _monthlyValues;
   }
 
-  Future<List<FlSpot>> _loadAssetDevelopmentChartData() async {
+  /*Future<List<FlSpot>> _loadAssetDevelopmentChartData() async {
     BookingRepository bookingRepository = BookingRepository();
+    AccountRepository accountRepository = AccountRepository();
     _monthlyRevenues = [];
     _monthlyExpenditures = [];
     _monthlyLineChartValues = [];
     _monthlyLineData = [];
     _reversedMonthlyLineData = [];
     _showingMonthlyBarGroups = [];
+    _assetValue = await accountRepository.getAssetValue();
+    _liabilityValue = await accountRepository.getLiabilityValue();
+    print("Assets: $_assetValue");
+    print("Liabilities: $_liabilityValue");
     for (int i = 0; i < 12; i++) {
       int currentYear = _selectedDate.year;
       int currentMonth = _selectedDate.month - i;
@@ -110,7 +117,7 @@ class _AssetDevelopmentStatisticTabViewState extends State<AssetDevelopmentStati
         print(_monthlyValues);
       }
       // TODO hier weitermachen und Vermögensentwicklung Statistik fertig entwickeln und Werte richtig aufsummieren
-      _monthlyLineData.insert(i, FlSpot(i.toDouble(), _monthlyLineChartValues[i]));
+      _monthlyLineData.insert(i, FlSpot(i.toDouble(), (_assetValue - _liabilityValue) + _monthlyLineChartValues[i]));
     }
     print(_monthlyLineData);
     _reversedMonthlyLineData = _monthlyLineData.reversed.toList();
@@ -118,14 +125,14 @@ class _AssetDevelopmentStatisticTabViewState extends State<AssetDevelopmentStati
       _showingMonthlyLineData = _reversedMonthlyLineData;
     });
     return _monthlyLineData;
-  }
+  }*/
 
   void _changeStartMonth(DateTime selectedDate) {
     setState(() {
       _selectedDate = selectedDate;
     });
     _loadMonthlyBarChartData();
-    _loadAssetDevelopmentChartData();
+    //_loadAssetDevelopmentChartData();
   }
 
   @override
@@ -177,7 +184,7 @@ class _AssetDevelopmentStatisticTabViewState extends State<AssetDevelopmentStati
                 swapAnimationDuration: const Duration(milliseconds: 0),
               ),
             ),
-            const SizedBox(
+            /*const SizedBox(
               height: 24.0,
             ),
             const Text('Vermögensentwicklung'),
@@ -194,7 +201,7 @@ class _AssetDevelopmentStatisticTabViewState extends State<AssetDevelopmentStati
                   assetDevelopmentData(),
                 ),
               ),
-            ),
+            ),*/
           ],
         ),
       ),
@@ -270,7 +277,7 @@ class _AssetDevelopmentStatisticTabViewState extends State<AssetDevelopmentStati
     );
   }
 
-  Widget bottomTitleWidgets(double value, TitleMeta meta) {
+  /*Widget bottomTitleWidgets(double value, TitleMeta meta) {
     final months = <String>[];
     for (int i = 0; i < 12; i++) {
       months.add(dateFormatterMMM.format(DateTime(_selectedDate.year, _selectedDate.month - i)));
@@ -300,11 +307,11 @@ class _AssetDevelopmentStatisticTabViewState extends State<AssetDevelopmentStati
       fontSize: 14.0,
     );
     String text = '';
-    if (value == _monthlyLineChartValues.reduce(min)) {
+    if (value == _monthlyLineChartValues.reduce(min) + (_assetValue - _liabilityValue)) {
       text = formatToMoneyAmountWithoutCent(_monthlyLineChartValues.reduce(min).toString());
-    } else if (value == (_monthlyLineChartValues.reduce(max) / 2).round()) {
+    } else if (value == (_monthlyLineChartValues.reduce(max) / 2).round() + (_assetValue - _liabilityValue)) {
       text = formatToMoneyAmountWithoutCent((_monthlyLineChartValues.reduce(max) / 2).toString());
-    } else if (value == _monthlyLineChartValues.reduce(max)) {
+    } else if (value == _monthlyLineChartValues.reduce(max) + (_assetValue - _liabilityValue)) {
       text = formatToMoneyAmountWithoutCent(_monthlyLineChartValues.reduce(max).toString());
     } else {
       return Container();
@@ -325,13 +332,13 @@ class _AssetDevelopmentStatisticTabViewState extends State<AssetDevelopmentStati
         verticalInterval: 1,
         getDrawingHorizontalLine: (value) {
           return FlLine(
-            color: Colors.cyanAccent,
+            //color: Colors.cyanAccent,
             strokeWidth: 1.0,
           );
         },
         getDrawingVerticalLine: (value) {
           return FlLine(
-            color: Colors.cyanAccent,
+            //color: Colors.cyanAccent,
             strokeWidth: 1.0,
           );
         },
@@ -367,8 +374,8 @@ class _AssetDevelopmentStatisticTabViewState extends State<AssetDevelopmentStati
       ),
       minX: 0,
       maxX: 11,
-      minY: _monthlyLineChartValues.isEmpty ? 0.0 : _monthlyLineChartValues.reduce(min),
-      maxY: _monthlyLineChartValues.isEmpty ? 0.0 : _monthlyLineChartValues.reduce(max),
+      minY: _monthlyLineChartValues.isEmpty ? 0.0 : _monthlyLineChartValues.reduce(min) + (_assetValue - _liabilityValue),
+      maxY: _monthlyLineChartValues.isEmpty ? 0.0 : _monthlyLineChartValues.reduce(max) + (_assetValue - _liabilityValue),
       lineBarsData: [
         LineChartBarData(
           spots: _showingMonthlyLineData,
@@ -376,7 +383,7 @@ class _AssetDevelopmentStatisticTabViewState extends State<AssetDevelopmentStati
           gradient: LinearGradient(
             colors: gradientColors,
           ),
-          barWidth: 5,
+          barWidth: 5.0,
           isStrokeCapRound: true,
           dotData: FlDotData(
             show: false,
@@ -390,5 +397,5 @@ class _AssetDevelopmentStatisticTabViewState extends State<AssetDevelopmentStati
         ),
       ],
     );
-  }
+  }*/
 }

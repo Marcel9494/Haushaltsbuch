@@ -8,15 +8,11 @@ import '../../blocs/button_blocs/categorie_type_toggle_buttons_bloc/categorie_ty
 import '../../components/deco/loading_indicator.dart';
 import '/blocs/categorie_bloc/categorie_bloc.dart';
 import '/blocs/input_field_blocs/text_input_field_bloc/text_input_field_cubit.dart';
-
-import '/models/categorie/categorie_model.dart';
-import '/models/categorie/categorie_repository.dart';
-
 import '/components/buttons/categorie_type_toggle_buttons.dart';
 import '/components/buttons/save_button.dart';
 import '/components/input_fields/text_input_field.dart';
-
-import '/utils/consts/route_consts.dart';
+import '/models/categorie/categorie_model.dart';
+import '/models/categorie/categorie_repository.dart';
 import '/utils/consts/global_consts.dart';
 
 class CreateOrEditCategorieScreen extends StatefulWidget {
@@ -37,8 +33,6 @@ class _CreateOrEditCategorieScreenState extends State<CreateOrEditCategorieScree
   CategorieRepository categorieRepository = CategorieRepository();
   String _categorieNameErrorText = '';
   String _currentCategorieType = '';
-
-  UniqueKey categorieNameUniqueKey = UniqueKey();
 
   FocusNode categorieNameFocusNode = FocusNode();
 
@@ -141,11 +135,7 @@ class _CreateOrEditCategorieScreenState extends State<CreateOrEditCategorieScree
                       BlocBuilder<TextInputFieldCubit, TextInputFieldModel>(
                         builder: (context, state) {
                           return TextInputField(
-                              fieldKey: categorieNameUniqueKey,
-                              focusNode: categorieNameFocusNode,
-                              textCubit: categorieNameInputFieldCubit,
-                              hintText: 'Kategoriename',
-                              maxLength: 60);
+                              focusNode: categorieNameFocusNode, textCubit: categorieNameInputFieldCubit, hintText: 'Kategoriename', maxLength: 60);
                         },
                       ),
                       SaveButton(

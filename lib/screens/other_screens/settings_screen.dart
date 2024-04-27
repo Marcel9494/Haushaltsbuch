@@ -3,13 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:settings_ui/settings_ui.dart';
 
+import '/main.dart';
+import '/models/account/account_repository.dart';
+import '/models/categorie/categorie_repository.dart';
 import '/models/global_state/global_state_repository.dart';
 import '/models/intro_screen_state/intro_screen_state_repository.dart';
+import '/models/primary_account/primary_account_repository.dart';
 import '/models/screen_arguments/bottom_nav_bar_screen_arguments.dart';
-
+import '/utils/consts/global_consts.dart';
 import '/utils/consts/hive_consts.dart';
 import '/utils/consts/route_consts.dart';
-import '/utils/consts/global_consts.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({Key? key}) : super(key: key);
@@ -44,6 +47,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
     globalStateRepository.create();
   }
 
+  // Hive Boxen auf Prod oder Demo Modus setzen
+  void _initializeHiveValues() async {
+    setHiveMode(!demoMode);
+    var categorieBox = await Hive.openBox(categoriesBox);
+    if (categorieBox.isNotEmpty) {
+      return;
+    }
+    GlobalStateRepository globalStateRepository = GlobalStateRepository();
+    globalStateRepository.create();
+    AccountRepository accountRepository = AccountRepository();
+    accountRepository.createStartAccounts();
+    CategorieRepository categorieRepository = CategorieRepository();
+    categorieRepository.createStartCategories();
+    PrimaryAccountRepository primaryAccountRepository = PrimaryAccountRepository();
+    primaryAccountRepository.createStartPrimaryAccounts();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -59,13 +79,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
               SettingsTile.navigation(
                 leading: const Icon(Icons.delete_forever_rounded),
                 title: const Text('Alle Daten löschen'),
-                description: const Text('Es werden alle Buchungen, Budgets, Konten und Kategorien gelöscht.\nDie gelöschten Daten können nicht wiederhergestellt werden.'),
+                description: const Text(
+                    'Es werden alle Buchungen, Budgets, Konten und Kategorien gelöscht.\nDie gelöschten Daten können nicht wiederhergestellt werden.'),
                 onPressed: (_) => {
                   showCupertinoDialog(
                     context: context,
                     builder: (context) {
                       return CupertinoAlertDialog(
-                        content: const Text('Wollen Sie wirklich alle Daten unwiderruflich löschen?\nDie gelöschten Daten können nicht wiederhergestellt werden!'),
+                        content: const Text(
+                            'Wollen Sie wirklich alle Daten unwiderruflich löschen?\nDie gelöschten Daten können nicht wiederhergestellt werden!'),
                         title: const Text('Warnung'),
                         actions: [
                           TextButton(
@@ -132,9 +154,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       leading: const Icon(Icons.developer_mode),
                       title: const Text('Demo Modus'),
                       initialValue: demoMode,
-                      onToggle: (bool value) {
+                      onToggle: (bool isDemoMode) {
                         setState(() {
-                          setHiveMode(value);
+                          _initializeHiveValues();
                         });
                         Navigator.pop(context);
                         Navigator.popAndPushNamed(context, bottomNavBarRoute, arguments: BottomNavBarScreenArguments(0));

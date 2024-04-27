@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
-
+import 'package:haushaltsbuch/utils/consts/hive_consts.dart';
 import 'package:introduction_screen/introduction_screen.dart';
 
-import '/models/global_state/global_state_repository.dart';
-import '/models/primary_account/primary_account_repository.dart';
 import '/models/account/account_repository.dart';
 import '/models/categorie/categorie_repository.dart';
+import '/models/global_state/global_state_repository.dart';
+import '/models/primary_account/primary_account_repository.dart';
 import '/models/screen_arguments/bottom_nav_bar_screen_arguments.dart';
-
 import '/utils/consts/route_consts.dart';
 
 class IntroductionScreens extends StatefulWidget {
@@ -18,10 +17,12 @@ class IntroductionScreens extends StatefulWidget {
 }
 
 class _IntroductionScreensState extends State<IntroductionScreens> {
-  bool _startValuesCreated = false;
+  bool _isProdHiveValuesInitialized = false;
 
-  void _createStartCategoriesAndAccounts() {
-    if (_startValuesCreated == false) {
+  // Produktiv Modus Start Werte setzen
+  void _initializeProdHiveValues() {
+    if (_isProdHiveValuesInitialized == false) {
+      setHiveMode(false);
       GlobalStateRepository globalStateRepository = GlobalStateRepository();
       globalStateRepository.create();
       AccountRepository accountRepository = AccountRepository();
@@ -30,7 +31,7 @@ class _IntroductionScreensState extends State<IntroductionScreens> {
       categorieRepository.createStartCategories();
       PrimaryAccountRepository primaryAccountRepository = PrimaryAccountRepository();
       primaryAccountRepository.createStartPrimaryAccounts();
-      _startValuesCreated = true;
+      _isProdHiveValuesInitialized = true;
     }
   }
 
@@ -119,10 +120,10 @@ class _IntroductionScreensState extends State<IntroductionScreens> {
       doneStyle: const ButtonStyle(
         foregroundColor: MaterialStatePropertyAll<Color>(Colors.black87),
       ),
-      onChange: (_) {
+      onChange: (_) async {
         // Muss in onChange aufgerufen werden.
         // Wenn dies erst bei onDone aufgerufen wird werden die Startkonten beim ersten Start der App nicht richtig angezeigt.
-        _createStartCategoriesAndAccounts();
+        _initializeProdHiveValues();
       },
       onDone: () {
         Navigator.popAndPushNamed(context, bottomNavBarRoute, arguments: BottomNavBarScreenArguments(0));

@@ -1,4 +1,4 @@
-bool demoMode = false;
+import '../../main.dart';
 
 // Namen der Hive Boxen
 var bookingsBox = demoMode ? 'DEMO_bookings' : 'bookings';

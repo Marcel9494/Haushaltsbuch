@@ -5,31 +5,28 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 
 import '/blocs/booking_bloc/booking_bloc.dart';
-import '/blocs/input_field_blocs/account_input_field_bloc/to_account_input_field_cubit.dart';
-import '/blocs/input_field_blocs/date_input_field_bloc/date_input_field_cubit.dart';
-import '/blocs/input_field_blocs/text_input_field_bloc/text_input_field_cubit.dart';
-import '/blocs/input_field_blocs/money_input_field_bloc/money_input_field_cubit.dart';
-import '/blocs/input_field_blocs/account_input_field_bloc/from_account_input_field_cubit.dart';
-import '/blocs/input_field_blocs/categorie_input_field_bloc/categorie_input_field_cubit.dart';
-import '/blocs/input_field_blocs/subcategorie_input_field_bloc/subcategorie_input_field_cubit.dart';
 import '/blocs/button_blocs/transaction_stats_toggle_buttons_bloc/transaction_stats_toggle_buttons_cubit.dart';
-
-import '/components/input_fields/subcategorie_input_field.dart';
-import '/components/buttons/transaction_toggle_buttons.dart';
-import '/components/input_fields/text_input_field.dart';
-import '/components/input_fields/date_input_field.dart';
-import '/components/input_fields/money_input_field.dart';
-import '/components/input_fields/categorie_input_field.dart';
-import '/components/input_fields/to_account_input_field.dart';
-import '/components/input_fields/from_account_input_field.dart';
+import '/blocs/input_field_blocs/account_input_field_bloc/from_account_input_field_cubit.dart';
+import '/blocs/input_field_blocs/account_input_field_bloc/to_account_input_field_cubit.dart';
+import '/blocs/input_field_blocs/categorie_input_field_bloc/categorie_input_field_cubit.dart';
+import '/blocs/input_field_blocs/date_input_field_bloc/date_input_field_cubit.dart';
+import '/blocs/input_field_blocs/money_input_field_bloc/money_input_field_cubit.dart';
+import '/blocs/input_field_blocs/subcategorie_input_field_bloc/subcategorie_input_field_cubit.dart';
+import '/blocs/input_field_blocs/text_input_field_bloc/text_input_field_cubit.dart';
 import '/components/buttons/save_button.dart';
+import '/components/buttons/transaction_toggle_buttons.dart';
 import '/components/deco/loading_indicator.dart';
-
+import '/components/input_fields/categorie_input_field.dart';
+import '/components/input_fields/date_input_field.dart';
+import '/components/input_fields/from_account_input_field.dart';
+import '/components/input_fields/money_input_field.dart';
+import '/components/input_fields/subcategorie_input_field.dart';
+import '/components/input_fields/text_input_field.dart';
+import '/components/input_fields/to_account_input_field.dart';
 import '/models/enums/categorie_types.dart';
 import '/models/enums/serie_edit_modes.dart';
 import '/models/enums/transaction_types.dart';
 import '/models/screen_arguments/bottom_nav_bar_screen_arguments.dart';
-
 import '/utils/consts/route_consts.dart';
 
 class CreateOrEditBookingScreen extends StatefulWidget {
@@ -52,8 +49,6 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
   late final ToAccountInputFieldCubit toAccountInputFieldCubit;
   late final SubcategorieInputFieldCubit subcategorieInputFieldCubit;
   final RoundedLoadingButtonController _saveButtonController = RoundedLoadingButtonController();
-
-  UniqueKey titleFieldUniqueKey = UniqueKey();
 
   FocusNode dateFocusNode = FocusNode();
   FocusNode titleFocusNode = FocusNode();
@@ -99,7 +94,8 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
                               context: context,
                               builder: (context) {
                                 return CupertinoAlertDialog(
-                                  title: Text(bookingState.serieEditModeType == SerieEditModeType.none || bookingState.serieEditModeType == SerieEditModeType.single
+                                  title: Text(bookingState.serieEditModeType == SerieEditModeType.none ||
+                                          bookingState.serieEditModeType == SerieEditModeType.single
                                       ? 'Buchung löschen?'
                                       : 'Buchungen löschen?'),
                                   actions: <Widget>[
@@ -122,10 +118,12 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
                                         Navigator.pop(context),
                                         Navigator.popAndPushNamed(context, bottomNavBarRoute, arguments: BottomNavBarScreenArguments(0)),
                                         Flushbar(
-                                          title: bookingState.serieEditModeType == SerieEditModeType.none || bookingState.serieEditModeType == SerieEditModeType.single
+                                          title: bookingState.serieEditModeType == SerieEditModeType.none ||
+                                                  bookingState.serieEditModeType == SerieEditModeType.single
                                               ? 'Buchung wurde gelöscht'
                                               : 'Buchungen wurden gelöscht',
-                                          message: bookingState.serieEditModeType == SerieEditModeType.none || bookingState.serieEditModeType == SerieEditModeType.single
+                                          message: bookingState.serieEditModeType == SerieEditModeType.none ||
+                                                  bookingState.serieEditModeType == SerieEditModeType.single
                                               ? 'Buchung wurde erfolgreich gelöscht.'
                                               : 'Buchungen wurden erfolgreich gelöscht',
                                           icon: const Icon(
@@ -167,12 +165,18 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
                           TransactionToggleButtons(cubit: transactionStatsToggleButtonsCubit),
                           BlocBuilder<DateInputFieldCubit, DateInputFieldModel>(
                             builder: (context, state) {
-                              return DateInputField(cubit: dateInputFieldCubit, focusNode: dateFocusNode, enabled: bookingState.serieEditModeType == SerieEditModeType.onlyFuture || bookingState.serieEditModeType == SerieEditModeType.all ? false : true);
+                              return DateInputField(
+                                  cubit: dateInputFieldCubit,
+                                  focusNode: dateFocusNode,
+                                  enabled: bookingState.serieEditModeType == SerieEditModeType.onlyFuture ||
+                                          bookingState.serieEditModeType == SerieEditModeType.all
+                                      ? false
+                                      : true);
                             },
                           ),
                           BlocBuilder<TextInputFieldCubit, TextInputFieldModel>(
                             builder: (context, state) {
-                              return TextInputField(fieldKey: titleFieldUniqueKey, focusNode: titleFocusNode, textCubit: titleInputFieldCubit, hintText: 'Titel', maxLength: 100);
+                              return TextInputField(focusNode: titleFocusNode, textCubit: titleInputFieldCubit, hintText: 'Titel', maxLength: 100);
                             },
                           ),
                           BlocBuilder<MoneyInputFieldCubit, MoneyInputFieldModel>(
@@ -182,7 +186,8 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
                                 focusNode: amountFocusNode,
                                 hintText: 'Betrag',
                                 bottomSheetTitle: 'Betrag eingeben:',
-                                transactionType: TransactionTypeExtension.getTransactionType(transactionStatsToggleButtonsCubit.state.transactionName),
+                                transactionType:
+                                    TransactionTypeExtension.getTransactionType(transactionStatsToggleButtonsCubit.state.transactionName),
                               );
                             },
                           ),
@@ -193,7 +198,8 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
                                   return FromAccountInputField(
                                       cubit: fromAccountInputFieldCubit,
                                       focusNode: fromAccountFocusNode,
-                                      hintText: transactionStatsToggleButtonsCubit.state.selectedTransaction[0] == true ? 'Konto' : 'Abbuchungskonto');
+                                      hintText:
+                                          transactionStatsToggleButtonsCubit.state.selectedTransaction[0] == true ? 'Konto' : 'Abbuchungskonto');
                                 },
                               ),
                               BlocBuilder<ToAccountInputFieldCubit, ToAccountInputFieldModel>(
@@ -215,7 +221,8 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
                                     return CategorieInputField(
                                       cubit: categorieInputFieldCubit,
                                       focusNode: categorieFocusNode,
-                                      categorieType: CategorieTypeExtension.getCategorieType(transactionStatsToggleButtonsCubit.state.transactionName),
+                                      categorieType:
+                                          CategorieTypeExtension.getCategorieType(transactionStatsToggleButtonsCubit.state.transactionName),
                                     );
                                   },
                                 ),

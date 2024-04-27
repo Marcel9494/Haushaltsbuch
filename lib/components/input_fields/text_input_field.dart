@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 class TextInputField extends StatelessWidget {
   final FocusNode focusNode;
-  final UniqueKey fieldKey;
   final dynamic textCubit;
   final String hintText;
   final int maxLength;
@@ -11,7 +10,6 @@ class TextInputField extends StatelessWidget {
   const TextInputField({
     Key? key,
     required this.focusNode,
-    required this.fieldKey,
     required this.textCubit,
     required this.hintText,
     this.maxLength = 60,
@@ -21,7 +19,7 @@ class TextInputField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
-      key: fieldKey,
+      key: ValueKey(key),
       focusNode: focusNode,
       initialValue: textCubit.state.text,
       textCapitalization: TextCapitalization.sentences,
@@ -36,6 +34,11 @@ class TextInputField extends StatelessWidget {
           Icons.title_rounded,
           color: Colors.grey,
         ),
+        // TODO
+        /*suffixIcon: IconButton(
+          onPressed: () => textCubit.resetValue(),
+          icon: const Icon(Icons.clear, color: Colors.grey),
+        ),*/
         focusedBorder: const UnderlineInputBorder(
           borderSide: BorderSide(color: Colors.cyanAccent, width: 1.5),
         ),

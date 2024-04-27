@@ -57,6 +57,8 @@ import 'screens/categorie_screens/create_or_edit_subcategorie_screen.dart';
 import 'screens/other_screens/settings_screen.dart';
 import 'screens/other_screens/splash_screen.dart';
 
+bool demoMode = false;
+
 void main() async {
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
     systemNavigationBarColor: Color(0xFF171717),
