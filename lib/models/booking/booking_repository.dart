@@ -233,7 +233,7 @@ class BookingRepository extends BookingInterface {
     var bookingBox = await Hive.openBox(bookingsBox);
     for (int i = 0; i < bookingBox.length; i++) {
       Booking booking = await bookingBox.getAt(i);
-      if (booking.serieId == templateBooking.serieId && booking.boxIndex == bookingBoxIndex) {
+      if (booking.serieId == templateBooking.serieId) {
         bookingBox.putAt(bookingBoxIndex, templateBooking);
         if (booking.booked) {
           accountRepository.undoneAccountBooking(oldBooking);
@@ -271,7 +271,7 @@ class BookingRepository extends BookingInterface {
     var bookingBox = await Hive.openBox(bookingsBox);
     for (int i = 0; i < bookingBox.length; i++) {
       Booking booking = await bookingBox.getAt(i);
-      if (booking.serieId == templateBooking.serieId && booking.boxIndex == bookingBoxIndex) {
+      if (booking.serieId == templateBooking.serieId) {
         bookingBox.putAt(bookingBoxIndex, templateBooking);
         if (booking.booked) {
           accountRepository.undoneAccountBooking(oldBooking);
@@ -286,6 +286,7 @@ class BookingRepository extends BookingInterface {
           booked = false;
         }
         Booking newBooking = Booking()
+          ..boxIndex = bookingBoxIndex
           ..transactionType = templateBooking.transactionType
           ..bookingRepeats = templateBooking.bookingRepeats
           ..title = templateBooking.title
@@ -362,6 +363,7 @@ class BookingRepository extends BookingInterface {
       // if für Performanceverbesserung => nur betroffene Buchungen werden geupdatet
       if (booking.fromAccount == oldAccountName || booking.toAccount == oldAccountName) {
         Booking updatedBookingWithNewAccountName = Booking()
+          ..boxIndex = i
           ..transactionType = booking.transactionType
           ..bookingRepeats = booking.bookingRepeats
           ..title = booking.title
@@ -587,6 +589,7 @@ class BookingRepository extends BookingInterface {
         DateTime dateToCheck = DateTime(DateTime.parse(booking.date).year, DateTime.parse(booking.date).month, DateTime.parse(booking.date).day);
         if (DateTime.parse(booking.date).isBefore(today) || dateToCheck == today) {
           Booking updatedBooking = Booking()
+            ..boxIndex = i
             ..transactionType = booking.transactionType
             ..bookingRepeats = booking.bookingRepeats
             ..title = booking.title

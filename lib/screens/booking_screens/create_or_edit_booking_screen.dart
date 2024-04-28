@@ -50,6 +50,8 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
   late final SubcategorieInputFieldCubit subcategorieInputFieldCubit;
   final RoundedLoadingButtonController _saveButtonController = RoundedLoadingButtonController();
 
+  UniqueKey textInputFieldUniqueKey = UniqueKey();
+
   FocusNode dateFocusNode = FocusNode();
   FocusNode titleFocusNode = FocusNode();
   FocusNode amountFocusNode = FocusNode();
@@ -176,7 +178,13 @@ class _CreateOrEditBookingScreenState extends State<CreateOrEditBookingScreen> {
                           ),
                           BlocBuilder<TextInputFieldCubit, TextInputFieldModel>(
                             builder: (context, state) {
-                              return TextInputField(focusNode: titleFocusNode, textCubit: titleInputFieldCubit, hintText: 'Titel', maxLength: 100);
+                              return TextInputField(
+                                uniqueKey: textInputFieldUniqueKey,
+                                focusNode: titleFocusNode,
+                                textCubit: titleInputFieldCubit,
+                                hintText: 'Titel',
+                                maxLength: 100,
+                              );
                             },
                           ),
                           BlocBuilder<MoneyInputFieldCubit, MoneyInputFieldModel>(

@@ -2,11 +2,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
-import '/models/enums/transaction_types.dart';
-import '/models/enums/amount_types.dart';
-
 import '/components/deco/bottom_sheet_line.dart';
-
+import '/models/enums/amount_types.dart';
+import '/models/enums/transaction_types.dart';
 import '/utils/number_formatters/number_formatter.dart';
 
 class MoneyInputField extends StatelessWidget {
@@ -37,7 +35,7 @@ class MoneyInputField extends StatelessWidget {
       builder: (BuildContext context) {
         return Material(
           child: SizedBox(
-            height: totalHeight,
+            height: 450.0, // TODO responsive implementieren
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [

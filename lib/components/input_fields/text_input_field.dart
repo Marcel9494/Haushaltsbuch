@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 class TextInputField extends StatelessWidget {
+  final UniqueKey uniqueKey;
   final FocusNode focusNode;
   final dynamic textCubit;
   final String hintText;
@@ -9,6 +10,7 @@ class TextInputField extends StatelessWidget {
 
   const TextInputField({
     Key? key,
+    required this.uniqueKey,
     required this.focusNode,
     required this.textCubit,
     required this.hintText,
@@ -19,7 +21,7 @@ class TextInputField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
-      key: ValueKey(key),
+      key: uniqueKey,
       focusNode: focusNode,
       initialValue: textCubit.state.text,
       textCapitalization: TextCapitalization.sentences,

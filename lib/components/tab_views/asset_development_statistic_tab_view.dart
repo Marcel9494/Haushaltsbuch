@@ -142,9 +142,9 @@ class _AssetDevelopmentStatisticTabViewState extends State<AssetDevelopmentStati
         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 0.0),
         child: ListView(
           children: <Widget>[
-            MonthPickerButtons(selectedDate: _selectedDate, selectedDateCallback: (selectedDate) => _changeStartMonth(selectedDate)),
-            const SizedBox(
-              height: 18.0,
+            Padding(
+              padding: const EdgeInsets.only(top: 4.0, bottom: 28.0),
+              child: MonthPickerButtons(selectedDate: _selectedDate, selectedDateCallback: (selectedDate) => _changeStartMonth(selectedDate)),
             ),
             AspectRatio(
               aspectRatio: 1.75,

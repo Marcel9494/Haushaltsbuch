@@ -30,6 +30,8 @@ class _CreateOrEditAccountScreenState extends State<CreateOrEditAccountScreen> {
   late final PreselectAccountInputFieldCubit preselectedAccountInputFieldCubit;
   final RoundedLoadingButtonController _saveButtonController = RoundedLoadingButtonController();
 
+  UniqueKey textInputFieldUniqueKey = UniqueKey();
+
   FocusNode accountTypeFocusNode = FocusNode();
   FocusNode accountNameFocusNode = FocusNode();
   FocusNode accountBalanceFocusNode = FocusNode();
@@ -76,17 +78,22 @@ class _CreateOrEditAccountScreenState extends State<CreateOrEditAccountScreen> {
                       ),
                       BlocBuilder<TextInputFieldCubit, TextInputFieldModel>(
                         builder: (context, state) {
-                          return TextInputField(focusNode: accountNameFocusNode, textCubit: accountNameInputFieldCubit, hintText: 'Name');
+                          return TextInputField(
+                            uniqueKey: textInputFieldUniqueKey,
+                            focusNode: accountNameFocusNode,
+                            textCubit: accountNameInputFieldCubit,
+                            hintText: 'Name',
+                          );
                         },
                       ),
                       BlocBuilder<MoneyInputFieldCubit, MoneyInputFieldModel>(
                         builder: (context, state) {
-                          if (accountState.accountBoxIndex == -1) accountBalanceInputFieldCubit.state.amount = '0,00 €';
                           return MoneyInputField(
-                              focusNode: accountBalanceFocusNode,
-                              cubit: accountBalanceInputFieldCubit,
-                              hintText: 'Kontostand',
-                              bottomSheetTitle: 'Kontostand eingeben:');
+                            focusNode: accountBalanceFocusNode,
+                            cubit: accountBalanceInputFieldCubit,
+                            hintText: 'Kontostand',
+                            bottomSheetTitle: 'Kontostand eingeben:',
+                          );
                         },
                       ),
                       /* TODO muss noch implementiert werden BlocBuilder<PreselectAccountInputFieldCubit, PreselectAccountInputFieldModel>(

@@ -34,6 +34,8 @@ class _CreateOrEditCategorieScreenState extends State<CreateOrEditCategorieScree
   String _categorieNameErrorText = '';
   String _currentCategorieType = '';
 
+  UniqueKey textInputFieldUniqueKey = UniqueKey();
+
   FocusNode categorieNameFocusNode = FocusNode();
 
   @override
@@ -135,7 +137,11 @@ class _CreateOrEditCategorieScreenState extends State<CreateOrEditCategorieScree
                       BlocBuilder<TextInputFieldCubit, TextInputFieldModel>(
                         builder: (context, state) {
                           return TextInputField(
-                              focusNode: categorieNameFocusNode, textCubit: categorieNameInputFieldCubit, hintText: 'Kategoriename', maxLength: 60);
+                              uniqueKey: textInputFieldUniqueKey,
+                              focusNode: categorieNameFocusNode,
+                              textCubit: categorieNameInputFieldCubit,
+                              hintText: 'Kategoriename',
+                              maxLength: 60);
                         },
                       ),
                       SaveButton(

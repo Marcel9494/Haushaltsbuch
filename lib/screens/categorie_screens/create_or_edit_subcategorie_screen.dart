@@ -22,6 +22,8 @@ class _CreateOrEditSubcategorieScreenState extends State<CreateOrEditSubcategori
   late final TextInputFieldCubit subcategorieNameInputFieldCubit;
   final RoundedLoadingButtonController _saveButtonController = RoundedLoadingButtonController();
 
+  UniqueKey textInputFieldUniqueKey = UniqueKey();
+
   FocusNode subcategorieNameFocusNode = FocusNode();
 
   @override
@@ -57,6 +59,7 @@ class _CreateOrEditSubcategorieScreenState extends State<CreateOrEditSubcategori
                       BlocBuilder<TextInputFieldCubit, TextInputFieldModel>(
                         builder: (context, state) {
                           return TextInputField(
+                            uniqueKey: textInputFieldUniqueKey,
                             focusNode: subcategorieNameFocusNode,
                             textCubit: subcategorieNameInputFieldCubit,
                             hintText: 'Unterkategoriename',

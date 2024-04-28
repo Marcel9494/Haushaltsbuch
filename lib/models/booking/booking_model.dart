@@ -35,17 +35,17 @@ class Booking extends HiveObject {
   // Anschließend: https://stackoverflow.com/questions/72548100/iam-having-a-problem-with-adding-fields-in-a-hive-model-in-flutter
   //Booking({required this.boxIndex, this.title, this.transactionType});
 
-  /*Booking copyWith({int? boxIndex, String? title, String? transactionType}) => Booking(
-        boxIndex: boxIndex ?? this.boxIndex,
-        title: title ?? this.title,
-        transactionType: transactionType ?? this.transactionType,
-      );*/
+  /*Booking({required this.boxIndex, required this.title, required this.transactionType});
 
-  /*Booking copyWith({
-    final int? boxIndex,
+  Booking copyWith({
+    int? boxIndex,
+    String? title,
+    String? transactionType,
   }) {
     return Booking(
       boxIndex: boxIndex ?? this.boxIndex,
+      title: title ?? this.title,
+      transactionType: transactionType ?? this.transactionType,
     );
   }*/
 }
